@@ -1,1 +1,1 @@
-# CPPExercises
+A set of C++ mini-apps performed as exercises to better understand (or re-visit) some CPP features.
