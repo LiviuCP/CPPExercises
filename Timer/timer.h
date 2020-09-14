@@ -18,19 +18,23 @@ using millisecond_t = std::chrono::duration<double, std::ratio<1, 1000> >;
 
 class ITimeoutHandler;
 
+/* single-shot timer */
 class Timer
 {
 public:
-    Timer(std::string m_Name = "");
+    Timer(std::string name = "");
     virtual ~Timer(); // in case the class is inherited for creating more complex timers
 
-    void start(size_t duration = 0);
-    void restart();
-    void stop();
+    virtual void start(size_t duration = 0);
+    virtual void restart();
+    virtual void stop();
+
     void reset(); // for use as "passive" timer, i.e. when the timer is not running
 
-    double getElapsedTime() const;
+    void setTimeoutInterval(size_t timeoutInterval);
     double getTimeoutInterval() const;
+
+    double getElapsedTime() const;
     std::string getName() const;
     bool isRunning() const;
 
@@ -39,12 +43,16 @@ public:
 
 protected:
     void timeout(); // in case inheriting is required for creating more complex timers
+    void resetCurrentTime(); // enables resetting current time while timer running
+
+    bool m_IsRunning;
 
 private:
+    void _doStart();
     void _sampleForTimeout();
+
     h_r_clock_t::time_point m_StartTime;
     millisecond_t m_TimeoutInterval;
-    bool m_IsRunning;
     std::string m_Name;
     std::vector<ITimeoutHandler*> m_TimeoutHandlers;
 };

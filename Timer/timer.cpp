@@ -5,11 +5,15 @@
 
 static constexpr double c_SamplingPeriod{0.5};
 
-Timer::Timer(std::string timerId)
-    : m_StartTime{h_r_clock_t::now()}
-    , m_TimeoutInterval{millisecond_t{0}}
-    , m_IsRunning{false}
-    , m_Name{timerId}
+ITimeoutHandler::~ITimeoutHandler()
+{
+}
+
+Timer::Timer(std::string name)
+    : m_IsRunning{false}
+    , m_StartTime{h_r_clock_t::now()}
+    , m_TimeoutInterval{millisecond_t{0.0}}
+    , m_Name{name}
 {
 }
 
@@ -22,20 +26,8 @@ void Timer::start(size_t timeoutInterval)
 {
     if (!m_IsRunning)
     {
-        m_StartTime = h_r_clock_t::now();
-
-        if (timeoutInterval == 0)
-        {
-            timeout();
-        }
-        else
-        {
-            m_TimeoutInterval = millisecond_t{timeoutInterval};
-            m_IsRunning = true;
-            // a detachable thread is preferred to std::async because of the blocking destructor of the latter one
-            std::thread samplingThread{&Timer::_sampleForTimeout, this};
-            samplingThread.detach();
-        }
+        m_TimeoutInterval = millisecond_t{static_cast<double>(timeoutInterval)};
+        _doStart();
     }
 }
 
@@ -44,19 +36,7 @@ void Timer::restart()
 {
     if (!m_IsRunning)
     {
-        m_StartTime = h_r_clock_t::now();
-
-        if (m_TimeoutInterval == millisecond_t{0})
-        {
-            timeout();
-        }
-        else
-        {
-            m_IsRunning = true;
-            // a detachable thread is preferred to std::async because of the blocking destructor of the latter one
-            std::thread samplingThread{&Timer::_sampleForTimeout, this};
-            samplingThread.detach();
-        }
+        _doStart();
     }
 }
 
@@ -74,14 +54,16 @@ void Timer::reset()
 {
     if (!m_IsRunning)
     {
-        m_StartTime = h_r_clock_t::now();
+        resetCurrentTime();
     }
 }
 
-double Timer::getElapsedTime() const
+void Timer::setTimeoutInterval(size_t timeoutInterval)
 {
-    const double c_Elapsed{std::chrono::duration_cast<millisecond_t>(h_r_clock_t::now() - m_StartTime).count()};
-    return c_Elapsed;
+    if (!m_IsRunning)
+    {
+        m_TimeoutInterval = millisecond_t{static_cast<double>(timeoutInterval)};
+    }
 }
 
 double Timer::getTimeoutInterval() const
@@ -90,29 +72,10 @@ double Timer::getTimeoutInterval() const
     return c_TimeoutInterval;
 }
 
-void Timer::timeout()
+double Timer::getElapsedTime() const
 {
-    m_IsRunning = false;
-    for (auto* handler : m_TimeoutHandlers)
-    {
-        handler->onTimeout(this);
-    }
-}
-
-void Timer::_sampleForTimeout()
-{
-    while(m_IsRunning)
-    {
-        if (getElapsedTime() < m_TimeoutInterval.count())
-        {
-            std::this_thread::sleep_for(millisecond_t{c_SamplingPeriod});
-        }
-        else
-        {
-            timeout();
-            break;
-        }
-    }
+    const double c_Elapsed{std::chrono::duration_cast<millisecond_t>(h_r_clock_t::now() - m_StartTime).count()};
+    return c_Elapsed;
 }
 
 std::string Timer::getName() const
@@ -141,7 +104,49 @@ void Timer::removeTimeoutHandler(ITimeoutHandler* handler)
     }
 }
 
-ITimeoutHandler::~ITimeoutHandler()
+void Timer::timeout()
 {
+    m_IsRunning = false;
+    for (auto* handler : m_TimeoutHandlers)
+    {
+        handler->onTimeout(this);
+    }
+}
 
+void Timer::resetCurrentTime()
+{
+    m_StartTime = h_r_clock_t::now();
+}
+
+void Timer::_doStart()
+{
+    m_StartTime = h_r_clock_t::now();
+
+    if (m_TimeoutInterval < millisecond_t{1.0})
+    {
+        timeout();
+    }
+    else
+    {
+        m_IsRunning = true;
+        // a detachable thread is preferred to std::async because of the blocking destructor of the latter one
+        std::thread samplingThread{&Timer::_sampleForTimeout, this};
+        samplingThread.detach();
+    }
+}
+
+void Timer::_sampleForTimeout()
+{
+    while(m_IsRunning)
+    {
+        if (getElapsedTime() < m_TimeoutInterval.count())
+        {
+            std::this_thread::sleep_for(millisecond_t{c_SamplingPeriod});
+        }
+        else
+        {
+            timeout();
+            break;
+        }
+    }
 }
