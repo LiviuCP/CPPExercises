@@ -12,11 +12,13 @@ int main()
     Server* webServer{Server::createServer(Server::ServerTypes::WEB)};
     Server* mailServer{Server::createServer(Server::ServerTypes::MAIL)};
     Server* ftpServer{Server::createServer(Server::ServerTypes::FTP)};
+    Server* firewall{Server::createServer(Server::ServerTypes::FIREWALL)};
 
     cout << endl << "Now let's see the object descriptions" << endl << endl;
     cout << webServer->getDescription() << endl;
     cout << mailServer->getDescription() << endl;
-    cout << ftpServer->getDescription() << endl << endl;
+    cout << ftpServer->getDescription() << endl;
+    cout << firewall->getDescription() << endl << endl;
 
     // user is responsible for deleting the factory created objects
     delete webServer;
@@ -25,6 +27,8 @@ int main()
     mailServer = nullptr;
     delete ftpServer;
     ftpServer = nullptr;
+    delete firewall;
+    firewall = nullptr;
 
     return 0;
 }

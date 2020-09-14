@@ -23,4 +23,10 @@ public:
     std::string getDescription() const;
 };
 
+class Firewall : public Server
+{
+public:
+    std::string getDescription() const;
+};
+
 #endif // SERVERTYPES_H

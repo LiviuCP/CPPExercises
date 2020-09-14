@@ -16,6 +16,9 @@ Server* Server::createServer(Server::ServerTypes serverType)
     case Server::ServerTypes::FTP:
         result = new FTPServer;
         break;
+    case Server::ServerTypes::FIREWALL:
+        result = new Firewall;
+        break;
     default:
         break;
     }

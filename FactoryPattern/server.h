@@ -11,6 +11,7 @@ public:
         WEB,
         MAIL,
         FTP,
+        FIREWALL,
         ServerTypesCount
     };
 
