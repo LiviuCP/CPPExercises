@@ -57,6 +57,21 @@ private:
     std::vector<ITimeoutHandler*> m_TimeoutHandlers;
 };
 
+/* repeating timer */
+class CyclicalTimer final : public Timer
+{
+public:
+    CyclicalTimer(std::string name = "");
+    ~CyclicalTimer() override;
+
+    void start(size_t duration = 0) override;
+    void restart() override;
+
+private:
+    void _doStart();
+    void _run();
+};
+
 class ITimeoutHandler
 {
 public:

@@ -28,6 +28,17 @@ private:
     const Timer* m_Timer2;
 };
 
+class CyclicalObserver : public ITimeoutHandler
+{
+public:
+    CyclicalObserver();
+    void onTimeout(const Timer* const timer);
+
+private:
+    CyclicalTimer m_CyclicalTimer;
+    int m_DisplayedValue;
+};
+
 int main()
 {
     SimpleObserver simpleObserver;
@@ -89,7 +100,14 @@ int main()
     timer3.restart();
     timer5.restart();
     while (timer1.isRunning() || timer3.isRunning() || timer5.isRunning());
-    cout << "* All remaining timers timed out. Goodbye!" << endl << endl;
+    cout << "* All timers timed out. No more jobs to assign to them" << endl;
+
+    this_thread::sleep_for(millisecond_t{500});
+    cout << endl << "* Finally we'll test a cyclical timer" << endl;
+    CyclicalObserver cyclicalObserver;
+    (void) cyclicalObserver;
+    this_thread::sleep_for(millisecond_t{5500});
+    cout << "* Goodbye!" << endl << endl;
 
     return 0;
 }
@@ -158,5 +176,22 @@ void ComplexObserver::onTimeout(const Timer * const timer)
     else
     {
         cout << "ComplexObserver, external timer " << timer->getName() << " expired" << endl;
+    }
+}
+
+CyclicalObserver::CyclicalObserver()
+    : m_CyclicalTimer{"CycleTimer"}
+    , m_DisplayedValue{0}
+{
+    m_CyclicalTimer.addTimeoutHandler(this);
+    m_CyclicalTimer.start(1000);
+}
+
+void CyclicalObserver::onTimeout(const Timer * const timer)
+{
+    if (timer == &m_CyclicalTimer)
+    {
+        ++m_DisplayedValue;
+        cout << "Timer " << m_CyclicalTimer.getName() << " expired! Displayed value is: " << m_DisplayedValue << endl;
     }
 }
