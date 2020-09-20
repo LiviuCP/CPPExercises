@@ -14,11 +14,15 @@ public:
 
     void retrieveDataFromServer(size_t requestedNrOfElements);
 
+    void setIpAddress(const std::string& ipAddress);
+    std::string getIpAddress() const;
+
     std::vector<int> getData() const;
     std::string getName() const;
 
 private:
     void _init();
+    void _setFileDescriptor();
     void _establishConnectionToServer();
 
     size_t m_BufferSize; // should match the server buffer size
@@ -28,6 +32,6 @@ private:
     char* m_Buffer;
     int m_FileDescriptor;
     std::vector<int> m_Data;
-};
+    };
 
 #endif // CLIENT_H

@@ -131,9 +131,24 @@ void Client::retrieveDataFromServer(size_t requestedNrOfElements)
     }
 }
 
+void Client::setIpAddress(const std::string& ipAddress)
+{
+    m_IpAddress = ipAddress;
+}
+
+std::string Client::getIpAddress() const
+{
+    return m_IpAddress;
+}
+
 std::vector<int> Client::getData() const
 {
     return m_Data;
+}
+
+std::string Client::getName() const
+{
+    return m_Name;
 }
 
 void Client::_init()
@@ -145,19 +160,30 @@ void Client::_init()
 
     if (m_FileDescriptor < 0)
     {
-        m_FileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+        _setFileDescriptor();
+    }
+}
 
-        if (m_FileDescriptor < 0)
-        {
-            fprintf(stderr, "Client %s: Error when creating socket file descriptor\n", m_Name.c_str());
-            perror("");
-            exit(-1);
-        }
+void Client::_setFileDescriptor()
+{
+    m_FileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (m_FileDescriptor < 0)
+    {
+        fprintf(stderr, "Client %s: Error when creating socket file descriptor\n", m_Name.c_str());
+        perror("");
+        exit(-1);
     }
 }
 
 void Client::_establishConnectionToServer()
 {
+    sleep(1);
+    if (m_FileDescriptor < 0)
+    {
+        _setFileDescriptor();
+    }
+
     sockaddr_in socketAddress;
     memset(&socketAddress, 0, sizeof(socketAddress));
     socketAddress.sin_family = AF_INET;
@@ -174,9 +200,4 @@ void Client::_establishConnectionToServer()
         fprintf(stderr, "CLIENT %s: Connection error\n", m_Name.c_str());
         exit(-1);
     }
-}
-
-std::string Client::getName() const
-{
-    return m_Name;
 }
