@@ -14,6 +14,8 @@ public:
 
     [[noreturn]] void listenForConnections();
 
+    std::string getName() const;
+
 private:
     void _init();
     void _setServerSocketConnectionParams();

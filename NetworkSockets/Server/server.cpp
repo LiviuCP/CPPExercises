@@ -151,3 +151,8 @@ void Server::_setServerSocketConnectionParams()
         exit(-1);
     }
 }
+
+std::string Server::getName() const
+{
+    return m_Name;
+}
