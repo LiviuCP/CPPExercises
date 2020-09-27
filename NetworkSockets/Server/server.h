@@ -19,6 +19,7 @@ public:
 private:
     void _init();
     void _setServerSocketConnectionParams();
+    void _processClientRequest(int clientFileDescriptor);
 
     size_t m_BufferSize; // should match the client buffer size
     int m_PortNumber; // port should match the client one and should have four numeric digits to avoid binding errors

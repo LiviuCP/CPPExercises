@@ -69,42 +69,15 @@ void Server::listenForConnections()
             continue;
         }
 
-        size_t* const reqElemCountAddress{reinterpret_cast<size_t*>(m_Buffer)};
-
-        for (size_t requestNr = 0; requestNr < c_NrOfClientRequests; ++requestNr)
-        {
-            memset(m_Buffer, '\0', m_BufferSize);
-
-            printf("SERVER %s: Client request received. Reading client request data...\n", m_Name.c_str());
-            ssize_t count{read(clientFileDescriptor, m_Buffer, m_BufferSize)};
-
-            if (count >= static_cast<ssize_t>(sizeof(size_t)))
-            {
-                if (*reqElemCountAddress > 0)
-                {
-                    const size_t nrOfElementsToSend{std::min(*reqElemCountAddress, m_Data.size())};
-                    printf("SERVER %s: Client will get first %d elements from list\n", m_Name.c_str(), static_cast<int>(nrOfElementsToSend));
-
-                    for (size_t index = 0; index < nrOfElementsToSend; ++index)
-                    {
-                        printf("SERVER %s: Writing element %d into buffer\n", m_Name.c_str(), static_cast<int>(m_Data[index]));
-                        *((reinterpret_cast<int*>(m_Buffer)) + index) = m_Data[index];
-                    }
-                }
-                else
-                {
-                    printf("SERVER %s: Client requested to know how many elements are available. Providing number to client: %d\n", m_Name.c_str(), static_cast<int>(m_Data.size()));
-                    *reqElemCountAddress = m_Data.size();
-                }
-
-                printf("SERVER %s: Sending requested data to client...\n", m_Name.c_str());
-                write(clientFileDescriptor, m_Buffer, m_BufferSize);
-                printf("SERVER %s: Done\n\n", m_Name.c_str());
-            }
-        }
+        _processClientRequest(clientFileDescriptor);
 
         close(clientFileDescriptor);
     }
+}
+
+std::string Server::getName() const
+{
+    return m_Name;
 }
 
 void Server::_init()
@@ -152,7 +125,39 @@ void Server::_setServerSocketConnectionParams()
     }
 }
 
-std::string Server::getName() const
+void Server::_processClientRequest(int clientFileDescriptor)
 {
-    return m_Name;
+    size_t* const reqElemCountAddress{reinterpret_cast<size_t*>(m_Buffer)};
+
+    for (size_t requestNr = 0; requestNr < c_NrOfClientRequests; ++requestNr)
+    {
+        memset(m_Buffer, '\0', m_BufferSize);
+
+        printf("SERVER %s: Client request received. Reading client request data...\n", m_Name.c_str());
+        ssize_t count{read(clientFileDescriptor, m_Buffer, m_BufferSize)};
+
+        if (count >= static_cast<ssize_t>(sizeof(size_t)))
+        {
+            if (*reqElemCountAddress > 0)
+            {
+                const size_t nrOfElementsToSend{std::min(*reqElemCountAddress, m_Data.size())};
+                printf("SERVER %s: Client will get first %d elements from list\n", m_Name.c_str(), static_cast<int>(nrOfElementsToSend));
+
+                for (size_t index = 0; index < nrOfElementsToSend; ++index)
+                {
+                    printf("SERVER %s: Writing element %d into buffer\n", m_Name.c_str(), static_cast<int>(m_Data[index]));
+                    *((reinterpret_cast<int*>(m_Buffer)) + index) = m_Data[index];
+                }
+            }
+            else
+            {
+                printf("SERVER %s: Client requested to know how many elements are available. Providing number to client: %d\n", m_Name.c_str(), static_cast<int>(m_Data.size()));
+                *reqElemCountAddress = m_Data.size();
+            }
+
+            printf("SERVER %s: Sending requested data to client...\n", m_Name.c_str());
+            write(clientFileDescriptor, m_Buffer, m_BufferSize);
+            printf("SERVER %s: Done\n\n", m_Name.c_str());
+        }
+    }
 }
