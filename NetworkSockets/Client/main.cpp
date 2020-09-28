@@ -1,5 +1,6 @@
 #include <iostream>
-#include <unistd.h>
+#include <thread>
+#include <chrono>
 
 #include "client.h"
 
@@ -15,15 +16,15 @@ int main(int argc, char* argv[])
 
     Client client{1024, 9010, c_IpAddress, "C1"};
     cout << "Client will connect to server with IP " << client.getIpAddress() << " and attempt to retrieve some data" << endl;
-    sleep(1);
+    this_thread::sleep_for(chrono::seconds{1});
     client.retrieveDataFromServer(4);
 
     displayRetrievedData(client);
 
-    sleep(1);
+    this_thread::sleep_for(chrono::seconds{1});
     client.setIpAddress("127.0.0.1");
     cout << "Now the client will (re)connect to the internal loopback address (" << client.getIpAddress() << ") and attempt to retrieve more data" << endl;
-    sleep(1);
+    this_thread::sleep_for(chrono::seconds{1});
     client.retrieveDataFromServer(10);
 
     displayRetrievedData(client);
@@ -33,7 +34,7 @@ int main(int argc, char* argv[])
 
 void displayRetrievedData(const Client& client)
 {
-    sleep(1);
+    this_thread::sleep_for(chrono::seconds{1});
     cout << endl << "The data retrieved by client " << client.getName() << " from server is: ";
     for (auto element : client.getData())
     {

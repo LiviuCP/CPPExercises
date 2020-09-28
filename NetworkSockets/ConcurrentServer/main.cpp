@@ -1,12 +1,12 @@
 #include <iostream>
 
-#include "server.h"
+#include "../Server/server.h"
 
 using namespace std;
 
 int main()
 {
-    Server server{1024, 9010, false, vector<int>{2, 5, -2, 6, 7, -1, 9, 10, -4, 3, 2, 14}, "S1"};
+    Server server{1024, 9010, true, vector<int>{2, 5, -2, 6, 7, -1, 9, 10, -4, 3, 2, 14}, "S1"};
     cout << "Server " << server.getName() << " setup" << endl << endl;
     server.listenForConnections();
 

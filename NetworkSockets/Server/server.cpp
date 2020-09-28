@@ -18,6 +18,7 @@ static const std::vector<int> c_DefaultServerData{1, 5, 2, -1, 4, -10, 6, 8, 9};
 Server::Server()
     : m_BufferSize{c_DefaultBufferSize + 1}
     , m_PortNumber{c_DefaultPortNumber}
+    , m_Concurrent{false}
     , m_Data{c_DefaultServerData}
     , m_Name{}
     , m_Buffer{nullptr}
@@ -26,9 +27,10 @@ Server::Server()
     _init();
 }
 
-Server::Server(size_t bufferSize, int portNumber, const std::vector<int>& serverData, const std::string& name)
+Server::Server(size_t bufferSize, int portNumber, bool concurrent, const std::vector<int>& serverData, const std::string& name)
     : m_BufferSize{bufferSize + 1}
     , m_PortNumber{portNumber}
+    , m_Concurrent{concurrent}
     , m_Data{serverData}
     , m_Name{name}
     , m_Buffer{nullptr}
@@ -69,9 +71,26 @@ void Server::listenForConnections()
             continue;
         }
 
-        _processClientRequest(clientFileDescriptor);
+        if (m_Concurrent)
+        {
+            int processId{fork()};
 
-        close(clientFileDescriptor);
+            if (processId == 0)
+            {
+                close(m_ServerFileDescriptor);
+                _processClientRequest(clientFileDescriptor);
+                exit(0);
+            }
+            else
+            {
+                close(clientFileDescriptor);
+            }
+        }
+        else
+        {
+            _processClientRequest(clientFileDescriptor);
+            close(clientFileDescriptor);
+        }
     }
 }
 
@@ -156,6 +175,7 @@ void Server::_processClientRequest(int clientFileDescriptor)
             }
 
             printf("SERVER %s: Sending requested data to client...\n", m_Name.c_str());
+            sleep(2); // for simulating a longer operation
             write(clientFileDescriptor, m_Buffer, m_BufferSize);
             printf("SERVER %s: Done\n\n", m_Name.c_str());
         }
