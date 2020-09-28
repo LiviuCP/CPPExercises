@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <functional>
+#include <mutex>
 
 class Client
 {
@@ -24,6 +26,7 @@ private:
     void _init();
     void _setFileDescriptor();
     void _establishConnectionToServer();
+    void _logMessage(const std::function<void()>& printMessage);
 
     size_t m_BufferSize; // should match the server buffer size
     int m_PortNumber; // port should match the server one and should have four numeric digits to avoid binding errors
@@ -32,6 +35,7 @@ private:
     char* m_Buffer;
     int m_FileDescriptor;
     std::vector<int> m_Data;
-    };
+    std::mutex m_LogMutex; // for multi-threaded clients (ConcurrentClients), otherwise log messages get scrambled
+};
 
 #endif // CLIENT_H
