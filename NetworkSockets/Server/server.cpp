@@ -1,13 +1,15 @@
-#include "server.h"
 #include <cassert>
 #include <cstring>
-#include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+
+#include <iostream>
+
+#include "server.h"
 
 static constexpr size_t c_DefaultBufferSize{512};
 static constexpr int c_DefaultPortNumber{5000};
@@ -56,7 +58,7 @@ Server::~Server()
 
 void Server::listenForConnections()
 {
-    printf("SERVER %s: listening on port %d for clients...\n\n", m_Name.c_str(), m_PortNumber);
+    std::clog << "SERVER " << m_Name << ": listening on port " << m_PortNumber << " for clients..." << std::endl << std::endl;
 
     for (;;)
     {
@@ -66,7 +68,7 @@ void Server::listenForConnections()
         int clientFileDescriptor{accept(m_ServerFileDescriptor, reinterpret_cast<sockaddr*>(&clientAddress), &len)};
         if (clientFileDescriptor < 0)
         {
-            fprintf(stderr, "SERVER %s: Connection accept error\n", m_Name.c_str());
+            std::cerr << "SERVER " << m_Name << ": Connection accept error" << std::endl;
             perror("");
             continue;
         }
@@ -112,7 +114,7 @@ void Server::_init()
 
         if (m_ServerFileDescriptor < 0)
         {
-            fprintf(stderr, "SERVER %s:Error when creating socket file descriptor\n", m_Name.c_str());
+            std::cerr << "SERVER " << m_Name << ": Error when creating socket file descriptor" << std::endl;
             perror("");
             exit(-1);
         }
@@ -131,14 +133,14 @@ void Server::_setServerSocketConnectionParams()
 
     if (bind(m_ServerFileDescriptor, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) < 0)
     {
-        fprintf(stderr, "SERVER %s: Error when binding socket address\n", m_Name.c_str());
+        std::cerr << "SERVER " << m_Name << ": Error when binding socket address" << std::endl;
         perror("");
         exit(-1);
     }
 
     if (listen(m_ServerFileDescriptor, c_MaxConnections) < 0)
     {
-        fprintf(stderr, "SERVER %s: Connection listening error\n", m_Name.c_str());
+        std::cerr << "SERVER " << m_Name << ": Connection listening error" << std::endl;
         perror("");
         exit(-1);
     }
@@ -152,7 +154,7 @@ void Server::_processClientRequest(int clientFileDescriptor)
     {
         memset(m_Buffer, '\0', m_BufferSize);
 
-        printf("SERVER %s: Client request received. Reading client request data...\n", m_Name.c_str());
+        std::clog << "SERVER " << m_Name << ": Client request received. Reading client request data..." << std::endl;
         ssize_t count{read(clientFileDescriptor, m_Buffer, m_BufferSize)};
 
         if (count >= static_cast<ssize_t>(sizeof(size_t)))
@@ -160,24 +162,24 @@ void Server::_processClientRequest(int clientFileDescriptor)
             if (*reqElemCountAddress > 0)
             {
                 const size_t nrOfElementsToSend{std::min(*reqElemCountAddress, m_Data.size())};
-                printf("SERVER %s: Client will get first %d elements from list\n", m_Name.c_str(), static_cast<int>(nrOfElementsToSend));
+                std::clog << "SERVER " << m_Name << ": Client will get first " << static_cast<int>(nrOfElementsToSend) << " elements from list" << std::endl;
 
                 for (size_t index = 0; index < nrOfElementsToSend; ++index)
                 {
-                    printf("SERVER %s: Writing element %d into buffer\n", m_Name.c_str(), static_cast<int>(m_Data[index]));
+                    std::clog << "SERVER " << m_Name << ": Writing element " << static_cast<int>(m_Data[index]) << " into buffer" << std::endl;
                     *((reinterpret_cast<int*>(m_Buffer)) + index) = m_Data[index];
                 }
             }
             else
             {
-                printf("SERVER %s: Client requested to know how many elements are available. Providing number to client: %d\n", m_Name.c_str(), static_cast<int>(m_Data.size()));
+                std::clog << "SERVER " << m_Name << ": Client requested to know how many elements are available. Providing number to client: " << static_cast<int>(m_Data.size()) << std::endl;
                 *reqElemCountAddress = m_Data.size();
             }
 
-            printf("SERVER %s: Sending requested data to client...\n", m_Name.c_str());
+            std::clog << "SERVER " << m_Name << ": Sending requested data to client..." << std::endl;
             sleep(2); // for simulating a longer operation
             write(clientFileDescriptor, m_Buffer, m_BufferSize);
-            printf("SERVER %s: Done\n\n", m_Name.c_str());
+            std::clog << "SERVER " << m_Name << ": Done" << std::endl << std::endl;
         }
     }
 }
