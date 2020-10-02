@@ -9,9 +9,9 @@ class QueueReceiver
 {
 public:
     QueueReceiver(std::string queueFile);
-    ~QueueReceiver();
 
     void readFromQueue(void* data, DataTypes dataType);
+    void removeQueue();
 
 private:
     void _retrieveQueueId();

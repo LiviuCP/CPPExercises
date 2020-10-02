@@ -32,15 +32,6 @@ QueueReceiver::QueueReceiver(std::string queueFile)
     _retrieveQueueId();
 }
 
-QueueReceiver::~QueueReceiver()
-{
-    if (msgctl(m_QueueId, IPC_RMID, nullptr) < 0)
-    {
-        perror("There was an issue with removing the queue\n");
-        exit(-1);
-    }
-}
-
 void QueueReceiver::readFromQueue(void* data, DataTypes dataType)
 {
     if (data)
@@ -59,6 +50,15 @@ void QueueReceiver::readFromQueue(void* data, DataTypes dataType)
         default:
             assert(false && "Unknown data type");
         }
+    }
+}
+
+void QueueReceiver::removeQueue()
+{
+    if (msgctl(m_QueueId, IPC_RMID, nullptr) < 0)
+    {
+        perror("There was an issue with removing the queue\n");
+        exit(-1);
     }
 }
 

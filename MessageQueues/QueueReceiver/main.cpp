@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#include <unistd.h>
+
 #include "queuereceiver.h"
 #include "../QueueUtils/queuedataobjects.h"
 
@@ -8,34 +10,55 @@ using namespace std;
 
 const string c_QueueFilename{"/tmp/messagequeue"};
 
+/* run the sender app first and then the receiver (separate terminals) */
+
 int main()
 {
     int intBuffer;
     double doubleBuffer;
     MeteoData meteoDataBuffer;
 
-    QueueReceiver queueReceiver{c_QueueFilename};
     cout << "Let's read from data queue" << endl << endl;
 
-    queueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
-    cout << "First " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
+    const int processID{fork()};
 
-    queueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
-    cout << "First " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
+    if (processID == 0)
+    {
+        QueueReceiver childQueueReceiver{c_QueueFilename};
 
-    queueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
-    cout << "First " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
+        sleep(1);
+        childQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
+        cout << "Child process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
 
-    queueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
-    cout << "Second " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
+        sleep(1);
+        childQueueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
+        cout << "Child process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
 
-    queueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
-    cout << "Second " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
+        sleep(1);
+        childQueueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
+        cout << "Child process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
+    }
+    else
+    {
+        QueueReceiver parentQueueReceiver{c_QueueFilename};
 
-    queueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
-    cout << "Second " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
+        sleep(1);
+        parentQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
+        cout << "Parent process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
 
-    cout << endl;
+        sleep(1);
+        parentQueueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
+        cout << "Parent process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
+
+        sleep(1);
+        parentQueueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
+        cout << "Parent process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
+
+        sleep(1);
+
+        parentQueueReceiver.removeQueue();
+        cout << endl << "Parent process removed queue" << endl << endl;
+    }
 
     return 0;
 }
