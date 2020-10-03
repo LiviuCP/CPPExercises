@@ -8,7 +8,7 @@
 class QueueReceiver
 {
 public:
-    QueueReceiver(std::string queueFile);
+    QueueReceiver(std::string queueFilename, bool waitForMessage = false);
 
     void readFromQueue(void* data, DataTypes dataType);
     void removeQueue();
@@ -18,6 +18,7 @@ private:
 
     std::string m_QueueFilename;
     int m_QueueId;
+    int m_Flags;
 };
 
 #endif // QUEUERECEIVER_H
