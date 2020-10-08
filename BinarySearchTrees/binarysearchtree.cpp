@@ -237,19 +237,19 @@ std::string SimpleBST::Node::getValue() const
 
 bool SimpleBST::Node::isLeftChild() const
 {
-    return (m_Parent && (m_Parent->m_LeftChild == this));
+    return (m_Parent != nullptr && m_Parent->m_LeftChild == this);
 }
 
 bool SimpleBST::Node::isRightChild() const
 {
-    return (m_Parent && (m_Parent->m_RightChild == this));
+    return (m_Parent != nullptr && m_Parent->m_RightChild == this);
 }
 
 void SimpleBST::Node::setLeftChild(Node* left)
 {
     m_LeftChild = left;
 
-    if (m_LeftChild)
+    if (m_LeftChild != nullptr)
     {
         m_LeftChild->m_Parent  = this;
     }
@@ -264,7 +264,7 @@ void SimpleBST::Node::setRightChild(SimpleBST::Node* right)
 {
     m_RightChild = right;
 
-    if (m_RightChild)
+    if (m_RightChild != nullptr)
     {
         m_RightChild->m_Parent = this;
     }
@@ -305,7 +305,7 @@ SimpleBST::Node* SimpleBST::Node::getGrandparent() const
 {
     Node* result{nullptr};
 
-    if (m_Parent)
+    if (m_Parent != nullptr)
     {
         result = m_Parent->getParent();
     }
