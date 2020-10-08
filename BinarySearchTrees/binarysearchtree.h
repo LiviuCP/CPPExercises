@@ -7,7 +7,9 @@
 class SimpleBST
 {
 public:
-    SimpleBST(std::string defaultNullValue = "");
+    SimpleBST(const std::string& defaultNullValue = "");
+    SimpleBST(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue = "");
+
     ~SimpleBST();
 
     bool addOrUpdateNode(int key, const std::string& value); // true if node added (number of nodes increased)
@@ -50,6 +52,7 @@ protected:
         std::string m_Value;
     };
 
+    void _doAddOrUpdateNode(int key, const std::string& value, bool& newNodeAdded);
     Node* _findNode(int key) const;
     void _convertTreeToArray(std::vector<Node*>& nodes) const;
 

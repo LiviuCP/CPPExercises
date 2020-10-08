@@ -2,10 +2,27 @@
 
 #include "binarysearchtree.h"
 
-SimpleBST::SimpleBST(std::string defaultNullValue)
+SimpleBST::SimpleBST(const std::string& defaultNullValue)
     : m_Root{nullptr}
     , m_DefaultNullValue{defaultNullValue}
 {
+}
+
+SimpleBST::SimpleBST(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
+    : SimpleBST{defaultNullValue}
+{
+    if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
+    {
+        for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
+        {
+            bool newNodeAdded{false};
+            _doAddOrUpdateNode(*it, defaultValue, newNodeAdded);
+            if (!newNodeAdded)
+            {
+                std::clog << "Warning: duplicate key found: " << *it << std::endl;
+            }
+        }
+    }
 }
 
 SimpleBST::~SimpleBST()
@@ -28,54 +45,7 @@ bool SimpleBST::addOrUpdateNode(int key, const std::string& value)
 
     if (value != m_DefaultNullValue)
     {
-        if (m_Root == nullptr)
-        {
-            m_Root = new Node{key, value};
-        }
-        else
-        {
-            Node* currentNode{m_Root};
-            bool entryPointFound{false};
-
-            while (!entryPointFound)
-            {
-                const int c_CurrentNodeKey{currentNode->getKey()};
-
-                if (key < c_CurrentNodeKey)
-                {
-                    Node* leftChild{currentNode->getLeftChild()};
-                    if (leftChild == nullptr)
-                    {
-                        currentNode->setLeftChild(new Node{key, value});
-                        entryPointFound = true;
-                        newNodeAdded = true;
-                    }
-                    else
-                    {
-                        currentNode = leftChild;
-                    }
-                }
-                else if (key > c_CurrentNodeKey)
-                {
-                    Node* rightChild{currentNode->getRightChild()};
-                    if (rightChild == nullptr)
-                    {
-                        currentNode->setRightChild(new Node{key, value});
-                        entryPointFound = true;
-                        newNodeAdded = true;
-                    }
-                    else
-                    {
-                        currentNode = rightChild;
-                    }
-                }
-                else
-                {
-                    currentNode->setValue(value);
-                    entryPointFound = true;
-                }
-            }
-        }
+        _doAddOrUpdateNode(key, value, newNodeAdded);
     }
 
     return newNodeAdded;
@@ -128,6 +98,59 @@ void SimpleBST::printNodesInfo() const
         displayRelative(currentNode->getGrandparent(), "Grandparent");
 
         std::cout << std::endl;
+    }
+}
+
+void SimpleBST::_doAddOrUpdateNode(int key, const std::string& value, bool& newNodeAdded)
+{
+    if (m_Root == nullptr)
+    {
+        m_Root = new Node{key, value};
+        newNodeAdded = true;
+    }
+    else
+    {
+        Node* currentNode{m_Root};
+        bool entryPointFound{false};
+
+        while (!entryPointFound)
+        {
+            const int c_CurrentNodeKey{currentNode->getKey()};
+
+            if (key < c_CurrentNodeKey)
+            {
+                Node* leftChild{currentNode->getLeftChild()};
+                if (leftChild == nullptr)
+                {
+                    currentNode->setLeftChild(new Node{key, value});
+                    entryPointFound = true;
+                    newNodeAdded = true;
+                }
+                else
+                {
+                    currentNode = leftChild;
+                }
+            }
+            else if (key > c_CurrentNodeKey)
+            {
+                Node* rightChild{currentNode->getRightChild()};
+                if (rightChild == nullptr)
+                {
+                    currentNode->setRightChild(new Node{key, value});
+                    entryPointFound = true;
+                    newNodeAdded = true;
+                }
+                else
+                {
+                    currentNode = rightChild;
+                }
+            }
+            else
+            {
+                currentNode->setValue(value);
+                entryPointFound = true;
+            }
+        }
     }
 }
 

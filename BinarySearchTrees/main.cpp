@@ -8,9 +8,9 @@ using namespace std;
 
 int main()
 {
-    const std::string c_Value{"initial value"};
-    const std::string c_NullValue{"no value (no node)"};
-    SimpleBST simpleBST{c_NullValue};
+    const std::string c_InitialValue{"initial"};
+    const std::string c_NullValue{"none"};
+    const std::string c_ChangedValue{"changed"};
     const std::vector<int> nodesBase{10, -2, 4, 3, -5, 8, 9, 7, -8, 0, 2, 5, 4};
 
     cout << "Let's create a binary search tree from an array" << endl << endl;
@@ -19,17 +19,18 @@ int main()
     for (std::vector<int>::const_iterator it{nodesBase.cbegin()}; it != nodesBase.cend(); ++it)
     {
         cout << *it << " ";
-        simpleBST.addOrUpdateNode(*it, c_Value);
     }
 
     cout << endl << endl;
 
-    cout << "Obtained tree (all nodes with value \"initial value\") is: " << endl << endl;
+    SimpleBST simpleBST{nodesBase, c_InitialValue, c_NullValue};
+
+    cout << "Obtained tree (all nodes with value \"" << c_InitialValue << "\") is: " << endl << endl;
     simpleBST.printNodesInfo();
     cout << endl;
 
     cout << "We'll set a new value for node 3" << endl << endl;
-    (void)simpleBST.addOrUpdateNode(3, "another value");
+    (void)simpleBST.addOrUpdateNode(3, c_ChangedValue);
 
     cout << "Now we'll print values for nodes 3, -8 and -7" << endl << endl;
     cout << "Node 3: " << "\"" << simpleBST.getNodeValue(3) << "\"" << endl;
