@@ -13,6 +13,8 @@ public:
     ~SimpleBST();
 
     bool addOrUpdateNode(int key, const std::string& value); // true if node added (number of nodes increased)
+    bool deleteNode(int key);
+
     std::string getNodeValue(int key) const;
 
     void printNodesInfo() const;

@@ -51,6 +51,108 @@ bool SimpleBST::addOrUpdateNode(int key, const std::string& value)
     return newNodeAdded;
 }
 
+bool SimpleBST::deleteNode(int key)
+{
+    bool deleted{false};
+    Node* nodeToDelete{_findNode(key)};
+
+    if (nodeToDelete != nullptr)
+    {
+        if (nodeToDelete->getLeftChild() == nullptr && nodeToDelete->getRightChild() == nullptr)
+        {
+            if (nodeToDelete->isLeftChild())
+            {
+                nodeToDelete->getParent()->setLeftChild(nullptr);
+            }
+            else if (nodeToDelete->isRightChild())
+            {
+                nodeToDelete->getParent()->setRightChild(nullptr);
+            }
+            else
+            {
+                m_Root = nullptr;
+            }
+        }
+        else if (nodeToDelete->getLeftChild() == nullptr)
+        {
+            if (nodeToDelete->isLeftChild())
+            {
+                nodeToDelete->getParent()->setLeftChild(nodeToDelete->getRightChild());
+            }
+            else if (nodeToDelete->isRightChild())
+            {
+                nodeToDelete->getParent()->setRightChild(nodeToDelete->getRightChild());
+            }
+            else
+            {
+                m_Root = nodeToDelete->getRightChild();
+                nodeToDelete->setRightChild(nullptr);
+            }
+        }
+        else if (nodeToDelete->getRightChild() == nullptr)
+        {
+            if (nodeToDelete->isLeftChild())
+            {
+                nodeToDelete->getParent()->setLeftChild(nodeToDelete->getLeftChild());
+            }
+            else if (nodeToDelete->isRightChild())
+            {
+                nodeToDelete->getParent()->setRightChild(nodeToDelete->getLeftChild());
+            }
+            else
+            {
+                m_Root = nodeToDelete->getLeftChild();
+                nodeToDelete->setLeftChild(nullptr);
+            }
+        }
+        else
+        {
+            Node* inOrderSuccessor{nodeToDelete->getRightChild()};
+            Node* successorChild{inOrderSuccessor->getLeftChild()};
+
+            while (successorChild != nullptr)
+            {
+                inOrderSuccessor = successorChild;
+                successorChild = successorChild->getLeftChild();
+            }
+
+            // handle removed node and successor node children accordingly (successor can only have a right child) - successor becomes childless and parentless
+            if (inOrderSuccessor->isLeftChild())
+            {
+                inOrderSuccessor->getParent()->setLeftChild(inOrderSuccessor->getRightChild());
+            }
+            else
+            {
+                inOrderSuccessor->getParent()->setRightChild(inOrderSuccessor->getRightChild());
+            }
+
+            // set successor parent node (deleted node becomes parentless)
+            if (nodeToDelete->isLeftChild())
+            {
+                nodeToDelete->getParent()->setLeftChild(inOrderSuccessor);
+            }
+            else if (nodeToDelete->isRightChild())
+            {
+                nodeToDelete->getParent()->setRightChild(inOrderSuccessor);
+            }
+            else
+            {
+                m_Root = inOrderSuccessor;
+            }
+
+            // move any left children from removed node to successor (successor replaces deleted node)
+            inOrderSuccessor->setLeftChild(nodeToDelete->getLeftChild());
+            inOrderSuccessor->setRightChild(nodeToDelete->getRightChild());
+        }
+
+        delete nodeToDelete;
+        nodeToDelete = nullptr;
+        deleted = true;
+    }
+
+    return deleted;
+}
+
 std::string SimpleBST::getNodeValue(int key) const
 {
     std::string result{m_DefaultNullValue};
@@ -247,12 +349,31 @@ bool SimpleBST::Node::isRightChild() const
 
 void SimpleBST::Node::setLeftChild(Node* left)
 {
-    m_LeftChild = left;
-
+    // ensure old left child gets decoupled from parent
     if (m_LeftChild != nullptr)
     {
-        m_LeftChild->m_Parent  = this;
+        m_LeftChild->m_Parent = nullptr;
     }
+
+    // ensure added left child gets decoupled from parent (if any) and coupled to actual parent
+    if (left != nullptr)
+    {
+        if (left->m_Parent != nullptr)
+        {
+            if (left->m_Parent->m_LeftChild == left)
+            {
+                left->m_Parent->m_LeftChild = nullptr;
+            }
+            else
+            {
+                left->m_Parent->m_RightChild = nullptr;
+            }
+        }
+
+        left->m_Parent = this;
+    }
+
+    m_LeftChild = left;
 }
 
 SimpleBST::Node* SimpleBST::Node::getLeftChild() const
@@ -262,12 +383,31 @@ SimpleBST::Node* SimpleBST::Node::getLeftChild() const
 
 void SimpleBST::Node::setRightChild(SimpleBST::Node* right)
 {
-    m_RightChild = right;
-
+    // ensure old right child gets decoupled from parent
     if (m_RightChild != nullptr)
     {
-        m_RightChild->m_Parent = this;
+        m_RightChild->m_Parent = nullptr;
     }
+
+    // ensure added right child gets decoupled from old parent (if any) and coupled to actual parent
+    if (right != nullptr)
+    {
+        if (right->m_Parent != nullptr)
+        {
+            if (right->m_Parent->m_LeftChild == right)
+            {
+                right->m_Parent->m_LeftChild = nullptr;
+            }
+            else
+            {
+                right->m_Parent->m_RightChild = nullptr;
+            }
+        }
+
+        right->m_Parent = this;
+    }
+
+    m_RightChild = right;
 }
 
 SimpleBST::Node *SimpleBST::Node::getRightChild() const

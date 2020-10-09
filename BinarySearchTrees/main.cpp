@@ -37,10 +37,22 @@ int main()
     cout << "Node -8: " << "\"" << simpleBST.getNodeValue(-8) << "\"" << endl;
     cout << "Node -7: " << "\"" << simpleBST.getNodeValue(-7) << "\"" << endl;
 
-    cout << endl << "Finally we'll update node 7 with the null value" << endl;
+    cout << endl << "Now we'll update node 7 with the null value" << endl;
     (void)simpleBST.addOrUpdateNode(7, c_NullValue);
-    cout << "Node has now the same value as before: "  << "\"" << simpleBST.getNodeValue(7) << "\"" << endl;
-    cout << endl << "That's all folks!" << endl << endl;
+    cout << "Node has now the same value as before: "  << "\"" << simpleBST.getNodeValue(7) << "\"" << endl << endl;
+    cout << "Finally we'll remove three nodes: 4, 10, 9, -5 and -17" << endl << endl;
+    (void)simpleBST.deleteNode(4); // this causes the issue (-5 is considered ROOT)
+    (void)simpleBST.deleteNode(10);
+    (void)simpleBST.deleteNode(9);
+    (void)simpleBST.deleteNode(-5);
+    const bool success{simpleBST.deleteNode(-17)};
+    cout << "New tree is: " << endl << endl;
+    simpleBST.printNodesInfo();
+    if (!success)
+    {
+        clog << endl << "Warning! No node -17 to be removed" << endl << endl;
+    }
+    cout << "That's all folks!" << endl << endl;
 
     return 0;
 }
