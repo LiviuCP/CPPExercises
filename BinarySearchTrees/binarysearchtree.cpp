@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cassert>
 
 #include "binarysearchtree.h"
 
@@ -25,18 +26,23 @@ SimpleBST::SimpleBST(const std::vector<int>& inputKeys, const std::string& defau
     }
 }
 
+SimpleBST::SimpleBST(const SimpleBST& sourceTree)
+    : m_Root{nullptr}
+    , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
+{
+    _copyTreeNodes(sourceTree);
+}
+
+SimpleBST::SimpleBST(SimpleBST&& sourceTree)
+    : m_Root{sourceTree.m_Root}
+    , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
+{
+    sourceTree.m_Root = nullptr;
+}
+
 SimpleBST::~SimpleBST()
 {
-    std::vector<Node*> nodesArray;
-    _convertTreeToArray(nodesArray);
-
-    for (std::vector<Node*>::iterator it{nodesArray.begin()}; it != nodesArray.end(); ++it)
-    {
-        delete(*it);
-        *it = nullptr;
-    }
-
-    m_Root = nullptr;
+    _deleteTreeNodes();
 }
 
 bool SimpleBST::addOrUpdateNode(int key, const std::string& value)
@@ -153,6 +159,33 @@ bool SimpleBST::deleteNode(int key)
     return deleted;
 }
 
+SimpleBST& SimpleBST::operator=(const SimpleBST& sourceTree)
+{
+    if (m_Root != nullptr)
+    {
+        _deleteTreeNodes();
+    }
+
+    m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+    _copyTreeNodes(sourceTree);
+
+    return *this;
+}
+
+SimpleBST& SimpleBST::operator=(SimpleBST&& sourceTree)
+{
+    if (m_Root != nullptr)
+    {
+        _deleteTreeNodes();
+    }
+
+    m_Root = sourceTree.m_Root;
+    sourceTree.m_Root = nullptr;
+    m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+
+    return *this;
+}
+
 std::string SimpleBST::getNodeValue(int key) const
 {
     std::string result{m_DefaultNullValue};
@@ -200,6 +233,11 @@ void SimpleBST::printNodesInfo() const
         displayRelative(currentNode->getGrandparent(), "Grandparent");
 
         std::cout << std::endl;
+    }
+
+    if (nodesArray.size() == 0)
+    {
+        std::clog << "Warning: tree has no nodes" << std::endl;
     }
 }
 
@@ -310,6 +348,34 @@ void SimpleBST::_convertTreeToArray(std::vector<SimpleBST::Node*>& nodes) const
                 }
             }
         }
+    }
+}
+
+void SimpleBST::_deleteTreeNodes()
+{
+    std::vector<Node*> nodesArray;
+    _convertTreeToArray(nodesArray);
+
+    for (std::vector<Node*>::iterator it{nodesArray.begin()}; it != nodesArray.end(); ++it)
+    {
+        delete(*it);
+        *it = nullptr;
+    }
+
+    m_Root = nullptr;
+}
+
+void SimpleBST::_copyTreeNodes(const SimpleBST& sourceTree)
+{
+    std::vector<Node*> sourceTreeArray;
+    sourceTree._convertTreeToArray(sourceTreeArray);
+
+    for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
+    {
+        bool nodeAdded{false};
+        _doAddOrUpdateNode((*it)->getKey(), (*it)->getValue(), nodeAdded);
+
+        assert(nodeAdded && "Source node not added");
     }
 }
 
