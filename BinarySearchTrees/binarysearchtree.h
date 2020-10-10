@@ -21,6 +21,7 @@ public:
     SimpleBST& operator=(SimpleBST&& sourceTree);
 
     std::string getNodeValue(int key) const;
+    int getSize() const;
 
     void printNodesInfo() const;
 
@@ -67,6 +68,9 @@ protected:
 
     Node* m_Root;
     std::string m_DefaultNullValue;
+
+private:
+    int m_Size;
 };
 
 

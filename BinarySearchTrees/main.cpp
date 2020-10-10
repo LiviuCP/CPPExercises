@@ -27,25 +27,28 @@ int main()
 
     cout << endl << "Obtained tree (all nodes with value \"" << c_InitialValue << "\") is: " << endl << endl;
     simpleBST.printNodesInfo();
-    cout << endl;
+    cout << endl << "Tree has " << simpleBST.getSize() << " nodes" << endl << endl;
 
     cout << "2) We'll set a new value for node 3 and then print values for nodes 3, -8 and 7" << endl << endl;
     (void)simpleBST.addOrUpdateNode(3, c_ChangedValue);
     cout << "Node 3: " << "\"" << simpleBST.getNodeValue(3) << "\"" << endl;
     cout << "Node -8: " << "\"" << simpleBST.getNodeValue(-8) << "\"" << endl;
     cout << "Node -7: " << "\"" << simpleBST.getNodeValue(-7) << "\"" << endl;
+    cout << endl << "Tree has size: " << simpleBST.getSize() << endl;
 
     cout << endl << "3) Now we'll update node 7 with the null value" << endl;
     (void)simpleBST.addOrUpdateNode(7, c_NullValue);
-    cout << "Node has now the same value as before: "  << "\"" << simpleBST.getNodeValue(7) << "\"" << endl << endl;
+    cout << "Node has now the same value as before: "  << "\"" << simpleBST.getNodeValue(7) << "\"" << endl;
+    cout << endl << "Tree has size: " << simpleBST.getSize() << endl << endl;
     cout << "4) Now we'll remove three nodes: 4, 10, 9, -5 and -17" << endl << endl;
     (void)simpleBST.deleteNode(4); // this causes the issue (-5 is considered ROOT)
     (void)simpleBST.deleteNode(10);
     (void)simpleBST.deleteNode(9);
     (void)simpleBST.deleteNode(-5);
     const bool success{simpleBST.deleteNode(-17)};
-    cout << "New tree is: " << endl << endl;
+    cout << "Updated tree is: " << endl << endl;
     simpleBST.printNodesInfo();
+    cout << endl << "It has size: " << simpleBST.getSize() << endl;
     if (!success)
     {
         clog << endl << "Warning: no node -17 to be removed" << endl << endl;
@@ -62,6 +65,9 @@ int main()
     simpleBSTMove.printNodesInfo();
     cout << endl << "Original tree after move operation: " << endl;
     simpleBST.printNodesInfo();
+    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
+    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
+    cout << "Size of copy constructor created tree: " << simpleBSTCopy.getSize() << endl;
 
     cout << endl << "5b) Move assigning the move created tree to original tree" << endl << endl;
     simpleBST = std::move(simpleBSTMove);
@@ -69,6 +75,8 @@ int main()
     simpleBSTMove.printNodesInfo();
     cout << endl << "Original tree: " << endl << endl;
     simpleBST.printNodesInfo();
+    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
+    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
 
     cout << endl << "5c) Copy assigning the original tree to move created tree" << endl << endl;
     simpleBSTMove = simpleBST;
@@ -76,8 +84,10 @@ int main()
     simpleBSTMove.printNodesInfo();
     cout << endl << "Original tree: " << endl << endl;
     simpleBST.printNodesInfo();
+    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
+    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
 
-    cout << endl << "5d) Finally we'll create a small tree and copy assign it to original and move assign it to move created tree" << endl << endl;
+    cout << endl << "5d) We'll now create a small tree and copy assign it to original and move assign it to move created tree" << endl << endl;
     SimpleBST newBST{std::vector<int>{2, 1, 3}, c_InitialValue, c_NullValue};
     simpleBST = newBST;
     simpleBSTMove = std::move(newBST);
@@ -87,6 +97,19 @@ int main()
     simpleBST.printNodesInfo();
     cout << endl << "New tree: " << endl;
     newBST.printNodesInfo();
+    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
+    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
+    cout << "New tree size: " << newBST.getSize() << endl;
+
+    cout << endl << "5e) Finally we'll add one node to each of the original tree and new tree" << endl;
+    simpleBST.addOrUpdateNode(25, c_InitialValue);
+    newBST.addOrUpdateNode(20, c_InitialValue);
+    cout << endl << "Original tree: " << endl << endl;
+    simpleBST.printNodesInfo();
+    cout << endl << "New tree: " << endl;
+    newBST.printNodesInfo();
+    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
+    cout << "New tree size: " << newBST.getSize() << endl;
 
     cout << endl << "That's all folks!" << endl << endl;
 

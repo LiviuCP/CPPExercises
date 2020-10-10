@@ -6,6 +6,7 @@
 SimpleBST::SimpleBST(const std::string& defaultNullValue)
     : m_Root{nullptr}
     , m_DefaultNullValue{defaultNullValue}
+    , m_Size{0}
 {
 }
 
@@ -29,6 +30,7 @@ SimpleBST::SimpleBST(const std::vector<int>& inputKeys, const std::string& defau
 SimpleBST::SimpleBST(const SimpleBST& sourceTree)
     : m_Root{nullptr}
     , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
+    , m_Size{0}
 {
     _copyTreeNodes(sourceTree);
 }
@@ -36,8 +38,10 @@ SimpleBST::SimpleBST(const SimpleBST& sourceTree)
 SimpleBST::SimpleBST(SimpleBST&& sourceTree)
     : m_Root{sourceTree.m_Root}
     , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
+    , m_Size{sourceTree.m_Size}
 {
     sourceTree.m_Root = nullptr;
+    sourceTree.m_Size = 0;
 }
 
 SimpleBST::~SimpleBST()
@@ -153,6 +157,7 @@ bool SimpleBST::deleteNode(int key)
 
         delete nodeToDelete;
         nodeToDelete = nullptr;
+        --m_Size;
         deleted = true;
     }
 
@@ -180,7 +185,9 @@ SimpleBST& SimpleBST::operator=(SimpleBST&& sourceTree)
     }
 
     m_Root = sourceTree.m_Root;
+    m_Size = sourceTree.m_Size;
     sourceTree.m_Root = nullptr;
+    sourceTree.m_Size = 0;
     m_DefaultNullValue = sourceTree.m_DefaultNullValue;
 
     return *this;
@@ -198,6 +205,11 @@ std::string SimpleBST::getNodeValue(int key) const
     }
 
     return result;
+}
+
+int SimpleBST::getSize() const
+{
+    return m_Size;
 }
 
 void SimpleBST::printNodesInfo() const
@@ -292,6 +304,11 @@ void SimpleBST::_doAddOrUpdateNode(int key, const std::string& value, bool& newN
             }
         }
     }
+
+    if (newNodeAdded)
+    {
+        ++m_Size;
+    }
 }
 
 SimpleBST::Node* SimpleBST::_findNode(int key) const
@@ -363,6 +380,7 @@ void SimpleBST::_deleteTreeNodes()
     }
 
     m_Root = nullptr;
+    m_Size = 0;
 }
 
 void SimpleBST::_copyTreeNodes(const SimpleBST& sourceTree)
