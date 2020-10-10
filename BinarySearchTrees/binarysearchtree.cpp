@@ -53,96 +53,96 @@ bool SimpleBST::addOrUpdateNode(int key, const std::string& value)
 
 bool SimpleBST::deleteNode(int key)
 {
-    bool deleted{false};
     Node* nodeToDelete{_findNode(key)};
+
+    auto removeNodeWithAtMostOneChild = [nodeToDelete, this](Node* child)
+    {
+        if (nodeToDelete->isLeftChild())
+        {
+            nodeToDelete->getParent()->setLeftChild(child);
+        }
+        else if (nodeToDelete->isRightChild())
+        {
+            nodeToDelete->getParent()->setRightChild(child);
+        }
+        else
+        {
+            m_Root = child;
+
+            if (child != nullptr)
+            {
+                if (child->isLeftChild())
+                {
+                    nodeToDelete->setLeftChild(nullptr);
+                }
+                else
+                {
+                    nodeToDelete->setRightChild(nullptr);
+                }
+            }
+        }
+    };
+
+    auto replaceWithInOrderSuccessor = [nodeToDelete, this]()
+    {
+        // get in order successor
+        Node* inOrderSuccessor{nodeToDelete->getRightChild()};
+        Node* successorChild{inOrderSuccessor->getLeftChild()};
+
+        while (successorChild != nullptr)
+        {
+            inOrderSuccessor = successorChild;
+            successorChild = successorChild->getLeftChild();
+        }
+
+        // handle removed node and successor node children accordingly (successor can only have a right child) - successor becomes childless and parentless
+        if (inOrderSuccessor->isLeftChild())
+        {
+            inOrderSuccessor->getParent()->setLeftChild(inOrderSuccessor->getRightChild());
+        }
+        else
+        {
+            inOrderSuccessor->getParent()->setRightChild(inOrderSuccessor->getRightChild());
+        }
+
+        // set successor parent node (deleted node becomes parentless)
+        if (nodeToDelete->isLeftChild())
+        {
+            nodeToDelete->getParent()->setLeftChild(inOrderSuccessor);
+        }
+        else if (nodeToDelete->isRightChild())
+        {
+            nodeToDelete->getParent()->setRightChild(inOrderSuccessor);
+        }
+        else
+        {
+            m_Root = inOrderSuccessor;
+        }
+
+        // move any left children from removed node to successor (successor replaces deleted node)
+        inOrderSuccessor->setLeftChild(nodeToDelete->getLeftChild());
+        inOrderSuccessor->setRightChild(nodeToDelete->getRightChild());
+    };
+
+    bool deleted{false};
 
     if (nodeToDelete != nullptr)
     {
         if (nodeToDelete->getLeftChild() == nullptr && nodeToDelete->getRightChild() == nullptr)
         {
-            if (nodeToDelete->isLeftChild())
-            {
-                nodeToDelete->getParent()->setLeftChild(nullptr);
-            }
-            else if (nodeToDelete->isRightChild())
-            {
-                nodeToDelete->getParent()->setRightChild(nullptr);
-            }
-            else
-            {
-                m_Root = nullptr;
-            }
+            removeNodeWithAtMostOneChild(nullptr);
         }
         else if (nodeToDelete->getLeftChild() == nullptr)
         {
-            if (nodeToDelete->isLeftChild())
-            {
-                nodeToDelete->getParent()->setLeftChild(nodeToDelete->getRightChild());
-            }
-            else if (nodeToDelete->isRightChild())
-            {
-                nodeToDelete->getParent()->setRightChild(nodeToDelete->getRightChild());
-            }
-            else
-            {
-                m_Root = nodeToDelete->getRightChild();
-                nodeToDelete->setRightChild(nullptr);
-            }
+            removeNodeWithAtMostOneChild(nodeToDelete->getRightChild());
         }
         else if (nodeToDelete->getRightChild() == nullptr)
         {
-            if (nodeToDelete->isLeftChild())
-            {
-                nodeToDelete->getParent()->setLeftChild(nodeToDelete->getLeftChild());
-            }
-            else if (nodeToDelete->isRightChild())
-            {
-                nodeToDelete->getParent()->setRightChild(nodeToDelete->getLeftChild());
-            }
-            else
-            {
-                m_Root = nodeToDelete->getLeftChild();
-                nodeToDelete->setLeftChild(nullptr);
-            }
+            removeNodeWithAtMostOneChild(nodeToDelete->getLeftChild());
         }
         else
         {
-            Node* inOrderSuccessor{nodeToDelete->getRightChild()};
-            Node* successorChild{inOrderSuccessor->getLeftChild()};
-
-            while (successorChild != nullptr)
-            {
-                inOrderSuccessor = successorChild;
-                successorChild = successorChild->getLeftChild();
-            }
-
-            // handle removed node and successor node children accordingly (successor can only have a right child) - successor becomes childless and parentless
-            if (inOrderSuccessor->isLeftChild())
-            {
-                inOrderSuccessor->getParent()->setLeftChild(inOrderSuccessor->getRightChild());
-            }
-            else
-            {
-                inOrderSuccessor->getParent()->setRightChild(inOrderSuccessor->getRightChild());
-            }
-
-            // set successor parent node (deleted node becomes parentless)
-            if (nodeToDelete->isLeftChild())
-            {
-                nodeToDelete->getParent()->setLeftChild(inOrderSuccessor);
-            }
-            else if (nodeToDelete->isRightChild())
-            {
-                nodeToDelete->getParent()->setRightChild(inOrderSuccessor);
-            }
-            else
-            {
-                m_Root = inOrderSuccessor;
-            }
-
-            // move any left children from removed node to successor (successor replaces deleted node)
-            inOrderSuccessor->setLeftChild(nodeToDelete->getLeftChild());
-            inOrderSuccessor->setRightChild(nodeToDelete->getRightChild());
+            replaceWithInOrderSuccessor();
         }
 
         delete nodeToDelete;
