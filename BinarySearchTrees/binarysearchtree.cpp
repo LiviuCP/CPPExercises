@@ -3,15 +3,15 @@
 
 #include "binarysearchtree.h"
 
-SimpleBST::SimpleBST(const std::string& defaultNullValue)
+BinarySearchTree::BinarySearchTree(const std::string& defaultNullValue)
     : m_Root{nullptr}
     , m_DefaultNullValue{defaultNullValue}
     , m_Size{0}
 {
 }
 
-SimpleBST::SimpleBST(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
-    : SimpleBST{defaultNullValue}
+BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
+    : BinarySearchTree{defaultNullValue}
 {
     if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
     {
@@ -27,7 +27,7 @@ SimpleBST::SimpleBST(const std::vector<int>& inputKeys, const std::string& defau
     }
 }
 
-SimpleBST::SimpleBST(const SimpleBST& sourceTree)
+BinarySearchTree::BinarySearchTree(const BinarySearchTree& sourceTree)
     : m_Root{nullptr}
     , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
     , m_Size{0}
@@ -35,7 +35,7 @@ SimpleBST::SimpleBST(const SimpleBST& sourceTree)
     _copyTreeNodes(sourceTree);
 }
 
-SimpleBST::SimpleBST(SimpleBST&& sourceTree)
+BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
     : m_Root{sourceTree.m_Root}
     , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
     , m_Size{sourceTree.m_Size}
@@ -44,12 +44,12 @@ SimpleBST::SimpleBST(SimpleBST&& sourceTree)
     sourceTree.m_Size = 0;
 }
 
-SimpleBST::~SimpleBST()
+BinarySearchTree::~BinarySearchTree()
 {
     _deleteTreeNodes();
 }
 
-bool SimpleBST::addOrUpdateNode(int key, const std::string& value)
+bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
 {
     bool newNodeAdded{false};
 
@@ -61,7 +61,7 @@ bool SimpleBST::addOrUpdateNode(int key, const std::string& value)
     return newNodeAdded;
 }
 
-bool SimpleBST::deleteNode(int key)
+bool BinarySearchTree::deleteNode(int key)
 {
     Node* nodeToDelete{_findNode(key)};
 
@@ -164,7 +164,7 @@ bool SimpleBST::deleteNode(int key)
     return deleted;
 }
 
-void SimpleBST::mergeTree(SimpleBST& sourceTree)
+void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
 {
     assert(m_DefaultNullValue == sourceTree.m_DefaultNullValue && "Default null values of trees don't match");
 
@@ -172,7 +172,7 @@ void SimpleBST::mergeTree(SimpleBST& sourceTree)
     sourceTree._deleteTreeNodes();
 }
 
-SimpleBST& SimpleBST::operator=(const SimpleBST& sourceTree)
+BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree)
 {
     if (m_Root != nullptr)
     {
@@ -185,7 +185,7 @@ SimpleBST& SimpleBST::operator=(const SimpleBST& sourceTree)
     return *this;
 }
 
-SimpleBST& SimpleBST::operator=(SimpleBST&& sourceTree)
+BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
 {
     if (m_Root != nullptr)
     {
@@ -201,7 +201,7 @@ SimpleBST& SimpleBST::operator=(SimpleBST&& sourceTree)
     return *this;
 }
 
-std::string SimpleBST::getNodeValue(int key) const
+std::string BinarySearchTree::getNodeValue(int key) const
 {
     std::string result{m_DefaultNullValue};
 
@@ -215,12 +215,12 @@ std::string SimpleBST::getNodeValue(int key) const
     return result;
 }
 
-int SimpleBST::getSize() const
+int BinarySearchTree::getSize() const
 {
     return m_Size;
 }
 
-void SimpleBST::printNodesInfo() const
+void BinarySearchTree::printNodesInfo() const
 {
     auto displayRelative = [](const Node* node, const std::string& relativeName)
     {
@@ -261,7 +261,7 @@ void SimpleBST::printNodesInfo() const
     }
 }
 
-void SimpleBST::_doAddOrUpdateNode(int key, const std::string& value, bool& newNodeAdded)
+void BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value, bool& newNodeAdded)
 {
     if (m_Root == nullptr)
     {
@@ -319,7 +319,7 @@ void SimpleBST::_doAddOrUpdateNode(int key, const std::string& value, bool& newN
     }
 }
 
-SimpleBST::Node* SimpleBST::_findNode(int key) const
+BinarySearchTree::Node* BinarySearchTree::_findNode(int key) const
 {
     Node* result{nullptr};
     Node* currentNode{m_Root};
@@ -346,7 +346,7 @@ SimpleBST::Node* SimpleBST::_findNode(int key) const
     return result;
 }
 
-void SimpleBST::_convertTreeToArray(std::vector<SimpleBST::Node*>& nodes) const
+void BinarySearchTree::_convertTreeToArray(std::vector<BinarySearchTree::Node*>& nodes) const
 {
     if (m_Root != nullptr)
     {
@@ -376,7 +376,7 @@ void SimpleBST::_convertTreeToArray(std::vector<SimpleBST::Node*>& nodes) const
     }
 }
 
-void SimpleBST::_deleteTreeNodes()
+void BinarySearchTree::_deleteTreeNodes()
 {
     std::vector<Node*> nodesArray;
     _convertTreeToArray(nodesArray);
@@ -391,7 +391,7 @@ void SimpleBST::_deleteTreeNodes()
     m_Size = 0;
 }
 
-void SimpleBST::_copyTreeNodes(const SimpleBST& sourceTree)
+void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
 {
     std::vector<Node*> sourceTreeArray;
     sourceTree._convertTreeToArray(sourceTreeArray);
@@ -408,7 +408,7 @@ void SimpleBST::_copyTreeNodes(const SimpleBST& sourceTree)
     }
 }
 
-SimpleBST::Node::Node(int key, std::string value)
+BinarySearchTree::Node::Node(int key, std::string value)
     : m_Parent{nullptr}
     , m_LeftChild{nullptr}
     , m_RightChild{nullptr}
@@ -417,32 +417,32 @@ SimpleBST::Node::Node(int key, std::string value)
 {
 }
 
-int SimpleBST::Node::getKey() const
+int BinarySearchTree::Node::getKey() const
 {
     return m_Key;
 }
 
-void SimpleBST::Node::setValue(const std::string& value)
+void BinarySearchTree::Node::setValue(const std::string& value)
 {
     m_Value = value;
 }
 
-std::string SimpleBST::Node::getValue() const
+std::string BinarySearchTree::Node::getValue() const
 {
     return m_Value;
 }
 
-bool SimpleBST::Node::isLeftChild() const
+bool BinarySearchTree::Node::isLeftChild() const
 {
     return (m_Parent != nullptr && m_Parent->m_LeftChild == this);
 }
 
-bool SimpleBST::Node::isRightChild() const
+bool BinarySearchTree::Node::isRightChild() const
 {
     return (m_Parent != nullptr && m_Parent->m_RightChild == this);
 }
 
-void SimpleBST::Node::setLeftChild(Node* left)
+void BinarySearchTree::Node::setLeftChild(Node* left)
 {
     // ensure old left child gets decoupled from parent
     if (m_LeftChild != nullptr)
@@ -471,12 +471,12 @@ void SimpleBST::Node::setLeftChild(Node* left)
     m_LeftChild = left;
 }
 
-SimpleBST::Node* SimpleBST::Node::getLeftChild() const
+BinarySearchTree::Node* BinarySearchTree::Node::getLeftChild() const
 {
     return m_LeftChild;
 }
 
-void SimpleBST::Node::setRightChild(SimpleBST::Node* right)
+void BinarySearchTree::Node::setRightChild(BinarySearchTree::Node* right)
 {
     // ensure old right child gets decoupled from parent
     if (m_RightChild != nullptr)
@@ -505,17 +505,17 @@ void SimpleBST::Node::setRightChild(SimpleBST::Node* right)
     m_RightChild = right;
 }
 
-SimpleBST::Node *SimpleBST::Node::getRightChild() const
+BinarySearchTree::Node *BinarySearchTree::Node::getRightChild() const
 {
     return m_RightChild;
 }
 
-SimpleBST::Node* SimpleBST::Node::getParent() const
+BinarySearchTree::Node* BinarySearchTree::Node::getParent() const
 {
     return m_Parent;
 }
 
-SimpleBST::Node* SimpleBST::Node::getUncle() const
+BinarySearchTree::Node* BinarySearchTree::Node::getUncle() const
 {
     Node* result{nullptr};
 
@@ -536,7 +536,7 @@ SimpleBST::Node* SimpleBST::Node::getUncle() const
     return result;
 }
 
-SimpleBST::Node* SimpleBST::Node::getGrandparent() const
+BinarySearchTree::Node* BinarySearchTree::Node::getGrandparent() const
 {
     Node* result{nullptr};
 

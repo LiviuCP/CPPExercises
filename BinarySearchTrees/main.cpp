@@ -24,32 +24,32 @@ int main()
 
     cout << endl << endl;
 
-    SimpleBST simpleBST{nodesBase, c_InitialValue, c_NullValue};
+    BinarySearchTree searchTree{nodesBase, c_InitialValue, c_NullValue};
 
     cout << endl << "Obtained tree (all nodes with value \"" << c_InitialValue << "\") is: " << endl << endl;
-    simpleBST.printNodesInfo();
-    cout << endl << "Tree has " << simpleBST.getSize() << " nodes" << endl << endl;
+    searchTree.printNodesInfo();
+    cout << endl << "Tree has " << searchTree.getSize() << " nodes" << endl << endl;
 
     cout << "2) We'll set a new value for node 3 and then print values for nodes 3, -8 and 7" << endl << endl;
-    (void)simpleBST.addOrUpdateNode(3, c_ChangedValue);
-    cout << "Node 3: " << "\"" << simpleBST.getNodeValue(3) << "\"" << endl;
-    cout << "Node -8: " << "\"" << simpleBST.getNodeValue(-8) << "\"" << endl;
-    cout << "Node -7: " << "\"" << simpleBST.getNodeValue(-7) << "\"" << endl;
-    cout << endl << "Tree has size: " << simpleBST.getSize() << endl;
+    (void)searchTree.addOrUpdateNode(3, c_ChangedValue);
+    cout << "Node 3: " << "\"" << searchTree.getNodeValue(3) << "\"" << endl;
+    cout << "Node -8: " << "\"" << searchTree.getNodeValue(-8) << "\"" << endl;
+    cout << "Node -7: " << "\"" << searchTree.getNodeValue(-7) << "\"" << endl;
+    cout << endl << "Tree has size: " << searchTree.getSize() << endl;
 
     cout << endl << "3) Now we'll update node 7 with the null value" << endl;
-    (void)simpleBST.addOrUpdateNode(7, c_NullValue);
-    cout << "Node has now the same value as before: "  << "\"" << simpleBST.getNodeValue(7) << "\"" << endl;
-    cout << endl << "Tree has size: " << simpleBST.getSize() << endl << endl;
+    (void)searchTree.addOrUpdateNode(7, c_NullValue);
+    cout << "Node has now the same value as before: "  << "\"" << searchTree.getNodeValue(7) << "\"" << endl;
+    cout << endl << "Tree has size: " << searchTree.getSize() << endl << endl;
     cout << "4) Now we'll remove three nodes: 4, 10, 9, -5 and -17" << endl << endl;
-    (void)simpleBST.deleteNode(4); // this causes the issue (-5 is considered ROOT)
-    (void)simpleBST.deleteNode(10);
-    (void)simpleBST.deleteNode(9);
-    (void)simpleBST.deleteNode(-5);
-    const bool success{simpleBST.deleteNode(-17)};
+    (void)searchTree.deleteNode(4); // this causes the issue (-5 is considered ROOT)
+    (void)searchTree.deleteNode(10);
+    (void)searchTree.deleteNode(9);
+    (void)searchTree.deleteNode(-5);
+    const bool success{searchTree.deleteNode(-17)};
     cout << "Updated tree is: " << endl << endl;
-    simpleBST.printNodesInfo();
-    cout << endl << "It has size: " << simpleBST.getSize() << endl;
+    searchTree.printNodesInfo();
+    cout << endl << "It has size: " << searchTree.getSize() << endl;
     if (!success)
     {
         clog << endl << "Warning: no node -17 to be removed" << endl << endl;
@@ -58,65 +58,65 @@ int main()
     cout << "5) Now we'll test some move/copy operations" << endl << endl;
 
     cout << "5a) First we'll create two new nodes based on original one, one with copy and one with move constructor" << endl << endl;
-    SimpleBST simpleBSTCopy{simpleBST};
+    BinarySearchTree searchTreeCopy{searchTree};
     cout << "Tree created with copy constructor: " << endl << endl;
-    simpleBSTCopy.printNodesInfo();
-    SimpleBST simpleBSTMove{std::move(simpleBST)};
+    searchTreeCopy.printNodesInfo();
+    BinarySearchTree searchTreeMove{std::move(searchTree)};
     cout << endl << "Tree created with move constructor:" << endl << endl;
-    simpleBSTMove.printNodesInfo();
+    searchTreeMove.printNodesInfo();
     cout << endl << "Original tree after move operation: " << endl;
-    simpleBST.printNodesInfo();
-    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
-    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
-    cout << "Size of copy constructor created tree: " << simpleBSTCopy.getSize() << endl;
+    searchTree.printNodesInfo();
+    cout << endl << "Original tree size: " << searchTree.getSize() << endl;
+    cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl;
+    cout << "Size of copy constructor created tree: " << searchTreeCopy.getSize() << endl;
 
     cout << endl << "5b) Move assigning the move created tree to original tree" << endl << endl;
-    simpleBST = std::move(simpleBSTMove);
+    searchTree = std::move(searchTreeMove);
     cout << "Tree created with move constructor" << endl;
-    simpleBSTMove.printNodesInfo();
+    searchTreeMove.printNodesInfo();
     cout << endl << "Original tree: " << endl << endl;
-    simpleBST.printNodesInfo();
-    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
-    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
+    searchTree.printNodesInfo();
+    cout << endl << "Original tree size: " << searchTree.getSize() << endl;
+    cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl;
 
     cout << endl << "5c) Copy assigning the original tree to move created tree" << endl << endl;
-    simpleBSTMove = simpleBST;
+    searchTreeMove = searchTree;
     cout << "Tree created with move constructor:" << endl << endl;
-    simpleBSTMove.printNodesInfo();
+    searchTreeMove.printNodesInfo();
     cout << endl << "Original tree: " << endl << endl;
-    simpleBST.printNodesInfo();
-    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
-    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
+    searchTree.printNodesInfo();
+    cout << endl << "Original tree size: " << searchTree.getSize() << endl;
+    cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl;
 
     cout << endl << "5d) We'll now create a small tree and copy assign it to original and move assign it to move created tree" << endl << endl;
-    SimpleBST newBST{std::vector<int>{2, 1, 3}, c_InitialValue, c_NullValue};
-    simpleBST = newBST;
-    simpleBSTMove = std::move(newBST);
+    BinarySearchTree newSearchTree{std::vector<int>{2, 1, 3}, c_InitialValue, c_NullValue};
+    searchTree = newSearchTree;
+    searchTreeMove = std::move(newSearchTree);
     cout << "Tree created with move constructor:" << endl << endl;
-    simpleBSTMove.printNodesInfo();
+    searchTreeMove.printNodesInfo();
     cout << endl << "Original tree: " << endl << endl;
-    simpleBST.printNodesInfo();
+    searchTree.printNodesInfo();
     cout << endl << "New tree: " << endl;
-    newBST.printNodesInfo();
-    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
-    cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
-    cout << "New tree size: " << newBST.getSize() << endl;
+    newSearchTree.printNodesInfo();
+    cout << endl << "Original tree size: " << searchTree.getSize() << endl;
+    cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl;
+    cout << "New tree size: " << newSearchTree.getSize() << endl;
 
     cout << endl << "5e) Now we'll add one node to each of the original tree and new tree" << endl;
-    simpleBST.addOrUpdateNode(25, c_InitialValue);
-    newBST.addOrUpdateNode(20, c_InitialValue);
+    searchTree.addOrUpdateNode(25, c_InitialValue);
+    newSearchTree.addOrUpdateNode(20, c_InitialValue);
     cout << endl << "Original tree: " << endl << endl;
-    simpleBST.printNodesInfo();
+    searchTree.printNodesInfo();
     cout << endl << "New tree: " << endl;
-    newBST.printNodesInfo();
-    cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
-    cout << "New tree size: " << newBST.getSize() << endl;
+    newSearchTree.printNodesInfo();
+    cout << endl << "Original tree size: " << searchTree.getSize() << endl;
+    cout << "New tree size: " << newSearchTree.getSize() << endl;
 
     cout << endl << "6) Finally let's do a merge of two trees" << endl;
-    SimpleBST firstTree{std::vector<int>{2, -5, 9, 7}, c_InitialValue}, secondTree{std::vector<int>{14, 3, -2, 8, 4}, c_InitialValue};
+    BinarySearchTree firstTree{std::vector<int>{2, -5, 9, 7}, c_InitialValue}, secondTree{std::vector<int>{14, 3, -2, 8, 4}, c_InitialValue};
     firstTree.addOrUpdateNode(17, c_ChangedValue);
     secondTree.addOrUpdateNode(17, c_SecondChangedValue);
-    SimpleBST firstTreeCopy{firstTree}, secondTreeCopy{secondTree};
+    BinarySearchTree firstTreeCopy{firstTree}, secondTreeCopy{secondTree};
     cout << endl << "First tree: " << endl << endl;
     firstTree.printNodesInfo();
     cout << endl << "Value of node 17 in first tree is: " << firstTree.getNodeValue(17) << endl;
