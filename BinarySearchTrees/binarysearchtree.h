@@ -17,6 +17,8 @@ public:
     bool addOrUpdateNode(int key, const std::string& value); // true if node added (number of nodes increased)
     bool deleteNode(int key);
 
+    void mergeTree(SimpleBST& sourceTree);
+
     SimpleBST& operator=(const SimpleBST& sourceTree);
     SimpleBST& operator=(SimpleBST&& sourceTree);
 

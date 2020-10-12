@@ -164,6 +164,14 @@ bool SimpleBST::deleteNode(int key)
     return deleted;
 }
 
+void SimpleBST::mergeTree(SimpleBST& sourceTree)
+{
+    assert(m_DefaultNullValue == sourceTree.m_DefaultNullValue && "Default null values of trees don't match");
+
+    _copyTreeNodes(sourceTree);
+    sourceTree._deleteTreeNodes();
+}
+
 SimpleBST& SimpleBST::operator=(const SimpleBST& sourceTree)
 {
     if (m_Root != nullptr)
@@ -393,7 +401,10 @@ void SimpleBST::_copyTreeNodes(const SimpleBST& sourceTree)
         bool nodeAdded{false};
         _doAddOrUpdateNode((*it)->getKey(), (*it)->getValue(), nodeAdded);
 
-        assert(nodeAdded && "Source node not added");
+        if (!nodeAdded)
+        {
+            std::clog << "Warning: node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
+        }
     }
 }
 

@@ -11,6 +11,7 @@ int main()
     const std::string c_InitialValue{"initial"};
     const std::string c_NullValue{"none"};
     const std::string c_ChangedValue{"changed"};
+    const std::string c_SecondChangedValue{"changed again"};
     const std::vector<int> nodesBase{10, -2, 4, 3, -5, 8, 9, 7, -8, 0, 2, 5, 4};
 
     cout << "1) Let's create a binary search tree from an array" << endl << endl;
@@ -101,7 +102,7 @@ int main()
     cout << "Size of move constructor created tree: " << simpleBSTMove.getSize() << endl;
     cout << "New tree size: " << newBST.getSize() << endl;
 
-    cout << endl << "5e) Finally we'll add one node to each of the original tree and new tree" << endl;
+    cout << endl << "5e) Now we'll add one node to each of the original tree and new tree" << endl;
     simpleBST.addOrUpdateNode(25, c_InitialValue);
     newBST.addOrUpdateNode(20, c_InitialValue);
     cout << endl << "Original tree: " << endl << endl;
@@ -110,6 +111,40 @@ int main()
     newBST.printNodesInfo();
     cout << endl << "Original tree size: " << simpleBST.getSize() << endl;
     cout << "New tree size: " << newBST.getSize() << endl;
+
+    cout << endl << "6) Finally let's do a merge of two trees" << endl;
+    SimpleBST firstTree{std::vector<int>{2, -5, 9, 7}, c_InitialValue}, secondTree{std::vector<int>{14, 3, -2, 8, 4}, c_InitialValue};
+    firstTree.addOrUpdateNode(17, c_ChangedValue);
+    secondTree.addOrUpdateNode(17, c_SecondChangedValue);
+    SimpleBST firstTreeCopy{firstTree}, secondTreeCopy{secondTree};
+    cout << endl << "First tree: " << endl << endl;
+    firstTree.printNodesInfo();
+    cout << endl << "Value of node 17 in first tree is: " << firstTree.getNodeValue(17) << endl;
+    cout << endl << "Second tree: " << endl << endl;
+    secondTree.printNodesInfo();
+    cout << endl << "Value of node 17 in second tree is: " << secondTree.getNodeValue(17) << endl;
+    cout << endl << "First tree size: " << firstTree.getSize() << endl;
+    cout << "Second tree size: " << secondTree.getSize() << endl;
+
+    cout << endl << "6a) Merge second tree into the first" << endl;
+    firstTree.mergeTree(secondTree);
+    cout << endl << "First tree is now: " << endl << endl;
+    firstTree.printNodesInfo();
+    cout << endl << "Value of node 17 in merged tree is: " << firstTree.getNodeValue(17) << endl;
+    cout << endl << "Second tree is now: " << endl;
+    secondTree.printNodesInfo();
+    cout << endl << "First tree size: " << firstTree.getSize() << endl;
+    cout << "Second tree size: " << secondTree.getSize() << endl;
+
+    cout << endl << "6b) Merge first tree into the second" << endl;
+    secondTreeCopy.mergeTree(firstTreeCopy);
+    cout << endl << "First tree is now: " << endl;
+    firstTreeCopy.printNodesInfo();
+    cout << endl << "Second tree is now: " << endl;
+    secondTreeCopy.printNodesInfo();
+    cout << endl << "Value of key 17 in merged tree is: " << secondTreeCopy.getNodeValue(17) << endl;
+    cout << endl << "First tree size: " << firstTreeCopy.getSize() << endl;
+    cout << "Second tree size: " << secondTreeCopy.getSize() << endl;
 
     cout << endl << "That's all folks!" << endl << endl;
 
