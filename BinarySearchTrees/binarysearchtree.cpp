@@ -168,35 +168,44 @@ void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
 {
     assert(m_DefaultNullValue == sourceTree.m_DefaultNullValue && "Default null values of trees don't match");
 
-    _copyTreeNodes(sourceTree);
-    sourceTree._deleteTreeNodes();
+    if (this != &sourceTree)
+    {
+        _copyTreeNodes(sourceTree);
+        sourceTree._deleteTreeNodes();
+    }
 }
 
 BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree)
 {
-    if (m_Root != nullptr)
+    if (this != &sourceTree)
     {
-        _deleteTreeNodes();
-    }
+        if (m_Root != nullptr)
+        {
+            _deleteTreeNodes();
+        }
 
-    m_DefaultNullValue = sourceTree.m_DefaultNullValue;
-    _copyTreeNodes(sourceTree);
+        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        _copyTreeNodes(sourceTree);
+    }
 
     return *this;
 }
 
 BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
 {
-    if (m_Root != nullptr)
+    if (this != &sourceTree)
     {
-        _deleteTreeNodes();
-    }
+        if (m_Root != nullptr)
+        {
+            _deleteTreeNodes();
+        }
 
-    m_Root = sourceTree.m_Root;
-    m_Size = sourceTree.m_Size;
-    sourceTree.m_Root = nullptr;
-    sourceTree.m_Size = 0;
-    m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        m_Root = sourceTree.m_Root;
+        m_Size = sourceTree.m_Size;
+        sourceTree.m_Root = nullptr;
+        sourceTree.m_Size = 0;
+        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+    }
 
     return *this;
 }
