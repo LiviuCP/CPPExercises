@@ -101,6 +101,14 @@ int main()
     cout << endl << "Original tree size: " << searchTree.getSize() << endl;
     cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl;
     cout << "New tree size: " << newSearchTree.getSize() << endl;
+    if (searchTree == searchTreeMove)
+    {
+        cout << endl << "The original tree and the tree created with move constructor are equal" << endl;
+    }
+    else
+    {
+        cout << endl << "The original tree and the tree created with move constructor are not equal" << endl;
+    }
 
     cout << endl << "5e) Now we'll add one node to each of the original tree and new tree" << endl;
     searchTree.addOrUpdateNode(25, c_InitialValue);
@@ -145,6 +153,16 @@ int main()
     cout << endl << "Value of key 17 in merged tree is: " << secondTreeCopy.getNodeValue(17) << endl;
     cout << endl << "First tree size: " << firstTreeCopy.getSize() << endl;
     cout << "Second tree size: " << secondTreeCopy.getSize() << endl;
+
+    if (firstTree != secondTreeCopy)
+    {
+        cout << endl << "The merged tree versions are not equal" << endl;
+    }
+    else
+    {
+        cout << endl << "The merged tree versions are equal" << endl;
+    }
+
 
     cout << endl << "That's all folks!" << endl << endl;
 

@@ -210,6 +210,18 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
     return *this;
 }
 
+bool BinarySearchTree::operator==(const BinarySearchTree& tree) const
+{
+    bool areEqualTrees{_isEqualTo(tree)};
+    return areEqualTrees;
+}
+
+bool BinarySearchTree::operator!=(const BinarySearchTree &tree) const
+{
+    bool areNotEqualTrees{!_isEqualTo(tree)};
+    return areNotEqualTrees;
+}
+
 std::string BinarySearchTree::getNodeValue(int key) const
 {
     std::string result{m_DefaultNullValue};
@@ -417,6 +429,38 @@ void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
     }
 }
 
+bool BinarySearchTree::_isEqualTo(const BinarySearchTree &tree) const
+{
+    bool areEqualTrees{true};
+
+    if (this != &tree)
+    {
+        std::vector<Node*> nodes;
+        std::vector<Node*> treeNodes;
+
+        _convertTreeToArray(nodes);
+        tree._convertTreeToArray(treeNodes);
+
+        if (nodes.size() != treeNodes.size())
+        {
+            areEqualTrees = false;
+        }
+        else
+        {
+            for (size_t index{0}; index < nodes.size(); ++index)
+            {
+                if (*(nodes[index]) != *(treeNodes[index]))
+                {
+                    areEqualTrees = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return areEqualTrees;
+}
+
 BinarySearchTree::Node::Node(int key, std::string value)
     : m_Parent{nullptr}
     , m_LeftChild{nullptr}
@@ -555,4 +599,48 @@ BinarySearchTree::Node* BinarySearchTree::Node::getGrandparent() const
     }
 
     return result;
+}
+
+bool BinarySearchTree::Node::operator==(const BinarySearchTree::Node& node) const
+{
+    bool areEqualNodes{_isEqualTo(node)};
+    return areEqualNodes;
+}
+
+bool BinarySearchTree::Node::operator!=(const BinarySearchTree::Node& node) const
+{
+    bool areNotEqualNodes{!_isEqualTo(node)};
+    return areNotEqualNodes;
+}
+
+bool BinarySearchTree::Node::_isEqualTo(const BinarySearchTree::Node &node) const
+{
+    bool areEqualNodes{true};
+
+    if (m_Key != node.m_Key || m_Value != node.m_Value)
+    {
+        areEqualNodes = false;
+    }
+    else if ((m_Parent == nullptr && node.m_Parent != nullptr) || (m_Parent != nullptr && node.m_Parent == nullptr))
+    {
+        areEqualNodes = false;
+    }
+    else if ((m_Parent != nullptr) && (m_Parent->m_Key != node.m_Parent->m_Key || m_Parent->m_Value != node.m_Parent->m_Value))
+    {
+        areEqualNodes = false;
+    }
+    else
+    {
+        const bool isLeft{isLeftChild()};
+        const bool isRight{isRightChild()};
+        const bool isNodeLeft{node.isLeftChild()};
+        const bool isNodeRight{node.isRightChild()};
+
+        if ((isLeft && !isNodeLeft) || (!isLeft && isNodeLeft) || (isRight && !isNodeRight) || (!isRight && isNodeRight))
+        {
+            areEqualNodes = false;
+        }
+    }
+
+    return areEqualNodes;
 }

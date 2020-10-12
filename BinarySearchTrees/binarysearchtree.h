@@ -22,6 +22,9 @@ public:
     BinarySearchTree& operator=(const BinarySearchTree& sourceTree);
     BinarySearchTree& operator=(BinarySearchTree&& sourceTree);
 
+    bool operator==(const BinarySearchTree& tree) const;
+    bool operator!=(const BinarySearchTree& tree) const;
+
     std::string getNodeValue(int key) const;
     int getSize() const;
 
@@ -52,10 +55,15 @@ protected:
         Node* getUncle() const;
         Node* getGrandparent() const;
 
+        bool operator==(const Node& node) const;
+        bool operator!=(const Node& node) const;
+
     protected:
         Node* m_Parent;
         Node* m_LeftChild;
         Node* m_RightChild;
+
+        bool _isEqualTo(const Node& node) const;
 
     private:
         int m_Key;
@@ -67,6 +75,7 @@ protected:
     void _convertTreeToArray(std::vector<Node*>& nodes) const;
     void _deleteTreeNodes();
     void _copyTreeNodes(const BinarySearchTree &sourceTree);
+    bool _isEqualTo(const BinarySearchTree& tree) const;
 
     Node* m_Root;
     std::string m_DefaultNullValue;
