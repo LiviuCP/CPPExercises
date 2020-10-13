@@ -8,4 +8,5 @@ SOURCES += \
     binarysearchtree.cpp
 
 HEADERS += \
-    binarysearchtree.h
+    binarysearchtree.h \
+    treetesting.h
