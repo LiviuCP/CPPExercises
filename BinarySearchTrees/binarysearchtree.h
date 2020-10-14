@@ -73,6 +73,7 @@ protected:
     void _doAddOrUpdateNode(int key, const std::string& value, bool& newNodeAdded);
     Node* _findNode(int key) const;
     void _convertTreeToArray(std::vector<Node*>& nodes) const;
+    void _removeNodeFromTree(Node* nodeToRemove);
     void _deleteTreeNodes();
     void _copyTreeNodes(const BinarySearchTree &sourceTree);
     bool _isEqualTo(const BinarySearchTree& tree) const;

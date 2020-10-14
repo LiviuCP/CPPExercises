@@ -36,7 +36,7 @@
     (void)searchTree.addOrUpdateNode(7, c_NullValue); \
     cout << "Node has now the same value as before: "  << "\"" << searchTree.getNodeValue(7) << "\"" << endl; \
     cout << endl << "Tree has size: " << searchTree.getSize() << endl << endl; \
-    cout << "4) Now we'll remove three nodes: 4, 10, 9, -5 and -17" << endl << endl; \
+    cout << "4) Now we'll remove some nodes: 4, 10, 9, -5 and -17" << endl << endl; \
     (void)searchTree.deleteNode(4); \
     (void)searchTree.deleteNode(10); \
     (void)searchTree.deleteNode(9); \
