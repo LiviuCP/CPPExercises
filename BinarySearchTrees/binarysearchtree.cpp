@@ -17,9 +17,8 @@ BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std:
     {
         for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
         {
-            bool newNodeAdded{false};
-            _doAddOrUpdateNode(*it, defaultValue, newNodeAdded);
-            if (!newNodeAdded)
+            Node* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
+            if (addedNode == nullptr)
             {
                 std::clog << "Warning: duplicate key found: " << *it << std::endl;
             }
@@ -46,7 +45,7 @@ BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
 
 BinarySearchTree::~BinarySearchTree()
 {
-    _deleteTreeNodes();
+    _deleteAllTreeNodes();
 }
 
 bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
@@ -55,7 +54,11 @@ bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
 
     if (value != m_DefaultNullValue)
     {
-        _doAddOrUpdateNode(key, value, newNodeAdded);
+        const Node* addedNode{_doAddOrUpdateNode(key, value)};
+        if (addedNode != nullptr)
+        {
+            newNodeAdded = true;
+        }
     }
 
     return newNodeAdded;
@@ -85,7 +88,7 @@ void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
     if (this != &sourceTree)
     {
         _copyTreeNodes(sourceTree);
-        sourceTree._deleteTreeNodes();
+        sourceTree._deleteAllTreeNodes();
     }
 }
 
@@ -95,7 +98,7 @@ BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree
     {
         if (m_Root != nullptr)
         {
-            _deleteTreeNodes();
+            _deleteAllTreeNodes();
         }
 
         m_DefaultNullValue = sourceTree.m_DefaultNullValue;
@@ -111,7 +114,7 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteTreeNodes();
+            _deleteAllTreeNodes();
         }
 
         m_Root = sourceTree.m_Root;
@@ -196,12 +199,13 @@ void BinarySearchTree::printNodesInfo() const
     }
 }
 
-void BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value, bool& newNodeAdded)
+BinarySearchTree::Node* BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value)
 {
+    Node* addedNode{nullptr};
     if (m_Root == nullptr)
     {
-        m_Root = new Node{key, value};
-        newNodeAdded = true;
+        m_Root = _createNewNode(key, value);
+        addedNode = m_Root;
     }
     else
     {
@@ -217,9 +221,9 @@ void BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value, boo
                 Node* leftChild{currentNode->getLeftChild()};
                 if (leftChild == nullptr)
                 {
-                    currentNode->setLeftChild(new Node{key, value});
+                    addedNode = _createNewNode(key, value);
+                    currentNode->setLeftChild(addedNode);
                     entryPointFound = true;
-                    newNodeAdded = true;
                 }
                 else
                 {
@@ -231,9 +235,9 @@ void BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value, boo
                 Node* rightChild{currentNode->getRightChild()};
                 if (rightChild == nullptr)
                 {
-                    currentNode->setRightChild(new Node{key, value});
+                    addedNode = _createNewNode(key, value);
+                    currentNode->setRightChild(addedNode);
                     entryPointFound = true;
-                    newNodeAdded = true;
                 }
                 else
                 {
@@ -248,67 +252,12 @@ void BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value, boo
         }
     }
 
-    if (newNodeAdded)
+    if (addedNode != nullptr)
     {
         ++m_Size;
     }
-}
 
-BinarySearchTree::Node* BinarySearchTree::_findNode(int key) const
-{
-    Node* result{nullptr};
-    Node* currentNode{m_Root};
-
-    while (currentNode != nullptr)
-    {
-        const int c_CurrentNodeKey{currentNode->getKey()};
-
-        if (key < c_CurrentNodeKey)
-        {
-            currentNode = currentNode->getLeftChild();
-        }
-        else if (key > c_CurrentNodeKey)
-        {
-            currentNode = currentNode->getRightChild();
-        }
-        else
-        {
-            result = currentNode;
-            break;
-        }
-    }
-
-    return result;
-}
-
-void BinarySearchTree::_convertTreeToArray(std::vector<BinarySearchTree::Node*>& nodes) const
-{
-    if (m_Root != nullptr)
-    {
-        nodes.clear();
-        std::vector<Node*> parentsToCheck{m_Root};
-
-        while (parentsToCheck.size() != 0)
-        {
-            nodes.insert(nodes.end(), parentsToCheck.begin(), parentsToCheck.end());
-            std::vector<Node*> currentParentsToCheck{std::move(parentsToCheck)};
-
-            for (std::vector<Node*>::const_iterator it{currentParentsToCheck.cbegin()}; it != currentParentsToCheck.cend(); ++it)
-            {
-                Node* leftChild{(*it)->getLeftChild()};
-                if (leftChild != nullptr)
-                {
-                    parentsToCheck.push_back(leftChild);
-                }
-
-                Node* rightChild{(*it)->getRightChild()};
-                if (rightChild != nullptr)
-                {
-                    parentsToCheck.push_back(rightChild);
-                }
-            }
-        }
-    }
+    return addedNode;
 }
 
 void BinarySearchTree::_removeNodeFromTree(BinarySearchTree::Node* nodeToRemove)
@@ -404,7 +353,7 @@ void BinarySearchTree::_removeNodeFromTree(BinarySearchTree::Node* nodeToRemove)
     --m_Size;
 }
 
-void BinarySearchTree::_deleteTreeNodes()
+void BinarySearchTree::_deleteAllTreeNodes()
 {
     std::vector<Node*> nodesArray;
     _convertTreeToArray(nodesArray);
@@ -420,6 +369,69 @@ void BinarySearchTree::_deleteTreeNodes()
     m_Size = 0;
 }
 
+BinarySearchTree::Node* BinarySearchTree::_findNode(int key) const
+{
+    Node* foundNode{nullptr};
+    Node* currentNode{m_Root};
+
+    while (currentNode != nullptr)
+    {
+        const int c_CurrentNodeKey{currentNode->getKey()};
+
+        if (key < c_CurrentNodeKey)
+        {
+            currentNode = currentNode->getLeftChild();
+        }
+        else if (key > c_CurrentNodeKey)
+        {
+            currentNode = currentNode->getRightChild();
+        }
+        else
+        {
+            foundNode = currentNode;
+            break;
+        }
+    }
+
+    return foundNode;
+}
+
+void BinarySearchTree::_convertTreeToArray(std::vector<BinarySearchTree::Node*>& nodes) const
+{
+    if (m_Root != nullptr)
+    {
+        nodes.clear();
+        std::vector<Node*> parentsToCheck{m_Root};
+
+        while (parentsToCheck.size() != 0)
+        {
+            nodes.insert(nodes.end(), parentsToCheck.begin(), parentsToCheck.end());
+            std::vector<Node*> currentParentsToCheck{std::move(parentsToCheck)};
+
+            for (std::vector<Node*>::const_iterator it{currentParentsToCheck.cbegin()}; it != currentParentsToCheck.cend(); ++it)
+            {
+                Node* leftChild{(*it)->getLeftChild()};
+                if (leftChild != nullptr)
+                {
+                    parentsToCheck.push_back(leftChild);
+                }
+
+                Node* rightChild{(*it)->getRightChild()};
+                if (rightChild != nullptr)
+                {
+                    parentsToCheck.push_back(rightChild);
+                }
+            }
+        }
+    }
+}
+
+BinarySearchTree::Node* BinarySearchTree::_createNewNode(int key, const std::string& value)
+{
+    Node* newNode{new Node{key, value}};
+    return newNode;
+}
+
 void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
 {
     std::vector<Node*> sourceTreeArray;
@@ -427,10 +439,9 @@ void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
 
     for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
     {
-        bool nodeAdded{false};
-        _doAddOrUpdateNode((*it)->getKey(), (*it)->getValue(), nodeAdded);
+        const Node* addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
 
-        if (!nodeAdded)
+        if (addedNode == nullptr)
         {
             std::clog << "Warning: node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
         }

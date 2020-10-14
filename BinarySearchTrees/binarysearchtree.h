@@ -14,21 +14,24 @@ public:
 
     virtual ~BinarySearchTree();
 
-    bool addOrUpdateNode(int key, const std::string& value); // true if node added (number of nodes increased)
-    bool deleteNode(int key);
+    virtual bool addOrUpdateNode(int key, const std::string& value); // true if node added (number of nodes increased)
+    virtual bool deleteNode(int key);
 
-    void mergeTree(BinarySearchTree& sourceTree);
+    // this function can (and SHOULD) be reimplemented by derived classes in order to perform a class specific merge (e.g. red-black BST merge different from "simple" BST merge)
+    virtual void mergeTree(BinarySearchTree& sourceTree);
 
+    // these operators should be rendered private by derived classes as they should be replaced by operators with class specific arguments (similar to constructors)
     BinarySearchTree& operator=(const BinarySearchTree& sourceTree);
     BinarySearchTree& operator=(BinarySearchTree&& sourceTree);
 
+    // these operators can be used as they are by derived classes and it should be possible to check different search tree types for equivalence (or the lack of it)
     bool operator==(const BinarySearchTree& tree) const;
     bool operator!=(const BinarySearchTree& tree) const;
 
     std::string getNodeValue(int key) const;
     int getSize() const;
 
-    void printNodesInfo() const;
+    virtual void printNodesInfo() const;
 
 protected:
     class Node
@@ -70,19 +73,28 @@ protected:
         std::string m_Value;
     };
 
-    void _doAddOrUpdateNode(int key, const std::string& value, bool& newNodeAdded);
+
+    Node* _doAddOrUpdateNode(int key, const std::string& value);
+    void _removeNodeFromTree(Node* nodeToRemove);
+
+    void _deleteAllTreeNodes();
+
     Node* _findNode(int key) const;
     void _convertTreeToArray(std::vector<Node*>& nodes) const;
-    void _removeNodeFromTree(Node* nodeToRemove);
-    void _deleteTreeNodes();
-    void _copyTreeNodes(const BinarySearchTree &sourceTree);
-    bool _isEqualTo(const BinarySearchTree& tree) const;
+
+    // we need this function to be virtual so future node types can be created too (e.g. red-black nodes)
+    virtual Node* _createNewNode(int key, const std::string& value);
 
     Node* m_Root;
     std::string m_DefaultNullValue;
+    int m_Size;
 
 private:
-    int m_Size;
+    // should only be used in current (base) class as it only implements that "simple" BST logic
+    void _copyTreeNodes(const BinarySearchTree& sourceTree);
+
+    // equivalence logic remains the same for all classes, no need for this function to be used by derived classes
+    bool _isEqualTo(const BinarySearchTree& tree) const;
 };
 
 
