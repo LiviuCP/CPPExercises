@@ -160,35 +160,15 @@ int BinarySearchTree::getSize() const
 
 void BinarySearchTree::printNodesInfo() const
 {
-    auto displayRelative = [](const Node* node, const std::string& relativeName)
-    {
-        std::cout << " / " << relativeName << ": ";
-
-        if (node != nullptr)
-        {
-            std::cout << node->getKey();
-        }
-        else
-        {
-            std::cout << "N";
-        }
-    };
-
     std::vector<Node*> nodesArray;
     _convertTreeToArray(nodesArray);
 
     for (std::vector<Node*>::const_iterator it{nodesArray.cbegin()}; it != nodesArray.cend(); ++it)
     {
-        Node* currentNode{*it};
+        std::cout << "Node: " << (*it)->getKey();
+        std::cout << " / Is child: " << ((*it)->isLeftChild() ? "L" : (*it)->isRightChild() ? "R" : "N");
 
-        std::cout << "Node: " << currentNode->getKey();
-        std::cout << " / Is child: " << (currentNode->isLeftChild() ? "L" : currentNode->isRightChild() ? "R" : "N");
-
-        displayRelative(currentNode->getLeftChild(), "Left child");
-        displayRelative(currentNode->getRightChild(), "Right child");
-        displayRelative(currentNode->getParent(), "Parent");
-        displayRelative(currentNode->getUncle(), "Uncle");
-        displayRelative(currentNode->getGrandparent(), "Grandparent");
+        _printNodeRelativesInfo(*it);
 
         std::cout << std::endl;
     }
@@ -424,6 +404,29 @@ void BinarySearchTree::_convertTreeToArray(std::vector<BinarySearchTree::Node*>&
             }
         }
     }
+}
+
+void BinarySearchTree::_printNodeRelativesInfo(const BinarySearchTree::Node* node) const
+{
+    auto printNodeRelativeInfo = [](const Node* node, const std::string& relativeName)
+    {
+        std::cout << " / " << relativeName << ": ";
+
+        if (node != nullptr)
+        {
+            std::cout << node->getKey();
+        }
+        else
+        {
+            std::cout << "N";
+        }
+    };
+
+    printNodeRelativeInfo(node->getLeftChild(), "Left child");
+    printNodeRelativeInfo(node->getRightChild(), "Right child");
+    printNodeRelativeInfo(node->getParent(), "Parent");
+    printNodeRelativeInfo(node->getUncle(), "Uncle");
+    printNodeRelativeInfo(node->getGrandparent(), "Grandparent");
 }
 
 BinarySearchTree::Node* BinarySearchTree::_createNewNode(int key, const std::string& value)

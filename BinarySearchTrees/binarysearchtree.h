@@ -82,6 +82,8 @@ protected:
     Node* _findNode(int key) const;
     void _convertTreeToArray(std::vector<Node*>& nodes) const;
 
+    void _printNodeRelativesInfo(const Node* node) const;
+
     // we need this function to be virtual so future node types can be created too (e.g. red-black nodes)
     virtual Node* _createNewNode(int key, const std::string& value);
 
