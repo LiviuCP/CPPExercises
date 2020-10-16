@@ -17,8 +17,8 @@ public:
     virtual bool addOrUpdateNode(int key, const std::string& value); // true if node added (number of nodes increased)
     virtual bool deleteNode(int key);
 
-    // this function can (and SHOULD) be reimplemented by derived classes in order to perform a class specific merge (e.g. red-black BST merge different from "simple" BST merge)
-    virtual void mergeTree(BinarySearchTree& sourceTree);
+    // this function should be rendered private by derived classes as only same type trees are supposed to be merged
+    void mergeTree(BinarySearchTree& sourceTree);
 
     // these operators should be rendered private by derived classes as they should be replaced by operators with class specific arguments (similar to constructors)
     BinarySearchTree& operator=(const BinarySearchTree& sourceTree);
