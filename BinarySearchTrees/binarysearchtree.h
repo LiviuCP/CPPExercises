@@ -48,10 +48,10 @@ protected:
         bool isLeftChild() const;
         bool isRightChild() const;
 
-        void setLeftChild(Node* left);
+        void setLeftChild(Node* leftChild);
         Node* getLeftChild() const;
 
-        void setRightChild(Node* right);
+        void setRightChild(Node* rightChild);
         Node* getRightChild() const;
 
         Node* getParent() const;

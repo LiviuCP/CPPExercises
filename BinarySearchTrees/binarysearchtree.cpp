@@ -517,33 +517,38 @@ bool BinarySearchTree::Node::isRightChild() const
     return (m_Parent != nullptr && m_Parent->m_RightChild == this);
 }
 
-void BinarySearchTree::Node::setLeftChild(Node* left)
+/* It is the responsibility of the tree object to ensure that the correct node is added as left child and that the tree rules are followed
+   (e.g. don't add root as left child of a sub-node prior to decoupling it from its children */
+void BinarySearchTree::Node::setLeftChild(Node* leftChild)
 {
-    // ensure old left child gets decoupled from parent
-    if (m_LeftChild != nullptr)
+    if (m_LeftChild != leftChild)
     {
-        m_LeftChild->m_Parent = nullptr;
-    }
-
-    // ensure added left child gets decoupled from parent (if any) and coupled to actual parent
-    if (left != nullptr)
-    {
-        if (left->m_Parent != nullptr)
+        // ensure old left child gets decoupled from parent
+        if (m_LeftChild != nullptr)
         {
-            if (left->m_Parent->m_LeftChild == left)
-            {
-                left->m_Parent->m_LeftChild = nullptr;
-            }
-            else
-            {
-                left->m_Parent->m_RightChild = nullptr;
-            }
+            m_LeftChild->m_Parent = nullptr;
         }
 
-        left->m_Parent = this;
-    }
+        // ensure added left child gets decoupled from parent (if any) and coupled to actual parent
+        if (leftChild != nullptr)
+        {
+            if (leftChild->m_Parent != nullptr)
+            {
+                if (leftChild->m_Parent->m_LeftChild == leftChild)
+                {
+                    leftChild->m_Parent->m_LeftChild = nullptr;
+                }
+                else
+                {
+                    leftChild->m_Parent->m_RightChild = nullptr;
+                }
+            }
 
-    m_LeftChild = left;
+            leftChild->m_Parent = this;
+        }
+
+        m_LeftChild = leftChild;
+    }
 }
 
 BinarySearchTree::Node* BinarySearchTree::Node::getLeftChild() const
@@ -551,33 +556,38 @@ BinarySearchTree::Node* BinarySearchTree::Node::getLeftChild() const
     return m_LeftChild;
 }
 
-void BinarySearchTree::Node::setRightChild(BinarySearchTree::Node* right)
+/* It is the responsibility of the tree object to ensure that the correct node is added as right child and that the tree rules are followed
+   (e.g. don't add root as right child of a sub-node prior to decoupling it from its children */
+void BinarySearchTree::Node::setRightChild(BinarySearchTree::Node* rightChild)
 {
-    // ensure old right child gets decoupled from parent
-    if (m_RightChild != nullptr)
+    if (m_RightChild != rightChild)
     {
-        m_RightChild->m_Parent = nullptr;
-    }
-
-    // ensure added right child gets decoupled from old parent (if any) and coupled to actual parent
-    if (right != nullptr)
-    {
-        if (right->m_Parent != nullptr)
+        // ensure old right child gets decoupled from parent
+        if (m_RightChild != nullptr)
         {
-            if (right->m_Parent->m_LeftChild == right)
-            {
-                right->m_Parent->m_LeftChild = nullptr;
-            }
-            else
-            {
-                right->m_Parent->m_RightChild = nullptr;
-            }
+            m_RightChild->m_Parent = nullptr;
         }
 
-        right->m_Parent = this;
-    }
+        // ensure added right child gets decoupled from old parent (if any) and coupled to actual parent
+        if (rightChild != nullptr)
+        {
+            if (rightChild->m_Parent != nullptr)
+            {
+                if (rightChild->m_Parent->m_LeftChild == rightChild)
+                {
+                    rightChild->m_Parent->m_LeftChild = nullptr;
+                }
+                else
+                {
+                    rightChild->m_Parent->m_RightChild = nullptr;
+                }
+            }
 
-    m_RightChild = right;
+            rightChild->m_Parent = this;
+        }
+
+        m_RightChild = rightChild;
+    }
 }
 
 BinarySearchTree::Node *BinarySearchTree::Node::getRightChild() const
