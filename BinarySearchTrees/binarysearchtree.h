@@ -55,6 +55,7 @@ protected:
         Node* getRightChild() const;
 
         Node* getParent() const;
+        Node* getSibling() const;
         Node* getUncle() const;
         Node* getGrandparent() const;
 

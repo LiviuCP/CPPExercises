@@ -438,6 +438,7 @@ void BinarySearchTree::_printNodeRelativesInfo(const BinarySearchTree::Node* nod
     printNodeRelativeInfo(node->getLeftChild(), "Left child");
     printNodeRelativeInfo(node->getRightChild(), "Right child");
     printNodeRelativeInfo(node->getParent(), "Parent");
+    printNodeRelativeInfo(node->getSibling(), "Sibling");
     printNodeRelativeInfo(node->getUncle(), "Uncle");
     printNodeRelativeInfo(node->getGrandparent(), "Grandparent");
 }
@@ -611,6 +612,25 @@ BinarySearchTree::Node *BinarySearchTree::Node::getRightChild() const
 BinarySearchTree::Node* BinarySearchTree::Node::getParent() const
 {
     return m_Parent;
+}
+
+BinarySearchTree::Node* BinarySearchTree::Node::getSibling() const
+{
+    Node* result{nullptr};
+
+    if (m_Parent != nullptr)
+    {
+        if (m_Parent->m_LeftChild == this)
+        {
+            result = m_Parent->m_RightChild;
+        }
+        else
+        {
+            result = m_Parent->m_LeftChild;
+        }
+    }
+
+    return result;
 }
 
 BinarySearchTree::Node* BinarySearchTree::Node::getUncle() const
