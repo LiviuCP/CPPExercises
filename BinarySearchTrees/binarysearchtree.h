@@ -75,7 +75,7 @@ protected:
 
 
     Node* _doAddOrUpdateNode(int key, const std::string& value);
-    void _removeNodeFromTree(Node* nodeToRemove);
+    Node* _removeNodeFromTree(Node* nodeToRemove);
 
     void _deleteAllTreeNodes();
 
