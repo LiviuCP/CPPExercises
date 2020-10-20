@@ -71,8 +71,15 @@ bool BinarySearchTree::deleteNode(int key)
 
     if (nodeToDelete != nullptr)
     {
-        Node* replacingNode{_removeNodeFromTree(nodeToDelete)};
-        (void)replacingNode; // not used here, will be used by derived classes (e.g. red-black tree)
+        // for two-children node to be removed: the in-order successor content will be copied to the node; then the successor will be recursively deleted
+        if (nodeToDelete->getLeftChild() != nullptr && nodeToDelete->getRightChild() != nullptr)
+        {
+            nodeToDelete->copyInOrderSuccessorKeyAndValue();
+            nodeToDelete = nodeToDelete->getInOrderSuccessor();
+        }
+
+        Node* replacingNode{_removeSingleChildedOrLeafNode(nodeToDelete)};
+        (void)replacingNode; // not used here, might be used by derived classes (e.g. red-black tree)
 
         delete nodeToDelete;
         nodeToDelete = nullptr;
@@ -241,25 +248,47 @@ BinarySearchTree::Node* BinarySearchTree::_doAddOrUpdateNode(int key, const std:
     return addedNode;
 }
 
-BinarySearchTree::Node* BinarySearchTree::_removeNodeFromTree(BinarySearchTree::Node* nodeToRemove)
+BinarySearchTree::Node* BinarySearchTree::_removeSingleChildedOrLeafNode(BinarySearchTree::Node* nodeToRemove)
 {
-    auto replaceWithDirectChild = [nodeToRemove, this](Node* child)
+    Node* replacingNode{nullptr};
+
+    if (nodeToRemove != nullptr)
     {
-        if (nodeToRemove->isLeftChild())
+        Node* leftChild{nodeToRemove->getLeftChild()};
+        Node* rightChild{nodeToRemove->getRightChild()};
+
+        assert((leftChild == nullptr || rightChild == nullptr) && "Attempt to use the remove function on a node with two children");
+
+        // determine replacing node
+        if (leftChild != nullptr && rightChild == nullptr)
         {
-            nodeToRemove->getParent()->setLeftChild(child);
+            replacingNode = leftChild;
         }
-        else if (nodeToRemove->isRightChild())
+        else if (leftChild == nullptr && rightChild != nullptr)
         {
-            nodeToRemove->getParent()->setRightChild(child);
+            replacingNode = rightChild;
         }
         else
         {
-            m_Root = child;
+            // do nothing, leaf node (defensive programming)
+        }
 
-            if (child != nullptr)
+        // remove and replace
+        if (nodeToRemove->isLeftChild())
+        {
+            nodeToRemove->getParent()->setLeftChild(replacingNode);
+        }
+        else if (nodeToRemove->isRightChild())
+        {
+            nodeToRemove->getParent()->setRightChild(replacingNode);
+        }
+        else
+        {
+            m_Root = replacingNode;
+
+            if (replacingNode != nullptr)
             {
-                if (child->isLeftChild())
+                if (replacingNode->isLeftChild())
                 {
                     nodeToRemove->setLeftChild(nullptr);
                 }
@@ -269,79 +298,9 @@ BinarySearchTree::Node* BinarySearchTree::_removeNodeFromTree(BinarySearchTree::
                 }
             }
         }
-    };
 
-    auto replaceWithInOrderSuccessor = [nodeToRemove, this](Node* successor)
-    {
-        // handle removed node and successor node children accordingly (successor can only have a right child) - successor becomes childless and parentless
-        if (successor->isLeftChild())
-        {
-            successor->getParent()->setLeftChild(successor->getRightChild());
-        }
-        else
-        {
-            successor->getParent()->setRightChild(successor->getRightChild());
-        }
-
-        // set successor parent node (deleted node becomes parentless)
-        if (nodeToRemove->isLeftChild())
-        {
-            nodeToRemove->getParent()->setLeftChild(successor);
-        }
-        else if (nodeToRemove->isRightChild())
-        {
-            nodeToRemove->getParent()->setRightChild(successor);
-        }
-        else
-        {
-            m_Root = successor;
-        }
-
-        // move any left children from removed node to successor (successor replaces deleted node)
-        successor->setLeftChild(nodeToRemove->getLeftChild());
-        successor->setRightChild(nodeToRemove->getRightChild());
-    };
-
-    auto getInOrderSuccessor = [nodeToRemove]()
-    {
-        // get in order successor
-        Node* inOrderSuccessor{nodeToRemove->getRightChild()};
-        Node* successorChild{inOrderSuccessor->getLeftChild()};
-
-        while (successorChild != nullptr)
-        {
-            inOrderSuccessor = successorChild;
-            successorChild = successorChild->getLeftChild();
-        }
-
-        return inOrderSuccessor;
-    };
-
-    assert(nodeToRemove != nullptr && "Attempt to remove null node from tree");
-
-    Node* replacingNode{nullptr};
-
-    if (nodeToRemove->getLeftChild() == nullptr && nodeToRemove->getRightChild() == nullptr)
-    {
-        replaceWithDirectChild(replacingNode);
+        --m_Size;
     }
-    else if (nodeToRemove->getLeftChild() == nullptr)
-    {
-        replacingNode = nodeToRemove->getRightChild();
-        replaceWithDirectChild(replacingNode);
-    }
-    else if (nodeToRemove->getRightChild() == nullptr)
-    {
-        replacingNode = nodeToRemove->getLeftChild();
-        replaceWithDirectChild(replacingNode);
-    }
-    else
-    {
-        replacingNode = getInOrderSuccessor();
-        replaceWithInOrderSuccessor(replacingNode);
-    }
-
-    --m_Size;
 
     return replacingNode;
 }
@@ -607,6 +566,35 @@ void BinarySearchTree::Node::setRightChild(BinarySearchTree::Node* rightChild)
 BinarySearchTree::Node *BinarySearchTree::Node::getRightChild() const
 {
     return m_RightChild;
+}
+
+void BinarySearchTree::Node::copyInOrderSuccessorKeyAndValue()
+{
+    Node* successor{getInOrderSuccessor()};
+
+    if (successor != nullptr)
+    {
+        m_Key = successor->m_Key;
+        m_Value = successor->m_Value;
+    }
+}
+
+BinarySearchTree::Node* BinarySearchTree::Node::getInOrderSuccessor() const
+{
+    Node* inOrderSuccessor{m_RightChild};
+
+    if (m_RightChild != nullptr)
+    {
+        Node* successorChild{inOrderSuccessor->m_LeftChild};
+
+        while (successorChild != nullptr)
+        {
+            inOrderSuccessor = successorChild;
+            successorChild = inOrderSuccessor->m_LeftChild;
+        }
+    }
+
+    return inOrderSuccessor;
 }
 
 BinarySearchTree::Node* BinarySearchTree::Node::getParent() const

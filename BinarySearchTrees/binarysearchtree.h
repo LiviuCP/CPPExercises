@@ -54,6 +54,9 @@ protected:
         void setRightChild(Node* rightChild);
         Node* getRightChild() const;
 
+        void copyInOrderSuccessorKeyAndValue();
+        Node* getInOrderSuccessor() const;
+
         Node* getParent() const;
         Node* getSibling() const;
         Node* getUncle() const;
@@ -76,7 +79,7 @@ protected:
 
 
     Node* _doAddOrUpdateNode(int key, const std::string& value);
-    Node* _removeNodeFromTree(Node* nodeToRemove);
+    Node* _removeSingleChildedOrLeafNode(Node* nodeToRemove);
 
     void _deleteAllTreeNodes();
 
