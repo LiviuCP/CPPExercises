@@ -378,6 +378,44 @@ void BinarySearchTree::_convertTreeToArray(std::vector<BinarySearchTree::Node*>&
     }
 }
 
+// a right child node is required for left rotation
+void BinarySearchTree::_rotateNodeLeft(BinarySearchTree::Node* node)
+{
+    if (node != nullptr)
+    {
+        Node* rightChild{node->getRightChild()};
+
+        if (rightChild != nullptr)
+        {
+            node->rotateLeft();
+
+            if (m_Root == node)
+            {
+                m_Root = rightChild;
+            }
+        }
+    }
+}
+
+// a left child node is required for right rotation
+void BinarySearchTree::_rotateNodeRight(BinarySearchTree::Node* node)
+{
+    if (node != nullptr)
+    {
+        Node* leftChild{node->getLeftChild()};
+
+        if (leftChild != nullptr)
+        {
+            node->rotateRight();
+
+            if (m_Root == node)
+            {
+                m_Root = leftChild;
+            }
+        }
+    }
+}
+
 void BinarySearchTree::_printNodeRelativesInfo(const BinarySearchTree::Node* node) const
 {
     auto printNodeRelativeInfo = [](const Node* node, const std::string& relativeName)
@@ -595,6 +633,86 @@ BinarySearchTree::Node* BinarySearchTree::Node::getInOrderSuccessor() const
     }
 
     return inOrderSuccessor;
+}
+
+void BinarySearchTree::Node::rotateLeft()
+{
+    assert(m_RightChild != nullptr && "Attempt to left rotate node without right child");
+
+    Node* rightChild{m_RightChild};
+    Node* rightLeftChild{m_RightChild->m_LeftChild};
+    Node* parent{m_Parent};
+
+    // current node becomes left child of its actual right child
+    m_RightChild->m_LeftChild = this;
+    m_Parent = rightChild;
+
+    // left child of actual right child becomes right child of current node
+    if (rightLeftChild != nullptr)
+    {
+        rightLeftChild->m_Parent = this;
+    }
+
+    m_RightChild = rightLeftChild;
+
+    // parent of current node (if any) becomes parent of actual right child (the new child remains same type of child for parent as before)
+    if (parent != nullptr)
+    {
+        if (parent->m_LeftChild == this)
+        {
+            parent->m_LeftChild = rightChild;
+            rightChild->m_Parent = parent;
+        }
+        else
+        {
+            parent->m_RightChild = rightChild;
+            rightChild->m_Parent = parent;
+        }
+    }
+    else
+    {
+        rightChild->m_Parent = nullptr;
+    }
+}
+
+void BinarySearchTree::Node::rotateRight()
+{
+    assert(m_LeftChild != nullptr && "Attempt to right rotate node without left child");
+
+    Node* leftChild{m_LeftChild};
+    Node* leftRightChild{m_LeftChild->m_RightChild};
+    Node* parent{m_Parent};
+
+    // current node becomes right child of its actual left child
+    m_LeftChild->m_RightChild = this;
+    m_Parent = leftChild;
+
+    // right child of actual left child becomes left child of current node
+    if (leftRightChild != nullptr)
+    {
+        leftRightChild->m_Parent = this;
+    }
+
+    m_LeftChild = leftRightChild;
+
+    // parent of current node (if any) becomes parent of actual left child (the new child remains same type of child for parent as before)
+    if (parent != nullptr)
+    {
+        if (parent->m_LeftChild == this)
+        {
+            parent->m_LeftChild = leftChild;
+            leftChild->m_Parent = parent;
+        }
+        else
+        {
+            parent->m_RightChild = leftChild;
+            leftChild->m_Parent = parent;
+        }
+    }
+    else
+    {
+        leftChild->m_Parent = nullptr;
+    }
 }
 
 BinarySearchTree::Node* BinarySearchTree::Node::getParent() const

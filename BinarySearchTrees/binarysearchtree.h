@@ -57,6 +57,10 @@ protected:
         void copyInOrderSuccessorKeyAndValue();
         Node* getInOrderSuccessor() const;
 
+        // required for implementing red-black, AVL trees etc.
+        void rotateLeft();
+        void rotateRight();
+
         Node* getParent() const;
         Node* getSibling() const;
         Node* getUncle() const;
@@ -86,9 +90,15 @@ protected:
     Node* _findNode(int key) const;
     void _convertTreeToArray(std::vector<Node*>& nodes) const;
 
+    void _rotateNodeLeft(Node* node);
+    void _rotateNodeRight(Node* node);
+
     void _printNodeRelativesInfo(const Node* node) const;
 
-    // we need this function to be virtual so future node types can be created too (e.g. red-black nodes)
+    /* We need this function to be virtual so future node types can be created too (e.g. red-black nodes)
+       It should be used by the base _doAddOrUpdateNode() method unless a different implementation is required
+       It should be implemented by each class that requires a node type different from Node
+       A tree class is supposed to have nodes of the same type so a static_cast conversion (Node* -> [OtherNode]*) should be possible */
     virtual Node* _createNewNode(int key, const std::string& value);
 
     Node* m_Root;
