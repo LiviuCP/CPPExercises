@@ -18,7 +18,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
     {
         for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
         {
-            RedBlackNode* addedNode{_doAddOrUpdateRBNode(*it, defaultValue)};
+            RedBlackNode* addedNode{_doAddOrUpdateRBTreeNode(*it, defaultValue)};
             if (addedNode == nullptr)
             {
                 std::clog << "Warning: duplicate red-black tree key found: " << *it << std::endl;
@@ -49,7 +49,7 @@ bool RedBlackTree::addOrUpdateNode(int key, const std::string& value)
 
     if (value != m_DefaultNullValue)
     {
-        const RedBlackNode* addedNode{_doAddOrUpdateRBNode(key, value)};
+        const RedBlackNode* addedNode{_doAddOrUpdateRBTreeNode(key, value)};
 
         if (addedNode != nullptr)
         {
@@ -154,22 +154,25 @@ void RedBlackTree::printNodesInfo() const
     }
 }
 
-RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateRBNode(int key, const std::string& value)
+/* Two steps are required for adding a new RB node (update works the same as for simple BST):
+  - add the node as per BST standard (inherited) procedure
+  - apply required transformation to resulting tree structure (rotations, recoloring) for ensuring the four rules (see redblacktree.h) are obeyed
+*/
+RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateRBTreeNode(int key, const std::string& value)
 {
-    // first: add the RB node as per standard procedure for binary search trees
     RedBlackNode* addedNode{static_cast<RedBlackNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
 
-    // second: apply the required transformations for enforcing the RB tree rules
     if (addedNode != nullptr)
     {
         RedBlackNode* currentNode{addedNode};
         RedBlackNode* parent{static_cast<RedBlackNode*>(currentNode->getParent())};
 
-        // there is always a grandparent (parent is red so there should be a black grandparent)
         while(parent != nullptr && !parent->isBlack())
         {
             RedBlackNode* uncle{static_cast<RedBlackNode*>(currentNode->getUncle())};
-            RedBlackNode* grandParent{static_cast<RedBlackNode*>(currentNode->getGrandparent())};
+            RedBlackNode* grandparent{static_cast<RedBlackNode*>(currentNode->getGrandparent())};
+
+            assert(grandparent != nullptr && "Null grandparent for current node"); // there should always be a grandparent (parent is red)
 
             if (uncle == nullptr || uncle->isBlack())
             {
@@ -177,34 +180,30 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateRBNode(int key, const st
                 bool isNodeLeftChild{currentNode->isLeftChild()};
                 bool isParentLeftChild{parent->isLeftChild()};
 
-                if (isParentLeftChild && isNodeLeftChild)
+                if (isParentLeftChild && isNodeLeftChild) // left - left: rotate grandparent right, then swap colors of grandparent (black->red) and parent (red->black)
                 {
-                    // left - left: rotate grandparent right, then swap colors of grandparent (black->red) and parent (red->black)
-                    _rotateNodeRight(grandParent);
-                    grandParent->setBlack(false);
+                    _rotateNodeRight(grandparent);
+                    grandparent->setBlack(false);
                     parent->setBlack(true);
                 }
-                else if (isParentLeftChild && !isNodeLeftChild)
+                else if (isParentLeftChild && !isNodeLeftChild) // left - right: rotate parent left and then apply previous case (but this time current node and grandparent have colors swapped)
                 {
-                    // left - right: rotate parent left and then apply previous case (but this time current node and grandparent have colors swapped)
                     _rotateNodeLeft(parent);
-                    _rotateNodeRight(grandParent);
-                    grandParent->setBlack(false);
+                    _rotateNodeRight(grandparent);
+                    grandparent->setBlack(false);
                     currentNode->setBlack(true);
                 }
-                else if (!isParentLeftChild && isNodeLeftChild)
+                else if (!isParentLeftChild && isNodeLeftChild) // right - left: rotate parent left, then apply next case (but this time current node and grandparent have colors swapped)
                 {
-                    // right - left: rotate parent left, then apply next case (but this time current node and grandparent have colors swapped)
                     _rotateNodeRight(parent);
-                    _rotateNodeLeft(grandParent);
-                    grandParent->setBlack(false);
+                    _rotateNodeLeft(grandparent);
+                    grandparent->setBlack(false);
                     currentNode->setBlack(true);
                 }
-                else
+                else // right - right: rotate grandparent left, then swap colors of grandparent (black->red) and parent (red->black)
                 {
-                    // right - right: rotate grandparent left, then swap colors of grandparent (black->red) and parent (red->black)
-                    _rotateNodeLeft(grandParent);
-                    grandParent->setBlack(false);
+                    _rotateNodeLeft(grandparent);
+                    grandparent->setBlack(false);
                     parent->setBlack(true);
                 }
 
@@ -214,8 +213,8 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateRBNode(int key, const st
             {
                 parent->setBlack(true);
                 uncle->setBlack(true);
-                grandParent->setBlack(false);
-                currentNode = grandParent;
+                grandparent->setBlack(false);
+                currentNode = grandparent;
                 parent = static_cast<RedBlackNode*>(currentNode->getParent());
 
                 if (parent == nullptr)
@@ -362,7 +361,7 @@ void RedBlackTree::_copyRBTreeNodes(const RedBlackTree& sourceTree)
 
     for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
     {
-        const Node* addedNode{_doAddOrUpdateRBNode((*it)->getKey(), (*it)->getValue())};
+        const Node* addedNode{_doAddOrUpdateRBTreeNode((*it)->getKey(), (*it)->getValue())};
 
         if (addedNode == nullptr)
         {

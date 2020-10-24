@@ -59,7 +59,7 @@ private:
     using BinarySearchTree::mergeTree;
     using BinarySearchTree::operator=;
 
-    RedBlackNode* _doAddOrUpdateRBNode(int key, const std::string& value);
+    RedBlackNode* _doAddOrUpdateRBTreeNode(int key, const std::string& value);
     void _removeNodeFromRBTree(RedBlackNode* nodeToRemove);
 
     void _copyRBTreeNodes(const RedBlackTree& sourceTree);
