@@ -33,3 +33,4 @@
 
 # Other
 *.pro.user
+build-*
