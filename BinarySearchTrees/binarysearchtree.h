@@ -96,9 +96,11 @@ protected:
     void _printNodeRelatives(const Node* node) const;
 
     /* We need this function to be virtual so future node types can be created too (e.g. red-black nodes)
-       It should be used by the base _doAddOrUpdateNode() method unless a different implementation is required
-       It should be implemented by each class that requires a node type different from Node
-       A tree class is supposed to have nodes of the same type so a static_cast conversion (Node* -> [OtherNode]*) should be possible */
+       It creates a dynamically allocated node object of type Node or a derived type
+       It is used by the base _doAddOrUpdateNode() method for adding a new node to the tree
+       It should be implemented by each class that requires a node type different from Node (this type should be derived from Node)
+       A tree class is supposed to have nodes of the same type so a static_cast conversion (Node* -> [DerivedNode]*) would be possible for accessing the derived nodes specific properties/methods
+    */
     virtual Node* _createNewNode(int key, const std::string& value);
 
     Node* m_Root;
