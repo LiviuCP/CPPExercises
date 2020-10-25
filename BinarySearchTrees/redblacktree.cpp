@@ -18,7 +18,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
     {
         for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
         {
-            RedBlackNode* addedNode{_doAddOrUpdateRBTreeNode(*it, defaultValue)};
+            RedBlackNode* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
             if (addedNode == nullptr)
             {
                 std::clog << "Warning: duplicate red-black tree key found: " << *it << std::endl;
@@ -49,7 +49,7 @@ bool RedBlackTree::addOrUpdateNode(int key, const std::string& value)
 
     if (value != m_DefaultNullValue)
     {
-        const RedBlackNode* addedNode{_doAddOrUpdateRBTreeNode(key, value)};
+        const RedBlackNode* addedNode{_doAddOrUpdateNode(key, value)};
 
         if (addedNode != nullptr)
         {
@@ -76,7 +76,7 @@ bool RedBlackTree::deleteNode(int key)
             nodeToDelete = static_cast<RedBlackNode*>(nodeToDelete->getInOrderSuccessor());
         }
 
-        _removeNodeFromRBTree(nodeToDelete);
+        _removeSingleChildedOrLeafNode(nodeToDelete);
 
         delete nodeToDelete;
         nodeToDelete = nullptr;
@@ -158,7 +158,7 @@ void RedBlackTree::printTree() const
   - add the node as per BST standard (inherited) procedure
   - apply required transformation to resulting tree structure (rotations, recoloring) for ensuring the four rules (see redblacktree.h) are obeyed
 */
-RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateRBTreeNode(int key, const std::string& value)
+RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateNode(int key, const std::string& value)
 {
     RedBlackNode* addedNode{static_cast<RedBlackNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
 
@@ -242,13 +242,14 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateRBTreeNode(int key, cons
    - the second step is performed only if a black node has been removed. Removing a red node (which can only be leaf) does not affect the rules.
    - the second step contains two cases: child of removed node is red (simple case - red child becomes black) and a black leaf node has been removed (complex case - more sub-cases/scenarios)
 */
-void RedBlackTree::_removeNodeFromRBTree(RedBlackTree::RedBlackNode* nodeToRemove)
+void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node from red-black tree");
+    assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
 
     RedBlackNode* parent{static_cast<RedBlackNode*>(nodeToRemove->getParent())};
     RedBlackNode* sibling{static_cast<RedBlackNode*>(nodeToRemove->getSibling())};
-    RedBlackNode* replacingNode{static_cast<RedBlackNode*>(_removeSingleChildedOrLeafNode(nodeToRemove))};
+    RedBlackNode* replacingNode{static_cast<RedBlackNode*>(BinarySearchTree::_removeSingleChildedOrLeafNode(nodeToRemove))};
 
     if (nodeToRemove->isBlack())
     {
@@ -361,7 +362,7 @@ void RedBlackTree::_copyRBTreeNodes(const RedBlackTree& sourceTree)
 
     for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
     {
-        const Node* addedNode{_doAddOrUpdateRBTreeNode((*it)->getKey(), (*it)->getValue())};
+        const Node* addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
 
         if (addedNode == nullptr)
         {

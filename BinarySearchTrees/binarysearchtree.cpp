@@ -268,9 +268,8 @@ BinarySearchTree::Node* BinarySearchTree::_removeSingleChildedOrLeafNode(BinaryS
         {
             replacingNode = rightChild;
         }
-        else
+        else // do nothing, leaf node (defensive programming)
         {
-            // do nothing, leaf node (defensive programming)
         }
 
         // remove and replace
