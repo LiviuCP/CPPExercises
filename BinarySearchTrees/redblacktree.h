@@ -39,7 +39,7 @@ public:
     RedBlackTree& operator=(const RedBlackTree& sourceTree);
     RedBlackTree& operator=(RedBlackTree&& sourceTree);
 
-    virtual void printNodesInfo() const override;
+    virtual void printTree() const override;
 
 private:
     class RedBlackNode : public Node

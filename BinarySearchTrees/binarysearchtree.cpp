@@ -166,7 +166,7 @@ int BinarySearchTree::getSize() const
     return m_Size;
 }
 
-void BinarySearchTree::printNodesInfo() const
+void BinarySearchTree::printTree() const
 {
     std::vector<Node*> nodesArray;
     _convertTreeToArray(nodesArray);
@@ -176,7 +176,7 @@ void BinarySearchTree::printNodesInfo() const
         std::cout << "Node: " << (*it)->getKey();
         std::cout << " / Is child: " << ((*it)->isLeftChild() ? "L" : (*it)->isRightChild() ? "R" : "N");
 
-        _printNodeRelativesInfo(*it);
+        _printNodeRelatives(*it);
 
         std::cout << std::endl;
     }
@@ -416,7 +416,7 @@ void BinarySearchTree::_rotateNodeRight(BinarySearchTree::Node* node)
     }
 }
 
-void BinarySearchTree::_printNodeRelativesInfo(const BinarySearchTree::Node* node) const
+void BinarySearchTree::_printNodeRelatives(const BinarySearchTree::Node* node) const
 {
     auto printNodeRelativeInfo = [](const Node* node, const std::string& relativeName)
     {

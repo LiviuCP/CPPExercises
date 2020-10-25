@@ -22,7 +22,7 @@
     SearchTreeType searchTree{nodesBase, c_InitialValue, c_NullValue}; \
                                                                             \
     cout << endl << "Obtained tree (all nodes with value \"" << c_InitialValue << "\") is: " << endl << endl; \
-    searchTree.printNodesInfo(); \
+    searchTree.printTree(); \
     cout << endl << "Tree has " << searchTree.getSize() << " nodes" << endl << endl; \
                                                                                       \
     cout << "2) We'll set a new value for node 3 and then print values for nodes 3, -8 and 7" << endl << endl; \
@@ -43,7 +43,7 @@
     (void)searchTree.deleteNode(-5); \
     const bool success{searchTree.deleteNode(-17)}; \
     cout << "Updated tree is: " << endl << endl; \
-    searchTree.printNodesInfo(); \
+    searchTree.printTree(); \
     cout << endl << "It has size: " << searchTree.getSize() << endl; \
     if (!success) \
     { \
@@ -55,12 +55,12 @@
     cout << "5a) First we'll create two new nodes based on original one, one with copy and one with move constructor" << endl << endl; \
     SearchTreeType searchTreeCopy{searchTree}; \
     cout << "Tree created with copy constructor: " << endl << endl; \
-    searchTreeCopy.printNodesInfo(); \
+    searchTreeCopy.printTree(); \
     SearchTreeType searchTreeMove{std::move(searchTree)}; \
     cout << endl << "Tree created with move constructor:" << endl << endl; \
-    searchTreeMove.printNodesInfo(); \
+    searchTreeMove.printTree(); \
     cout << endl << "Original tree after move operation: " << endl; \
-    searchTree.printNodesInfo(); \
+    searchTree.printTree(); \
     cout << endl << "Original tree size: " << searchTree.getSize() << endl; \
     cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl; \
     cout << "Size of copy constructor created tree: " << searchTreeCopy.getSize() << endl; \
@@ -68,18 +68,18 @@
     cout << endl << "5b) Move assigning the move created tree to original tree" << endl << endl; \
     searchTree = std::move(searchTreeMove); \
     cout << "Tree created with move constructor" << endl; \
-    searchTreeMove.printNodesInfo(); \
+    searchTreeMove.printTree(); \
     cout << endl << "Original tree: " << endl << endl; \
-    searchTree.printNodesInfo(); \
+    searchTree.printTree(); \
     cout << endl << "Original tree size: " << searchTree.getSize() << endl; \
     cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl; \
                                                                                             \
     cout << endl << "5c) Copy assigning the original tree to move created tree" << endl << endl; \
     searchTreeMove = searchTree; \
     cout << "Tree created with move constructor:" << endl << endl; \
-    searchTreeMove.printNodesInfo(); \
+    searchTreeMove.printTree(); \
     cout << endl << "Original tree: " << endl << endl; \
-    searchTree.printNodesInfo(); \
+    searchTree.printTree(); \
     cout << endl << "Original tree size: " << searchTree.getSize() << endl; \
     cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl; \
                                                                                            \
@@ -88,11 +88,11 @@
     searchTree = newSearchTree; \
     searchTreeMove = std::move(newSearchTree); \
     cout << "Tree created with move constructor:" << endl << endl; \
-    searchTreeMove.printNodesInfo(); \
+    searchTreeMove.printTree(); \
     cout << endl << "Original tree: " << endl << endl; \
-    searchTree.printNodesInfo(); \
+    searchTree.printTree(); \
     cout << endl << "New tree: " << endl; \
-    newSearchTree.printNodesInfo(); \
+    newSearchTree.printTree(); \
     cout << endl << "Original tree size: " << searchTree.getSize() << endl; \
     cout << "Size of move constructor created tree: " << searchTreeMove.getSize() << endl; \
     cout << "New tree size: " << newSearchTree.getSize() << endl; \
@@ -109,9 +109,9 @@
     searchTree.addOrUpdateNode(25, c_InitialValue); \
     newSearchTree.addOrUpdateNode(20, c_InitialValue); \
     cout << endl << "Original tree: " << endl << endl; \
-    searchTree.printNodesInfo(); \
+    searchTree.printTree(); \
     cout << endl << "New tree: " << endl; \
-    newSearchTree.printNodesInfo(); \
+    newSearchTree.printTree(); \
     cout << endl << "Original tree size: " << searchTree.getSize() << endl; \
     cout << "New tree size: " << newSearchTree.getSize() << endl; \
                                                                   \
@@ -121,10 +121,10 @@
     secondTree.addOrUpdateNode(17, c_SecondChangedValue); \
     SearchTreeType firstTreeCopy{firstTree}, secondTreeCopy{secondTree}; \
     cout << endl << "First tree: " << endl << endl; \
-    firstTree.printNodesInfo(); \
+    firstTree.printTree(); \
     cout << endl << "Value of node 17 in first tree is: " << firstTree.getNodeValue(17) << endl; \
     cout << endl << "Second tree: " << endl << endl; \
-    secondTree.printNodesInfo(); \
+    secondTree.printTree(); \
     cout << endl << "Value of node 17 in second tree is: " << secondTree.getNodeValue(17) << endl; \
     cout << endl << "First tree size: " << firstTree.getSize() << endl; \
     cout << "Second tree size: " << secondTree.getSize() << endl; \
@@ -132,19 +132,19 @@
     cout << endl << "6a) Merge second tree into the first" << endl; \
     firstTree.mergeTree(secondTree); \
     cout << endl << "First tree is now: " << endl << endl; \
-    firstTree.printNodesInfo(); \
+    firstTree.printTree(); \
     cout << endl << "Value of node 17 in merged tree is: " << firstTree.getNodeValue(17) << endl; \
     cout << endl << "Second tree is now: " << endl; \
-    secondTree.printNodesInfo(); \
+    secondTree.printTree(); \
     cout << endl << "First tree size: " << firstTree.getSize() << endl; \
     cout << "Second tree size: " << secondTree.getSize() << endl; \
                                                                   \
     cout << endl << "6b) Merge first tree into the second" << endl; \
     secondTreeCopy.mergeTree(firstTreeCopy); \
     cout << endl << "First tree is now: " << endl; \
-    firstTreeCopy.printNodesInfo(); \
+    firstTreeCopy.printTree(); \
     cout << endl << "Second tree is now: " << endl; \
-    secondTreeCopy.printNodesInfo(); \
+    secondTreeCopy.printTree(); \
     cout << endl << "Value of key 17 in merged tree is: " << secondTreeCopy.getNodeValue(17) << endl; \
     cout << endl << "First tree size: " << firstTreeCopy.getSize() << endl; \
     cout << "Second tree size: " << secondTreeCopy.getSize() << endl; \

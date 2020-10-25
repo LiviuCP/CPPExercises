@@ -31,7 +31,7 @@ public:
     std::string getNodeValue(int key) const;
     int getSize() const;
 
-    virtual void printNodesInfo() const;
+    virtual void printTree() const;
 
 protected:
     class Node
@@ -93,7 +93,7 @@ protected:
     void _rotateNodeLeft(Node* node);
     void _rotateNodeRight(Node* node);
 
-    void _printNodeRelativesInfo(const Node* node) const;
+    void _printNodeRelatives(const Node* node) const;
 
     /* We need this function to be virtual so future node types can be created too (e.g. red-black nodes)
        It should be used by the base _doAddOrUpdateNode() method unless a different implementation is required

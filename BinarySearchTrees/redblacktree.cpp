@@ -132,7 +132,7 @@ RedBlackTree& RedBlackTree::operator=(RedBlackTree&& sourceTree)
     return *this;
 }
 
-void RedBlackTree::printNodesInfo() const
+void RedBlackTree::printTree() const
 {
     std::vector<Node*> nodesArray;
     _convertTreeToArray(nodesArray);
@@ -143,7 +143,7 @@ void RedBlackTree::printNodesInfo() const
         std::cout << "/ Colour: " << (static_cast<RedBlackNode*>(*it)->isBlack() ? "B" : "R");
         std::cout << " / Is child: " << ((*it)->isLeftChild() ? "L" : (*it)->isRightChild() ? "R" : "N");
 
-        _printNodeRelativesInfo(*it);
+        _printNodeRelatives(*it);
 
         std::cout << std::endl;
     }
