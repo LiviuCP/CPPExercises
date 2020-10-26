@@ -271,11 +271,11 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
                     assert((sibling != nullptr && sibling->getParent() != nullptr) && "Invalid sibling of non-root black node found");
                 }
 
-                RedBlackNode* siblingLeftChild{static_cast<RedBlackNode*>(sibling->getLeftChild())};
-                RedBlackNode* siblingRightChild{static_cast<RedBlackNode*>(sibling->getRightChild())};
+                RedBlackNode* siblingLeftChild{sibling != nullptr ? static_cast<RedBlackNode*>(sibling->getLeftChild()) : nullptr};
+                RedBlackNode* siblingRightChild{sibling != nullptr ? static_cast<RedBlackNode*>(sibling->getRightChild()) : nullptr};
                 bool isSiblingLeftChildRed{siblingLeftChild != nullptr && !siblingLeftChild->isBlack()};
                 bool isSiblingRightChildRed{siblingRightChild != nullptr && !siblingRightChild->isBlack()};
-                bool isLeftSibling{sibling->isLeftChild()};
+                bool isLeftSibling{sibling != nullptr && sibling->isLeftChild()};
 
                 if (doubleBlackNode == m_Root)
                 {
