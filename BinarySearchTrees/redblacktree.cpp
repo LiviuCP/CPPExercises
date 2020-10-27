@@ -265,34 +265,48 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
 
             while (!isTreeValid)
             {
-                // non-root BLACK node SHOULD HAVE a sibling to avoid rule 4 violation
-                if (doubleBlackNode != m_Root)
-                {
-                    assert((sibling != nullptr && sibling->getParent() != nullptr) && "Invalid sibling of non-root black node found");
-                }
-
-                RedBlackNode* siblingLeftChild{sibling != nullptr ? static_cast<RedBlackNode*>(sibling->getLeftChild()) : nullptr};
-                RedBlackNode* siblingRightChild{sibling != nullptr ? static_cast<RedBlackNode*>(sibling->getRightChild()) : nullptr};
-                bool isSiblingLeftChildRed{siblingLeftChild != nullptr && !siblingLeftChild->isBlack()};
-                bool isSiblingRightChildRed{siblingRightChild != nullptr && !siblingRightChild->isBlack()};
-                bool isLeftSibling{sibling != nullptr && sibling->isLeftChild()};
-
                 if (doubleBlackNode == m_Root)
                 {
                     isTreeValid = true; // for double-black root: "convert" double black to black and finish
                 }
-                else if (sibling->isBlack())
+                else
                 {
-                    if (isSiblingLeftChildRed || isSiblingRightChildRed) // sub-case 2a: black sibling with at least one red child
+                    assert((sibling != nullptr && sibling->getParent() != nullptr) && "Invalid sibling of non-root black node found"); // required for avoiding rule 4 violation
+
+                    // keep reference to sibling children before doing any rotations
+                    RedBlackNode* siblingLeftChild{static_cast<RedBlackNode*>(sibling->getLeftChild())};
+                    RedBlackNode* siblingRightChild{static_cast<RedBlackNode*>(sibling->getRightChild())};
+
+                    if (sibling->isBlack())
                     {
-                        if (isLeftSibling && isSiblingLeftChildRed) // left-left (left sibling with left red child (right sibling child null, cannot be black) or both children red)
+                        bool isSiblingLeftChildRed{siblingLeftChild != nullptr && !siblingLeftChild->isBlack()};
+                        bool isSiblingRightChildRed{siblingRightChild != nullptr && !siblingRightChild->isBlack()};
+                        bool isRecurringRequired{false};
+
+                        if (!isSiblingLeftChildRed && !isSiblingRightChildRed) // sub-case 2a: two sibling black children (everything else is sub-case 2b: black sibling with at least one red child)
+                        {
+                            sibling->setBlack(false);
+
+                            if (parent->isBlack())
+                            {
+                                doubleBlackNode = parent; // set parent double black and recur
+                                parent = static_cast<RedBlackNode*>(doubleBlackNode->getParent());
+                                sibling = static_cast<RedBlackNode*>(doubleBlackNode->getSibling());
+                                isRecurringRequired = true;
+                            }
+                            else
+                            {
+                                parent->setBlack(true); // set parent black, local black height remains preserved
+                            }
+                        }
+                        else if (sibling->isLeftChild() && isSiblingLeftChildRed) // 2b: left-left (left sibling with left red child (right sibling child null, cannot be black) or both children red)
                         {
                             parent->rotateRight();
                             sibling->setBlack(parent->isBlack()); // if removed node parent is red: swap the parent and sibling colors in order to get local black height preserved
                             parent->setBlack(true);
                             siblingLeftChild->setBlack(true);
                         }
-                        else if (isLeftSibling && !isSiblingLeftChildRed) // left-right (left sibling with right red child only, no sibling left child)
+                        else if (sibling->isLeftChild() && !isSiblingLeftChildRed) // 2b: left-right (left sibling with right red child only, no sibling left child)
                         {
                             // swap sibling and sibling child colors after first rotation; after second rotation ensure parent and sibling have the same color (preserve local black height)
                             sibling->rotateLeft();
@@ -300,14 +314,14 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
                             sibling->setBlack(parent->isBlack());
                             siblingRightChild->setBlack(true);
                         }
-                        else if (isSiblingRightChildRed)  // right-right (left-left mirrored)
+                        else if (isSiblingRightChildRed)  // 2b: right-right (left-left mirrored)
                         {
                             parent->rotateLeft();
                             sibling->setBlack(parent->isBlack());
                             parent->setBlack(true);
                             siblingRightChild->setBlack(true);
                         }
-                        else // right-left (left-right mirrored)
+                        else // 2b: right-left (left-right mirrored)
                         {
                             sibling->rotateRight();
                             parent->rotateLeft();
@@ -315,39 +329,23 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
                             siblingLeftChild->setBlack(true);
                         }
 
-                        isTreeValid = true;
+                        isTreeValid = !isRecurringRequired;
                     }
-                    else // sub-case 2b: two sibling black children
+                    else // sub-case 2c: red sibling (should have EXACTLY two black non-null children)
                     {
-                        sibling->setBlack(false);
+                        assert((siblingLeftChild != nullptr && siblingRightChild != nullptr) && "At least one null child identified for red sibling");
+                        sibling->setBlack(true);
 
-                        if (parent->isBlack())
+                        if (sibling->isLeftChild())
                         {
-                            doubleBlackNode = parent; // set parent double black and recur
-                            parent = static_cast<RedBlackNode*>(doubleBlackNode->getParent());
-                            sibling = static_cast<RedBlackNode*>(doubleBlackNode->getSibling());
+                            parent->rotateRight();
+                            siblingRightChild->setBlack(false);
                         }
                         else
                         {
-                            parent->setBlack(true); // set parent black, local black height remains preserved
-                            isTreeValid = true;
+                            parent->rotateLeft();
+                            siblingLeftChild->setBlack(false);
                         }
-                    }
-                }
-                else // sub-case 2c: red sibling (should have EXACTLY two black non-null children)
-                {
-                    assert((siblingLeftChild != nullptr && siblingRightChild != nullptr) && "At least one null child identified for red sibling");
-                    sibling->setBlack(true);
-
-                    if (isLeftSibling)
-                    {
-                        parent->rotateRight();
-                        siblingRightChild->setBlack(false);
-                    }
-                    else
-                    {
-                        parent->rotateLeft();
-                        siblingLeftChild->setBlack(false);
                     }
                 }
             }
