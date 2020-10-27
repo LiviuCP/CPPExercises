@@ -331,20 +331,30 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
 
                         isTreeValid = !isRecurringRequired;
                     }
-                    else // sub-case 2c: red sibling (should have EXACTLY two black non-null children)
+                    else // sub-case 2c: red sibling - apply below changes and RECUR to one of the cases above (in the recursion: same nodes are being used as parent and double black)
                     {
-                        assert((siblingLeftChild != nullptr && siblingRightChild != nullptr) && "At least one null child identified for red sibling");
+                        // sibling should have 2 non-null black children (otherwise rule 4 violation)
+                        assert((siblingLeftChild != nullptr && siblingRightChild != nullptr) && "At least a null child identified for red sibling");
+
+                        // parent and sibling should swap colors BEFORE sibling reference changes to another node
+                        parent->setBlack(false);
                         sibling->setBlack(true);
+
+                        // ensure root reference is updated accordingly before sibling reference changes to another node
+                        if (parent == m_Root)
+                        {
+                            m_Root = sibling;
+                        }
 
                         if (sibling->isLeftChild())
                         {
                             parent->rotateRight();
-                            siblingRightChild->setBlack(false);
+                            sibling = siblingRightChild; // new sibling when recurring due to parent rotation
                         }
-                        else
+                        else // mirrored case
                         {
                             parent->rotateLeft();
-                            siblingLeftChild->setBlack(false);
+                            sibling = siblingLeftChild;
                         }
                     }
                 }
