@@ -6,13 +6,13 @@
 #include "redblacktree.h"
 
 RedBlackTree::RedBlackTree(const std::string& defaultNullValue)
-    : BinarySearchTree(defaultNullValue)
+    : BinarySearchTree{defaultNullValue}
 {
 }
 
 // we don't use the similar base BST class constructor in init list as we need to use another logic in building an unempty red-black tree (RB rules to be followed)
 RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
-    : BinarySearchTree(defaultNullValue)
+    : BinarySearchTree{defaultNullValue}
 {
     if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
     {
@@ -28,7 +28,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
 }
 
 RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
-    : BinarySearchTree(sourceTree.m_DefaultNullValue)
+    : BinarySearchTree{sourceTree.m_DefaultNullValue}
 {
     _copyRBTreeNodes(sourceTree);
 }
@@ -380,7 +380,7 @@ BinarySearchTree::Node* RedBlackTree::_createNewNode(int key, const std::string&
 }
 
 RedBlackTree::RedBlackNode::RedBlackNode(int key, std::string value)
-    : Node(key, value)
+    : Node{key, value}
     , m_IsBlack{false}  // all newly nodes are red by default as this is the convention for adding them to the red-black-tree
 {
 }
