@@ -62,7 +62,7 @@ private:
     RedBlackNode* _doAddOrUpdateNode(int key, const std::string& value);
     void _removeSingleChildedOrLeafNode(RedBlackNode* nodeToRemove);
 
-    void _copyRBTreeNodes(const RedBlackTree& sourceTree);
+    void _copyTreeNodes(const RedBlackTree& sourceTree);
 
     virtual RedBlackNode* _createNewNode(int key, const std::string& value) override;
 };

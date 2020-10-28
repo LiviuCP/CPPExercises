@@ -30,7 +30,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
 RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
     : BinarySearchTree{sourceTree.m_DefaultNullValue}
 {
-    _copyRBTreeNodes(sourceTree);
+    _copyTreeNodes(sourceTree);
 }
 
 RedBlackTree::RedBlackTree(RedBlackTree&& sourceTree)
@@ -92,7 +92,7 @@ void RedBlackTree::mergeTree(RedBlackTree& sourceTree)
 
     if (this != &sourceTree)
     {
-        _copyRBTreeNodes(sourceTree);
+        _copyTreeNodes(sourceTree);
         sourceTree._deleteAllTreeNodes();
     }
 }
@@ -107,7 +107,7 @@ RedBlackTree& RedBlackTree::operator=(const RedBlackTree& sourceTree)
         }
 
         m_DefaultNullValue = sourceTree.m_DefaultNullValue;
-        _copyRBTreeNodes(sourceTree);
+        _copyTreeNodes(sourceTree);
     }
 
     return *this;
@@ -357,7 +357,7 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
     }
 }
 
-void RedBlackTree::_copyRBTreeNodes(const RedBlackTree& sourceTree)
+void RedBlackTree::_copyTreeNodes(const RedBlackTree& sourceTree)
 {
     std::vector<Node*> sourceTreeArray;
     sourceTree._convertTreeToArray(sourceTreeArray);
