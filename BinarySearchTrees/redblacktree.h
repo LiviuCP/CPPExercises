@@ -64,7 +64,7 @@ private:
 
     void _copyRBTreeNodes(const RedBlackTree& sourceTree);
 
-    virtual Node* _createNewNode(int key, const std::string& value) override;
+    virtual RedBlackNode* _createNewNode(int key, const std::string& value) override;
 };
 
 #endif // REDBLACKTREE_H

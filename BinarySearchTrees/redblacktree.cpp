@@ -373,7 +373,7 @@ void RedBlackTree::_copyRBTreeNodes(const RedBlackTree& sourceTree)
     }
 }
 
-BinarySearchTree::Node* RedBlackTree::_createNewNode(int key, const std::string& value)
+RedBlackTree::RedBlackNode* RedBlackTree::_createNewNode(int key, const std::string& value)
 {
     RedBlackNode* newNode{new RedBlackNode{key, value}};
     return newNode;

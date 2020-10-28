@@ -100,6 +100,7 @@ protected:
        It is used by the base _doAddOrUpdateNode() method for adding a new node to the tree
        It should be implemented by each class that requires a node type different from Node (this type should be derived from Node)
        A tree class is supposed to have nodes of the same type so a static_cast conversion (Node* -> [DerivedNode]*) would be possible for accessing the derived nodes specific properties/methods
+       It is recommended to use covariant return type in derived class for better readability
     */
     virtual Node* _createNewNode(int key, const std::string& value);
 
