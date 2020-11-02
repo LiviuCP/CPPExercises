@@ -4,6 +4,7 @@
 
 #include "binarysearchtree.h"
 #include "redblacktree.h"
+#include "avltree.h"
 
 #include "treetesting.h"
 
@@ -19,7 +20,7 @@ int main()
 #elif defined(RED_BLACK_TREE)
     TEST_TREE(RedBlackTree);
 #else
-//    to be added later
+    TEST_TREE(AVLTree);
 #endif
     return 0;
 }

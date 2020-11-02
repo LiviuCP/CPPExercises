@@ -6,9 +6,11 @@ CONFIG -= qt
 SOURCES += \
         main.cpp \
     binarysearchtree.cpp \
-    redblacktree.cpp
+    redblacktree.cpp \
+    avltree.cpp
 
 HEADERS += \
     binarysearchtree.h \
     treetesting.h \
-    redblacktree.h
+    redblacktree.h \
+    avltree.h
