@@ -10,7 +10,10 @@ RedBlackTree::RedBlackTree(const std::string& defaultNullValue)
 {
 }
 
-// we don't use the similar base BST class constructor in init list as we need to use another logic in building an unempty red-black tree (RB rules to be followed)
+/* This RB constructor does not call the "same arguments" base BST class constructor in init list
+   The reason is that the base constructor creates Node objects (instead of RedBlackNode) and uses the simple BST logic for connecting them with each other
+   Consequently the "empty tree" base constructor is called instead
+*/
 RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
     : BinarySearchTree{defaultNullValue}
 {
@@ -28,7 +31,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
 }
 
 RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
-    : BinarySearchTree{sourceTree.m_DefaultNullValue}
+    : BinarySearchTree{sourceTree.m_DefaultNullValue} // the "empty tree" base constructor is called for the above mentioned reasons
 {
     _copyTreeNodes(sourceTree);
 }
@@ -43,67 +46,13 @@ RedBlackTree::RedBlackTree(RedBlackTree&& sourceTree)
     sourceTree.m_Size = 0;
 }
 
-bool RedBlackTree::addOrUpdateNode(int key, const std::string& value)
-{
-    bool newNodeAdded{false};
-
-    if (value != m_DefaultNullValue)
-    {
-        const RedBlackNode* addedNode{_doAddOrUpdateNode(key, value)};
-
-        if (addedNode != nullptr)
-        {
-            newNodeAdded = true;
-        }
-    }
-
-    return newNodeAdded;
-}
-
-bool RedBlackTree::deleteNode(int key)
-{
-    bool deleted{false};
-
-    // no need for dynamic_cast as we only work with RedBlackNode node objects in the RB tree class (no mixed node types scenario) and the base class is not abstract
-    RedBlackNode* nodeToDelete{static_cast<RedBlackNode*>(_findNode(key))};
-
-    if (nodeToDelete != nullptr)
-    {
-        // for two-children node to be removed: the in-order successor content will be copied to the node; then the successor will be recursively deleted
-        if (nodeToDelete->getLeftChild() != nullptr && nodeToDelete->getRightChild() != nullptr)
-        {
-            nodeToDelete->copyInOrderSuccessorKeyAndValue();
-            nodeToDelete = static_cast<RedBlackNode*>(nodeToDelete->getInOrderSuccessor());
-        }
-
-        _removeSingleChildedOrLeafNode(nodeToDelete);
-
-        delete nodeToDelete;
-        nodeToDelete = nullptr;
-        deleted = true;
-    }
-
-    return deleted;
-}
-
-void RedBlackTree::mergeTree(RedBlackTree& sourceTree)
-{
-    assert(m_DefaultNullValue == sourceTree.m_DefaultNullValue && "Default null values of trees don't match");
-
-    if (this != &sourceTree)
-    {
-        _copyTreeNodes(sourceTree);
-        sourceTree._deleteAllTreeNodes();
-    }
-}
-
 RedBlackTree& RedBlackTree::operator=(const RedBlackTree& sourceTree)
 {
     if (this != &sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllTreeNodes();
+            _deleteAllNodes();
         }
 
         m_DefaultNullValue = sourceTree.m_DefaultNullValue;
@@ -119,7 +68,7 @@ RedBlackTree& RedBlackTree::operator=(RedBlackTree&& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllTreeNodes();
+            _deleteAllNodes();
         }
 
         m_Root = sourceTree.m_Root;
@@ -242,7 +191,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateNode(int key, const std:
    - the second step is performed only if a black node has been removed. Removing a red node (which can only be leaf) does not affect the rules.
    - the second step contains two cases: child of removed node is red (simple case - red child becomes black) and a black leaf node has been removed (complex case - more sub-cases/scenarios)
 */
-void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* nodeToRemove)
+RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node from red-black tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
@@ -251,7 +200,7 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
     RedBlackNode* sibling{static_cast<RedBlackNode*>(nodeToRemove->getSibling())};
     RedBlackNode* replacingNode{static_cast<RedBlackNode*>(BinarySearchTree::_removeSingleChildedOrLeafNode(nodeToRemove))};
 
-    if (!nodeToRemove->isBlack()) // no action required if removed node is a red leaf
+    if (!static_cast<RedBlackNode*>(nodeToRemove)->isBlack()) // no action required if removed node is a red leaf
     {
     }
     else if (replacingNode != nullptr) // case 1: removed black node with red child
@@ -355,22 +304,8 @@ void RedBlackTree::_removeSingleChildedOrLeafNode(RedBlackTree::RedBlackNode* no
             }
         }
     }
-}
 
-void RedBlackTree::_copyTreeNodes(const RedBlackTree& sourceTree)
-{
-    std::vector<Node*> sourceTreeArray;
-    sourceTree._convertTreeToArray(sourceTreeArray);
-
-    for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
-    {
-        const Node* addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
-
-        if (addedNode == nullptr)
-        {
-            std::clog << "Warning: red-black node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
-        }
-    }
+    return nullptr; // no replacing node required for AVL nodes (return value only for signature purposes)
 }
 
 RedBlackTree::RedBlackNode* RedBlackTree::_createNewNode(int key, const std::string& value)

@@ -15,14 +15,7 @@ BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std:
 {
     if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
     {
-        for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
-        {
-            Node* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
-            if (addedNode == nullptr)
-            {
-                std::clog << "Warning: duplicate key found: " << *it << std::endl;
-            }
-        }
+        _createTreeStructure(inputKeys, defaultValue, defaultNullValue);
     }
 }
 
@@ -45,7 +38,7 @@ BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
 
 BinarySearchTree::~BinarySearchTree()
 {
-    _deleteAllTreeNodes();
+    _deleteAllNodes();
 }
 
 bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
@@ -55,6 +48,7 @@ bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
     if (value != m_DefaultNullValue)
     {
         const Node* addedNode{_doAddOrUpdateNode(key, value)};
+
         if (addedNode != nullptr)
         {
             newNodeAdded = true;
@@ -78,8 +72,9 @@ bool BinarySearchTree::deleteNode(int key)
             nodeToDelete = nodeToDelete->getInOrderSuccessor();
         }
 
+        // when using the standard BST delete method, replacing node can be NULL (deleted node is leaf) or the child of the deleted node (deleted node has a single child)
         Node* replacingNode{_removeSingleChildedOrLeafNode(nodeToDelete)};
-        (void)replacingNode; // not used here, might be used by derived classes (e.g. red-black tree)
+        (void)replacingNode; // replacing node is not used here, is used instead by derived classes (AVL, RB trees) when calling the BinarySearchTree::_removeSingleChildedOrLeafNode() method
 
         delete nodeToDelete;
         nodeToDelete = nullptr;
@@ -96,7 +91,7 @@ void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
     if (this != &sourceTree)
     {
         _copyTreeNodes(sourceTree);
-        sourceTree._deleteAllTreeNodes();
+        sourceTree._deleteAllNodes();
     }
 }
 
@@ -106,7 +101,7 @@ BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree
     {
         if (m_Root != nullptr)
         {
-            _deleteAllTreeNodes();
+            _deleteAllNodes();
         }
 
         m_DefaultNullValue = sourceTree.m_DefaultNullValue;
@@ -122,7 +117,7 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllTreeNodes();
+            _deleteAllNodes();
         }
 
         m_Root = sourceTree.m_Root;
@@ -184,6 +179,37 @@ void BinarySearchTree::printTree() const
     if (nodesArray.size() == 0)
     {
         std::clog << "Warning: tree has no nodes" << std::endl;
+    }
+}
+
+void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
+{
+    assert(inputKeys.size() != 0 && "No keys provided for creating tree structure");
+    assert(defaultValue != defaultNullValue && "Default null value set as default value for tree keys");
+
+    for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
+    {
+        Node* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
+        if (addedNode == nullptr)
+        {
+            std::clog << "Warning: duplicate key found: " << *it << std::endl;
+        }
+    }
+}
+
+void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
+{
+    std::vector<Node*> sourceTreeArray;
+    sourceTree._convertTreeToArray(sourceTreeArray);
+
+    for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
+    {
+        const Node* addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
+
+        if (addedNode == nullptr)
+        {
+            std::clog << "Warning: node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
+        }
     }
 }
 
@@ -304,7 +330,13 @@ BinarySearchTree::Node* BinarySearchTree::_removeSingleChildedOrLeafNode(BinaryS
     return replacingNode;
 }
 
-void BinarySearchTree::_deleteAllTreeNodes()
+BinarySearchTree::Node* BinarySearchTree::_createNewNode(int key, const std::string& value)
+{
+    Node* newNode{new Node{key, value}};
+    return newNode;
+}
+
+void BinarySearchTree::_deleteAllNodes()
 {
     std::vector<Node*> nodesArray;
     _convertTreeToArray(nodesArray);
@@ -437,28 +469,6 @@ void BinarySearchTree::_printNodeRelatives(const BinarySearchTree::Node* node) c
     printNodeRelativeInfo(node->getSibling(), "Sibling");
     printNodeRelativeInfo(node->getUncle(), "Uncle");
     printNodeRelativeInfo(node->getGrandparent(), "Grandparent");
-}
-
-BinarySearchTree::Node* BinarySearchTree::_createNewNode(int key, const std::string& value)
-{
-    Node* newNode{new Node{key, value}};
-    return newNode;
-}
-
-void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
-{
-    std::vector<Node*> sourceTreeArray;
-    sourceTree._convertTreeToArray(sourceTreeArray);
-
-    for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
-    {
-        const Node* addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
-
-        if (addedNode == nullptr)
-        {
-            std::clog << "Warning: node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
-        }
-    }
 }
 
 bool BinarySearchTree::_isEqualTo(const BinarySearchTree &tree) const

@@ -10,25 +10,21 @@ AVLTree::AVLTree(const std::string& defaultNullValue)
 {
 }
 
-// we don't use the similar base BST class constructor in init list as we need to use another logic in building an unempty AVL tree (AVL rules to be followed)
+/* This AVL constructor does not call the "same arguments" base BST class constructor in init list
+   The reason is that the base constructor creates Node objects (instead of AVLNode) and uses the simple BST logic for connecting them with each other
+   Consequently the "empty tree" base constructor is called instead
+*/
 AVLTree::AVLTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
     : BinarySearchTree{defaultNullValue}
 {
     if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
     {
-        for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
-        {
-            AVLNode* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
-            if (addedNode == nullptr)
-            {
-                std::clog << "Warning: duplicate AVL tree key found: " << *it << std::endl;
-            }
-        }
+        _createTreeStructure(inputKeys, defaultValue, defaultNullValue);
     }
 }
 
 AVLTree::AVLTree(const AVLTree& sourceTree)
-    : BinarySearchTree{sourceTree.m_DefaultNullValue}
+    : BinarySearchTree{sourceTree.m_DefaultNullValue} // the "empty tree" base constructor is called for the above mentioned reasons
 {
     _copyTreeNodes(sourceTree);
 }
@@ -43,67 +39,13 @@ AVLTree::AVLTree(AVLTree&& sourceTree)
     sourceTree.m_Size = 0;
 }
 
-bool AVLTree::addOrUpdateNode(int key, const std::string& value)
-{
-    bool newNodeAdded{false};
-
-    if (value != m_DefaultNullValue)
-    {
-        const AVLNode* addedNode{_doAddOrUpdateNode(key, value)};
-
-        if (addedNode != nullptr)
-        {
-            newNodeAdded = true;
-        }
-    }
-
-    return newNodeAdded;
-}
-
-bool AVLTree::deleteNode(int key)
-{
-    bool deleted{false};
-
-    // no need for dynamic_cast as we only work with AVLNode node objects in the AVL tree class (no mixed node types scenario) and the base class is not abstract
-    AVLNode* nodeToDelete{static_cast<AVLNode*>(_findNode(key))};
-
-    if (nodeToDelete != nullptr)
-    {
-        // for two-children node to be removed: the in-order successor content will be copied to the node; then the successor will be recursively deleted
-        if (nodeToDelete->getLeftChild() != nullptr && nodeToDelete->getRightChild() != nullptr)
-        {
-            nodeToDelete->copyInOrderSuccessorKeyAndValue();
-            nodeToDelete = static_cast<AVLNode*>(nodeToDelete->getInOrderSuccessor());
-        }
-
-        _removeSingleChildedOrLeafNode(nodeToDelete);
-
-        delete nodeToDelete;
-        nodeToDelete = nullptr;
-        deleted = true;
-    }
-
-    return deleted;
-}
-
-void AVLTree::mergeTree(AVLTree& sourceTree)
-{
-    assert(m_DefaultNullValue == sourceTree.m_DefaultNullValue && "Default null values of trees don't match");
-
-    if (this != &sourceTree)
-    {
-        _copyTreeNodes(sourceTree);
-        sourceTree._deleteAllTreeNodes();
-    }
-}
-
 AVLTree& AVLTree::operator=(const AVLTree& sourceTree)
 {
     if (this != &sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllTreeNodes();
+            _deleteAllNodes();
         }
 
         m_DefaultNullValue = sourceTree.m_DefaultNullValue;
@@ -119,7 +61,7 @@ AVLTree& AVLTree::operator=(AVLTree&& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllTreeNodes();
+            _deleteAllNodes();
         }
 
         m_Root = sourceTree.m_Root;
@@ -179,7 +121,7 @@ AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
      - update parent height and ancestor heights
      - recursively balance resulting unbalanced nodes (sub-trees) starting with parent and going bottom-up until reaching root
 */
-void AVLTree::_removeSingleChildedOrLeafNode(AVLTree::AVLNode* nodeToRemove)
+AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node for AVL tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
@@ -213,22 +155,14 @@ void AVLTree::_removeSingleChildedOrLeafNode(AVLTree::AVLNode* nodeToRemove)
             }
         }
     }
+
+    return nullptr; // no replacing node required for AVL nodes (return value only for signature purposes)
 }
 
-void AVLTree::_copyTreeNodes(const AVLTree& sourceTree)
+AVLTree::AVLNode* AVLTree::_createNewNode(int key, const std::string &value)
 {
-    std::vector<Node*> sourceTreeArray;
-    sourceTree._convertTreeToArray(sourceTreeArray);
-
-    for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
-    {
-        const Node* addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
-
-        if (addedNode == nullptr)
-        {
-            std::clog << "Warning: AVL node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
-        }
-    }
+    AVLNode* newNode{new AVLNode{key, value}};
+    return newNode;
 }
 
 void AVLTree::_updateAncestorHeights(AVLTree::AVLNode* node)
@@ -288,12 +222,6 @@ AVLTree::AVLNode* AVLTree::_balanceSubtree(AVLNode* grandparent, AVLNode* parent
     _updateAncestorHeights(resultingSubtreeRoot);
 
     return resultingSubtreeRoot;
-}
-
-AVLTree::AVLNode* AVLTree::_createNewNode(int key, const std::string &value)
-{
-    AVLNode* newNode{new AVLNode{key, value}};
-    return newNode;
 }
 
 AVLTree::AVLNode::AVLNode(int key, std::string value)

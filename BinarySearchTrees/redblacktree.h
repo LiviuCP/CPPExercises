@@ -31,11 +31,6 @@ public:
     RedBlackTree(const RedBlackTree& sourceTree);
     RedBlackTree(RedBlackTree&& sourceTree);
 
-    virtual bool addOrUpdateNode(int key, const std::string& value) override; // true if node added (number of nodes increased)
-    virtual bool deleteNode(int key) override;
-
-    void mergeTree(RedBlackTree& sourceTree);
-
     RedBlackTree& operator=(const RedBlackTree& sourceTree);
     RedBlackTree& operator=(RedBlackTree&& sourceTree);
 
@@ -55,14 +50,13 @@ private:
         bool m_IsBlack;
     };
 
-    // design decision: any assignment operator or merge method to work only between trees of same type
-    using BinarySearchTree::mergeTree;
+    // design decision: any assignment operator to work only between trees of same type
     using BinarySearchTree::operator=;
 
-    RedBlackNode* _doAddOrUpdateNode(int key, const std::string& value);
-    void _removeSingleChildedOrLeafNode(RedBlackNode* nodeToRemove);
+    virtual RedBlackNode* _doAddOrUpdateNode(int key, const std::string& value) override;
 
-    void _copyTreeNodes(const RedBlackTree& sourceTree);
+    // Node* instead of RedBlackNode* is required as argument for signature purposes (but return type can be covariant)
+    virtual RedBlackNode* _removeSingleChildedOrLeafNode(Node* nodeToRemove) override;
 
     virtual RedBlackNode* _createNewNode(int key, const std::string& value) override;
 };
