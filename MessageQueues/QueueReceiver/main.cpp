@@ -2,6 +2,7 @@
 #include <string>
 
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include "queuereceiver.h"
 #include "../QueueUtils/queuedataobjects.h"
@@ -18,8 +19,7 @@ int main()
     double doubleBuffer;
     MeteoData meteoDataBuffer;
 
-    cout << "Let's read from data queue" << endl;
-    cout << "(if needed receivers will wait until transmitters send data)" << endl << endl;
+    cout << "Let's read from data queue (receivers wait and listen to queue if data is not available)" << endl << endl;
 
     const int processID{fork()};
 
@@ -27,41 +27,42 @@ int main()
     {
         QueueReceiver childQueueReceiver{c_QueueFilename, true};
 
-        sleep(1);
         childQueueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
         cout << "Child process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
 
-        sleep(1);
         childQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
         cout << "Child process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
 
-        sleep(1);
         childQueueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
         cout << "Child process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
+
+        sleep(2); // simulate waiting for the child to exit so parent can remove the queue
+
+        cout << "Child process is exiting" << endl;
+
+        _exit(0); // inform parent process of exit so the message queue can be removed by parent
     }
     else
     {
-        sleep(2); // a small (additional) delay so the parent and child process don't start sending simultaneously
-
         QueueReceiver parentQueueReceiver{c_QueueFilename, true};
 
-        sleep(1);
         parentQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
         cout << "Parent process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
 
-        sleep(1);
         parentQueueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
         cout << "Parent process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
 
-        sleep(1);
         parentQueueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
         cout << "Parent process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
 
-        sleep(3); // ensures the child process reads everything prior to closing the queue
+        cout << "Parent process is waiting for the child to exit" << endl;
+        wait(nullptr);
 
+        cout << "Child exited. Parent process is now removing the queue and exiting." << endl << endl;
         parentQueueReceiver.removeQueue();
-        cout << endl << "Parent process removed queue" << endl << endl;
+
+        exit(0);
     }
 
-    return 0;
+    return 0; // just for following the best practices (main() function should return something) - actually not executed
 }

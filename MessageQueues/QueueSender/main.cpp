@@ -19,7 +19,7 @@ int main()
     MeteoData firstMeteoData{-5, 22.4, 56.2f}, secondMeteoData{23, 2.2, 0.0f};
 
     cout << "Let's write to data queue" << endl << endl;
-    sleep(4); // for being able to start the receiver program before data is being sent (if sender program had been started first)
+    sleep(5); // for being able to start the receiver program before data is being sent (if sender program had been started first)
 
     const int processID{fork()};
 
@@ -31,7 +31,7 @@ int main()
         childQueueSender.writeToQueue(&secondInt, DataTypes::INT);
         cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::INT) << " Value: " << secondInt << endl;
 
-        sleep(1);
+        sleep(2);
         childQueueSender.writeToQueue(&secondDouble, DataTypes::DOUBLE);
         cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::DOUBLE) << " Value: " << secondDouble << endl;
 
@@ -39,15 +39,13 @@ int main()
         childQueueSender.writeToQueue(&secondMeteoData, DataTypes::METEODATA);
         cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::METEODATA) << " Value: " << secondMeteoData << endl;
 
-        _exit(0);
+        exit(0);
     }
     else
     {
-        sleep(2); // a small (additional) delay so the parent and child process don't start sending simultaneously
-
         QueueSender parentQueueSender{c_QueueFilename};
 
-        sleep(1);
+        sleep(2);
         parentQueueSender.writeToQueue(&firstDouble, DataTypes::DOUBLE);
         cout << "Parent process sent data type: " << c_DataTypesNames.at(DataTypes::DOUBLE) << " Value: " << firstDouble << endl;
 
@@ -65,5 +63,5 @@ int main()
         exit(0);
     }
 
-    return 0; // just for following the best practices (function should return something) - actually not executed
+    return 0; // just for following the best practices (main() function should return something) - actually not executed
 }
