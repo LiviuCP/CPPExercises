@@ -118,6 +118,16 @@ void Server::_init()
             perror("");
             exit(-1);
         }
+
+        int socketOption{1};
+
+        // prevent "address-already-in-use" error
+        if (setsockopt(m_ServerFileDescriptor, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &socketOption, sizeof(socketOption)))
+        {
+            std::cerr << "SERVER " << m_Name << ": Error when setting socket option for reusing address and port" << std::endl;
+            perror("");
+            exit(-1);
+        }
     }
 
     _setServerSocketConnectionParams();
