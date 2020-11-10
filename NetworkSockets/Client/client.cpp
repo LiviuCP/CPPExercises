@@ -61,10 +61,10 @@ void Client::retrieveDataFromServer(size_t requestedNrOfElements)
 {
     if (requestedNrOfElements > 0)
     {
-        _logMessage([this](){std::clog << std::endl << "CLIENT " << m_Name.c_str() << ": Connecting to server..." << std::endl;});
+        _logMessage("\nCLIENT :name: Connecting to server...");
         _establishConnectionToServer();
-        _logMessage([this](){std::clog << "CLIENT " << m_Name << ": Connection established" << std::endl << std::endl;});
-        _logMessage([this](){std::clog << "CLIENT " << m_Name << ": Checking data availability" << std::endl;});
+        _logMessage("CLIENT :name: Connection established\n");
+        _logMessage("CLIENT :name: Checking data availability");
 
         size_t availableCount{0}, actuallyRequestedCount{0};
         sleep(1);
@@ -81,22 +81,22 @@ void Client::retrieveDataFromServer(size_t requestedNrOfElements)
             }
         }
 
-        _logMessage([this](){std::clog << "CLIENT " << m_Name << ": Done" << std::endl << std::endl;});
+        _logMessage("CLIENT :name: Done\n");
 
         if (availableCount == 0)
         {
-            _logMessage([this](){std::clog << "CLIENT " << m_Name << ": No data is available." << std::endl;});
+            _logMessage("CLIENT :name: No data is available.");
         }
         else
         {
             if (requestedNrOfElements > availableCount)
             {
-                _logMessage([this, availableCount](){std::clog << "CLIENT " << m_Name <<": More data requested than available. Number of elements will be limited to " << static_cast<int>(availableCount)
-                                                               << std::endl << std::endl;});
+                const std::string c_Message{"CLIENT :name: More data requested than available. Number of elements will be limited to " + std::to_string(static_cast<int>(availableCount)) + "\n"};
+                _logMessage(c_Message);
             }
 
             actuallyRequestedCount = std::min(requestedNrOfElements, availableCount);
-            _logMessage([this](){std::clog << "CLIENT " << m_Name << ": Requesting elements from server" << std::endl << std::endl;});
+            _logMessage("CLIENT :name: Requesting elements from server\n");
 
             if (write(m_FileDescriptor, &actuallyRequestedCount, sizeof(size_t)))
             {
@@ -107,24 +107,25 @@ void Client::retrieveDataFromServer(size_t requestedNrOfElements)
                 if (read(m_FileDescriptor, m_Buffer, m_BufferSize))
                 {
                     sleep(1);
-                    _logMessage([this](){std::clog << "CLIENT " << m_Name << ": Response received from server" << std::endl << std::endl;});
+                    _logMessage("CLIENT :name: Response received from server\n");
                     sleep(1);
-                    _logMessage([this](){std::clog << "CLIENT " << m_Name.c_str() << ": Storing received elements" << std::endl;});
+                    _logMessage("CLIENT :name: Storing received elements");
                     sleep(1);
                     for (size_t index{0}; index < actuallyRequestedCount; ++index)
                     {
                         m_Data.push_back(*(startAddress + index));
-                        _logMessage([=](){std::clog << "CLIENT " << m_Name << ": Added element with value: " << *(startAddress + index) << std::endl;});
+                        std::string c_Message{"CLIENT :name: Added element with value: " + std::to_string(*(startAddress + index))};
+                        _logMessage(c_Message);
                     }
                 }
                 else
                 {
-                    _logMessage([this](){std::cerr << "CLIENT " << m_Name << ": The request could not be completed" << std::endl;});
+                    _logMessage("CLIENT :name: The request could not be completed", true);
                 }
             }
             else
             {
-                _logMessage([this](){std::cerr << "CLIENT " << m_Name << ": The request could not be completed" << std::endl;});
+                _logMessage("CLIENT :name: The request could not be completed", true);
             }
         }
 
@@ -172,7 +173,7 @@ void Client::_setFileDescriptor()
 
     if (m_FileDescriptor < 0)
     {
-        _logMessage([this](){std::cerr << "CLIENT " << m_Name << ": Error when creating socket file descriptor" << std::endl;});
+        _logMessage("CLIENT :name: Error when creating socket file descriptor", true);
         perror("");
         exit(-1);
     }
@@ -193,19 +194,30 @@ void Client::_establishConnectionToServer()
 
     if(inet_pton(AF_INET, m_IpAddress.c_str(), &socketAddress.sin_addr)<=0)
     {
-        _logMessage([this](){std::cerr << "CLIENT " << m_Name << ": IP address error" << std::endl;});
+        _logMessage("CLIENT :name: IP address error", true);
         exit(-1);
     }
 
     if (connect(m_FileDescriptor, reinterpret_cast<sockaddr*>(&socketAddress), sizeof(socketAddress)) < 0)
     {
-        _logMessage([this](){std::cerr << "CLIENT " << m_Name << ": Connection error" << std::endl;});
+        _logMessage("CLIENT :name: Connection error", true);
         exit(-1);
     }
 }
 
-void Client::_logMessage(const std::function<void()>& printMessage)
+void Client::_logMessage(const std::string& message, bool isErrorMessage)
 {
     std::lock_guard<std::mutex> lock{m_LogMutex};
-    printMessage();
+    const std::string c_ClientNamePlaceholder{":name"};
+    std::string messageToLog{message};
+    std::ostream& out{isErrorMessage ? std::cerr : std::clog};
+    size_t clientNamePos{messageToLog.find(c_ClientNamePlaceholder, 0)};
+
+    while (clientNamePos != std::string::npos)
+    {
+        messageToLog.replace(clientNamePos, c_ClientNamePlaceholder.size(), m_Name);
+        clientNamePos = messageToLog.find(c_ClientNamePlaceholder, clientNamePos + m_Name.size());
+    }
+
+    out << messageToLog << "\n";
 }

@@ -26,7 +26,9 @@ private:
     void _init();
     void _setFileDescriptor();
     void _establishConnectionToServer();
-    void _logMessage(const std::function<void()>& printMessage);
+
+    // use placeholder :name for client name (m_Name) in the argument
+    void _logMessage(const std::string& message, bool isErrorMessage = false);
 
     size_t m_BufferSize; // should match the server buffer size
     int m_PortNumber; // port should match the server one and should have four numeric digits to avoid binding errors
