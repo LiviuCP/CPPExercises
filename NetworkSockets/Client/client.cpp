@@ -16,7 +16,6 @@
 static constexpr size_t c_DefaultBufferSize{512};
 static constexpr int c_DefaultPortNumber{5000};
 static const std::string c_InternalLoopbackIpAddress{"127.0.0.1"};
-static const size_t c_AvailabilityRequestCode = 0; // used for querying server about the maximum number of retrievable elements
 
 Client::Client()
     : m_BufferSize{c_DefaultBufferSize + 1}
@@ -26,7 +25,7 @@ Client::Client()
     , m_Buffer{nullptr}
     , m_FileDescriptor{-1}
     , m_Data{}
-    {
+{
     _init();
 }
 
@@ -57,76 +56,53 @@ Client::~Client()
     }
 }
 
-void Client::retrieveDataFromServer(size_t requestedNrOfElements)
+void Client::retrieveDataFromServer(size_t requiredElementsCount)
 {
-    if (requestedNrOfElements > 0)
+    if (requiredElementsCount > 0)
     {
-        _logMessage("\nCLIENT :name: Connecting to server...");
+        _logMessage("CLIENT :name: Connecting to server...");
         _establishConnectionToServer();
-        _logMessage("CLIENT :name: Connection established\n");
-        _logMessage("CLIENT :name: Checking data availability");
+        _logMessage("CLIENT :name: Connection established");
+        _logMessage("CLIENT :name: " + std::to_string(requiredElementsCount) + " elements required. Querying server for availability...");
 
-        size_t availableCount{0}, actuallyRequestedCount{0};
-        sleep(1);
+        size_t availableElementsCount{0};
+        const ssize_t c_NrOfBytesSentInFirstQuery{_requestDataFromServer(0)};
 
-        if (write(m_FileDescriptor, &c_AvailabilityRequestCode, sizeof(size_t)))
+        if (c_NrOfBytesSentInFirstQuery > 0)
         {
-            memset(m_Buffer, '\0', m_BufferSize);
+            const ssize_t c_NrOfBytesReceivedInFirstQuery{_receiveDataFromServer()};
 
-            size_t* startAddress = reinterpret_cast<size_t*>(m_Buffer);
-
-            if (read(m_FileDescriptor, m_Buffer, m_BufferSize))
+            if (static_cast<size_t>(c_NrOfBytesReceivedInFirstQuery) >= sizeof(size_t))
             {
-                availableCount = *startAddress;
+                availableElementsCount = *(reinterpret_cast<size_t*>(m_Buffer));
             }
         }
 
-        _logMessage("CLIENT :name: Done\n");
-
-        if (availableCount == 0)
+        if (availableElementsCount > 0)
         {
-            _logMessage("CLIENT :name: No data is available.");
-        }
-        else
-        {
-            if (requestedNrOfElements > availableCount)
+            const size_t c_RequestedElementsCount{std::min(requiredElementsCount, availableElementsCount)}; // number of requested elements to be limited by maximum that are available at server side
+            _logMessage("CLIENT :name: " + std::to_string(availableElementsCount) + " elements can be provided by server");
+            _logMessage("CLIENT :name: Requesting " + std::to_string(static_cast<int>(c_RequestedElementsCount)) + " elements");
+            const ssize_t c_NrOfBytesSentInSecondQuery{_requestDataFromServer(c_RequestedElementsCount)};
+
+            if (c_NrOfBytesSentInSecondQuery > 0)
             {
-                const std::string c_Message{"CLIENT :name: More data requested than available. Number of elements will be limited to " + std::to_string(static_cast<int>(availableCount)) + "\n"};
-                _logMessage(c_Message);
-            }
+                ssize_t c_NrOfBytesReceivedInSecondQuery{_receiveDataFromServer()};
+                _logMessage("CLIENT :name: Received response from server (" + std::to_string(c_NrOfBytesReceivedInSecondQuery) + " bytes)");
 
-            actuallyRequestedCount = std::min(requestedNrOfElements, availableCount);
-            _logMessage("CLIENT :name: Requesting elements from server\n");
-
-            if (write(m_FileDescriptor, &actuallyRequestedCount, sizeof(size_t)))
-            {
-                memset(m_Buffer, '\0', m_BufferSize);
-
-                int* startAddress{reinterpret_cast<int*>(m_Buffer)};
-
-                if (read(m_FileDescriptor, m_Buffer, m_BufferSize))
+                if (c_RequestedElementsCount * sizeof(int) <= static_cast<size_t>(c_NrOfBytesReceivedInSecondQuery)) // number of received bytes should match (or exceed) requested elements
                 {
-                    sleep(1);
-                    _logMessage("CLIENT :name: Response received from server\n");
-                    sleep(1);
-                    _logMessage("CLIENT :name: Storing received elements");
-                    sleep(1);
-                    for (size_t index{0}; index < actuallyRequestedCount; ++index)
-                    {
-                        m_Data.push_back(*(startAddress + index));
-                        std::string c_Message{"CLIENT :name: Added element with value: " + std::to_string(*(startAddress + index))};
-                        _logMessage(c_Message);
-                    }
+                    _storeReceivedData(c_RequestedElementsCount);
                 }
                 else
                 {
-                    _logMessage("CLIENT :name: The request could not be completed", true);
+                    _logMessage("CLIENT :name: The request could not be completed (no data or insufficient data received)", true);
                 }
             }
-            else
-            {
-                _logMessage("CLIENT :name: The request could not be completed", true);
-            }
+        }
+        else
+        {
+            _logMessage("CLIENT :name: No elements are available for download or the count info received from server is corrupt.", true);
         }
 
         close(m_FileDescriptor);
@@ -182,6 +158,7 @@ void Client::_setFileDescriptor()
 void Client::_establishConnectionToServer()
 {
     sleep(1);
+
     if (m_FileDescriptor < 0)
     {
         _setFileDescriptor();
@@ -202,6 +179,40 @@ void Client::_establishConnectionToServer()
     {
         _logMessage("CLIENT :name: Connection error", true);
         exit(-1);
+    }
+}
+
+ssize_t Client::_requestDataFromServer(size_t nrOfRequestedElements)
+{
+    char* const pClientNameBufferPos{m_Buffer + sizeof(nrOfRequestedElements)};
+    const size_t c_NrOfBytesToSend{sizeof(nrOfRequestedElements) + m_Name.size() + 1};
+
+    memset(m_Buffer, '\0', m_BufferSize);
+    *(reinterpret_cast<size_t*>(m_Buffer)) = nrOfRequestedElements;
+    m_Name.copy(pClientNameBufferPos, m_Name.size(), 0);
+    const ssize_t c_NrOfSentBytes{write(m_FileDescriptor, m_Buffer, c_NrOfBytesToSend)};
+
+    return c_NrOfSentBytes;
+}
+
+ssize_t Client::_receiveDataFromServer()
+{
+    memset(m_Buffer, '\0', m_BufferSize);
+    const ssize_t c_ReceivedBytesCount = read(m_FileDescriptor, m_Buffer, m_BufferSize);
+    usleep(125000);
+
+    return c_ReceivedBytesCount;
+}
+
+void Client::_storeReceivedData(size_t elementsCount)
+{
+    _logMessage("CLIENT :name: Storing received elements");
+
+    for (size_t index{0}; index < elementsCount; ++index)
+    {
+        usleep(250000);
+        m_Data.push_back(*(reinterpret_cast<int*>(m_Buffer) + index));
+        _logMessage("CLIENT :name: Added element with value: " + std::to_string(*(reinterpret_cast<int*>(m_Buffer) + index)));
     }
 }
 

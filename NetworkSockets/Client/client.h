@@ -1,10 +1,8 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <cstdlib>
 #include <string>
 #include <vector>
-#include <functional>
 #include <mutex>
 
 class Client
@@ -26,6 +24,9 @@ private:
     void _init();
     void _setFileDescriptor();
     void _establishConnectionToServer();
+    ssize_t _requestDataFromServer(size_t nrOfRequestedElements);
+    ssize_t _receiveDataFromServer();
+    void _storeReceivedData(size_t elementsCount);
 
     // use placeholder :name for client name (m_Name) in the argument
     void _logMessage(const std::string& message, bool isErrorMessage = false);

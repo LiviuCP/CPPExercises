@@ -32,13 +32,13 @@ int main(int argc, char* argv[])
 
 void executeOperation(Client& client, size_t requestedValuesCount)
 {
-    cout << "Client " << client.getName() << " will connect to server with IP " << client.getIpAddress() << " and attempt to retrieve some data" << endl;
+    cout << "Client " << client.getName() << " will connect to server with IP " << client.getIpAddress() << "and attempt to retrieve some data" << endl;
 
     this_thread::sleep_for(chrono::seconds{1});
     client.retrieveDataFromServer(requestedValuesCount);
 
     this_thread::sleep_for(chrono::seconds{1});
-    cout << endl << "The data retrieved by client " << client.getName() << " from server is: ";
+    cout << "The data retrieved by client " << client.getName() << " from server is: ";
 
     for (auto element : client.getData())
     {

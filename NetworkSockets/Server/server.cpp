@@ -58,7 +58,7 @@ Server::~Server()
 
 void Server::listenForConnections()
 {
-    std::clog << "SERVER " << m_Name << ": listening on port " << m_PortNumber << " for clients..." << std::endl << std::endl;
+    std::clog << "SERVER " << m_Name << ": listening on port " << m_PortNumber << " for clients..." << std::endl;
 
     for (;;)
     {
@@ -158,38 +158,51 @@ void Server::_setServerSocketConnectionParams()
 
 void Server::_processClientRequest(int clientFileDescriptor)
 {
-    size_t* const reqElemCountAddress{reinterpret_cast<size_t*>(m_Buffer)};
+    size_t* const pRequestedElementsCount{reinterpret_cast<size_t*>(m_Buffer)}; // number of elements requested by client (if 0 then the server should send back the maximum available number of elements)
+    char* const pClientName{m_Buffer + sizeof(size_t)}; // optional information sent by client that helps identifying the client for a concurrent client - server model (actually the client name)
 
     for (size_t requestNr = 0; requestNr < c_NrOfClientRequests; ++requestNr)
     {
         memset(m_Buffer, '\0', m_BufferSize);
 
-        std::clog << "SERVER " << m_Name << ": Client request received. Reading client request data..." << std::endl;
         ssize_t count{read(clientFileDescriptor, m_Buffer, m_BufferSize)};
+        std::string clientName{pClientName};
+        std::clog << "SERVER " << m_Name << ": Client request received. Client name: " << clientName << std::endl;
 
-        if (count >= static_cast<ssize_t>(sizeof(size_t)))
+        size_t bytesToSend{0};
+
+        if (count >= static_cast<ssize_t>(sizeof(size_t))) // there should be at least size_t bytes (number of requested elements)
         {
-            if (*reqElemCountAddress > 0)
+            size_t requestedElementsCount{*pRequestedElementsCount};
+            memset(m_Buffer, '\0', m_BufferSize);
+
+            if (requestedElementsCount > 0)
             {
-                const size_t nrOfElementsToSend{std::min(*reqElemCountAddress, m_Data.size())};
-                std::clog << "SERVER " << m_Name << ": Client will get first " << static_cast<int>(nrOfElementsToSend) << " elements from list" << std::endl;
+                const size_t nrOfElementsToSend{std::min(requestedElementsCount, m_Data.size())};
+                std::clog << "SERVER " << m_Name << ": Client " << clientName << " requested " << static_cast<int>(nrOfElementsToSend) << " elements" << std::endl;
 
                 for (size_t index = 0; index < nrOfElementsToSend; ++index)
                 {
-                    std::clog << "SERVER " << m_Name << ": Writing element " << static_cast<int>(m_Data[index]) << " into buffer" << std::endl;
+                    std::clog << "SERVER " << m_Name << ": Adding element " << static_cast<int>(m_Data[index]) << " to buffer for sending to client " << clientName << std::endl;
+                    usleep(1000);
                     *((reinterpret_cast<int*>(m_Buffer)) + index) = m_Data[index];
+                    bytesToSend += sizeof(int);
                 }
             }
             else
             {
-                std::clog << "SERVER " << m_Name << ": Client requested to know how many elements are available. Providing number to client: " << static_cast<int>(m_Data.size()) << std::endl;
-                *reqElemCountAddress = m_Data.size();
+                std::clog << "SERVER " << m_Name << ": Client " << clientName << " requested to know how many elements are available. The number is: " << static_cast<int>(m_Data.size()) << std::endl;
+                *pRequestedElementsCount = m_Data.size();
+                bytesToSend += sizeof(size_t);
             }
 
-            std::clog << "SERVER " << m_Name << ": Sending requested data to client..." << std::endl;
-            sleep(2); // for simulating a longer operation
-            write(clientFileDescriptor, m_Buffer, m_BufferSize);
-            std::clog << "SERVER " << m_Name << ": Done" << std::endl << std::endl;
+            // add a NULL terminating character (\0) to the sent byte stream
+            ++bytesToSend;
+
+            std::clog << "SERVER " << m_Name << ": Sending requested data to client " << clientName << " ..." << std::endl;
+            sleep(1); // for simulating a longer operation
+            write(clientFileDescriptor, m_Buffer, bytesToSend);
+            std::clog << "SERVER " << m_Name << ": " << bytesToSend << " bytes sent to client " << clientName << std::endl;
         }
     }
 }

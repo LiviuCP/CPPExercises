@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 
     this_thread::sleep_for(chrono::seconds{1});
     client.setIpAddress("127.0.0.1");
-    cout << "Now the client will (re)connect to the internal loopback address (" << client.getIpAddress() << ") and attempt to retrieve more data" << endl;
+    cout << "Now the client will (re)connect to the internal loopback address (" << client.getIpAddress() << ")" << " and attempt to retrieve more data" << endl;
     this_thread::sleep_for(chrono::seconds{1});
     client.retrieveDataFromServer(10);
 
@@ -35,10 +35,24 @@ int main(int argc, char* argv[])
 void displayRetrievedData(const Client& client)
 {
     this_thread::sleep_for(chrono::seconds{1});
-    cout << endl << "The data retrieved by client " << client.getName() << " from server is: ";
-    for (auto element : client.getData())
+
+    const std::vector<int> clientData{client.getData()};
+
+    cout << "Client " << client.getName();
+
+    if (clientData.size() == 0)
     {
-        cout << element << " ";
+        cout << " has no data!" << endl;
     }
-    cout << endl << endl;
+    else
+    {
+        cout << " data is: ";
+
+        for (auto element : client.getData())
+        {
+            cout << element << " ";
+        }
+    }
+
+    cout << endl;
 }
