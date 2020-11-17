@@ -1,8 +1,6 @@
 #ifndef CHESSTABLE_H
 #define CHESSTABLE_H
 
-#define ERROR_CHECKING // enables Matrix asserts
-
 #include <string>
 #include <vector>
 
