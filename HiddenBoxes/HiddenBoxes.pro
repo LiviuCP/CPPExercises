@@ -9,8 +9,6 @@ INCLUDEPATH += ../LexicographicSorting
 
 SOURCES += \
         main.cpp \
-    ../LexicographicSorting/lexicographicalsorter.cpp \
-    ../Shared/matrixutils.cpp \
     boxutils.cpp
 
 HEADERS += \
