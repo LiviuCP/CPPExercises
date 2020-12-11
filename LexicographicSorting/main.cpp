@@ -10,11 +10,11 @@ using namespace std;
 const std::string c_InFile{"/tmp/matrixinput.txt"};
 const std::string c_OutFile{"/tmp/matrixoutput.txt"};
 
-void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix, const Matrix<int>& originalRowNumbersMatrix);
+void logLexicographicalSortOutput(ofstream& outStream, const Matrix<double>& sortedMatrix, const Matrix<int>& originalRowNumbersMatrix);
 
 int main()
 {
-    Matrix<int> matrix;
+    Matrix<double> matrix;
     Matrix<int> originalRowNumbers;
     std::ifstream in{c_InFile};
 
@@ -25,7 +25,7 @@ int main()
 
         if (matrix)
         {
-            (void)LexicographicalSorter::sort(matrix, originalRowNumbers, true);
+            (void)LexicographicalSorter<double>::sort(matrix, originalRowNumbers, true);
             cout << "The matrix has been successfully read and lexicographically sorted" << endl;
 
             std::ofstream out{c_OutFile};
@@ -53,7 +53,7 @@ int main()
     return 0;
 }
 
-void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix, const Matrix<int>& originalRowNumbersMatrix)
+void logLexicographicalSortOutput(ofstream& outStream, const Matrix<double>& sortedMatrix, const Matrix<int>& originalRowNumbersMatrix)
 {
     assert(originalRowNumbersMatrix.getNrOfColumns() == 1 && originalRowNumbersMatrix.getNrOfRows() == sortedMatrix.getNrOfRows());
 

@@ -10,7 +10,6 @@ INCLUDEPATH += ../Shared
 SOURCES += \
         main.cpp \
         lexicographicalsorter.cpp \
-        ../Shared/matrixutils.cpp
 
 HEADERS += \
     lexicographicalsorter.h

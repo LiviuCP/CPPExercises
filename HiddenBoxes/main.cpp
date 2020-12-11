@@ -41,7 +41,7 @@ int main()
 
             if(sortedBoxData.getNrOfRows() > 0)
             {
-                LexicographicalSorter::sort(sortedBoxData, originalIndexes, true);
+                LexicographicalSorter<int>::sort(sortedBoxData, originalIndexes, true);
                 retrieveFittingBoxes(sortedBoxData, fittingBoxes);
 
                 cout << "Writing maximum fitting range of boxes to output file: " << c_OutFile << endl;
