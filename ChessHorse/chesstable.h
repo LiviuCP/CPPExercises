@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../External/Matrix/MatrixLib/matrix.h"
+#include "matrix.h"
 
 class ChessTable
 {

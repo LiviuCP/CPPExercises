@@ -3,10 +3,11 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
+INCLUDEPATH += ../External/Matrix/MatrixLib
+
 SOURCES += \
         main.cpp \
         chesstable.cpp
 
 HEADERS += \
-    ../External/Matrix/MatrixLib/matrix.h \
     chesstable.h
