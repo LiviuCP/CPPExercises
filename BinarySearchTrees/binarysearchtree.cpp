@@ -1,4 +1,6 @@
 #include <iostream>
+#include <sstream>
+
 #include <cassert>
 
 #include "binarysearchtree.h"
@@ -180,6 +182,28 @@ void BinarySearchTree::printTree() const
     {
         std::clog << "Warning: tree has no nodes" << std::endl;
     }
+}
+
+std::string BinarySearchTree::getTreeAsString(bool areNodeValuesRequired) const
+{
+    std::string result;
+
+    std::vector<Node*> nodesArray;
+    _convertTreeToArray(nodesArray);
+
+    for (std::vector<Node*>::const_iterator it{nodesArray.cbegin()}; it != nodesArray.cend(); ++it)
+    {
+        result += _getNodeAsString(*it, areNodeValuesRequired);
+        result += "/";
+    }
+
+    // trim the resulting string
+    if (result.size() > 0)
+    {
+        result.pop_back();
+    }
+
+    return result;
 }
 
 void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
@@ -469,6 +493,46 @@ void BinarySearchTree::_printNodeRelatives(const BinarySearchTree::Node* node) c
     printNodeRelativeInfo(node->getSibling(), "Sibling");
     printNodeRelativeInfo(node->getUncle(), "Uncle");
     printNodeRelativeInfo(node->getGrandparent(), "Grandparent");
+}
+
+std::string BinarySearchTree::_getNodeAsString(const BinarySearchTree::Node* node, bool isValueRequired) const
+{
+    std::string result{"NULL"};
+
+    if (node != nullptr)
+    {
+        std::ostringstream nodeData;
+        const Node* const parent{node->getParent()};
+
+        nodeData << node->getKey() << ":";
+
+        if (isValueRequired)
+        {
+            nodeData << node->getValue() << ":";
+        }
+
+        if (parent != nullptr)
+        {
+            nodeData << parent->getKey() << ":";
+
+            if (node->isLeftChild())
+            {
+                nodeData << "L";
+            }
+            else
+            {
+                nodeData << "R";
+            }
+        }
+        else
+        {
+            nodeData << "ROOT";
+        }
+
+        result = nodeData.str();
+    }
+
+    return result;
 }
 
 bool BinarySearchTree::_isEqualTo(const BinarySearchTree &tree) const

@@ -24,6 +24,10 @@
     cout << endl << "Obtained tree (all nodes with value \"" << c_InitialValue << "\") is: " << endl << endl; \
     searchTree.printTree(); \
     cout << endl << "Tree has " << searchTree.getSize() << " nodes" << endl << endl; \
+    cout << "The tree (keys only) as string is: " << endl << endl; \
+    cout << searchTree.getTreeAsString(false) << endl << endl; \
+    cout << "The tree (values included) as string is: " << endl << endl; \
+    cout << searchTree.getTreeAsString(true) << endl << endl; \
                                                                                       \
     cout << "2) We'll set a new value for node 3 and then print values for nodes 3, -8 and 7" << endl << endl; \
     (void)searchTree.addOrUpdateNode(3, c_ChangedValue); \

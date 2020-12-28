@@ -314,6 +314,27 @@ RedBlackTree::RedBlackNode* RedBlackTree::_createNewNode(int key, const std::str
     return newNode;
 }
 
+std::string RedBlackTree::_getNodeAsString(const BinarySearchTree::Node* node, bool isValueRequired) const
+{
+    std::string result{"NULL"};
+
+    if (node != nullptr)
+    {
+        result = BinarySearchTree::_getNodeAsString(node, isValueRequired);
+
+        if (static_cast<const RedBlackNode*>(node)->isBlack())
+        {
+            result += ":BK";
+        }
+        else
+        {
+            result += ":RD";
+        }
+    }
+
+    return result;
+}
+
 RedBlackTree::RedBlackNode::RedBlackNode(int key, std::string value)
     : Node{key, value}
     , m_IsBlack{false}  // all newly nodes are red by default as this is the convention for adding them to the red-black-tree

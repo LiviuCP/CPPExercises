@@ -44,6 +44,7 @@ public:
     int getSize() const;
 
     virtual void printTree() const;
+    virtual std::string getTreeAsString(bool areNodeValuesRequired) const;
 
 protected:
     class Node
@@ -124,6 +125,7 @@ protected:
     void _rotateNodeRight(Node* node);
 
     void _printNodeRelatives(const Node* node) const;
+    virtual std::string _getNodeAsString(const Node* node, bool isValueRequired) const;
 
     Node* m_Root;
     std::string m_DefaultNullValue; // value that each key that is NOT contained within tree corresponds to

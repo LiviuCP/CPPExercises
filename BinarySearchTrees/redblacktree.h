@@ -59,6 +59,8 @@ private:
     virtual RedBlackNode* _removeSingleChildedOrLeafNode(Node* nodeToRemove) override;
 
     virtual RedBlackNode* _createNewNode(int key, const std::string& value) override;
+
+    virtual std::string _getNodeAsString(const Node* node, bool isValueRequired) const override;
 };
 
 #endif // REDBLACKTREE_H
