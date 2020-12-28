@@ -518,16 +518,7 @@ std::string BinarySearchTree::_getNodeAsString(const BinarySearchTree::Node* nod
 
         if (parent != nullptr)
         {
-            nodeData << parent->getKey() << ":";
-
-            if (node->isLeftChild())
-            {
-                nodeData << "L";
-            }
-            else
-            {
-                nodeData << "R";
-            }
+            nodeData << parent->getKey();
         }
         else
         {
