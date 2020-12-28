@@ -97,6 +97,11 @@ void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
     }
 }
 
+void BinarySearchTree::clear()
+{
+    _deleteAllNodes();
+}
+
 BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree)
 {
     if (this != &sourceTree)

@@ -119,7 +119,7 @@
     cout << endl << "Original tree size: " << searchTree.getSize() << endl; \
     cout << "New tree size: " << newSearchTree.getSize() << endl; \
                                                                   \
-    cout << endl << "6) Finally let's do a merge of two trees" << endl; \
+    cout << endl << "6) Let's do a merge of two trees" << endl; \
     SearchTreeType firstTree{std::vector<int>{2, -5, 9, 7}, c_InitialValue}, secondTree{std::vector<int>{14, 3, -2, 8, 4}, c_InitialValue}; \
     firstTree.addOrUpdateNode(17, c_ChangedValue); \
     secondTree.addOrUpdateNode(17, c_SecondChangedValue); \
@@ -162,6 +162,10 @@
         cout << endl << "The merged tree versions are equal" << endl; \
     } \
       \
+    cout << endl << "7) Finally let's clear the original tree" << endl; \
+    cout << endl << "Before clearing the tree had size: " << searchTree.getSize() << endl; \
+    searchTree.clear(); \
+    cout << "After clearing the tree has size: " << searchTree.getSize() << endl; \
     cout << endl << "That's all folks!" << endl << endl; \
 }
 

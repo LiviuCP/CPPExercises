@@ -32,6 +32,9 @@ public:
     */
     virtual void mergeTree(BinarySearchTree& sourceTree);
 
+    /* This function has been left unvirtualized as the clear() operation should occur the same way for all base and derived search tree objects */
+    void clear();
+
     // these operators should be rendered private by derived classes as they should be replaced by operators with class specific arguments (similar to constructors)
     BinarySearchTree& operator=(const BinarySearchTree& sourceTree);
     BinarySearchTree& operator=(BinarySearchTree&& sourceTree);
