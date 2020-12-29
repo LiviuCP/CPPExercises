@@ -12,6 +12,7 @@ public:
 
 private slots:
     void testAddNodes();
+    void testRemoveNodes();
 
 private:
     void reset();
@@ -99,6 +100,75 @@ void SimpleBSTTests::testAddNodes()
     mpSearchTree->clear();
 
     QVERIFY(scEmptyTreeString == mpSearchTree->getTreeAsString(false));
+}
+
+void SimpleBSTTests::testRemoveNodes()
+{
+    reset();
+
+    bool nodeDeleted{false};
+
+    mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue};
+    mpAuxSearchTree = new BinarySearchTree{*mpSearchTree};
+
+    nodeDeleted = mpSearchTree->deleteNode(-16);
+    QVERIFY(nodeDeleted && "-5:ROOT/-9:-5/8:-5/-23:-9/-1:8/16:8/-12:-23/-2:-1/2:-1/14:16/17:16/0:2/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(8);
+    QVERIFY(nodeDeleted && "-5:ROOT/-9:-5/14:-5/-23:-9/-1:14/16:14/-12:-23/-2:-1/2:-1/17:16/0:2/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(0);
+    QVERIFY(nodeDeleted && "-5:ROOT/-9:-5/14:-5/-23:-9/-1:14/16:14/-12:-23/-2:-1/2:-1/17:16/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(-23);
+    QVERIFY(nodeDeleted && "-5:ROOT/-9:-5/14:-5/-12:-9/-1:14/16:14/-2:-1/2:-1/17:16/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(17);
+    QVERIFY(nodeDeleted && "-5:ROOT/-9:-5/14:-5/-12:-9/-1:14/16:14/-2:-1/2:-1/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(-5);
+    QVERIFY(nodeDeleted && "-2:ROOT/-9:-2/14:-2/-12:-9/-1:14/16:14/2:-1/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(-9);
+    QVERIFY(nodeDeleted && "-2:ROOT/-12:-2/14:-2/-1:14/16:14/2:-1/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(14);
+    QVERIFY(nodeDeleted && "-2:ROOT/-12:-2/16:-2/-1:16/2:-1/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(-1);
+    QVERIFY(nodeDeleted && "-2:ROOT/-12:-2/16:-2/2:16/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(-2);
+    QVERIFY(nodeDeleted && "2:ROOT/-12:2/16:2/7:16" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(-12);
+    QVERIFY(nodeDeleted && "2:ROOT/16:2/7:16" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(16);
+    QVERIFY(nodeDeleted && "2:ROOT/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(2);
+    QVERIFY(nodeDeleted && "7:ROOT" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(7);
+    QVERIFY(nodeDeleted && scEmptyTreeString == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(7);
+    QVERIFY(!nodeDeleted && scEmptyTreeString == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(25);
+    QVERIFY(!nodeDeleted && scEmptyTreeString == mpSearchTree->getTreeAsString(false));
+
+    // some additional (corner) cases
+    nodeDeleted = mpAuxSearchTree->deleteNode(-9);
+    QVERIFY(nodeDeleted && "-5:ROOT/-23:-5/8:-5/-16:-23/-1:8/16:8/-12:-16/-2:-1/2:-1/14:16/17:16/0:2/7:2" == mpAuxSearchTree->getTreeAsString(false));
+    nodeDeleted = mpAuxSearchTree->deleteNode(-1);
+    QVERIFY(nodeDeleted && "-5:ROOT/-23:-5/8:-5/-16:-23/0:8/16:8/-12:-16/-2:0/2:0/14:16/17:16/7:2" == mpAuxSearchTree->getTreeAsString(false));
+
+    delete mpSearchTree;
+    mpSearchTree = new BinarySearchTree{std::vector<int>{2, -12}, scDefaultValue};
+
+    nodeDeleted = mpSearchTree->deleteNode(2);
+    QVERIFY(nodeDeleted && "-12:ROOT" == mpSearchTree->getTreeAsString(false));
+
+    delete mpSearchTree;
+    mpSearchTree = new BinarySearchTree{std::vector<int>{2, -12, 7}, scDefaultValue};
+    *mpAuxSearchTree = *mpSearchTree;
+
+    nodeDeleted = mpSearchTree->deleteNode(-12);
+    QVERIFY(nodeDeleted && "2:ROOT/7:2" == mpSearchTree->getTreeAsString(false));
+    nodeDeleted = mpSearchTree->deleteNode(7);
+    QVERIFY(nodeDeleted && "2:ROOT" == mpSearchTree->getTreeAsString(false));
+
+    nodeDeleted = mpAuxSearchTree->deleteNode(7);
+    QVERIFY(nodeDeleted && "2:ROOT/-12:2" == mpAuxSearchTree->getTreeAsString(false));
+    nodeDeleted = mpAuxSearchTree->deleteNode(-12);
+    QVERIFY(nodeDeleted && "2:ROOT" == mpAuxSearchTree->getTreeAsString(false));
 }
 
 void SimpleBSTTests::reset()
