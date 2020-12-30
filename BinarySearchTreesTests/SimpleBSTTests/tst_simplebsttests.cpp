@@ -13,6 +13,7 @@ public:
 private slots:
     void testAddNodes();
     void testRemoveNodes();
+    void testUpdateNodeValue();
 
 private:
     void reset();
@@ -169,6 +170,56 @@ void SimpleBSTTests::testRemoveNodes()
     QVERIFY(nodeDeleted && "2:ROOT/-12:2" == mpAuxSearchTree->getTreeAsString(false));
     nodeDeleted = mpAuxSearchTree->deleteNode(-12);
     QVERIFY(nodeDeleted && "2:ROOT" == mpAuxSearchTree->getTreeAsString(false));
+}
+
+void SimpleBSTTests::testUpdateNodeValue()
+{
+    reset();
+
+    mpSearchTree = new BinarySearchTree;
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "a1");
+    (void)mpSearchTree->addOrUpdateNode(8, "b2");
+    (void)mpSearchTree->addOrUpdateNode(-1, "c3");
+    (void)mpSearchTree->addOrUpdateNode(2, "d4");
+    (void)mpSearchTree->addOrUpdateNode(-2, "e5");
+    (void)mpSearchTree->addOrUpdateNode(7, "f6");
+    (void)mpSearchTree->addOrUpdateNode(0, "g7");
+    (void)mpSearchTree->addOrUpdateNode(-9, "h8");
+    (void)mpSearchTree->addOrUpdateNode(16, "i9");
+    (void)mpSearchTree->addOrUpdateNode(14, "j10");
+    (void)mpSearchTree->addOrUpdateNode(-23, "k11");
+    (void)mpSearchTree->addOrUpdateNode(17, "l12");
+    (void)mpSearchTree->addOrUpdateNode(-16, "m13");
+    (void)mpSearchTree->addOrUpdateNode(-12, "n14");
+
+    QVERIFY("-5:a1:ROOT/-9:h8:-5/8:b2:-5/-23:k11:-9/-1:c3:8/16:i9:8/-16:m13:-23/-2:e5:-1/2:d4:-1/14:j10:16/17:l12:16/-12:n14:-16/0:g7:2/7:f6:2" == mpSearchTree->getTreeAsString(true));
+
+    QVERIFY("a1" == mpSearchTree->getNodeValue(-5));
+    QVERIFY("i9" == mpSearchTree->getNodeValue(16));
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(25));
+
+    bool newNodeAdded{false};
+
+    newNodeAdded = mpSearchTree->addOrUpdateNode(2, "d4_1");
+    QVERIFY(!newNodeAdded && "d4_1" == mpSearchTree->getNodeValue(2));
+    newNodeAdded = mpSearchTree->addOrUpdateNode(-9, "b2");
+    QVERIFY(!newNodeAdded && "b2" == mpSearchTree->getNodeValue(-9));
+    newNodeAdded = mpSearchTree->addOrUpdateNode(14, "j10");
+    QVERIFY(!newNodeAdded && "j10" == mpSearchTree->getNodeValue(14));
+    newNodeAdded = mpSearchTree->addOrUpdateNode(17, "L12");
+    QVERIFY(!newNodeAdded && "L12" == mpSearchTree->getNodeValue(17));
+    newNodeAdded = mpSearchTree->addOrUpdateNode(-12, scDefaultNullValue);
+    QVERIFY(!newNodeAdded && "n14" == mpSearchTree->getNodeValue(-12));
+    newNodeAdded = mpSearchTree->addOrUpdateNode(25, scDefaultNullValue);
+    QVERIFY(!newNodeAdded && scDefaultNullValue == mpSearchTree->getNodeValue(25));
+    newNodeAdded = mpSearchTree->addOrUpdateNode(25, "o15");
+    QVERIFY(newNodeAdded && "o15" == mpSearchTree->getNodeValue(25));
+
+    (void)mpSearchTree->deleteNode(7);
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(7));
+    (void)mpSearchTree->deleteNode(-28);
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(-28));
 }
 
 void SimpleBSTTests::reset()
