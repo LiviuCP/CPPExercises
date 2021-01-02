@@ -15,6 +15,7 @@ private slots:
     void testRemoveNodes();
     void testUpdateNodeValue();
     void testMoveSemantics();
+    void testMergeTrees();
 
 private:
     void reset();
@@ -362,6 +363,60 @@ void SimpleBSTTests::testMoveSemantics()
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-25:o15:ROOT/0:g7_1:-25/17:l12_1:0/3:p16:17", 4, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+}
+
+void SimpleBSTTests::testMergeTrees()
+{
+    reset();
+
+    mpSearchTree = new BinarySearchTree;
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "a1_1");
+    (void)mpSearchTree->addOrUpdateNode(2, "d4");
+    (void)mpSearchTree->addOrUpdateNode(7, "f6");
+    (void)mpSearchTree->addOrUpdateNode(-23, "k11");
+    (void)mpSearchTree->addOrUpdateNode(17, "l12");
+    (void)mpSearchTree->addOrUpdateNode(-12, "n14");
+    (void)mpSearchTree->addOrUpdateNode(16, "i9_1");
+    (void)mpSearchTree->addOrUpdateNode(0, "g7_1");
+
+    mpAuxSearchTree = new BinarySearchTree;
+
+    (void)mpAuxSearchTree->addOrUpdateNode(8, "b2");
+    (void)mpAuxSearchTree->addOrUpdateNode(-1, "c3");
+    (void)mpAuxSearchTree->addOrUpdateNode(-2, "e5");
+    (void)mpAuxSearchTree->addOrUpdateNode(0, "g7_2");
+    (void)mpAuxSearchTree->addOrUpdateNode(-5, "a1_2");
+    (void)mpAuxSearchTree->addOrUpdateNode(16, "i9_2");
+    (void)mpAuxSearchTree->addOrUpdateNode(-9, "h8");
+    (void)mpAuxSearchTree->addOrUpdateNode(14, "j10");
+    (void)mpAuxSearchTree->addOrUpdateNode(-16, "m13");
+
+    BinarySearchTree searchTreeCopy{*mpSearchTree};
+    BinarySearchTree searchTreeAuxCopy{*mpAuxSearchTree};
+
+    QVERIFY(searchTreeCopy == *mpSearchTree &&      // just a(n additional) check that the copy constructor and == operator work correctly
+            searchTreeAuxCopy == *mpAuxSearchTree);
+
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-5:a1_2:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23/0:g7_2:2/7:f6:2/-16:m13:-12/-9:h8:-12/-1:c3:0/17:l12:7/-2:e5:-1/16:i9_2:17/8:b2:16/14:j10:8", 14, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+
+    BinarySearchTree firstMergeResult{*mpSearchTree};
+
+    *mpSearchTree = searchTreeCopy;
+    *mpAuxSearchTree = searchTreeAuxCopy;
+
+    QVERIFY(*mpSearchTree == searchTreeCopy &&      // just a(n additional) check that the copy assignment operator and == operator work correctly
+            *mpAuxSearchTree == searchTreeAuxCopy);
+
+    mpAuxSearchTree->mergeTree(*mpSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "8:b2:ROOT/-1:c3:8/16:i9_1:8/-2:e5:-1/0:g7_1:-1/14:j10:16/17:l12:16/-5:a1_1:-2/2:d4:0/-9:h8:-5/7:f6:2/-16:m13:-9/-23:k11:-16/-12:n14:-16", 14, true));
+
+    QVERIFY(*mpAuxSearchTree != firstMergeResult); // test the != operator too
 }
 
 void SimpleBSTTests::reset()
