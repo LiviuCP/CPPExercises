@@ -298,11 +298,13 @@ void SimpleBSTTests::testUpdateNodeValue()
     QVERIFY(!newNodeAdded &&
             scDefaultNullValue == mpSearchTree->getNodeValue(25));
 
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-9:b2:-5/8:b2:-5/-23:k11:-9/-1:c3:8/16:i9:8/-16:m13:-23/-2:e5:-1/2:d4_1:-1/14:j10:16/17:L12:16/-12:n14:-16/0:g7:2/7:f6:2", 14, true));
+
     newNodeAdded = mpSearchTree->addOrUpdateNode(25, "o15");
     QVERIFY(newNodeAdded &&
             "o15" == mpSearchTree->getNodeValue(25));
 
-    QVERIFY(15 == mpSearchTree->getSize());
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-9:b2:-5/8:b2:-5/-23:k11:-9/-1:c3:8/16:i9:8/-16:m13:-23/-2:e5:-1/2:d4_1:-1/14:j10:16/17:L12:16/-12:n14:-16/0:g7:2/7:f6:2/25:o15:17", 15, true));
 
     // update by deleting node
     bool nodeDeleted{false};
@@ -315,7 +317,7 @@ void SimpleBSTTests::testUpdateNodeValue()
     QVERIFY(!nodeDeleted &&
             scDefaultNullValue == mpSearchTree->getNodeValue(-28));
 
-    QVERIFY(14 == mpSearchTree->getSize());
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-9:b2:-5/8:b2:-5/-23:k11:-9/-1:c3:8/16:i9:8/-16:m13:-23/-2:e5:-1/2:d4_1:-1/14:j10:16/17:L12:16/-12:n14:-16/0:g7:2/25:o15:17", 14, true));
 }
 
 void SimpleBSTTests::testMoveSemantics()
