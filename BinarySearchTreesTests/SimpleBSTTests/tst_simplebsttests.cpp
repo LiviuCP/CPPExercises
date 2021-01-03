@@ -52,7 +52,7 @@ void SimpleBSTTests::testAddNodes()
 
     mpSearchTree = new BinarySearchTree;
 
-    QVERIFY(0 == mpSearchTree->getSize() && scEmptyTreeString == mpSearchTree->getTreeAsString(false));
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
 
     newNodeAdded = mpSearchTree->addOrUpdateNode(-5, scDefaultValue);
     QVERIFY(newNodeAdded &&
