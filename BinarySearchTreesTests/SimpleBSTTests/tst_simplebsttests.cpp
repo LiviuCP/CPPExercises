@@ -353,36 +353,27 @@ void SimpleBSTTests::testMoveSemantics()
     (void)mpSearchTree->addOrUpdateNode(-1, "c3");
     (void)mpSearchTree->addOrUpdateNode(2, "d4");
     (void)mpSearchTree->addOrUpdateNode(-2, "e5");
-    (void)mpSearchTree->addOrUpdateNode(7, "f6");
-    (void)mpSearchTree->addOrUpdateNode(0, "g7");
-    (void)mpSearchTree->addOrUpdateNode(-9, "h8");
-    (void)mpSearchTree->addOrUpdateNode(16, "i9");
-    (void)mpSearchTree->addOrUpdateNode(14, "j10");
-    (void)mpSearchTree->addOrUpdateNode(-23, "k11");
-    (void)mpSearchTree->addOrUpdateNode(17, "l12");
-    (void)mpSearchTree->addOrUpdateNode(-16, "m13");
-    (void)mpSearchTree->addOrUpdateNode(-12, "n14");
 
     mpAuxSearchTree = new BinarySearchTree{std::move(*mpSearchTree)};
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
-    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-5:a1:ROOT/-9:h8:-5/8:b2:-5/-23:k11:-9/-1:c3:8/16:i9:8/-16:m13:-23/-2:e5:-1/2:d4:-1/14:j10:16/17:l12:16/-12:n14:-16/0:g7:2/7:f6:2", 14, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-5:a1:ROOT/8:b2:-5/-1:c3:8/-2:e5:-1/2:d4:-1", 5, true));
 
-    mpSearchTree->addOrUpdateNode(-25, "o15");
-    mpSearchTree->addOrUpdateNode(0, "g7_1");
-    mpSearchTree->addOrUpdateNode(17, "l12_1");
-    mpSearchTree->addOrUpdateNode(3, "p16");
+    mpSearchTree->addOrUpdateNode(17, "f6");
+    mpSearchTree->addOrUpdateNode(0, "g7");
+    mpSearchTree->addOrUpdateNode(-2, "e5_1");
+    mpSearchTree->addOrUpdateNode(3, "h8");
 
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-25:o15:ROOT/0:g7_1:-25/17:l12_1:0/3:p16:17", 4, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "17:f6:ROOT/0:g7:17/-2:e5_1:0/3:h8:0", 4, true));
 
     *mpAuxSearchTree = std::move(*mpSearchTree);
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
-    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-25:o15:ROOT/0:g7_1:-25/17:l12_1:0/3:p16:17", 4, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "17:f6:ROOT/0:g7:17/-2:e5_1:0/3:h8:0", 4, true));
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
 
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-25:o15:ROOT/0:g7_1:-25/17:l12_1:0/3:p16:17", 4, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "17:f6:ROOT/0:g7:17/-2:e5_1:0/3:h8:0", 4, true));
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
 }
 
