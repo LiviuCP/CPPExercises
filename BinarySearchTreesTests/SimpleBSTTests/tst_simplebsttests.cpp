@@ -29,7 +29,7 @@ private:
     static const std::string scEmptyTreeString;
 };
 
-const std::string SimpleBSTTests::scDefaultValue{"default"};
+const std::string SimpleBSTTests::scDefaultValue{"DF"};
 const std::string SimpleBSTTests::scDefaultNullValue{""};
 const std::string SimpleBSTTests::scEmptyTreeString{""};
 
@@ -251,6 +251,10 @@ void SimpleBSTTests::testUpdateNodeValue()
 
     mpSearchTree = new BinarySearchTree;
 
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(-5) &&
+            scDefaultNullValue == mpSearchTree->getNodeValue(0) &&
+            scDefaultNullValue == mpSearchTree->getNodeValue(16));
+
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
     (void)mpSearchTree->addOrUpdateNode(8, "b2");
     (void)mpSearchTree->addOrUpdateNode(-1, "c3");
@@ -268,8 +272,10 @@ void SimpleBSTTests::testUpdateNodeValue()
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-9:h8:-5/8:b2:-5/-23:k11:-9/-1:c3:8/16:i9:8/-16:m13:-23/-2:e5:-1/2:d4:-1/14:j10:16/17:l12:16/-12:n14:-16/0:g7:2/7:f6:2", 14, true));
 
-    QVERIFY("a1" == mpSearchTree->getNodeValue(-5));
-    QVERIFY("i9" == mpSearchTree->getNodeValue(16));
+    QVERIFY("a1" == mpSearchTree->getNodeValue(-5) &&
+            "g7" == mpSearchTree->getNodeValue(0) &&
+            "i9" == mpSearchTree->getNodeValue(16));
+
     QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(25));
 
     // update by adding/modifying node
@@ -319,6 +325,21 @@ void SimpleBSTTests::testUpdateNodeValue()
             scDefaultNullValue == mpSearchTree->getNodeValue(-28));
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-9:b2:-5/8:b2:-5/-23:k11:-9/-1:c3:8/16:i9:8/-16:m13:-23/-2:e5:-1/2:d4_1:-1/14:j10:16/17:L12:16/-12:n14:-16/0:g7:2/25:o15:17", 14, true));
+
+    mpSearchTree->clear();
+
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(-5) &&
+            scDefaultNullValue == mpSearchTree->getNodeValue(0) &&
+            scDefaultNullValue == mpSearchTree->getNodeValue(16));
+
+    // test with same value for all nodes
+    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue};
+
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-5:DF:ROOT/-9:DF:-5/8:DF:-5/-23:DF:-9/-1:DF:8/16:DF:8/-16:DF:-23/-2:DF:-1/2:DF:-1/14:DF:16/17:DF:16/-12:DF:-16/0:DF:2/7:DF:2", 14, true));
+
+    QVERIFY(scDefaultValue == mpAuxSearchTree->getNodeValue(-5) &&
+            scDefaultValue == mpAuxSearchTree->getNodeValue(0) &&
+            scDefaultValue == mpAuxSearchTree->getNodeValue(16));
 }
 
 void SimpleBSTTests::testMoveSemantics()
