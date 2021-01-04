@@ -16,6 +16,7 @@ private slots:
     void testUpdateNodeValue();
     void testMoveSemantics();
     void testMergeTrees();
+    void testTreesWithCustomNullValue();
 
 private:
     void _reset();
@@ -26,11 +27,13 @@ private:
 
     static const std::string scDefaultValue;
     static const std::string scDefaultNullValue;
+    static const std::string scCustomNullValue;
     static const std::string scEmptyTreeString;
 };
 
 const std::string SimpleBSTTests::scDefaultValue{"DF"};
 const std::string SimpleBSTTests::scDefaultNullValue{""};
+const std::string SimpleBSTTests::scCustomNullValue{"/0"};
 const std::string SimpleBSTTests::scEmptyTreeString{""};
 
 SimpleBSTTests::SimpleBSTTests()
@@ -429,6 +432,97 @@ void SimpleBSTTests::testMergeTrees()
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "8:b2:ROOT/-1:c3:8/16:i9_1:8/-2:e5:-1/0:g7_1:-1/14:j10:16/17:l12:16/-5:a1_1:-2/2:d4:0/-9:h8:-5/7:f6:2/-16:m13:-9/-23:k11:-16/-12:n14:-16", 14, true));
 
     QVERIFY(*mpAuxSearchTree != firstMergeResult); // test the != operator too
+}
+
+void SimpleBSTTests::testTreesWithCustomNullValue()
+{
+    _reset();
+
+    mpSearchTree = new BinarySearchTree{scCustomNullValue};
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "a1");
+    (void)mpSearchTree->addOrUpdateNode(8, "b2");
+    (void)mpSearchTree->addOrUpdateNode(-1, scDefaultNullValue);
+    (void)mpSearchTree->addOrUpdateNode(2, "d4");
+    (void)mpSearchTree->addOrUpdateNode(-2, "e5");
+    (void)mpSearchTree->addOrUpdateNode(7, "f6");
+    (void)mpSearchTree->addOrUpdateNode(-8, scDefaultNullValue);
+    (void)mpSearchTree->addOrUpdateNode(0, "g7");
+    (void)mpSearchTree->addOrUpdateNode(-9, "h8");
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-8::-5/8:b2:-5/-9:h8:-8/-1::8/-2:e5:-1/2:d4:-1/0:g7:2/7:f6:2", 9, true));
+
+    bool newNodeAdded{false};
+
+    newNodeAdded = mpSearchTree->addOrUpdateNode(2, "d4_1");
+    QVERIFY(!newNodeAdded &&
+            "d4_1" == mpSearchTree->getNodeValue(2));
+
+    newNodeAdded = mpSearchTree->addOrUpdateNode(-1, "c3");
+    QVERIFY(!newNodeAdded &&
+            "c3" == mpSearchTree->getNodeValue(-1));
+
+    newNodeAdded = mpSearchTree->addOrUpdateNode(7, scCustomNullValue);
+    QVERIFY(!newNodeAdded &&
+            "f6" == mpSearchTree->getNodeValue(7));
+
+    newNodeAdded = mpSearchTree->addOrUpdateNode(-2, scDefaultNullValue);
+    QVERIFY(!newNodeAdded &&
+            scDefaultNullValue == mpSearchTree->getNodeValue(-2));
+
+    newNodeAdded = mpSearchTree->addOrUpdateNode(25, scCustomNullValue);
+    QVERIFY(!newNodeAdded &&
+            scCustomNullValue == mpSearchTree->getNodeValue(25));
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-8::-5/8:b2:-5/-9:h8:-8/-1:c3:8/-2::-1/2:d4_1:-1/0:g7:2/7:f6:2", 9, true));
+
+    newNodeAdded = mpSearchTree->addOrUpdateNode(-7, "i9");
+    QVERIFY(newNodeAdded &&
+            "i9" == mpSearchTree->getNodeValue(-7));
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-8::-5/8:b2:-5/-9:h8:-8/-7:i9:-8/-1:c3:8/-2::-1/2:d4_1:-1/0:g7:2/7:f6:2", 10, true));
+
+    bool nodeDeleted{false};
+
+    nodeDeleted = mpSearchTree->deleteNode(-25);
+    QVERIFY(!nodeDeleted &&
+            scCustomNullValue == mpSearchTree->getNodeValue(-25));
+
+    nodeDeleted = mpSearchTree->deleteNode(-8);
+    QVERIFY(nodeDeleted &&
+            scCustomNullValue == mpSearchTree->getNodeValue(-8));
+
+    nodeDeleted = mpSearchTree->deleteNode(2);
+    QVERIFY(nodeDeleted &&
+            scCustomNullValue == mpSearchTree->getNodeValue(2));
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-7:i9:-5/8:b2:-5/-9:h8:-7/-1:c3:8/-2::-1/7:f6:-1/0:g7:7", 8, true));
+
+    mpAuxSearchTree = new BinarySearchTree{std::move(*mpSearchTree)};
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-5:a1:ROOT/-7:i9:-5/8:b2:-5/-9:h8:-7/-1:c3:8/-2::-1/7:f6:-1/0:g7:7", 8, true));
+
+    delete mpSearchTree;
+    mpSearchTree = new BinarySearchTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "16:ROOT/-9:16/17:16/-23:-9/14:-9/-16:-23/7:14/-12:-16", 8, false));
+    QVERIFY("DF" == mpSearchTree->getNodeValue(14));
+
+    (void)mpSearchTree->addOrUpdateNode(-9, scDefaultNullValue);
+    (void)mpAuxSearchTree->addOrUpdateNode(7, scDefaultNullValue);
+    mpAuxSearchTree->mergeTree(*mpSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-5:a1:ROOT/-7:i9:-5/8:b2:-5/-9::-7/-1:c3:8/16:DF:8/-23:DF:-9/-2::-1/7:DF:-1/14:DF:16/17:DF:16/-16:DF:-23/0:g7:7/-12:DF:-16", 14, true));
+
+    *mpSearchTree = *mpAuxSearchTree;
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-7:i9:-5/8:b2:-5/-9::-7/-1:c3:8/16:DF:8/-23:DF:-9/-2::-1/7:DF:-1/14:DF:16/17:DF:16/-16:DF:-23/0:g7:7/-12:DF:-16", 14, true));
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree);
+
+    (void)mpAuxSearchTree->addOrUpdateNode(17, "df");
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 }
 
 void SimpleBSTTests::_reset()
