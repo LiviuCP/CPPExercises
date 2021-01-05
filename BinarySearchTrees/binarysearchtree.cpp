@@ -163,6 +163,11 @@ std::string BinarySearchTree::getNodeValue(int key) const
     return result;
 }
 
+std::string BinarySearchTree::getNullValue() const
+{
+    return m_NullValue;
+}
+
 int BinarySearchTree::getSize() const
 {
     return m_Size;

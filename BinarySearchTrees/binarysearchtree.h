@@ -44,6 +44,7 @@ public:
     bool operator!=(const BinarySearchTree& tree) const;
 
     std::string getNodeValue(int key) const;
+    std::string getNullValue() const;
     int getSize() const;
 
     virtual void printTree() const;
