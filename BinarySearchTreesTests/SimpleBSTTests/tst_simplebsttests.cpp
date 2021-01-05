@@ -17,6 +17,7 @@ private slots:
     void testMoveSemantics();
     void testMergeTrees();
     void testTreesWithCustomNullValue();
+    void testPrintTree(); // only required for improving code coverage
 
 private:
     void _reset();
@@ -523,6 +524,26 @@ void SimpleBSTTests::testTreesWithCustomNullValue()
 
     (void)mpAuxSearchTree->addOrUpdateNode(17, "df");
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+}
+
+void SimpleBSTTests::testPrintTree()
+{
+    _reset();
+
+    qInfo("Creating new tree");
+    mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue};
+
+    QVERIFY(14 == mpSearchTree->getSize());
+
+    qInfo("The tree nodes are: ");
+    mpSearchTree->printTree();
+
+    qInfo("Clearing tree content");
+    mpSearchTree->clear();
+
+    QVERIFY(0 == mpSearchTree->getSize());
+
+    mpSearchTree->printTree();
 }
 
 void SimpleBSTTests::_reset()
