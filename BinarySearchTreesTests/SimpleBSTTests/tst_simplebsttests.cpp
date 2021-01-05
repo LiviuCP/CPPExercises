@@ -408,19 +408,48 @@ void SimpleBSTTests::testMergeTrees()
     (void)mpAuxSearchTree->addOrUpdateNode(14, "j10");
     (void)mpAuxSearchTree->addOrUpdateNode(-16, "m13");
 
-    BinarySearchTree searchTreeCopy{*mpSearchTree};
-    BinarySearchTree searchTreeAuxCopy{*mpAuxSearchTree};
+    const BinarySearchTree searchTreeCopy{*mpSearchTree};
+    const BinarySearchTree searchTreeAuxCopy{*mpAuxSearchTree};
 
     QVERIFY(searchTreeCopy == *mpSearchTree &&      // just a(n additional) check that the copy constructor and == operator work correctly
             searchTreeAuxCopy == *mpAuxSearchTree);
 
+    // first (main) merge
     mpSearchTree->mergeTree(*mpAuxSearchTree);
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1_2:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23/0:g7_2:2/7:f6:2/-16:m13:-12/-9:h8:-12/-1:c3:0/17:l12:7/-2:e5:-1/16:i9_2:17/8:b2:16/14:j10:8", 14, true));
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
 
-    BinarySearchTree firstMergeResult{*mpSearchTree};
+    const BinarySearchTree mainTreeAfterFirstMerge{*mpSearchTree};
 
+    // merge empty tree into unempty tree
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(*mpSearchTree == mainTreeAfterFirstMerge);
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+
+    // merge unempty tree with itself
+    mpSearchTree->mergeTree(*mpSearchTree);
+    QVERIFY(*mpSearchTree == mainTreeAfterFirstMerge);
+
+    // merge unempty tree into empty tree
+    mpAuxSearchTree->mergeTree(*mpSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(*mpAuxSearchTree == mainTreeAfterFirstMerge);
+
+    // merge empty tree with itself
+    mpSearchTree->mergeTree(*mpSearchTree);
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+
+    // merge two empty trees
+    mpAuxSearchTree->clear();
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree);
+
+    // do inverse merge operation comparing to first merge
     *mpSearchTree = searchTreeCopy;
     *mpAuxSearchTree = searchTreeAuxCopy;
 
@@ -432,7 +461,7 @@ void SimpleBSTTests::testMergeTrees()
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "8:b2:ROOT/-1:c3:8/16:i9_1:8/-2:e5:-1/0:g7_1:-1/14:j10:16/17:l12:16/-5:a1_1:-2/2:d4:0/-9:h8:-5/7:f6:2/-16:m13:-9/-23:k11:-16/-12:n14:-16", 14, true));
 
-    QVERIFY(*mpAuxSearchTree != firstMergeResult); // test the != operator too
+    QVERIFY(*mpAuxSearchTree != mainTreeAfterFirstMerge); // test the != operator too
 }
 
 void SimpleBSTTests::testTreesWithCustomNullValue()
