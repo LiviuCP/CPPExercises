@@ -5,8 +5,8 @@
 
 #include "redblacktree.h"
 
-RedBlackTree::RedBlackTree(const std::string& defaultNullValue)
-    : BinarySearchTree{defaultNullValue}
+RedBlackTree::RedBlackTree(const std::string& nullValue)
+    : BinarySearchTree{nullValue}
 {
 }
 
@@ -14,10 +14,10 @@ RedBlackTree::RedBlackTree(const std::string& defaultNullValue)
    The reason is that the base constructor creates Node objects (instead of RedBlackNode) and uses the simple BST logic for connecting them with each other
    Consequently the "empty tree" base constructor is called instead
 */
-RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
-    : BinarySearchTree{defaultNullValue}
+RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
+    : BinarySearchTree{nullValue}
 {
-    if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
+    if (inputKeys.size() != 0 && defaultValue != nullValue)
     {
         for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
         {
@@ -31,7 +31,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
 }
 
 RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
-    : BinarySearchTree{sourceTree.m_DefaultNullValue} // the "empty tree" base constructor is called for the above mentioned reasons
+    : BinarySearchTree{sourceTree.m_NullValue} // the "empty tree" base constructor is called for the above mentioned reasons
 {
     _copyTreeNodes(sourceTree);
 }
@@ -39,7 +39,7 @@ RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
 RedBlackTree::RedBlackTree(RedBlackTree&& sourceTree)
 {
     m_Root = sourceTree.m_Root;
-    m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+    m_NullValue = sourceTree.m_NullValue;
     m_Size = sourceTree.m_Size;
 
     sourceTree.m_Root = nullptr;
@@ -55,7 +55,7 @@ RedBlackTree& RedBlackTree::operator=(const RedBlackTree& sourceTree)
             _deleteAllNodes();
         }
 
-        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        m_NullValue = sourceTree.m_NullValue;
         _copyTreeNodes(sourceTree);
     }
 
@@ -75,7 +75,7 @@ RedBlackTree& RedBlackTree::operator=(RedBlackTree&& sourceTree)
         m_Size = sourceTree.m_Size;
         sourceTree.m_Root = nullptr;
         sourceTree.m_Size = 0;
-        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        m_NullValue = sourceTree.m_NullValue;
     }
 
     return *this;

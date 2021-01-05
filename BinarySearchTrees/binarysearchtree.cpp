@@ -5,25 +5,25 @@
 
 #include "binarysearchtree.h"
 
-BinarySearchTree::BinarySearchTree(const std::string& defaultNullValue)
+BinarySearchTree::BinarySearchTree(const std::string& nullValue)
     : m_Root{nullptr}
-    , m_DefaultNullValue{defaultNullValue}
+    , m_NullValue{nullValue}
     , m_Size{0}
 {
 }
 
-BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
-    : BinarySearchTree{defaultNullValue}
+BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
+    : BinarySearchTree{nullValue}
 {
-    if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
+    if (inputKeys.size() != 0 && defaultValue != nullValue)
     {
-        _createTreeStructure(inputKeys, defaultValue, defaultNullValue);
+        _createTreeStructure(inputKeys, defaultValue, nullValue);
     }
 }
 
 BinarySearchTree::BinarySearchTree(const BinarySearchTree& sourceTree)
     : m_Root{nullptr}
-    , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
+    , m_NullValue{sourceTree.m_NullValue}
     , m_Size{0}
 {
     _copyTreeNodes(sourceTree);
@@ -31,7 +31,7 @@ BinarySearchTree::BinarySearchTree(const BinarySearchTree& sourceTree)
 
 BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
     : m_Root{sourceTree.m_Root}
-    , m_DefaultNullValue{sourceTree.m_DefaultNullValue}
+    , m_NullValue{sourceTree.m_NullValue}
     , m_Size{sourceTree.m_Size}
 {
     sourceTree.m_Root = nullptr;
@@ -47,7 +47,7 @@ bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
 {
     bool newNodeAdded{false};
 
-    if (value != m_DefaultNullValue)
+    if (value != m_NullValue)
     {
         const Node* addedNode{_doAddOrUpdateNode(key, value)};
 
@@ -88,7 +88,7 @@ bool BinarySearchTree::deleteNode(int key)
 
 void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
 {
-    assert(m_DefaultNullValue == sourceTree.m_DefaultNullValue && "Default null values of trees don't match");
+    assert(m_NullValue == sourceTree.m_NullValue && "Null values of trees don't match");
 
     if (this != &sourceTree)
     {
@@ -111,7 +111,7 @@ BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree
             _deleteAllNodes();
         }
 
-        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        m_NullValue = sourceTree.m_NullValue;
         _copyTreeNodes(sourceTree);
     }
 
@@ -131,7 +131,7 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
         m_Size = sourceTree.m_Size;
         sourceTree.m_Root = nullptr;
         sourceTree.m_Size = 0;
-        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        m_NullValue = sourceTree.m_NullValue;
     }
 
     return *this;
@@ -151,7 +151,7 @@ bool BinarySearchTree::operator!=(const BinarySearchTree &tree) const
 
 std::string BinarySearchTree::getNodeValue(int key) const
 {
-    std::string result{m_DefaultNullValue};
+    std::string result{m_NullValue};
 
     Node* foundNode{_findNode(key)};
 
@@ -216,10 +216,10 @@ std::string BinarySearchTree::getTreeAsString(bool areNodeValuesRequired) const
     return result;
 }
 
-void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
+void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
 {
     assert(inputKeys.size() != 0 && "No keys provided for creating tree structure");
-    assert(defaultValue != defaultNullValue && "Default null value set as default value for tree keys");
+    assert(defaultValue != nullValue && "Null value set as default value for tree keys");
 
     for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
     {

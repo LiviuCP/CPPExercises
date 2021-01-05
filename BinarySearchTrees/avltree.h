@@ -11,8 +11,8 @@
 class AVLTree final: public BinarySearchTree
 {
 public:
-    AVLTree(const std::string& defaultNullValue = "");
-    AVLTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue = "");
+    AVLTree(const std::string& nullValue = "");
+    AVLTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue = "");
     AVLTree(const AVLTree& sourceTree);
     AVLTree(AVLTree&& sourceTree);
 

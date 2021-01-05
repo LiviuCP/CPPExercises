@@ -26,8 +26,8 @@ Notes:
 class RedBlackTree final : public BinarySearchTree
 {
 public:
-    RedBlackTree(const std::string& defaultNullValue = "");
-    RedBlackTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue = "");
+    RedBlackTree(const std::string& nullValue = "");
+    RedBlackTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue = "");
     RedBlackTree(const RedBlackTree& sourceTree);
     RedBlackTree(RedBlackTree&& sourceTree);
 

@@ -5,8 +5,8 @@
 
 #include "avltree.h"
 
-AVLTree::AVLTree(const std::string& defaultNullValue)
-    : BinarySearchTree(defaultNullValue)
+AVLTree::AVLTree(const std::string& nullValue)
+    : BinarySearchTree(nullValue)
 {
 }
 
@@ -14,17 +14,17 @@ AVLTree::AVLTree(const std::string& defaultNullValue)
    The reason is that the base constructor creates Node objects (instead of AVLNode) and uses the simple BST logic for connecting them with each other
    Consequently the "empty tree" base constructor is called instead
 */
-AVLTree::AVLTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue)
-    : BinarySearchTree{defaultNullValue}
+AVLTree::AVLTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
+    : BinarySearchTree{nullValue}
 {
-    if (inputKeys.size() != 0 && defaultValue != defaultNullValue)
+    if (inputKeys.size() != 0 && defaultValue != nullValue)
     {
-        _createTreeStructure(inputKeys, defaultValue, defaultNullValue);
+        _createTreeStructure(inputKeys, defaultValue, nullValue);
     }
 }
 
 AVLTree::AVLTree(const AVLTree& sourceTree)
-    : BinarySearchTree{sourceTree.m_DefaultNullValue} // the "empty tree" base constructor is called for the above mentioned reasons
+    : BinarySearchTree{sourceTree.m_NullValue} // the "empty tree" base constructor is called for the above mentioned reasons
 {
     _copyTreeNodes(sourceTree);
 }
@@ -32,7 +32,7 @@ AVLTree::AVLTree(const AVLTree& sourceTree)
 AVLTree::AVLTree(AVLTree&& sourceTree)
 {
     m_Root = sourceTree.m_Root;
-    m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+    m_NullValue = sourceTree.m_NullValue;
     m_Size = sourceTree.m_Size;
 
     sourceTree.m_Root = nullptr;
@@ -48,7 +48,7 @@ AVLTree& AVLTree::operator=(const AVLTree& sourceTree)
             _deleteAllNodes();
         }
 
-        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        m_NullValue = sourceTree.m_NullValue;
         _copyTreeNodes(sourceTree);
     }
 
@@ -68,7 +68,7 @@ AVLTree& AVLTree::operator=(AVLTree&& sourceTree)
         m_Size = sourceTree.m_Size;
         sourceTree.m_Root = nullptr;
         sourceTree.m_Size = 0;
-        m_DefaultNullValue = sourceTree.m_DefaultNullValue;
+        m_NullValue = sourceTree.m_NullValue;
     }
 
     return *this;

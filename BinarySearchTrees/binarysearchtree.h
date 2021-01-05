@@ -7,10 +7,10 @@
 class BinarySearchTree
 {
 public:
-    BinarySearchTree(const std::string& defaultNullValue = "");
+    BinarySearchTree(const std::string& nullValue = "");
 
     // these constructors shouldn't be called from derived classes that use node objects which are derived from Node
-    BinarySearchTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue = "");
+    BinarySearchTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue = "");
     BinarySearchTree(const BinarySearchTree& sourceTree);
     BinarySearchTree(BinarySearchTree&& sourceTree);
 
@@ -100,7 +100,7 @@ protected:
 
 
     // used by constructors of base and derived classes, specific behavior implemented by _doAddOrUpdateNode()
-    void _createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& defaultNullValue);
+    void _createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue);
 
     // used by RB and AVL trees as well (generic function), specific logic implemented by _doAddOrUpdateNode()
     void _copyTreeNodes(const BinarySearchTree& sourceTree);
@@ -132,7 +132,7 @@ protected:
     virtual std::string _getNodeAsString(const Node* node, bool isValueRequired) const;
 
     Node* m_Root;
-    std::string m_DefaultNullValue; // value that each key that is NOT contained within tree corresponds to
+    std::string m_NullValue; // value that each key that is NOT contained within tree corresponds to
     int m_Size; // used for easy retrieval of the number of nodes (to avoid tree traversal)
 
 
