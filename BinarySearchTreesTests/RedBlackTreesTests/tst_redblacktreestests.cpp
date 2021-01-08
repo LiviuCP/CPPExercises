@@ -12,6 +12,7 @@ public:
 
 private slots:
     void testAddNodes();
+    void testPrintTree(); // only required for improving code coverage
 
 private:
     void _reset();
@@ -153,6 +154,26 @@ void RedBlackTreesTests::testAddNodes()
     mpSearchTree->clear();
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
+}
+
+void RedBlackTreesTests::testPrintTree()
+{
+    _reset();
+
+    qInfo("Creating new tree");
+    mpSearchTree = new RedBlackTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue};
+
+    QVERIFY(16 == mpSearchTree->getSize());
+
+    qInfo("The tree nodes are: ");
+    mpSearchTree->printTree();
+
+    qInfo("Clearing tree content");
+    mpSearchTree->clear();
+
+    QVERIFY(0 == mpSearchTree->getSize());
+
+    mpSearchTree->printTree();
 }
 
 void RedBlackTreesTests::_reset()
