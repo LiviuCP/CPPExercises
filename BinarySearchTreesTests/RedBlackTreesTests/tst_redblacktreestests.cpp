@@ -40,7 +40,7 @@ RedBlackTreesTests::RedBlackTreesTests()
 
 RedBlackTreesTests::~RedBlackTreesTests()
 {
-
+    _reset();
 }
 
 void RedBlackTreesTests::testAddNodes()
