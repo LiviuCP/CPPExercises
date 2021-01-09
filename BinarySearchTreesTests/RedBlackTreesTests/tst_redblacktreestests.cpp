@@ -154,6 +154,41 @@ void RedBlackTreesTests::testAddNodes()
     mpSearchTree->clear();
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
+
+    // additional tests for constructors
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue};
+
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree); // in this particular case due to RB tree construction rules the trees become equal when third element is being added (unlike the basic BST)
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{-3, -5, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{-3, 2, -5, 4, 0, 1}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{}, scDefaultValue, scDefaultNullValue};
+
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree);
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
+
+    delete mpSearchTree;
+    mpSearchTree = new RedBlackTree{scCustomNullValue};
+
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 }
 
 void RedBlackTreesTests::testPrintTree()
