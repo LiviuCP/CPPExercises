@@ -151,7 +151,7 @@ void SimpleBSTTests::testAddNodes()
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
 
-    // additional tests for constructors
+    // additional tests for constructors along with the == and != operators
     _reset();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
@@ -163,6 +163,13 @@ void SimpleBSTTests::testAddNodes()
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 

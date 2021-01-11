@@ -155,7 +155,7 @@ void RedBlackTreesTests::testAddNodes()
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
 
-    // additional tests for constructors
+    // additional tests for constructors along with the == and != operators
     _reset();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
@@ -169,6 +169,13 @@ void RedBlackTreesTests::testAddNodes()
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree); // in this particular case due to RB tree construction rules the trees become equal when third element is being added (unlike the basic BST)
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
     _reset();
 
