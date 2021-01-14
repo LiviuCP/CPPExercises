@@ -281,7 +281,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *n
 
                     isTreeValid = !doubleBlackNodeChanged;
                 }
-                else // sub-case 2c: red sibling - apply below changes and RECUR to one of the cases above (in the recursion: same nodes are being used as parent and double black)
+                else // sub-case 2c: red sibling - apply below changes and RECUR to one of the cases above (in the recursion: the sibling determined below is used as starting point (new sibling))
                 {
                     // sibling should have 2 non-null black children (otherwise rule 4 violation)
                     assert((siblingLeftChild != nullptr && siblingRightChild != nullptr) && "At least a null child identified for red sibling");

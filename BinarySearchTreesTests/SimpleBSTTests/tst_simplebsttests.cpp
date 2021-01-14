@@ -260,7 +260,6 @@ void SimpleBSTTests::testRemoveNodes()
             _areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
 
     nodeDeleted = mpSearchTree->deleteNode(7);
-
     QVERIFY(!nodeDeleted &&
             _areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
 
