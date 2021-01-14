@@ -151,6 +151,11 @@ void RedBlackTreesTests::testAddNodes()
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "14:ROOT:BK/0:14:RD/17:14:BK/-9:0:BK/7:0:BK/16:17:BK/19:17:BK/-15:-9:RD/-2:-9:RD/2:7:BK/8:7:BK/-16:-15:BK/-12:-15:BK/-5:-2:BK/-1:-2:BK/-23:-16:RD", 16));
 
+    delete mpSearchTree;
+    mpSearchTree = new RedBlackTree{std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-12:ROOT:BK/-16:-12:BK/14:-12:RD/-23:-16:BK/-15:-16:BK/-1:14:BK/17:14:BK/-5:-1:RD/7:-1:RD/16:17:BK/19:17:BK/-9:-5:BK/-2:-5:BK/2:7:BK/8:7:BK/0:2:RD", 16));
+
     mpSearchTree->clear();
 
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
@@ -159,7 +164,7 @@ void RedBlackTreesTests::testAddNodes()
     _reset();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
-    mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
@@ -187,7 +192,7 @@ void RedBlackTreesTests::testAddNodes()
     _reset();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{}, scDefaultValue, scCustomNullValue};
-    mpAuxSearchTree = new RedBlackTree{std::vector<int>{}, scDefaultValue, scDefaultNullValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{}, scDefaultValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
