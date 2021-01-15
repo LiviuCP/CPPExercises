@@ -518,7 +518,7 @@ void SimpleBSTTests::testUpdateNodeValue()
     _reset();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
-    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scDefaultNullValue};
+    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue};
 
     newNodeAdded = mpSearchTree->addOrUpdateNode(7, scDefaultNullValue);
     QVERIFY(!newNodeAdded &&
