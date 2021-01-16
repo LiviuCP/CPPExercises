@@ -15,6 +15,7 @@ private slots:
     void testRemoveNodes();
     void testUpdateNodeValue();
     void testMoveSemantics();
+    void testMergeTrees();
     void testPrintTree(); // only required for improving code coverage
 
 private:
@@ -809,6 +810,121 @@ void RedBlackTreesTests::testMoveSemantics()
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
     QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
             scDefaultNullValue == mpAuxSearchTree->getNullValue());
+}
+
+void RedBlackTreesTests::testMergeTrees()
+{
+    _reset();
+
+    mpSearchTree = new RedBlackTree;
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "a1_1");
+    (void)mpSearchTree->addOrUpdateNode(2, "d4");
+    (void)mpSearchTree->addOrUpdateNode(7, "f6");
+    (void)mpSearchTree->addOrUpdateNode(-23, "k11");
+    (void)mpSearchTree->addOrUpdateNode(17, "l12");
+    (void)mpSearchTree->addOrUpdateNode(-12, "n14");
+    (void)mpSearchTree->addOrUpdateNode(16, "i9_1");
+    (void)mpSearchTree->addOrUpdateNode(0, "g7_1");
+
+    mpAuxSearchTree = new RedBlackTree;
+
+    (void)mpAuxSearchTree->addOrUpdateNode(8, "b2");
+    (void)mpAuxSearchTree->addOrUpdateNode(-1, "c3");
+    (void)mpAuxSearchTree->addOrUpdateNode(-2, "e5");
+    (void)mpAuxSearchTree->addOrUpdateNode(0, "g7_2");
+    (void)mpAuxSearchTree->addOrUpdateNode(-5, "a1_2");
+    (void)mpAuxSearchTree->addOrUpdateNode(16, "i9_2");
+    (void)mpAuxSearchTree->addOrUpdateNode(-9, "h8");
+    (void)mpAuxSearchTree->addOrUpdateNode(14, "j10");
+    (void)mpAuxSearchTree->addOrUpdateNode(-16, "m13");
+
+    const RedBlackTree searchTreeCopy{*mpSearchTree};
+    const RedBlackTree searchTreeAuxCopy{*mpAuxSearchTree};
+
+    QVERIFY(searchTreeCopy == *mpSearchTree &&      // just a(n additional) check that the copy constructor and == operator work correctly
+            searchTreeAuxCopy == *mpAuxSearchTree);
+
+    // first (main) merge
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT:BK/-12:n14:2:BK/16:i9_2:2:BK/-23:k11:-12:BK/-1:c3:-12:RD/8:b2:16:BK/17:l12:16:BK/-16:m13:-23:RD/-5:a1_2:-1:BK/0:g7_2:-1:BK/7:f6:8:RD/14:j10:8:RD/-9:h8:-5:RD/-2:e5:-5:RD", 14, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+
+    const RedBlackTree mainTreeAfterFirstMerge{*mpSearchTree};
+
+    // merge empty tree into unempty tree
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(*mpSearchTree == mainTreeAfterFirstMerge);
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+
+    // merge unempty tree with itself
+    mpSearchTree->mergeTree(*mpSearchTree);
+    QVERIFY(*mpSearchTree == mainTreeAfterFirstMerge);
+
+    // merge unempty tree into empty tree
+    mpAuxSearchTree->mergeTree(*mpSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(*mpAuxSearchTree == mainTreeAfterFirstMerge);
+
+    // merge empty tree with itself
+    mpSearchTree->mergeTree(*mpSearchTree);
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+
+    // merge two empty trees
+    mpAuxSearchTree->clear();
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(*mpSearchTree == *mpAuxSearchTree);
+
+    // do inverse merge operation comparing to first merge
+    *mpSearchTree = searchTreeCopy;
+    *mpAuxSearchTree = searchTreeAuxCopy;
+
+    QVERIFY(*mpSearchTree == searchTreeCopy &&      // just a(n additional) check that the copy assignment operator and == operator work correctly
+            *mpAuxSearchTree == searchTreeAuxCopy);
+
+    mpAuxSearchTree->mergeTree(*mpSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT:BK/-5:a1_1:-1:BK/8:b2:-1:BK/-12:n14:-5:RD/-2:e5:-5:BK/2:d4:8:BK/16:i9_1:8:BK/-16:m13:-12:BK/-9:h8:-12:BK/0:g7_1:2:RD/7:f6:2:RD/14:j10:16:RD/17:l12:16:RD/-23:k11:-16:RD", 14, true));
+
+    QVERIFY(*mpAuxSearchTree != mainTreeAfterFirstMerge); // test the != operator too
+
+    // actually not necesarily required to test this as the two trees SHOULD have same null value in order to be merged (assert statement enforces this)
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
+            scDefaultNullValue == mpAuxSearchTree->getNullValue());
+
+    // merge trees with (same) custom null value
+    _reset();
+
+    mpSearchTree = new RedBlackTree{scCustomNullValue};
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "a1");
+    (void)mpSearchTree->addOrUpdateNode(8, "b2");
+    (void)mpSearchTree->addOrUpdateNode(-1, "c3");
+    (void)mpSearchTree->addOrUpdateNode(2, "d4");
+    (void)mpSearchTree->addOrUpdateNode(-2, scDefaultNullValue);
+    (void)mpSearchTree->addOrUpdateNode(-8, "e5");
+    (void)mpSearchTree->addOrUpdateNode(7, scDefaultNullValue);
+    (void)mpSearchTree->addOrUpdateNode(0, "g7");
+    (void)mpSearchTree->addOrUpdateNode(-9, "h8");
+    (void)mpSearchTree->addOrUpdateNode(-7, "i9");
+    (void)mpSearchTree->deleteNode(-8);
+    (void)mpSearchTree->deleteNode(2);
+
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
+    (void)mpAuxSearchTree->addOrUpdateNode(-9, scDefaultNullValue);
+
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0));
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT:BK/-5:a1:-1:BK/7:DF:-1:BK/-9::-5:RD/-2::-5:BK/0:g7:7:BK/14:DF:7:RD/-16:DF:-9:BK/-7:i9:-9:BK/8:b2:14:BK/16:DF:14:BK/-23:DF:-16:RD/-12:DF:-16:RD/17:DF:16:RD", 14, true));
+    QVERIFY(scCustomNullValue == mpSearchTree->getNullValue() &&
+            scCustomNullValue == mpAuxSearchTree->getNullValue());
 }
 
 void RedBlackTreesTests::testPrintTree()
