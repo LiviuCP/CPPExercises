@@ -268,11 +268,11 @@ void RedBlackTreesTests::testRemoveNodes()
     QVERIFY(nodeDeleted &&
             _areExpectedTreeValuesMet(mpSearchTree, "7:ROOT:BK/2:7:BK/16:7:BK", 3));
 
-    nodeDeleted = mpSearchTree->deleteNode(16);
+    nodeDeleted = mpSearchTree->deleteNode(16); // root and two black children, erase right child
     QVERIFY(nodeDeleted &&
             _areExpectedTreeValuesMet(mpSearchTree, "7:ROOT:BK/2:7:RD", 2));
 
-    nodeDeleted = mpSearchTree->deleteNode(2);
+    nodeDeleted = mpSearchTree->deleteNode(2); // root and left child, erase left child
     QVERIFY(nodeDeleted &&
             _areExpectedTreeValuesMet(mpSearchTree, "7:ROOT:BK", 1));
 
@@ -328,10 +328,10 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->deleteNode(2);
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-1:ROOT:BK/-5:-1:BK/8:-1:BK", 3));
 
-    (void)mpAuxSearchTree->deleteNode(-1);
+    (void)mpAuxSearchTree->deleteNode(-1); // root and two black children, erase root
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "8:ROOT:BK/-5:8:RD", 2));
 
-    (void)mpAuxSearchTree->deleteNode(8);
+    (void)mpAuxSearchTree->deleteNode(8); // root and left child, erase root
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-5:ROOT:BK", 1));
 
     _reset();
@@ -377,9 +377,6 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->deleteNode(-16);
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-12:ROOT:BK/-15:-12:BK/19:-12:BK", 3));
 
-    (void)mpSearchTree->deleteNode(-12);
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "19:ROOT:BK/-15:19:RD", 2));
-
     _reset();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue};
@@ -423,10 +420,10 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->deleteNode(14);
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "17:ROOT:BK/16:17:BK/19:17:BK", 3));
 
-    (void)mpSearchTree->deleteNode(16);
+    (void)mpSearchTree->deleteNode(16); // root and two black children, erase left child
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "17:ROOT:BK/19:17:RD", 2));
 
-    (void)mpSearchTree->deleteNode(17);
+    (void)mpSearchTree->deleteNode(17); // root and right child, erase root
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "19:ROOT:BK", 1));
 
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue, scCustomNullValue};
@@ -470,9 +467,6 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->deleteNode(-12);
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-16:ROOT:BK/-23:-16:BK/-15:-16:BK", 3));
 
-    (void)mpAuxSearchTree->deleteNode(-15);
-    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-16:ROOT:BK/-23:-16:RD", 2));
-
     _reset();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue};
@@ -513,31 +507,47 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->deleteNode(-16);
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-1:ROOT:BK/-23:-1:BK/19:-1:BK/0:19:RD", 4));
 
-    (void)mpSearchTree->deleteNode(19);
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-1:ROOT:BK/-23:-1:BK/0:-1:BK", 3));
-
-    (void)mpSearchTree->deleteNode(-1);
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "0:ROOT:BK/-23:0:RD", 2));
-
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-3, -5, 2}, scDefaultValue};
 
-    (void)mpAuxSearchTree->deleteNode(-5);
+    (void)mpAuxSearchTree->deleteNode(-5); // root and two red children, erase left child
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-3:ROOT:BK/2:-3:RD", 2));
 
-    (void)mpAuxSearchTree->deleteNode(2);
+    (void)mpAuxSearchTree->deleteNode(2); // root and right child, erase right child
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-3:ROOT:BK", 1));
 
     _reset();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-3, -5, 2}, scDefaultValue, scCustomNullValue};
 
-    (void)mpSearchTree->deleteNode(2);
+    (void)mpSearchTree->deleteNode(2); // root and two red children, erase right child
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-3:ROOT:BK/-5:-3:RD", 2));
 
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-3, -5, 2}, scDefaultValue};
 
-    (void)mpAuxSearchTree->deleteNode(-3);
+    (void)mpAuxSearchTree->deleteNode(-3); // root and two red children, erase root
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "2:ROOT:BK/-5:2:RD", 2));
+
+    _reset();
+
+    // deleting null node from custom null value tree
+    mpSearchTree = new RedBlackTree{std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue};
+
+    nodeDeleted = mpSearchTree->deleteNode(-5);
+    QVERIFY(!nodeDeleted &&
+            _areExpectedTreeValuesMet(mpSearchTree, "2:ROOT:BK/-1:2:BK/3:2:BK/-2:-1:RD/4:3:RD", 5, false));
+
+    // deleting same node from custom and default null value trees of equal structure, keys and values
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue};
+
+    nodeDeleted = mpSearchTree->deleteNode(3);
+    QVERIFY(nodeDeleted &&
+            *mpSearchTree != *mpAuxSearchTree);
+
+    nodeDeleted = mpAuxSearchTree->deleteNode(3);
+    QVERIFY(nodeDeleted &&
+            *mpSearchTree == *mpAuxSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "2:ROOT:BK/-1:2:BK/4:2:BK/-2:-1:RD", 4, false));
 }
 
 void RedBlackTreesTests::testUpdateNodeValue()
