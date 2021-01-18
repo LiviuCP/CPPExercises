@@ -316,17 +316,17 @@ void SimpleBSTTests::testRemoveNodes()
     QVERIFY(nodeDeleted &&
             _areExpectedTreeValuesMet(mpAuxSearchTree, "2:ROOT", 1));
 
+    _reset();
+
     // deleting null node from custom null value tree
-    delete mpSearchTree;
-    mpSearchTree = new BinarySearchTree{std::vector<int>{-1, 3, 2, 4, -2}, scCustomNullValue};
+    mpSearchTree = new BinarySearchTree{std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue};
 
     nodeDeleted = mpSearchTree->deleteNode(-5);
     QVERIFY(!nodeDeleted &&
             _areExpectedTreeValuesMet(mpSearchTree, "-1:ROOT/-2:-1/3:-1/2:3/4:3", 5, false));
 
-    // deleting same node from default and custom null value tree of equal structure, keys and values
-    delete mpAuxSearchTree;
-    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-1, 3, 2, 4, -2}, scCustomNullValue};
+    // deleting same node from custom and default null value trees of equal structure, keys and values
+    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue};
 
     nodeDeleted = mpSearchTree->deleteNode(3);
     QVERIFY(nodeDeleted &&
