@@ -507,6 +507,9 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->deleteNode(-16);
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-1:ROOT:BK/-23:-1:BK/19:-1:BK/0:19:RD", 4));
 
+    (void)mpSearchTree->deleteNode(19);
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-1:ROOT:BK/-23:-1:BK/0:-1:BK", 3));
+
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-3, -5, 2}, scDefaultValue};
 
     (void)mpAuxSearchTree->deleteNode(-5); // root and two red children, erase left child
