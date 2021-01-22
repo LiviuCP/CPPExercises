@@ -934,8 +934,8 @@ void RedBlackTreesTests::testMergeTrees()
 
     mpSearchTree->mergeTree(*mpAuxSearchTree);
 
-    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0));
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT:BK/-5:a1:-1:BK/7:DF:-1:BK/-9::-5:RD/-2::-5:BK/0:g7:7:BK/14:DF:7:RD/-16:DF:-9:BK/-7:i9:-9:BK/8:b2:14:BK/16:DF:14:BK/-23:DF:-16:RD/-12:DF:-16:RD/17:DF:16:RD", 14, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0));
     QVERIFY(scCustomNullValue == mpSearchTree->getNullValue() &&
             scCustomNullValue == mpAuxSearchTree->getNullValue());
 }

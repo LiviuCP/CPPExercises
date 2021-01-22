@@ -720,8 +720,8 @@ void SimpleBSTTests::testMergeTrees()
 
     mpSearchTree->mergeTree(*mpAuxSearchTree);
 
-    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0));
     QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-5:a1:ROOT/-7:i9:-5/8:b2:-5/-9::-7/-1:c3:8/16:DF:8/-23:DF:-9/-2::-1/7:DF:-1/14:DF:16/17:DF:16/-16:DF:-23/0:g7:7/-12:DF:-16", 14, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0));
     QVERIFY(scCustomNullValue == mpSearchTree->getNullValue() &&
             scCustomNullValue == mpAuxSearchTree->getNullValue());
 }
