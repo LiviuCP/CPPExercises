@@ -14,6 +14,7 @@ private slots:
     void testAddNodes();
     void testRemoveNodes();
     void testUpdateNodeValue();
+    void testMoveSemantics();
 
 private:
     void _reset();
@@ -733,6 +734,81 @@ void AVLTreesTests::testUpdateNodeValue()
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "14:DF:ROOT/-9:DF:14/16:DF:14/-16:DF:-9/7::-9/17:DF:16/-23:DF:-16/-12:DF:-16", 8, true));
     QVERIFY(scCustomNullValue == mpSearchTree->getNullValue() &&
             scCustomNullValue == mpAuxSearchTree->getNullValue());
+}
+
+void AVLTreesTests::testMoveSemantics()
+{
+    _reset();
+
+    mpSearchTree = new AVLTree;
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "a1");
+    (void)mpSearchTree->addOrUpdateNode(8, "b2");
+    (void)mpSearchTree->addOrUpdateNode(-1, "c3");
+    (void)mpSearchTree->addOrUpdateNode(2, "d4");
+    (void)mpSearchTree->addOrUpdateNode(-2, "e5");
+
+    mpAuxSearchTree = new AVLTree{std::move(*mpSearchTree)};
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT/-5:a1:-1/8:b2:-1/-2:e5:-5/2:d4:8", 5, true));
+
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
+            scDefaultNullValue == mpAuxSearchTree->getNullValue());
+
+    mpSearchTree->addOrUpdateNode(17, "f6");
+    mpSearchTree->addOrUpdateNode(0, "g7");
+    mpSearchTree->addOrUpdateNode(-2, "e5_1");
+    mpSearchTree->addOrUpdateNode(3, "h8");
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "0:g7:ROOT/-2:e5_1:0/17:f6:0/3:h8:17", 4, true));
+
+    *mpAuxSearchTree = std::move(*mpSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "0:g7:ROOT/-2:e5_1:0/17:f6:0/3:h8:17", 4, true));
+
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
+            scDefaultNullValue == mpAuxSearchTree->getNullValue());
+
+    *mpSearchTree = std::move(*mpAuxSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "0:g7:ROOT/-2:e5_1:0/17:f6:0/3:h8:17", 4, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
+            scDefaultNullValue == mpAuxSearchTree->getNullValue());
+
+    // test move constructor for trees with custom null value
+    _reset();
+
+    mpSearchTree = new AVLTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scCustomNullValue};
+
+    (void)mpSearchTree->addOrUpdateNode(5, scDefaultNullValue);
+    (void)mpSearchTree->addOrUpdateNode(4, "newval");
+
+    mpAuxSearchTree = new AVLTree{std::move(*mpSearchTree)};
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, "4:newval:ROOT/-1:DF:4/5::4/-2:DF:-1/0:DF:-1", 5, true));
+    QVERIFY(scCustomNullValue == mpSearchTree->getNullValue() &&
+            scCustomNullValue == mpAuxSearchTree->getNullValue());
+
+    // test move and copy for trees with different null values
+    _reset();
+
+    mpSearchTree = new AVLTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new AVLTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue};
+
+    (void)mpSearchTree->addOrUpdateNode(7, scDefaultNullValue);
+    (void)mpAuxSearchTree->addOrUpdateNode(4, scCustomNullValue);
+
+    *mpSearchTree = std::move(*mpAuxSearchTree);
+
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "4:/0:ROOT/-1:DF:4/5:DF:4/-2:DF:-1/0:DF:-1", 5, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
+            scDefaultNullValue == mpAuxSearchTree->getNullValue());
 }
 
 void AVLTreesTests::_reset()
