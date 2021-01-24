@@ -33,7 +33,7 @@ private:
 
 const std::string RedBlackTreesTests::scDefaultValue{"DF"};
 const std::string RedBlackTreesTests::scDefaultNullValue{""};
-const std::string RedBlackTreesTests::scCustomNullValue{"/0"};
+const std::string RedBlackTreesTests::scCustomNullValue{"NULL"};
 const std::string RedBlackTreesTests::scEmptyTreeString{""};
 
 RedBlackTreesTests::RedBlackTreesTests()
@@ -819,7 +819,7 @@ void RedBlackTreesTests::testMoveSemantics()
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
 
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "4:/0:ROOT:BK/-1:DF:4:BK/5:DF:4:BK/-2:DF:-1:RD/0:DF:-1:RD", 5, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "4:NULL:ROOT:BK/-1:DF:4:BK/5:DF:4:BK/-2:DF:-1:RD/0:DF:-1:RD", 5, true));
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
     QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
             scDefaultNullValue == mpAuxSearchTree->getNullValue());

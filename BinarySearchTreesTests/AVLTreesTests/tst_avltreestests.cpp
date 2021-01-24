@@ -32,7 +32,7 @@ private:
 
 const std::string AVLTreesTests::scDefaultValue{"DF"};
 const std::string AVLTreesTests::scDefaultNullValue{""};
-const std::string AVLTreesTests::scCustomNullValue{"/0"};
+const std::string AVLTreesTests::scCustomNullValue{"NULL"};
 const std::string AVLTreesTests::scEmptyTreeString{""};
 
 AVLTreesTests::AVLTreesTests()
@@ -806,7 +806,7 @@ void AVLTreesTests::testMoveSemantics()
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
 
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "4:/0:ROOT/-1:DF:4/5:DF:4/-2:DF:-1/0:DF:-1", 5, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "4:NULL:ROOT/-1:DF:4/5:DF:4/-2:DF:-1/0:DF:-1", 5, true));
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
     QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
             scDefaultNullValue == mpAuxSearchTree->getNullValue());

@@ -33,7 +33,7 @@ private:
 
 const std::string SimpleBSTTests::scDefaultValue{"DF"};
 const std::string SimpleBSTTests::scDefaultNullValue{""};
-const std::string SimpleBSTTests::scCustomNullValue{"/0"};
+const std::string SimpleBSTTests::scCustomNullValue{"NULL"};
 const std::string SimpleBSTTests::scEmptyTreeString{""};
 
 SimpleBSTTests::SimpleBSTTests()
@@ -605,7 +605,7 @@ void SimpleBSTTests::testMoveSemantics()
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
 
-    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-2:DF:ROOT/5:DF:-2/4:/0:5/0:DF:4/-1:DF:0", 5, true));
+    QVERIFY(_areExpectedTreeValuesMet(mpSearchTree, "-2:DF:ROOT/5:DF:-2/4:NULL:5/0:DF:4/-1:DF:0", 5, true));
     QVERIFY(_areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
     QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue() &&
             scDefaultNullValue == mpAuxSearchTree->getNullValue());
