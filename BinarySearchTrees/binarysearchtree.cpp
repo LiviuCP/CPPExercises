@@ -524,6 +524,22 @@ std::string BinarySearchTree::_getNodeAsString(const BinarySearchTree::Node* nod
         if (parent != nullptr)
         {
             nodeData << parent->getKey();
+
+            if (node->getSibling() == nullptr)
+            {
+                if (node->isLeftChild())
+                {
+                    nodeData << "L";
+                }
+                else if (node->isRightChild())
+                {
+                    nodeData << "R";
+                }
+                else
+                {
+                    assert(false); // defensive programming, this code should be unreachable as the parent is not null
+                }
+            }
         }
         else
         {
