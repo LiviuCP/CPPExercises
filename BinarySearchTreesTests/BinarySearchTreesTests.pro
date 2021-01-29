@@ -1,7 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    AVLTreesTests \
+    SimpleBSTTests \
     RedBlackTreesTests \
-    SimpleBSTTests
+    AVLTreesTests \
+    MixedTreeTypesTests
 
