@@ -7,7 +7,10 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 INCLUDEPATH += ../../BinarySearchTrees
+INCLUDEPATH += ../TestUtils
 
 SOURCES +=  tst_avltreestests.cpp \
     ../../BinarySearchTrees/binarysearchtree.cpp \
     ../../BinarySearchTrees/avltree.cpp
+
+LIBS += -L../TestUtils -lTestUtils
