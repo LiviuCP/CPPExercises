@@ -63,8 +63,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     _buildFirstMergeableTree();
     _buildSecondMergeableTree();
 
-    const RedBlackTree redBlackTreeCopy{*static_cast<RedBlackTree*>(mpSearchTree)};
-    const RedBlackTree redBlackTreeAuxCopy{*static_cast<RedBlackTree*>(mpAuxSearchTree)};
+    const RedBlackTree redBlackTreeCopy{*dynamic_cast<RedBlackTree*>(mpSearchTree)};
+    const RedBlackTree redBlackTreeAuxCopy{*dynamic_cast<RedBlackTree*>(mpAuxSearchTree)};
 
     _reset();
 
@@ -74,8 +74,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     _buildFirstMergeableTree();
     _buildSecondMergeableTree();
 
-    const AVLTree avlTreeCopy{*static_cast<AVLTree*>(mpSearchTree)};
-    const AVLTree avlTreeAuxCopy{*static_cast<AVLTree*>(mpAuxSearchTree)};
+    const AVLTree avlTreeCopy{*dynamic_cast<AVLTree*>(mpSearchTree)};
+    const AVLTree avlTreeAuxCopy{*dynamic_cast<AVLTree*>(mpAuxSearchTree)};
 
     /* merge RED-BLACK tree into SIMPLE tree */
     _reset();
