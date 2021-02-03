@@ -127,11 +127,13 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
             _deleteAllNodes();
         }
 
-        m_Root = sourceTree.m_Root;
-        m_Size = sourceTree.m_Size;
-        sourceTree.m_Root = nullptr;
-        sourceTree.m_Size = 0;
+        /* It is required to do a copy assignment and then erase the source tree content.
+           The reason is that it is possible to apply this operator to trees of different types by dereferencing BinarySearchTree pointers to derived tree objects.
+           In this case using the move assignment operator by simply copying the m_Root pointer value of the source object into the destination pointer and setting the m_Root source pointer to null would cause an error.
+        */
         m_NullValue = sourceTree.m_NullValue;
+        _copyTreeNodes(sourceTree);
+        sourceTree._deleteAllNodes();
     }
 
     return *this;

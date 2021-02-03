@@ -19,6 +19,7 @@ private slots:
     void testMergeDifferentSearchTrees();
     void testDifferentTreeTypesEquivalence();
     void testCopyAssignmentOfMixedTreeTypes();
+    void testMoveAssignmentOfMixedTreeTypes();
 
 private:
     void _reset();
@@ -429,6 +430,102 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     *mpAuxSearchTree = *mpSearchTree;
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-5:a1_1:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23R/0:g7_1:2/7:f6:2/17:l12:7R/16:i9_1:17L", 8, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-5:a1_1:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23R/0:g7_1:2/16:i9_1:2/7:f6:16/17:l12:16", 8, true));
+    QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
+}
+
+void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
+{
+    // AVL tree assigned to Red-Black tree (and vice-versa)
+    _reset();
+
+    mpSearchTree = new RedBlackTree{scCustomNullValue};
+    _buildFirstMergeableTree();
+
+    mpAuxSearchTree = new AVLTree;
+    _buildSecondMergeableTree();
+
+    *mpSearchTree = std::move(*mpAuxSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT:BK/-5:a1_2:-1:RD/8:b2:-1:RD/-9:h8:-5:BK/-2:e5:-5:BK/0:g7_2:8:BK/16:i9_2:8:BK/-16:m13:-9L:RD/14:j10:16L:RD", 9, true));
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue());
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{scCustomNullValue};
+    _buildFirstMergeableTree();
+
+    mpAuxSearchTree = new AVLTree;
+    _buildSecondMergeableTree();
+
+    *mpAuxSearchTree = std::move(*mpSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(scCustomNullValue == mpSearchTree->getNullValue());
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
+    QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
+
+    // Simple BST assigned to Red-Black tree (and vice-versa)
+    _reset();
+
+    mpSearchTree = new RedBlackTree;
+    _buildFirstMergeableTree();
+
+    mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
+    _buildSecondMergeableTree();
+
+    *mpSearchTree = std::move(*mpAuxSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT:BK/-5:a1_2:-1:RD/8:b2:-1:RD/-9:h8:-5:BK/-2:e5:-5:BK/0:g7_2:8:BK/16:i9_2:8:BK/-16:m13:-9L:RD/14:j10:16L:RD", 9, true));
+    QVERIFY(scCustomNullValue == mpSearchTree->getNullValue());
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree;
+    _buildFirstMergeableTree();
+
+    mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
+    _buildSecondMergeableTree();
+
+    *mpAuxSearchTree = std::move(*mpSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue());
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
+    QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
+
+    // AVL tree assigned to Simple BST (and vice-versa)
+    _reset();
+
+    mpSearchTree = new BinarySearchTree;
+    _buildFirstMergeableTree();
+
+    mpAuxSearchTree = new AVLTree{scCustomNullValue};
+    _buildSecondMergeableTree();
+
+    *mpSearchTree = std::move(*mpAuxSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
+    QVERIFY(scCustomNullValue == mpSearchTree->getNullValue());
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
+
+    _reset();
+
+    mpSearchTree = new BinarySearchTree;
+    _buildFirstMergeableTree();
+
+    mpAuxSearchTree = new AVLTree{scCustomNullValue};
+    _buildSecondMergeableTree();
+
+    *mpAuxSearchTree = std::move(*mpSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue());
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-5:a1_1:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23R/0:g7_1:2/16:i9_1:2/7:f6:16/17:l12:16", 8, true));
     QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
 }
