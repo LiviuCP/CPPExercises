@@ -45,7 +45,7 @@ AVLTree& AVLTree::operator=(const AVLTree& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllNodes();
+            _doClearTreeContent();
         }
 
         m_NullValue = sourceTree.m_NullValue;
@@ -61,7 +61,7 @@ AVLTree& AVLTree::operator=(AVLTree&& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllNodes();
+            _doClearTreeContent();
         }
 
         m_Root = sourceTree.m_Root;
@@ -185,7 +185,7 @@ AVLTree::AVLNode* AVLTree::_balanceSubtree(AVLNode* grandparent, AVLNode* parent
     assert(child != nullptr && "Null subtree root grandchild detected");
     assert(child->getParent() == parent && parent->getParent() == grandparent && "Invalid relationships detected between subtree nodes");
 
-    // this node reference is required by the delete operation as after balancing it will recur starting from resulting root in search for another unbalanced node (search stops when reaching TREE ROOT)
+    // this node reference is required by the node removal operation as after balancing it will recur starting from resulting root in search for another unbalanced node (search stops when reaching TREE ROOT)
     AVLNode* resultingSubtreeRoot{parent};
 
     // step 1: do the corresponding rotations based on the subtree topology/relationships between the three nodes in order to obtain a balanced subtree (restore AVL rules)

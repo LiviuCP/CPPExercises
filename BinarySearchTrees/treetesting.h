@@ -41,11 +41,11 @@
     cout << "Node has now the same value as before: "  << "\"" << searchTree.getNodeValue(7) << "\"" << endl; \
     cout << endl << "Tree has size: " << searchTree.getSize() << endl << endl; \
     cout << "4) Now we'll remove some nodes: 4, 10, 9, -5 and -17" << endl << endl; \
-    (void)searchTree.deleteNode(4); \
-    (void)searchTree.deleteNode(10); \
-    (void)searchTree.deleteNode(9); \
-    (void)searchTree.deleteNode(-5); \
-    const bool success{searchTree.deleteNode(-17)}; \
+    (void)searchTree.removeNode(4); \
+    (void)searchTree.removeNode(10); \
+    (void)searchTree.removeNode(9); \
+    (void)searchTree.removeNode(-5); \
+    const bool success{searchTree.removeNode(-17)}; \
     cout << "Updated tree is: " << endl << endl; \
     searchTree.printTree(); \
     cout << endl << "It has size: " << searchTree.getSize() << endl; \

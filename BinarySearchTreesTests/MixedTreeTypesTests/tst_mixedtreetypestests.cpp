@@ -239,14 +239,14 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    (void)mpSearchTree->deleteNode(14);
+    (void)mpSearchTree->removeNode(14);
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    (void)mpAuxSearchTree->deleteNode(14);
+    (void)mpAuxSearchTree->removeNode(14);
     QVERIFY(*mpSearchTree == *dynamic_cast<RedBlackTree*>(mpAuxSearchTree));
 
-    (void)mpSearchTree->deleteNode(-2);
-    (void)mpAuxSearchTree->deleteNode(-2);
+    (void)mpSearchTree->removeNode(-2);
+    (void)mpAuxSearchTree->removeNode(-2);
     QVERIFY(*mpSearchTree != *dynamic_cast<RedBlackTree*>(mpAuxSearchTree));
 
     // Red-Black tree vs. AVL tree
@@ -290,15 +290,15 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
     QVERIFY(*mpAuxSearchTree == *dynamic_cast<AVLTree*>(mpSearchTree));
 
-    (void)mpSearchTree->deleteNode(-2);
+    (void)mpSearchTree->removeNode(-2);
     QVERIFY(*mpAuxSearchTree != *mpSearchTree);
     QVERIFY(*mpAuxSearchTree != *dynamic_cast<AVLTree*>(mpSearchTree));
 
-    (void)mpAuxSearchTree->deleteNode(-2);
+    (void)mpAuxSearchTree->removeNode(-2);
     QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree) == *dynamic_cast<AVLTree*>(mpSearchTree));
     QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree) == *mpSearchTree);
 
-    (void)mpSearchTree->deleteNode(14);
+    (void)mpSearchTree->removeNode(14);
     QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree) != *dynamic_cast<AVLTree*>(mpSearchTree));
     QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree) != *mpSearchTree);
 
@@ -333,14 +333,14 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
 
-    (void)mpSearchTree->deleteNode(14);
+    (void)mpSearchTree->removeNode(14);
     QVERIFY(*mpAuxSearchTree != *mpSearchTree);
 
-    (void)mpAuxSearchTree->deleteNode(14);
+    (void)mpAuxSearchTree->removeNode(14);
     QVERIFY(*dynamic_cast<AVLTree*>(mpAuxSearchTree) == *mpSearchTree);
 
-    (void)mpSearchTree->deleteNode(-2);
-    (void)mpAuxSearchTree->deleteNode(-2);
+    (void)mpSearchTree->removeNode(-2);
+    (void)mpAuxSearchTree->removeNode(-2);
     QVERIFY(*dynamic_cast<AVLTree*>(mpAuxSearchTree) != *mpSearchTree);
 }
 

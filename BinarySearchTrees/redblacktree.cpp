@@ -52,7 +52,7 @@ RedBlackTree& RedBlackTree::operator=(const RedBlackTree& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllNodes();
+            _doClearTreeContent();
         }
 
         m_NullValue = sourceTree.m_NullValue;
@@ -68,7 +68,7 @@ RedBlackTree& RedBlackTree::operator=(RedBlackTree&& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllNodes();
+            _doClearTreeContent();
         }
 
         m_Root = sourceTree.m_Root;

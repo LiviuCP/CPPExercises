@@ -15,7 +15,7 @@ public:
     BinarySearchTree(BinarySearchTree&& sourceTree);
 
     /* created virtual destructor (to follow best practices in inheritance) although there is no need to implement destructors
-       for derived tree classes (Node objects and their derived versions are supposed to use the default destructor so _deleteAllNodes() can do all the work when destroying a tree)
+       for derived tree classes (Node objects and their derived versions are supposed to use the default destructor so _doClearTreeContent() can do all the work when destroying a tree)
     */
     virtual ~BinarySearchTree();
 
@@ -25,7 +25,7 @@ public:
        This provides increased flexibility.
     */
     virtual bool addOrUpdateNode(int key, const std::string& value); // in actual implementation(s) true is returned if new node is added (number of nodes increases)
-    virtual bool deleteNode(int key); // in actual implementation(s) true is returned if the node with the given key exists within tree structure (and thus is deleted)
+    virtual bool removeNode(int key); // in actual implementation(s) true is returned if the node with the given key exists within tree structure (and thus is removed)
 
     /* it is possible to merge different types of trees but the resulting tree should be of the type of the calling object while the source tree should have all elements removed
        (currently the derived classes use the base version but it is possible to create own implementations if required)
@@ -120,7 +120,7 @@ protected:
     /* required for destructive operations where the whole tree content needs to be erased (tree destruction, assignment operations); can also safely delete
        node objects derived from Node unless they have a non-default destructor (currently not the case)
     */
-    void _deleteAllNodes();
+    void _doClearTreeContent();
 
     Node* _findNode(int key) const;
     void _convertTreeToArray(std::vector<Node*>& nodes) const;

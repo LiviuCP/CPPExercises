@@ -40,7 +40,7 @@ BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
 
 BinarySearchTree::~BinarySearchTree()
 {
-    _deleteAllNodes();
+    _doClearTreeContent();
 }
 
 bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
@@ -60,30 +60,30 @@ bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
     return newNodeAdded;
 }
 
-bool BinarySearchTree::deleteNode(int key)
+bool BinarySearchTree::removeNode(int key)
 {
-    bool deleted{false};
-    Node* nodeToDelete{_findNode(key)};
+    bool removed{false};
+    Node* nodeToRemove{_findNode(key)};
 
-    if (nodeToDelete != nullptr)
+    if (nodeToRemove != nullptr)
     {
-        // for two-children node to be removed: the in-order successor content will be copied to the node; then the successor will be recursively deleted
-        if (nodeToDelete->getLeftChild() != nullptr && nodeToDelete->getRightChild() != nullptr)
+        // for two-children node to be removed: the in-order successor content will be copied to the node; then the successor will be recursively removed
+        if (nodeToRemove->getLeftChild() != nullptr && nodeToRemove->getRightChild() != nullptr)
         {
-            nodeToDelete->copyInOrderSuccessorKeyAndValue();
-            nodeToDelete = nodeToDelete->getInOrderSuccessor();
+            nodeToRemove->copyInOrderSuccessorKeyAndValue();
+            nodeToRemove = nodeToRemove->getInOrderSuccessor();
         }
 
-        // when using the standard BST delete method, replacing node can be NULL (deleted node is leaf) or the child of the deleted node (deleted node has a single child)
-        Node* replacingNode{_removeSingleChildedOrLeafNode(nodeToDelete)};
+        // when using the standard BST remove method, replacing node can be NULL (removed node is leaf) or the child of the removed node (removed node has a single child)
+        Node* replacingNode{_removeSingleChildedOrLeafNode(nodeToRemove)};
         (void)replacingNode; // replacing node is not used here, is used instead by derived classes (AVL, RB trees) when calling the BinarySearchTree::_removeSingleChildedOrLeafNode() method
 
-        delete nodeToDelete;
-        nodeToDelete = nullptr;
-        deleted = true;
+        delete nodeToRemove;
+        nodeToRemove = nullptr;
+        removed = true;
     }
 
-    return deleted;
+    return removed;
 }
 
 void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
@@ -93,13 +93,13 @@ void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
     if (this != &sourceTree)
     {
         _copyTreeNodes(sourceTree);
-        sourceTree._deleteAllNodes();
+        sourceTree._doClearTreeContent();
     }
 }
 
 void BinarySearchTree::clear()
 {
-    _deleteAllNodes();
+    _doClearTreeContent();
 }
 
 BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree)
@@ -108,7 +108,7 @@ BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree
     {
         if (m_Root != nullptr)
         {
-            _deleteAllNodes();
+            _doClearTreeContent();
         }
 
         m_NullValue = sourceTree.m_NullValue;
@@ -124,7 +124,7 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
     {
         if (m_Root != nullptr)
         {
-            _deleteAllNodes();
+            _doClearTreeContent();
         }
 
         /* It is required to do a copy assignment and then erase the source tree content.
@@ -133,7 +133,7 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
         */
         m_NullValue = sourceTree.m_NullValue;
         _copyTreeNodes(sourceTree);
-        sourceTree._deleteAllNodes();
+        sourceTree._doClearTreeContent();
     }
 
     return *this;
@@ -372,7 +372,7 @@ BinarySearchTree::Node* BinarySearchTree::_createNewNode(int key, const std::str
     return newNode;
 }
 
-void BinarySearchTree::_deleteAllNodes()
+void BinarySearchTree::_doClearTreeContent()
 {
     std::vector<Node*> nodesArray;
     _convertTreeToArray(nodesArray);
