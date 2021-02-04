@@ -57,6 +57,8 @@ protected:
         Node() = delete;
         Node(int key, std::string value);
 
+        virtual ~Node(); // not necessary here but good practice
+
         int getKey() const;
 
         void setValue(const std::string& value);

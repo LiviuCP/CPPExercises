@@ -595,6 +595,10 @@ BinarySearchTree::Node::Node(int key, std::string value)
 {
 }
 
+BinarySearchTree::Node::~Node()
+{
+}
+
 int BinarySearchTree::Node::getKey() const
 {
     return m_Key;
