@@ -217,6 +217,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
     _buildFirstSameContentTree();
 
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT:BK/-12:n14:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:RD/17:l12:16:RD/0:g7_1:-5R:RD", 8, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
+
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
     (void)mpSearchTree->addOrUpdateNode(-12, "n14_1");
@@ -229,6 +232,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     (void)mpAuxSearchTree->addOrUpdateNode(1, "abcd");
     QVERIFY(*dynamic_cast<RedBlackTree*>(mpSearchTree) != *mpAuxSearchTree);
 
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT:BK/-12:n14_1:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/0:g7_1:-12:BK/7:f6:16:RD/17:l12:16:RD/-5:a1_1:0:RD/1:abcd:0:RD", 9, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R/1:abcd:0R", 9, true));
+
     _reset();
 
     mpAuxSearchTree = new RedBlackTree{scCustomNullValue};
@@ -236,6 +242,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 
     mpSearchTree = new BinarySearchTree{};
     _buildSecondSameContentTree();
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT:BK/-5:a1_2:-1:RD/8:b2:-1:RD/-9:h8:-5:BK/-2:e5:-5:BK/0:g7_2:8:BK/16:i9_2:8:BK/-16:m13:-9L:RD/14:j10:16L:RD", 9, true));
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
@@ -249,6 +258,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     (void)mpAuxSearchTree->removeNode(-2);
     QVERIFY(*mpSearchTree != *dynamic_cast<RedBlackTree*>(mpAuxSearchTree));
 
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5L/0:g7_2:8/16:i9_2:8/-16:m13:-9L", 7, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT:BK/-9:h8:-1:RD/8:b2:-1:RD/-16:m13:-9:BK/-5:a1_2:-9:BK/0:g7_2:8:BK/16:i9_2:8:BK", 7, true));
+
     // Red-Black tree vs. AVL tree
     _reset();
 
@@ -260,6 +272,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     delete mpSearchTree;
     mpSearchTree = new AVLTree;
     _buildFirstMergeableTree();
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT:BK/-12:n14:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:RD/17:l12:16:RD/0:g7_1:-5R:RD", 8, true));
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
     QVERIFY(*mpSearchTree == *dynamic_cast<RedBlackTree*>(mpAuxSearchTree));
@@ -276,6 +291,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     QVERIFY(*dynamic_cast<AVLTree*>(mpSearchTree) != *dynamic_cast<RedBlackTree*>(mpAuxSearchTree));
     QVERIFY(*dynamic_cast<AVLTree*>(mpSearchTree) != *mpAuxSearchTree);
 
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT:BK/-12:n14_1:2:RD/16:i9_1:2:RD/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:BK/17:l12:16:BK/0:g7_1:-5R:RD/25:abcd:17R:RD", 9, true));
+
     _reset();
 
     mpAuxSearchTree = new AVLTree{scCustomNullValue};
@@ -286,6 +304,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     delete mpAuxSearchTree;
     mpAuxSearchTree = new RedBlackTree;
     _buildSecondMergeableTree();
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT:BK/-5:a1_2:-1:RD/8:b2:-1:RD/-9:h8:-5:BK/-2:e5:-5:BK/0:g7_2:8:BK/16:i9_2:8:BK/-16:m13:-9L:RD/14:j10:16L:RD", 9, true));
 
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
     QVERIFY(*mpAuxSearchTree == *dynamic_cast<AVLTree*>(mpSearchTree));
@@ -302,6 +323,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree) != *dynamic_cast<AVLTree*>(mpSearchTree));
     QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree) != *mpSearchTree);
 
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-9:h8:-1/8:b2:-1/-16:m13:-9/-5:a1_2:-9/0:g7_2:8/16:i9_2:8", 7, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT:BK/-9:h8:-1:RD/8:b2:-1:RD/-16:m13:-9:BK/-5:a1_2:-9:BK/0:g7_2:8:BK/16:i9_2:8:BK/14:j10:16L:RD", 8, true));
+
     // AVL tree vs. Simple BST
     _reset();
 
@@ -310,6 +334,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 
     mpAuxSearchTree = new BinarySearchTree{};
     _buildFirstSameContentTree();
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
 
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
 
@@ -323,6 +350,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     (void)mpAuxSearchTree->addOrUpdateNode(1, "abcd");
     QVERIFY(*mpAuxSearchTree != *dynamic_cast<AVLTree*>(mpSearchTree));
 
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/0:g7_1:-12/7:f6:16/17:l12:16/-5:a1_1:0/1:abcd:0", 9, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R/1:abcd:0R", 9, true));
+
     _reset();
 
     mpAuxSearchTree = new AVLTree{};
@@ -330,6 +360,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 
     mpSearchTree = new BinarySearchTree{scCustomNullValue};
     _buildSecondSameContentTree();
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
 
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
 
@@ -342,6 +375,9 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     (void)mpSearchTree->removeNode(-2);
     (void)mpAuxSearchTree->removeNode(-2);
     QVERIFY(*dynamic_cast<AVLTree*>(mpAuxSearchTree) != *mpSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5L/0:g7_2:8/16:i9_2:8/-16:m13:-9L", 7, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT/-9:h8:-1/8:b2:-1/-16:m13:-9/-5:a1_2:-9/0:g7_2:8/16:i9_2:8", 7, true));
 }
 
 void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
