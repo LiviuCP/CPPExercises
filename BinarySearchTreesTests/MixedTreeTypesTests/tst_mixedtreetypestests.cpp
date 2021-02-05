@@ -379,6 +379,66 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5L/0:g7_2:8/16:i9_2:8/-16:m13:-9L", 7, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT/-9:h8:-1/8:b2:-1/-16:m13:-9/-5:a1_2:-9/0:g7_2:8/16:i9_2:8", 7, true));
+
+    // additional tests
+    _reset();
+
+    mpSearchTree = new BinarySearchTree{std::vector<int>{2, -1, 3}, scDefaultValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{1, -1, 3}, scDefaultValue};
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{2, -1, 3, 4}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new AVLTree{std::vector<int>{2, -1, 3, -5}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new AVLTree{std::vector<int>{2, -1, 3, -2}, scDefaultValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{2, -1, 3, 8}, scDefaultValue};
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new AVLTree{std::vector<int>{2, -1, 3, 4}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue};
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{2, -1, 3, -4}, scDefaultValue};
+    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{2, -1, 3, -5}, scDefaultValue};
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new BinarySearchTree{std::vector<int>{2, -1, 3}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new AVLTree{std::vector<int>{2, -1, 3}, scDefaultValue, scCustomNullValue};
+    mpSearchTree->addOrUpdateNode(2, "abcd");
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new BinarySearchTree{std::vector<int>{2, -1, 3, -4}, scDefaultValue};
+    mpAuxSearchTree = new RedBlackTree{std::vector<int>{2, -1, 3, -4}, scDefaultValue};
+    mpAuxSearchTree->addOrUpdateNode(-4, "abcd");
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree = new AVLTree{std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue};
+    mpAuxSearchTree->addOrUpdateNode(5, "abcd");
+
+    QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 }
 
 void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
