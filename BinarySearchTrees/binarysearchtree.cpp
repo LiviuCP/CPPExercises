@@ -868,12 +868,6 @@ BinarySearchTree::Node* BinarySearchTree::Node::getGrandparent() const
     return result;
 }
 
-bool BinarySearchTree::Node::operator==(const BinarySearchTree::Node& node) const
-{
-    bool areEqualNodes{_isEqualTo(node)};
-    return areEqualNodes;
-}
-
 bool BinarySearchTree::Node::operator!=(const BinarySearchTree::Node& node) const
 {
     bool areNotEqualNodes{!_isEqualTo(node)};

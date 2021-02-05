@@ -85,7 +85,6 @@ protected:
         Node* getUncle() const;
         Node* getGrandparent() const;
 
-        bool operator==(const Node& node) const;
         bool operator!=(const Node& node) const;
 
     protected:
