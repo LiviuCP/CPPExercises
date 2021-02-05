@@ -145,7 +145,7 @@ bool BinarySearchTree::operator==(const BinarySearchTree& tree) const
     return areEqualTrees;
 }
 
-bool BinarySearchTree::operator!=(const BinarySearchTree &tree) const
+bool BinarySearchTree::operator!=(const BinarySearchTree& tree) const
 {
     bool areNotEqualTrees{!_isEqualTo(tree)};
     return areNotEqualTrees;
@@ -554,7 +554,7 @@ std::string BinarySearchTree::_getNodeAsString(const BinarySearchTree::Node* nod
     return result;
 }
 
-bool BinarySearchTree::_isEqualTo(const BinarySearchTree &tree) const
+bool BinarySearchTree::_isEqualTo(const BinarySearchTree& tree) const
 {
     bool areEqualTrees{true};
 
@@ -870,13 +870,7 @@ BinarySearchTree::Node* BinarySearchTree::Node::getGrandparent() const
 
 bool BinarySearchTree::Node::operator!=(const BinarySearchTree::Node& node) const
 {
-    bool areNotEqualNodes{!_isEqualTo(node)};
-    return areNotEqualNodes;
-}
-
-bool BinarySearchTree::Node::_isEqualTo(const BinarySearchTree::Node &node) const
-{
-    bool areEqualNodes{true};
+    bool areNotEqualNodes{false};
 
     if (m_Parent != nullptr)
     {
@@ -884,7 +878,7 @@ bool BinarySearchTree::Node::_isEqualTo(const BinarySearchTree::Node &node) cons
 
         if (m_Parent->m_Key != node.m_Parent->m_Key)
         {
-            areEqualNodes = false;
+            areNotEqualNodes = true;
         }
         else
         {
@@ -899,7 +893,7 @@ bool BinarySearchTree::Node::_isEqualTo(const BinarySearchTree::Node &node) cons
 
             if ((isLeft && isNodeRight) || (isRight && isNodeLeft) || (m_Key != node.m_Key || m_Value != node.m_Value))
             {
-                areEqualNodes = false;
+                areNotEqualNodes = true;
             }
         }
     }
@@ -909,9 +903,9 @@ bool BinarySearchTree::Node::_isEqualTo(const BinarySearchTree::Node &node) cons
 
         if (m_Key != node.m_Key || m_Value != node.m_Value)
         {
-            areEqualNodes = false;
+            areNotEqualNodes = true;
         }
     }
 
-    return areEqualNodes;
+    return areNotEqualNodes;
 }

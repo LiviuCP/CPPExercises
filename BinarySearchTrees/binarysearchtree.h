@@ -92,8 +92,6 @@ protected:
         Node* m_LeftChild;
         Node* m_RightChild;
 
-        bool _isEqualTo(const Node& node) const;
-
     private:
         int m_Key;
         std::string m_Value;
