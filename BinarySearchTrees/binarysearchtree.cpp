@@ -884,26 +884,36 @@ bool BinarySearchTree::Node::_isEqualTo(const BinarySearchTree::Node &node) cons
 {
     bool areEqualNodes{true};
 
-    if (m_Key != node.m_Key || m_Value != node.m_Value)
+    if (m_Parent != nullptr)
     {
-        areEqualNodes = false;
-    }
-    else if ((m_Parent == nullptr && node.m_Parent != nullptr) || (m_Parent != nullptr && node.m_Parent == nullptr))
-    {
-        areEqualNodes = false;
-    }
-    else if ((m_Parent != nullptr) && (m_Parent->m_Key != node.m_Parent->m_Key || m_Parent->m_Value != node.m_Parent->m_Value))
-    {
-        areEqualNodes = false;
+        assert(node.m_Parent != nullptr); // defensive programming, a non-root node should only be compared with another non-root node
+
+        if (m_Parent->m_Key != node.m_Parent->m_Key)
+        {
+            areEqualNodes = false;
+        }
+        else
+        {
+            assert(m_Parent->m_Value == node.m_Parent->m_Value); // defensive programming, it is presumed that the parent nodes have already been compared and have equal keys and values
+
+            const bool isLeft{isLeftChild()};
+            const bool isRight{isRightChild()};
+            const bool isNodeLeft{node.isLeftChild()};
+            const bool isNodeRight{node.isRightChild()};
+
+            assert((isLeft || isRight) && (isNodeLeft || isNodeRight)); // defensive programming, neither node should be root
+
+            if ((isLeft && isNodeRight) || (isRight && isNodeLeft) || (m_Key != node.m_Key || m_Value != node.m_Value))
+            {
+                areEqualNodes = false;
+            }
+        }
     }
     else
     {
-        const bool isLeft{isLeftChild()};
-        const bool isRight{isRightChild()};
-        const bool isNodeLeft{node.isLeftChild()};
-        const bool isNodeRight{node.isRightChild()};
+        assert(node.m_Parent == nullptr); // defensive programming, the root node should only be compared with another root
 
-        if ((isLeft && !isNodeLeft) || (!isLeft && isNodeLeft) || (isRight && !isNodeRight) || (!isRight && isNodeRight))
+        if (m_Key != node.m_Key || m_Value != node.m_Value)
         {
             areEqualNodes = false;
         }
