@@ -20,6 +20,7 @@ private slots:
     void testDifferentTreeTypesEquivalence();
     void testCopyAssignmentOfMixedTreeTypes();
     void testMoveAssignmentOfMixedTreeTypes();
+    void testPassThroughAllLogMessages();
 
 private:
     void _buildMainSearchTree();
@@ -625,6 +626,45 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     QVERIFY(scDefaultNullValue == mpSearchTree->getNullValue());
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-5:a1_1:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23R/0:g7_1:2/16:i9_1:2/7:f6:16/17:l12:16", 8, true));
     QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
+}
+
+void MixedTreeTypesTests::testPassThroughAllLogMessages()
+{
+    _reset();
+
+    BinarySearchTree::enableLogging(true);
+
+    mpSearchTree = new BinarySearchTree;
+    mpAuxSearchTree = new RedBlackTree;
+
+    mpSearchTree->printTree();
+    mpAuxSearchTree->printTree();
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, true));
+
+    _reset();
+
+    mpSearchTree = new RedBlackTree{std::vector<int>{2, 3, 2, -4}, scDefaultValue};
+    mpAuxSearchTree = new AVLTree{std::vector<int>{2, 5, 2, 2}, scDefaultValue};
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:ROOT:BK/-4:2:RD/3:2:RD", 3));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:ROOT/5:2R", 2));
+
+    mpAuxSearchTree->addOrUpdateNode(2, "abcd");
+
+    qInfo("Printing red-black tree before merge");
+    mpSearchTree->printTree();
+    qInfo("Printing AVL tree before merge");
+    mpAuxSearchTree->printTree();
+
+    mpSearchTree->mergeTree(*mpAuxSearchTree);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:abcd:ROOT:BK/-4:DF:2:BK/3:DF:2:BK/5:DF:3R:RD", 4, true));
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0, false));
+
+    qInfo("Printing red-black tree after merging AVL tree into it");
+    mpSearchTree->printTree();
 }
 
 void MixedTreeTypesTests::_buildMainSearchTree()
