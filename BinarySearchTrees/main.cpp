@@ -15,6 +15,7 @@ using namespace std;
 
 int main()
 {
+    BinarySearchTree::enableLogging(true);
 #ifdef SIMPLE_BST
     TEST_TREE(BinarySearchTree);
 #elif defined(RED_BLACK_TREE)

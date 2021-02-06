@@ -736,6 +736,7 @@ void SimpleBSTTests::testPrintTree()
     QVERIFY(0 == mpSearchTree->getSize());
 
     mpSearchTree->printTree();
+    qInfo("The tree has no nodes");
 }
 
 void SimpleBSTTests::_reset()

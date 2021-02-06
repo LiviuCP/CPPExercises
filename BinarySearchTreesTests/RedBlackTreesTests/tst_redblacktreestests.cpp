@@ -950,6 +950,7 @@ void RedBlackTreesTests::testPrintTree()
     QVERIFY(0 == mpSearchTree->getSize());
 
     mpSearchTree->printTree();
+    qInfo("The red-black tree has no nodes");
 }
 
 void RedBlackTreesTests::_reset()

@@ -22,7 +22,8 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
         for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
         {
             RedBlackNode* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
-            if (addedNode == nullptr)
+
+            if (BinarySearchTree::sLoggingEnabled && addedNode == nullptr)
             {
                 std::clog << "Warning: duplicate red-black tree key found: " << *it << std::endl;
             }
@@ -97,7 +98,7 @@ void RedBlackTree::printTree() const
         std::cout << std::endl;
     }
 
-    if (nodesArray.size() == 0)
+    if (BinarySearchTree::sLoggingEnabled && nodesArray.size() == 0)
     {
         std::clog << "Warning: red-black tree has no nodes" << std::endl;
     }

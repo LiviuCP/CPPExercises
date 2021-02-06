@@ -50,6 +50,8 @@ public:
     virtual void printTree() const;
     virtual std::string getTreeAsString(bool areNodeValuesRequired) const;
 
+    static void enableLogging(bool enable);
+
 protected:
     class Node
     {
@@ -134,6 +136,7 @@ protected:
     std::string m_NullValue; // value that each key that is NOT contained within tree corresponds to
     int m_Size; // used for easy retrieval of the number of nodes (to avoid tree traversal)
 
+    static bool sLoggingEnabled;
 
 private:
     // equivalence logic remains the same for all classes, no need for this function to be used by derived classes

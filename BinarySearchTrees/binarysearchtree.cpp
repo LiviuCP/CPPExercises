@@ -5,6 +5,8 @@
 
 #include "binarysearchtree.h"
 
+bool BinarySearchTree::sLoggingEnabled = false;
+
 BinarySearchTree::BinarySearchTree(const std::string& nullValue)
     : m_Root{nullptr}
     , m_NullValue{nullValue}
@@ -190,7 +192,7 @@ void BinarySearchTree::printTree() const
         std::cout << std::endl;
     }
 
-    if (nodesArray.size() == 0)
+    if (sLoggingEnabled && nodesArray.size() == 0)
     {
         std::clog << "Warning: tree has no nodes" << std::endl;
     }
@@ -218,6 +220,14 @@ std::string BinarySearchTree::getTreeAsString(bool areNodeValuesRequired) const
     return result;
 }
 
+void BinarySearchTree::enableLogging(bool enable)
+{
+    if (sLoggingEnabled != enable)
+    {
+        sLoggingEnabled = enable;
+    }
+}
+
 void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
 {
     assert(inputKeys.size() != 0 && "No keys provided for creating tree structure");
@@ -226,7 +236,8 @@ void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, c
     for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
     {
         Node* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
-        if (addedNode == nullptr)
+
+        if (sLoggingEnabled && addedNode == nullptr)
         {
             std::clog << "Warning: duplicate key found: " << *it << std::endl;
         }
@@ -242,7 +253,7 @@ void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
     {
         const Node* addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
 
-        if (addedNode == nullptr)
+        if (sLoggingEnabled && addedNode == nullptr)
         {
             std::clog << "Warning: node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
         }
