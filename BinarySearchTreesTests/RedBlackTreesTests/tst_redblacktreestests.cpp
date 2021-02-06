@@ -14,6 +14,9 @@ public:
     ~RedBlackTreesTests();
 
 private slots:
+    void init();
+    void cleanup();
+
     void testAddNodes();
     void testRemoveNodes();
     void testUpdateNodeValue();
@@ -22,7 +25,7 @@ private slots:
     void testPrintTree(); // only required for improving code coverage
 
 private:
-    void _reset();
+    void _resetTreeObjects();
 
     RedBlackTree* mpSearchTree;
     RedBlackTree* mpAuxSearchTree;
@@ -32,17 +35,27 @@ RedBlackTreesTests::RedBlackTreesTests()
     : mpSearchTree{nullptr}
     , mpAuxSearchTree{nullptr}
 {
+    BinarySearchTree::enableLogging(false);
 }
 
 RedBlackTreesTests::~RedBlackTreesTests()
 {
-    _reset();
+    // not implemented as cleanup() does all the job
+}
+
+void RedBlackTreesTests::init()
+{
+    QVERIFY(nullptr == mpSearchTree && nullptr == mpAuxSearchTree);
+}
+
+void RedBlackTreesTests::cleanup()
+{
+    _resetTreeObjects();
+    BinarySearchTree::enableLogging(false);
 }
 
 void RedBlackTreesTests::testAddNodes()
 {
-    _reset();
-
     bool newNodeAdded{false};
 
     mpSearchTree = new RedBlackTree;
@@ -157,35 +170,35 @@ void RedBlackTreesTests::testAddNodes()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
 
     // additional tests for constructors along with the == and != operators
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree); // in this particular case due to RB tree construction rules the trees become equal when third element is being added (unlike the basic BST)
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-3, -5, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue};
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-3, 2, -5, 4, 0, 1}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{}, scDefaultValue};
@@ -201,8 +214,6 @@ void RedBlackTreesTests::testAddNodes()
 
 void RedBlackTreesTests::testRemoveNodes()
 {
-    _reset();
-
     bool nodeDeleted{false};
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue};
@@ -326,7 +337,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(8); // root and left child, erase root
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-5:ROOT:BK", 1));
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue};
 
@@ -369,7 +380,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->removeNode(-16);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-12:ROOT:BK/-15:-12:BK/19:-12:BK", 3));
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue};
 
@@ -459,7 +470,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(-12);
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-16:ROOT:BK/-23:-16:BK/-15:-16:BK", 3));
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue};
 
@@ -510,7 +521,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(2); // root and right child, erase right child
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-3:ROOT:BK", 1));
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-3, -5, 2}, scDefaultValue, scCustomNullValue};
 
@@ -522,7 +533,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(-3); // root and two red children, erase root
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:ROOT:BK/-5:2L:RD", 2));
 
-    _reset();
+    _resetTreeObjects();
 
     // deleting null node from custom null value tree
     mpSearchTree = new RedBlackTree{std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue};
@@ -547,8 +558,6 @@ void RedBlackTreesTests::testRemoveNodes()
 
 void RedBlackTreesTests::testUpdateNodeValue()
 {
-    _reset();
-
     mpSearchTree = new RedBlackTree;
 
     QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(-5) &&
@@ -649,7 +658,7 @@ void RedBlackTreesTests::testUpdateNodeValue()
             scDefaultValue == mpAuxSearchTree->getNodeValue(16));
 
     // test updating custom null value tree node values
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{scCustomNullValue};
 
@@ -721,7 +730,7 @@ void RedBlackTreesTests::testUpdateNodeValue()
             *mpSearchTree != *mpAuxSearchTree);
 
     // test value update and copy assignment between default and custom null value trees
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue};
@@ -744,8 +753,6 @@ void RedBlackTreesTests::testUpdateNodeValue()
 
 void RedBlackTreesTests::testMoveSemantics()
 {
-    _reset();
-
     mpSearchTree = new RedBlackTree;
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
@@ -786,7 +793,7 @@ void RedBlackTreesTests::testMoveSemantics()
             scDefaultNullValue == mpAuxSearchTree->getNullValue());
 
     // test move constructor for trees with custom null value
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scCustomNullValue};
 
@@ -801,7 +808,7 @@ void RedBlackTreesTests::testMoveSemantics()
             scCustomNullValue == mpAuxSearchTree->getNullValue());
 
     // test move and copy for trees with different null values
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new RedBlackTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue};
@@ -819,8 +826,6 @@ void RedBlackTreesTests::testMoveSemantics()
 
 void RedBlackTreesTests::testMergeTrees()
 {
-    _reset();
-
     mpSearchTree = new RedBlackTree;
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1_1");
@@ -904,7 +909,7 @@ void RedBlackTreesTests::testMergeTrees()
             scDefaultNullValue == mpAuxSearchTree->getNullValue());
 
     // merge trees with (same) custom null value
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{scCustomNullValue};
 
@@ -934,8 +939,6 @@ void RedBlackTreesTests::testMergeTrees()
 
 void RedBlackTreesTests::testPrintTree()
 {
-    _reset();
-
     qInfo("Creating new tree");
     mpSearchTree = new RedBlackTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue};
 
@@ -953,7 +956,7 @@ void RedBlackTreesTests::testPrintTree()
     qInfo("The red-black tree has no nodes");
 }
 
-void RedBlackTreesTests::_reset()
+void RedBlackTreesTests::_resetTreeObjects()
 {
     delete mpSearchTree;
     mpSearchTree = nullptr;

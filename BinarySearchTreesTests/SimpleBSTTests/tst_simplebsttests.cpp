@@ -14,6 +14,9 @@ public:
     ~SimpleBSTTests();
 
 private slots:
+    void init();
+    void cleanup();
+
     void testAddNodes();
     void testRemoveNodes();
     void testUpdateNodeValue();
@@ -22,7 +25,7 @@ private slots:
     void testPrintTree(); // only required for improving code coverage
 
 private:
-    void _reset();
+    void _resetTreeObjects();
 
     BinarySearchTree* mpSearchTree;
     BinarySearchTree* mpAuxSearchTree;
@@ -32,17 +35,27 @@ SimpleBSTTests::SimpleBSTTests()
     : mpSearchTree{nullptr}
     , mpAuxSearchTree{nullptr}
 {
+    BinarySearchTree::enableLogging(false);
 }
 
 SimpleBSTTests::~SimpleBSTTests()
 {
-    _reset();
+    // not implemented as cleanup() does all the job
+}
+
+void SimpleBSTTests::init()
+{
+    QVERIFY(nullptr == mpSearchTree && nullptr == mpAuxSearchTree);
+}
+
+void SimpleBSTTests::cleanup()
+{
+    _resetTreeObjects();
+    BinarySearchTree::enableLogging(false);
 }
 
 void SimpleBSTTests::testAddNodes()
 {
-    _reset();
-
     bool newNodeAdded{false};
 
     mpSearchTree = new BinarySearchTree;
@@ -157,35 +170,35 @@ void SimpleBSTTests::testAddNodes()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, scEmptyTreeString, 0));
 
     // additional tests for constructors along with the == and != operators
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-3, -5, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-3, 2, -5, 4, 0, 1}, scDefaultValue, scCustomNullValue};
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{}, scDefaultValue, scDefaultNullValue};
@@ -201,8 +214,6 @@ void SimpleBSTTests::testAddNodes()
 
 void SimpleBSTTests::testRemoveNodes()
 {
-    _reset();
-
     bool nodeDeleted{false};
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue};
@@ -308,7 +319,7 @@ void SimpleBSTTests::testRemoveNodes()
     QVERIFY(nodeDeleted &&
             areExpectedTreeValuesMet(mpAuxSearchTree, "2:ROOT", 1));
 
-    _reset();
+    _resetTreeObjects();
 
     // deleting null node from custom null value tree
     mpSearchTree = new BinarySearchTree{std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue};
@@ -333,8 +344,6 @@ void SimpleBSTTests::testRemoveNodes()
 
 void SimpleBSTTests::testUpdateNodeValue()
 {
-    _reset();
-
     mpSearchTree = new BinarySearchTree;
 
     QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(-5) &&
@@ -435,7 +444,7 @@ void SimpleBSTTests::testUpdateNodeValue()
             scDefaultValue == mpAuxSearchTree->getNodeValue(16));
 
     // test updating custom null value tree node values
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{scCustomNullValue};
 
@@ -507,7 +516,7 @@ void SimpleBSTTests::testUpdateNodeValue()
             *mpSearchTree != *mpAuxSearchTree);
 
     // test value update and copy assignment between default and custom null value trees
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue};
@@ -530,8 +539,6 @@ void SimpleBSTTests::testUpdateNodeValue()
 
 void SimpleBSTTests::testMoveSemantics()
 {
-    _reset();
-
     mpSearchTree = new BinarySearchTree;
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
@@ -572,7 +579,7 @@ void SimpleBSTTests::testMoveSemantics()
             scDefaultNullValue == mpAuxSearchTree->getNullValue());
 
     // test move constructor for trees with custom null value
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scCustomNullValue};
 
@@ -587,7 +594,7 @@ void SimpleBSTTests::testMoveSemantics()
             scCustomNullValue == mpAuxSearchTree->getNullValue());
 
     // test move and copy for trees with different null values
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue};
     mpAuxSearchTree = new BinarySearchTree{std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue};
@@ -605,8 +612,6 @@ void SimpleBSTTests::testMoveSemantics()
 
 void SimpleBSTTests::testMergeTrees()
 {
-    _reset();
-
     mpSearchTree = new BinarySearchTree;
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1_1");
@@ -690,7 +695,7 @@ void SimpleBSTTests::testMergeTrees()
             scDefaultNullValue == mpAuxSearchTree->getNullValue());
 
     // merge trees with (same) custom null value
-    _reset();
+    _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree{scCustomNullValue};
 
@@ -720,8 +725,6 @@ void SimpleBSTTests::testMergeTrees()
 
 void SimpleBSTTests::testPrintTree()
 {
-    _reset();
-
     qInfo("Creating new tree");
     mpSearchTree = new BinarySearchTree{std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue};
 
@@ -739,7 +742,7 @@ void SimpleBSTTests::testPrintTree()
     qInfo("The tree has no nodes");
 }
 
-void SimpleBSTTests::_reset()
+void SimpleBSTTests::_resetTreeObjects()
 {
     delete mpSearchTree;
     mpSearchTree = nullptr;
