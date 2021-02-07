@@ -129,8 +129,8 @@ protected:
     void _rotateNodeLeft(Node* node);
     void _rotateNodeRight(Node* node);
 
-    void _printNodeRelatives(const Node* node) const;
-    virtual std::string _getNodeAsString(const Node* node, bool isValueRequired) const;
+    void _printNodeRelatives(const Node* const node) const;
+    virtual std::string _getNodeAsString(const Node* const node, bool isValueRequired) const;
 
     Node* m_Root;
     std::string m_NullValue; // value that each key that is NOT contained within tree corresponds to

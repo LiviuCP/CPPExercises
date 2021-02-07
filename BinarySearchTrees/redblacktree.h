@@ -56,11 +56,11 @@ private:
     virtual RedBlackNode* _doAddOrUpdateNode(int key, const std::string& value) override;
 
     // Node* instead of RedBlackNode* is required as argument for signature purposes (but return type can be covariant)
-    virtual RedBlackNode* _removeSingleChildedOrLeafNode(Node* nodeToRemove) override;
+    virtual RedBlackNode* _removeSingleChildedOrLeafNode(Node* const nodeToRemove) override;
 
     virtual RedBlackNode* _createNewNode(int key, const std::string& value) override;
 
-    virtual std::string _getNodeAsString(const Node* node, bool isValueRequired) const override;
+    virtual std::string _getNodeAsString(const Node* const node, bool isValueRequired) const override;
 };
 
 #endif // REDBLACKTREE_H

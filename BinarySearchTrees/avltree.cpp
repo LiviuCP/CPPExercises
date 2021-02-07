@@ -121,7 +121,7 @@ AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
      - update parent height and ancestor heights
      - recursively balance resulting unbalanced nodes (sub-trees) starting with parent and going bottom-up until reaching root
 */
-AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* nodeToRemove)
+AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node for AVL tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
@@ -165,7 +165,7 @@ AVLTree::AVLNode* AVLTree::_createNewNode(int key, const std::string &value)
     return newNode;
 }
 
-void AVLTree::_updateAncestorHeights(AVLTree::AVLNode* node)
+void AVLTree::_updateAncestorHeights(const AVLTree::AVLNode* const node)
 {
     assert(node != nullptr && "Attempt to update ancestors of a null node");
 
@@ -178,7 +178,7 @@ void AVLTree::_updateAncestorHeights(AVLTree::AVLNode* node)
     }
 }
 
-AVLTree::AVLNode* AVLTree::_balanceSubtree(AVLNode* grandparent, AVLNode* parent, AVLNode* child)
+AVLTree::AVLNode* AVLTree::_balanceSubtree(AVLNode* const grandparent, AVLNode* const parent, AVLNode* const child)
 {
     assert(grandparent != nullptr && "Null subtree root detected");
     assert(parent != nullptr && "Null subtree root child detected");

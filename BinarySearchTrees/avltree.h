@@ -41,14 +41,14 @@ private:
     virtual AVLNode* _doAddOrUpdateNode(int key, const std::string& value) override;
 
     // Node* instead of AVLNode* is required as argument for signature purposes (but return type can be covariant)
-    virtual AVLNode* _removeSingleChildedOrLeafNode(Node* nodeToRemove) override;
+    virtual AVLNode* _removeSingleChildedOrLeafNode(Node* const nodeToRemove) override;
 
     virtual AVLNode* _createNewNode(int key, const std::string& value) override;
 
     // update all ancestors of a specific node up to the root
-    void _updateAncestorHeights(AVLNode* node);
+    void _updateAncestorHeights(const AVLNode* const node);
 
-    AVLNode* _balanceSubtree(AVLNode* grandparent, AVLNode* parent, AVLNode* child);
+    AVLNode* _balanceSubtree(AVLNode* const grandparent, AVLNode* const parent, AVLNode* const child);
 };
 
 #endif // AVLTREE_H

@@ -192,7 +192,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateNode(int key, const std:
    - the second step is performed only if a black node has been removed. Removing a red node (which can only be leaf) does not affect the rules.
    - the second step contains two cases: child of removed node is red (simple case - red child becomes black) and a black leaf node has been removed (complex case - more sub-cases/scenarios)
 */
-RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node* nodeToRemove)
+RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node from red-black tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
@@ -315,7 +315,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_createNewNode(int key, const std::str
     return newNode;
 }
 
-std::string RedBlackTree::_getNodeAsString(const BinarySearchTree::Node* node, bool isValueRequired) const
+std::string RedBlackTree::_getNodeAsString(const BinarySearchTree::Node* const node, bool isValueRequired) const
 {
     std::string result{"NULL"};
 

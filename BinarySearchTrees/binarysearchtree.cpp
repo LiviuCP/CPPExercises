@@ -497,7 +497,7 @@ void BinarySearchTree::_rotateNodeRight(BinarySearchTree::Node* node)
     }
 }
 
-void BinarySearchTree::_printNodeRelatives(const BinarySearchTree::Node* node) const
+void BinarySearchTree::_printNodeRelatives(const BinarySearchTree::Node* const node) const
 {
     auto printNodeRelativeInfo = [](const Node* node, const std::string& relativeName)
     {
@@ -521,7 +521,7 @@ void BinarySearchTree::_printNodeRelatives(const BinarySearchTree::Node* node) c
     printNodeRelativeInfo(node->getGrandparent(), "Grandparent");
 }
 
-std::string BinarySearchTree::_getNodeAsString(const BinarySearchTree::Node* node, bool isValueRequired) const
+std::string BinarySearchTree::_getNodeAsString(const Node* const node, bool isValueRequired) const
 {
     std::string result{"NULL"};
 
