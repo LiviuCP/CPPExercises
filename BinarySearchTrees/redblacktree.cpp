@@ -119,31 +119,31 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateNode(int key, const std:
 
         while(parent != nullptr && !parent->isBlack())
         {
-            RedBlackNode* uncle{static_cast<RedBlackNode*>(currentNode->getUncle())};
-            RedBlackNode* grandparent{static_cast<RedBlackNode*>(currentNode->getGrandparent())};
+            RedBlackNode* const uncle{static_cast<RedBlackNode*>(currentNode->getUncle())};
+            RedBlackNode* const grandparent{static_cast<RedBlackNode*>(currentNode->getGrandparent())};
 
             assert(grandparent != nullptr && "Null grandparent for current node"); // there should always be a grandparent (parent is red)
 
             if (uncle == nullptr || uncle->isBlack())
             {
                 // parent and current node cannot be root so they are either left or right child (no need for [node]->isRightChild())
-                bool isNodeLeftChild{currentNode->isLeftChild()};
-                bool isParentLeftChild{parent->isLeftChild()};
+                const bool c_IsNodeLeftChild{currentNode->isLeftChild()};
+                const bool c_IsParentLeftChild{parent->isLeftChild()};
 
-                if (isParentLeftChild && isNodeLeftChild) // left - left: rotate grandparent right, then swap colors of grandparent (black->red) and parent (red->black)
+                if (c_IsParentLeftChild && c_IsNodeLeftChild) // left - left: rotate grandparent right, then swap colors of grandparent (black->red) and parent (red->black)
                 {
                     _rotateNodeRight(grandparent);
                     grandparent->setBlack(false);
                     parent->setBlack(true);
                 }
-                else if (isParentLeftChild && !isNodeLeftChild) // left - right: rotate parent left and then apply previous case (but this time current node and grandparent have colors swapped)
+                else if (c_IsParentLeftChild && !c_IsNodeLeftChild) // left - right: rotate parent left and then apply previous case (but this time current node and grandparent have colors swapped)
                 {
                     _rotateNodeLeft(parent);
                     _rotateNodeRight(grandparent);
                     grandparent->setBlack(false);
                     currentNode->setBlack(true);
                 }
-                else if (!isParentLeftChild && isNodeLeftChild) // right - left: rotate parent left, then apply next case (but this time current node and grandparent have colors swapped)
+                else if (!c_IsParentLeftChild && c_IsNodeLeftChild) // right - left: rotate parent left, then apply next case (but this time current node and grandparent have colors swapped)
                 {
                     _rotateNodeRight(parent);
                     _rotateNodeLeft(grandparent);
@@ -192,14 +192,14 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateNode(int key, const std:
    - the second step is performed only if a black node has been removed. Removing a red node (which can only be leaf) does not affect the rules.
    - the second step contains two cases: child of removed node is red (simple case - red child becomes black) and a black leaf node has been removed (complex case - more sub-cases/scenarios)
 */
-RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *nodeToRemove)
+RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node* nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node from red-black tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
 
     RedBlackNode* parent{static_cast<RedBlackNode*>(nodeToRemove->getParent())};
     RedBlackNode* sibling{static_cast<RedBlackNode*>(nodeToRemove->getSibling())};
-    RedBlackNode* replacingNode{static_cast<RedBlackNode*>(BinarySearchTree::_removeSingleChildedOrLeafNode(nodeToRemove))};
+    RedBlackNode* const replacingNode{static_cast<RedBlackNode*>(BinarySearchTree::_removeSingleChildedOrLeafNode(nodeToRemove))};
 
     if (!static_cast<RedBlackNode*>(nodeToRemove)->isBlack()) // no action required if removed node is a red leaf
     {
@@ -211,7 +211,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *n
     }
     else // case 2: removed black leaf node
     {
-        RedBlackNode* doubleBlackNode{replacingNode}; // convert replacing node (null leaf) to double-black node
+        const RedBlackNode* doubleBlackNode{replacingNode}; // convert replacing node (null leaf) to double-black node
         bool isTreeValid{false};
 
         while (!isTreeValid)
@@ -225,16 +225,16 @@ RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *n
                 assert((sibling != nullptr && sibling->getParent() != nullptr) && "Invalid sibling of non-root black node found"); // required for avoiding rule 4 violation
 
                 // keep reference to sibling children before doing any rotations
-                RedBlackNode* siblingLeftChild{static_cast<RedBlackNode*>(sibling->getLeftChild())};
-                RedBlackNode* siblingRightChild{static_cast<RedBlackNode*>(sibling->getRightChild())};
+                RedBlackNode* const siblingLeftChild{static_cast<RedBlackNode*>(sibling->getLeftChild())};
+                RedBlackNode* const siblingRightChild{static_cast<RedBlackNode*>(sibling->getRightChild())};
 
                 if (sibling->isBlack())
                 {
-                    bool isSiblingLeftChildRed{siblingLeftChild != nullptr && !siblingLeftChild->isBlack()};
-                    bool isSiblingRightChildRed{siblingRightChild != nullptr && !siblingRightChild->isBlack()};
+                    const bool c_IsSiblingLeftChildRed{siblingLeftChild != nullptr && !siblingLeftChild->isBlack()};
+                    const bool c_IsSiblingRightChildRed{siblingRightChild != nullptr && !siblingRightChild->isBlack()};
                     bool doubleBlackNodeChanged{false};
 
-                    if (!isSiblingLeftChildRed && !isSiblingRightChildRed) // sub-case 2a: two sibling black children (everything else is sub-case 2b: black sibling with at least one red child)
+                    if (!c_IsSiblingLeftChildRed && !c_IsSiblingRightChildRed) // sub-case 2a: two sibling black children (everything else is sub-case 2b: black sibling with at least one red child)
                     {
                         sibling->setBlack(false);
 
@@ -250,14 +250,14 @@ RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *n
                             parent->setBlack(true); // set parent black, local black height remains preserved
                         }
                     }
-                    else if (sibling->isLeftChild() && isSiblingLeftChildRed) // 2b: left-left (left sibling with left red child (right sibling child null, cannot be black) or both children red)
+                    else if (sibling->isLeftChild() && c_IsSiblingLeftChildRed) // 2b: left-left (left sibling with left red child (right sibling child null, cannot be black) or both children red)
                     {
                         _rotateNodeRight(parent);
                         sibling->setBlack(parent->isBlack()); // if removed node parent is red: swap the parent and sibling colors in order to get local black height preserved
                         parent->setBlack(true);
                         siblingLeftChild->setBlack(true);
                     }
-                    else if (sibling->isLeftChild() && !isSiblingLeftChildRed) // 2b: left-right (left sibling with right red child only, no sibling left child)
+                    else if (sibling->isLeftChild() && !c_IsSiblingLeftChildRed) // 2b: left-right (left sibling with right red child only, no sibling left child)
                     {
                         // swap sibling and sibling child colors after first rotation; after second rotation ensure parent and sibling have the same color (preserve local black height)
                         _rotateNodeLeft(sibling);
@@ -265,7 +265,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *n
                         sibling->setBlack(parent->isBlack());
                         siblingRightChild->setBlack(true);
                     }
-                    else if (isSiblingRightChildRed)  // 2b: right-right (left-left mirrored)
+                    else if (c_IsSiblingRightChildRed)  // 2b: right-right (left-left mirrored)
                     {
                         _rotateNodeLeft(parent);
                         sibling->setBlack(parent->isBlack());
@@ -306,12 +306,12 @@ RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node *n
         }
     }
 
-    return nullptr; // no replacing node required for AVL nodes (return value only for signature purposes)
+    return nullptr; // no replacing node required for red-black nodes (return value only for signature purposes)
 }
 
 RedBlackTree::RedBlackNode* RedBlackTree::_createNewNode(int key, const std::string& value)
 {
-    RedBlackNode* newNode{new RedBlackNode{key, value}};
+    RedBlackNode* const newNode{new RedBlackNode{key, value}};
     return newNode;
 }
 
@@ -344,7 +344,10 @@ RedBlackTree::RedBlackNode::RedBlackNode(int key, std::string value)
 
 void RedBlackTree::RedBlackNode::setBlack(bool isBlackRequired)
 {
-    m_IsBlack = isBlackRequired;
+    if (m_IsBlack != isBlackRequired)
+    {
+        m_IsBlack = isBlackRequired;
+    }
 }
 
 bool RedBlackTree::RedBlackNode::isBlack() const
