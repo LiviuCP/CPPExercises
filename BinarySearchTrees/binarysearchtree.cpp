@@ -540,17 +540,17 @@ std::string BinarySearchTree::_getNodeAsString(const BinarySearchTree::Node* nod
 
             if (node->getSibling() == nullptr)
             {
-                if (node->isLeftChild())
+                const bool isNodeLeftChild{node->isLeftChild()};
+
+                assert(isNodeLeftChild || node->isRightChild()); // defensive programming, node should not be root
+
+                if (isNodeLeftChild)
                 {
                     nodeData << "L";
                 }
-                else if (node->isRightChild())
-                {
-                    nodeData << "R";
-                }
                 else
                 {
-                    assert(false); // defensive programming, this code should be unreachable as the parent is not null
+                    nodeData << "R";
                 }
             }
         }
