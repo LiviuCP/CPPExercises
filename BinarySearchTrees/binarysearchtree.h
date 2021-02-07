@@ -69,10 +69,10 @@ protected:
         bool isLeftChild() const;
         bool isRightChild() const;
 
-        void setLeftChild(Node* leftChild);
+        void setLeftChild(Node* const leftChild);
         Node* getLeftChild() const;
 
-        void setRightChild(Node* rightChild);
+        void setRightChild(Node* const rightChild);
         Node* getRightChild() const;
 
         void copyInOrderSuccessorKeyAndValue();
@@ -107,7 +107,7 @@ protected:
     void _copyTreeNodes(const BinarySearchTree& sourceTree);
 
     virtual Node* _doAddOrUpdateNode(int key, const std::string& value);
-    virtual Node* _removeSingleChildedOrLeafNode(Node* nodeToRemove);
+    virtual Node* _removeSingleChildedOrLeafNode(Node* const nodeToRemove);
 
     /* We need this function to be virtual so future node types can be created too (e.g. red-black nodes) even when derived classes only use BinarySearchTree::_doAddOrUpdateNode()
        It creates a dynamically allocated node object of type Node or a derived type
