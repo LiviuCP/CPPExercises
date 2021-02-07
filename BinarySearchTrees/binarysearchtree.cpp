@@ -895,14 +895,12 @@ bool BinarySearchTree::Node::operator!=(const BinarySearchTree::Node& node) cons
         {
             assert(m_Parent->m_Value == node.m_Parent->m_Value); // defensive programming, it is presumed that the parent nodes have already been compared and have equal keys and values
 
-            const bool isLeft{isLeftChild()};
-            const bool isRight{isRightChild()};
-            const bool isNodeLeft{node.isLeftChild()};
-            const bool isNodeRight{node.isRightChild()};
+            const bool isCurrentNodeLeftChild{isLeftChild()};
+            const bool isOtherNodeLeftChild{node.isLeftChild()};
 
-            assert((isLeft || isRight) && (isNodeLeft || isNodeRight)); // defensive programming, neither node should be root
+            assert((isCurrentNodeLeftChild || isRightChild()) && (isOtherNodeLeftChild || node.isRightChild())); // defensive programming, neither node should be root
 
-            if ((isLeft && isNodeRight) || (isRight && isNodeLeft) || (m_Key != node.m_Key || m_Value != node.m_Value))
+            if ((isCurrentNodeLeftChild && !isOtherNodeLeftChild) || (!isCurrentNodeLeftChild && isOtherNodeLeftChild) || (m_Key != node.m_Key || m_Value != node.m_Value))
             {
                 areNotEqualNodes = true;
             }
