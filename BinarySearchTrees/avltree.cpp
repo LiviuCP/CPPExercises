@@ -143,9 +143,9 @@ AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* nodeToRemove)
         {
             if (!currentNode->isBalanced())
             {
-                AVLNode* currentNodeChild{currentNode->getGreaterHeightChild()};
+                AVLNode* const currentNodeChild{currentNode->getGreaterHeightChild()};
                 assert(currentNodeChild != nullptr && "Null larger height child found for unbalanced node"); // defensive programming, normally this issue should not occur
-                AVLNode* currentNodeGrandchild{currentNodeChild->getGreaterHeightChild()};
+                AVLNode* const currentNodeGrandchild{currentNodeChild->getGreaterHeightChild()};
                 assert(currentNodeGrandchild != nullptr && "Null larger height grandchild found for unbalanced node"); // defensive programming, normally this issue should not occur
                 currentNode = _balanceSubtree(currentNode, currentNodeChild, currentNodeGrandchild);
             }
@@ -161,7 +161,7 @@ AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* nodeToRemove)
 
 AVLTree::AVLNode* AVLTree::_createNewNode(int key, const std::string &value)
 {
-    AVLNode* newNode{new AVLNode{key, value}};
+    AVLNode* const newNode{new AVLNode{key, value}};
     return newNode;
 }
 
@@ -243,7 +243,7 @@ bool AVLTree::AVLNode::isBalanced() const
     const short c_LeftSubtreeHeight{m_LeftChild != nullptr ? static_cast<AVLNode*>(m_LeftChild)->m_Height : short{0}};
     const short c_RightSubtreeHeight{m_RightChild != nullptr ? static_cast<AVLNode*>(m_RightChild)->m_Height : short{0}};
 
-    const bool c_IsBalanced{std::abs(c_LeftSubtreeHeight-c_RightSubtreeHeight) <= 1};
+    const bool c_IsBalanced{std::abs(c_LeftSubtreeHeight - c_RightSubtreeHeight) <= 1};
 
     return c_IsBalanced;
 }
@@ -251,8 +251,8 @@ bool AVLTree::AVLNode::isBalanced() const
 AVLTree::AVLNode* AVLTree::AVLNode::getGreaterHeightChild() const
 {
     AVLNode* result{nullptr};
-    AVLNode* leftChild{static_cast<AVLNode*>(m_LeftChild)};
-    AVLNode* rightChild{static_cast<AVLNode*>(m_RightChild)};
+    AVLNode* const leftChild{static_cast<AVLNode*>(m_LeftChild)};
+    AVLNode* const rightChild{static_cast<AVLNode*>(m_RightChild)};
 
     if (leftChild == nullptr || (rightChild != nullptr && leftChild->m_Height < rightChild->m_Height))
     {
