@@ -26,10 +26,10 @@ private slots:
     void testPassThroughAllLogMessages();
 
 private:
-    void _buildMainSearchTree();
-    void _buildAuxSearchTree();
-    void _buildMainSearchTreeInDifferentOrder(); // same content, different node adding order to the tree created by _buildMainSearchTree()
-    void _buildAuxSearchTreeInDifferentOrder(); // same content, different node adding order to the tree created by _buildAuxSearchTree()
+    void _buildPrimaryTestSearchTree(); // create content for the primary test tree (referenced by mpSearchTree)
+    void _buildSecondaryTestSearchTree(); // create content for the secondary test tree (referenced by mpAuxSearchTree)
+    void _buildPrimaryTestSearchTreeInDifferentOrder(); // same content, different node adding order to the tree created by _buildPrimaryTestSearchTree() method (referenced by mpAuxSearchTree)
+    void _buildSecondaryTestSearchTreeInDifferentOrder(); // same content, different node adding order to the tree created by _buildSecondaryTestSearchTree() method (referenced by mpSearchTree)
 
     void _resetTreeObjects();
 
@@ -66,8 +66,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     mpSearchTree = new BinarySearchTree;
     mpAuxSearchTree = new BinarySearchTree;
 
-    _buildMainSearchTree();
-    _buildAuxSearchTree();
+    _buildPrimaryTestSearchTree();
+    _buildSecondaryTestSearchTree();
 
     const BinarySearchTree simpleTreeCopy{*mpSearchTree};
     const BinarySearchTree simpleTreeAuxCopy{*mpAuxSearchTree};
@@ -77,8 +77,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     mpSearchTree = new RedBlackTree;
     mpAuxSearchTree = new RedBlackTree;
 
-    _buildMainSearchTree();
-    _buildAuxSearchTree();
+    _buildPrimaryTestSearchTree();
+    _buildSecondaryTestSearchTree();
 
     const RedBlackTree redBlackTreeCopy{*dynamic_cast<RedBlackTree*>(mpSearchTree)};
     const RedBlackTree redBlackTreeAuxCopy{*dynamic_cast<RedBlackTree*>(mpAuxSearchTree)};
@@ -88,8 +88,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     mpSearchTree = new AVLTree;
     mpAuxSearchTree = new AVLTree;
 
-    _buildMainSearchTree();
-    _buildAuxSearchTree();
+    _buildPrimaryTestSearchTree();
+    _buildSecondaryTestSearchTree();
 
     const AVLTree avlTreeCopy{*dynamic_cast<AVLTree*>(mpSearchTree)};
     const AVLTree avlTreeAuxCopy{*dynamic_cast<AVLTree*>(mpAuxSearchTree)};
@@ -225,10 +225,10 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 {
     // Simple BST vs. Red-Black tree
     mpSearchTree = new RedBlackTree{scCustomNullValue};
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
-    _buildMainSearchTreeInDifferentOrder();
+    _buildPrimaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT:BK/-12:n14:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:RD/17:l12:16:RD/0:g7_1:-5R:RD", 8, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
@@ -251,10 +251,10 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     _resetTreeObjects();
 
     mpAuxSearchTree = new RedBlackTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     mpSearchTree = new BinarySearchTree{};
-    _buildAuxSearchTreeInDifferentOrder();
+    _buildSecondaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT:BK/-5:a1_2:-1:RD/8:b2:-1:RD/-9:h8:-5:BK/-2:e5:-5:BK/0:g7_2:8:BK/16:i9_2:8:BK/-16:m13:-9L:RD/14:j10:16L:RD", 9, true));
@@ -278,13 +278,13 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{scCustomNullValue};
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new RedBlackTree{std::move(*dynamic_cast<RedBlackTree*>(mpSearchTree))};
 
     delete mpSearchTree;
     mpSearchTree = new AVLTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT:BK/-12:n14:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:RD/17:l12:16:RD/0:g7_1:-5R:RD", 8, true));
@@ -310,13 +310,13 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     _resetTreeObjects();
 
     mpAuxSearchTree = new AVLTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     mpSearchTree = new AVLTree{*dynamic_cast<AVLTree*>(mpAuxSearchTree)};
 
     delete mpAuxSearchTree;
     mpAuxSearchTree = new RedBlackTree;
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT:BK/-5:a1_2:-1:RD/8:b2:-1:RD/-9:h8:-5:BK/-2:e5:-5:BK/0:g7_2:8:BK/16:i9_2:8:BK/-16:m13:-9L:RD/14:j10:16L:RD", 9, true));
@@ -343,10 +343,10 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     _resetTreeObjects();
 
     mpSearchTree = new AVLTree{};
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new BinarySearchTree{};
-    _buildMainSearchTreeInDifferentOrder();
+    _buildPrimaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8, true));
@@ -369,10 +369,10 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     _resetTreeObjects();
 
     mpAuxSearchTree = new AVLTree{};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     mpSearchTree = new BinarySearchTree{scCustomNullValue};
-    _buildAuxSearchTreeInDifferentOrder();
+    _buildSecondaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9, true));
@@ -457,10 +457,10 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
 {
     // AVL tree assigned to Red-Black tree (and vice-versa)
     mpSearchTree = new RedBlackTree{scCustomNullValue};
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree;
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpSearchTree = *mpAuxSearchTree;
 
@@ -471,10 +471,10 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{scCustomNullValue};
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree;
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = *mpSearchTree;
 
@@ -486,10 +486,10 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpSearchTree = *mpAuxSearchTree;
 
@@ -500,10 +500,10 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = *mpSearchTree;
 
@@ -515,10 +515,10 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpSearchTree = *mpAuxSearchTree;
 
@@ -529,10 +529,10 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = *mpSearchTree;
 
@@ -545,10 +545,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
 {
     // AVL tree assigned to Red-Black tree (and vice-versa)
     mpSearchTree = new RedBlackTree{scCustomNullValue};
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree;
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
 
@@ -560,10 +560,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree{scCustomNullValue};
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree;
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = std::move(*mpSearchTree);
 
@@ -576,10 +576,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
 
@@ -591,10 +591,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new RedBlackTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new BinarySearchTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = std::move(*mpSearchTree);
 
@@ -607,10 +607,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
 
@@ -622,10 +622,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     _resetTreeObjects();
 
     mpSearchTree = new BinarySearchTree;
-    _buildMainSearchTree();
+    _buildPrimaryTestSearchTree();
 
     mpAuxSearchTree = new AVLTree{scCustomNullValue};
-    _buildAuxSearchTree();
+    _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = std::move(*mpSearchTree);
 
@@ -672,7 +672,7 @@ void MixedTreeTypesTests::testPassThroughAllLogMessages()
     mpSearchTree->printTree();
 }
 
-void MixedTreeTypesTests::_buildMainSearchTree()
+void MixedTreeTypesTests::_buildPrimaryTestSearchTree()
 {
     (void)mpSearchTree->addOrUpdateNode(-5, "a1_1");
     (void)mpSearchTree->addOrUpdateNode(2, "d4");
@@ -684,7 +684,7 @@ void MixedTreeTypesTests::_buildMainSearchTree()
     (void)mpSearchTree->addOrUpdateNode(0, "g7_1");
 }
 
-void MixedTreeTypesTests::_buildAuxSearchTree()
+void MixedTreeTypesTests::_buildSecondaryTestSearchTree()
 {
     (void)mpAuxSearchTree->addOrUpdateNode(8, "b2");
     (void)mpAuxSearchTree->addOrUpdateNode(-1, "c3");
@@ -697,7 +697,7 @@ void MixedTreeTypesTests::_buildAuxSearchTree()
     (void)mpAuxSearchTree->addOrUpdateNode(-16, "m13");
 }
 
-void MixedTreeTypesTests::_buildMainSearchTreeInDifferentOrder()
+void MixedTreeTypesTests::_buildPrimaryTestSearchTreeInDifferentOrder()
 {
     (void)mpAuxSearchTree->addOrUpdateNode(2, "d4");
     (void)mpAuxSearchTree->addOrUpdateNode(-12, "n14");
@@ -709,7 +709,7 @@ void MixedTreeTypesTests::_buildMainSearchTreeInDifferentOrder()
     (void)mpAuxSearchTree->addOrUpdateNode(0, "g7_1");
 }
 
-void MixedTreeTypesTests::_buildAuxSearchTreeInDifferentOrder()
+void MixedTreeTypesTests::_buildSecondaryTestSearchTreeInDifferentOrder()
 {
     (void)mpSearchTree->addOrUpdateNode(-1, "c3");
     (void)mpSearchTree->addOrUpdateNode(-5, "a1_2");
