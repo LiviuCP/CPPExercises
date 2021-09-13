@@ -1,9 +1,14 @@
+/* Each CPPExercises subproject that includes matrixutils.h should have following path setup in INCLUDEPATH (relative to the subproject dir):
+   1) CPPExercises/External/Matrix/MatrixLib/Matrix
+   2) CPPExercises/External/Matrix/MatrixLib/Utils
+*/
+
 #ifndef MATRIXUTILS_H
 #define MATRIXUTILS_H
 
 #include <fstream>
 
-#include "../External/Matrix/MatrixLib/matrix.h"
+#include "../External/Matrix/MatrixLib/Matrix/matrix.h"
 
 template<typename T>
 std::ifstream& operator>>(std::ifstream& in, Matrix<T>& data);
