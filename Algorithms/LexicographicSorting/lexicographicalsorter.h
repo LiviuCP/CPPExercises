@@ -39,7 +39,7 @@ bool LexicographicalSorter<T>::sort(Matrix<T>& data, Matrix<int>& originalRowNum
 
         for (Matrix<int>::NIterator it{sOriginalRowNumbers.nBegin()}; it != sOriginalRowNumbers.nEnd(); ++it)
         {
-            *it = it.getCurrentRowNr();
+            *it = it.getRowNr();
         }
 
         if (sortingPerRowRequired)

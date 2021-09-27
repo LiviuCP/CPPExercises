@@ -49,7 +49,7 @@ int main()
 
             for (Matrix<bool>::ConstZIterator countryIt{neighbourhoodMatrix.constZBegin()}; countryIt != neighbourhoodMatrix.constZRowEnd(0); ++countryIt)
             {
-                const int currentUncolouredCountry{countryIt.getCurrentColumnNr()};
+                const int currentUncolouredCountry{countryIt.getColumnNr()};
                 Matrix<int>::ConstNIterator currentUncolouredCountryIt{countryColours.getConstNIterator(currentUncolouredCountry)};
 
                 uniqueColours.setAllItemsToValue(false);
@@ -57,7 +57,7 @@ int main()
                 // mark colours that are in use by neighbors that were coloured in previous iterations
                 for (Matrix<int>::ConstNIterator colouredCountryIt{countryColours.constNBegin()}; colouredCountryIt != currentUncolouredCountryIt; ++colouredCountryIt)
                 {
-                    const int currentColouredCountry{colouredCountryIt.getCurrentRowNr()};
+                    const int currentColouredCountry{colouredCountryIt.getRowNr()};
 
                     if (true == neighbourhoodMatrix.at(currentColouredCountry, currentUncolouredCountry))
                     {
@@ -108,6 +108,6 @@ void printCountryColoursToFile(ofstream& output, const Matrix<int>& countryColou
 
     for (Matrix<int>::ConstNIterator it{countryColours.constNBegin()}; it != countryColours.constNEnd(); ++it)
     {
-        output << "Country " << it.getCurrentRowNr() << " - Colour " << *it << endl;
+        output << "Country " << it.getRowNr() << " - Colour " << *it << endl;
     }
 }

@@ -35,7 +35,7 @@ int MapColouringUtils::getFirstAvailableColour(const Matrix<bool>& availableColo
     {
         if (false == *colourIt)
         {
-            firstAvailableColour = colourIt.getCurrentColumnNr();
+            firstAvailableColour = colourIt.getColumnNr();
             break;
         }
     }
