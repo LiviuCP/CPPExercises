@@ -5,4 +5,5 @@ SUBDIRS += \
     HiddenBoxes \
     LexicographicSorting \
     ChessHorse \
-    MapColouring
+    MapColouring \
+    KruskalMinCostTree
