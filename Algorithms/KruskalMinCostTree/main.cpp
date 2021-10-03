@@ -14,7 +14,7 @@
 
 using namespace std;
 
-const string c_InFile{"/tmp/kruskalinput.txt"};
+const string c_InFile{"/tmp/kruskalinput.txt"};  // check CPPExercises/InputFileExamples directory
 const string c_OutFile{"/tmp/kruskaloutput.txt"};
 
 void writeOutputToFile(ofstream& out, const GraphMatrix& graph, const EdgeList& edgeList);
