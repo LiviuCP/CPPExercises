@@ -6,4 +6,4 @@ SUBDIRS += \
     LexicographicSorting \
     ChessHorse \
     MapColouring \
-    KruskalMinCostTree
+    KruskalTree
