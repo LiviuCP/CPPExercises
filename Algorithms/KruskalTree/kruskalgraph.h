@@ -30,6 +30,7 @@ private:
     void _buildEmptyComponents();
     void _reset();
 
+    bool _addEdgeToTree(const Edge& edge);
     void _bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componentNode);
     void _bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode);
     void _mergeComponents(Node enclosingComponentNode, Node mergedComponentNode);

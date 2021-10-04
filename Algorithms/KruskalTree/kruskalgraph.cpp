@@ -49,15 +49,7 @@ void KruskalGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
     }
 }
 
-/* Add the nodes to components and merge the components together until only one component remains which contains all nodes.
-
-   For each edge 3 cases should be considered:
-   a) one of the nodes has no component (orphan): add it to the component of the other node
-   b) none of the nodes is assigned to a component: add both to the component corresponding to the lower numbered node
-   c) both nodes have components: merge the smaller component into the larger one
-
-   The goal is to avoid creating any loops within minimum cost tree by ensuring only edges containing nodes from different components (or no component) are appended to it.
-   Edges should be appended in increasing cost size order to ensure a minimum total cost.
+/* Edges should be appended in increasing cost size order to ensure a minimum total cost.
 */
 void KruskalGraph::_buildTreeFromGraph()
 {
@@ -69,42 +61,10 @@ void KruskalGraph::_buildTreeFromGraph()
 
     for (EdgeCostsMap::const_iterator it{mEdgeCostsMap.cbegin()}; it != mEdgeCostsMap.cend() && requiredEdgesCount > 0u; ++it)
     {
-        bool edgeFound{false};
-        Edge edge{it->second};
+        bool edgeAdded{_addEdgeToTree(it->second)};
 
-        if (mComponentNumbers[edge.first] != mComponentNumbers[edge.second])
+        if (edgeAdded)
         {
-            if (scNullComponent == mComponentNumbers[edge.first])
-            {
-                _bindOrphanNodeToNonOrphanNode(edge.first, edge.second);
-            }
-            else if (scNullComponent == mComponentNumbers[edge.second])
-            {
-                _bindOrphanNodeToNonOrphanNode(edge.second, edge.first);
-            }
-            else if (mComponents[mComponentNumbers[edge.first]].size() >= mComponents[mComponentNumbers[edge.second]].size())
-            {
-                _mergeComponents(edge.first, edge.second);
-            }
-            else
-            {
-                _mergeComponents(edge.second, edge.first);
-            }
-
-            edgeFound = true;
-        }
-        else
-        {
-            if (scNullComponent == mComponentNumbers[edge.first])
-            {
-                _bindOrphanNodes(edge.first, edge.second);
-                edgeFound = true;
-            }
-        }
-
-        if (edgeFound)
-        {
-            mTreeEdges.push_back(edge);
             --requiredEdgesCount;
         }
     }
@@ -133,17 +93,71 @@ void KruskalGraph::_reset()
     mTreeEdges.clear();
 }
 
+/* Add the nodes to components and merge the components together until only one component remains which contains all nodes.
+
+   For each edge 3 cases should be considered:
+   a) one of the nodes has no component (orphan): add it to the component of the other node
+   b) none of the nodes is assigned to a component: add both to the component corresponding to the lower numbered node
+   c) both nodes have components: merge the smaller component into the larger one
+
+   The goal is to avoid creating any loops within minimum cost tree by ensuring only edges containing nodes from different components (or no component) are appended to it.
+*/
+bool KruskalGraph::_addEdgeToTree(const Edge& edge)
+{
+    // to keep consistency only edges with higher numbered right node are considered
+    assert(edge.first < edge.second);
+
+    bool success{false};
+
+    if (mComponentNumbers[edge.first] != mComponentNumbers[edge.second])
+    {
+        if (scNullComponent == mComponentNumbers[edge.first])
+        {
+            _bindOrphanNodeToNonOrphanNode(edge.first, edge.second);
+        }
+        else if (scNullComponent == mComponentNumbers[edge.second])
+        {
+            _bindOrphanNodeToNonOrphanNode(edge.second, edge.first);
+        }
+        else if (mComponents[mComponentNumbers[edge.first]].size() >= mComponents[mComponentNumbers[edge.second]].size())
+        {
+            _mergeComponents(edge.first, edge.second);
+        }
+        else
+        {
+            _mergeComponents(edge.second, edge.first);
+        }
+
+        success = true;
+    }
+    else
+    {
+        if (scNullComponent == mComponentNumbers[edge.first])
+        {
+            _bindOrphanNodes(edge.first, edge.second);
+            success = true;
+        }
+    }
+
+    if (success)
+    {
+        mTreeEdges.push_back(edge);
+    }
+
+    return success;
+}
+
 void KruskalGraph::_bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componentNode)
 {
     mComponentNumbers[orphanNode] = mComponentNumbers[componentNode];
     mComponents[mComponentNumbers[componentNode]].push_back(orphanNode);
 }
 
+/* add both nodes to component corresponding to lowest numbered node
+   (this is edge.first as edges are increasingly ordered: first < second)
+*/
 void KruskalGraph::_bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode)
 {
-    // add both to component corresponding to lowest numbered node (this is edge.first as edges are increasingly ordered: first < second)
-    assert(firstOrphanNode < secondOrphanNode);
-
     mComponents[firstOrphanNode].push_back(firstOrphanNode);
     mComponents[firstOrphanNode].push_back(secondOrphanNode);
     mComponentNumbers[firstOrphanNode] = firstOrphanNode;
