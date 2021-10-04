@@ -8,7 +8,7 @@
 #include <fstream>
 #include <cassert>
 
-#include "kruskaltree.h"
+#include "kruskalgraph.h"
 #include "matrix.h"
 #include "utils.h"
 #include "matrixutils.h"
@@ -36,14 +36,14 @@ int main()
 
         if (c_NodesCount > 0u)
         {
-            KruskalTree kruskalTree;
-            bool success{kruskalTree.build(graphMatrix)};
+            KruskalGraph kruskalGraph;
+            bool success{kruskalGraph.build(graphMatrix)};
 
             if (success)
             {
-                writeOutputToFile(out, graphMatrix, kruskalTree.getTreeEdges());
+                writeOutputToFile(out, graphMatrix, kruskalGraph.getTreeEdges());
 
-                if (c_NodesCount - 1 == kruskalTree.getTreeEdges().size())
+                if (c_NodesCount - 1 == kruskalGraph.getTreeEdges().size())
                 {
                     cout << "Kruskal minimum cost tree successfully written to: " << endl << endl << c_OutFile << endl << endl;
                 }
@@ -83,7 +83,7 @@ void writeOutputToFile(ofstream& out, const GraphMatrix& graph, const EdgeList& 
 
         for (EdgeList::const_iterator it{edgeList.cbegin()}; it != edgeList.cend(); ++it)
         {
-            // it's safe to convert the indexes to int as long as the same matrix passed to the KruskalTree is passed to the current function
+            // it's safe to convert the indexes to int as long as the same matrix passed to the KruskalGraph is passed to the current function
             Cost cost{graph.at(static_cast<int>(it->first), static_cast<int>(it->second))};
             totalCost += cost;
 

@@ -1,11 +1,11 @@
-#include "kruskaltree.h"
+#include "kruskalgraph.h"
 
-KruskalTree::KruskalTree()
+KruskalGraph::KruskalGraph()
     : mNodesCount{0u}
 {
 }
 
-bool KruskalTree::build(const GraphMatrix& graphMatrix)
+bool KruskalGraph::build(const GraphMatrix& graphMatrix)
 {
     bool success{false};
 
@@ -24,12 +24,12 @@ bool KruskalTree::build(const GraphMatrix& graphMatrix)
     return success;
 }
 
-const EdgeList& KruskalTree::getTreeEdges() const
+const EdgeList& KruskalGraph::getTreeEdges() const
 {
     return mTreeEdges;
 }
 
-void KruskalTree::_buildGraph(const Matrix<int>& edgeCostsMatrix)
+void KruskalGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
 {
     const int c_RowsCount{edgeCostsMatrix.getNrOfRows()};
 
@@ -59,7 +59,7 @@ void KruskalTree::_buildGraph(const Matrix<int>& edgeCostsMatrix)
    The goal is to avoid creating any loops within minimum cost tree by ensuring only edges containing nodes from different components (or no component) are appended to it.
    Edges should be appended in increasing cost size order to ensure a minimum total cost.
 */
-void KruskalTree::_buildTreeFromGraph()
+void KruskalGraph::_buildTreeFromGraph()
 {
     assert(mNodesCount > 0u);
 
@@ -113,7 +113,7 @@ void KruskalTree::_buildTreeFromGraph()
 /* Empty components (one per node) are created. However initially no node "belongs" to its component but instead is considered standalone ("orphan")
    Nodes would then be progressively added to components and these ones are merged until finally a single component representing the Kruskal tree remains.
 */
-void KruskalTree::_buildEmptyComponents()
+void KruskalGraph::_buildEmptyComponents()
 {
     mComponents.resize(mNodesCount);
     mComponentNumbers.resize(mNodesCount);
@@ -124,7 +124,7 @@ void KruskalTree::_buildEmptyComponents()
     }
 }
 
-void KruskalTree::_reset()
+void KruskalGraph::_reset()
 {
     mNodesCount = 0;
     mEdgeCostsMap.clear();
@@ -133,13 +133,13 @@ void KruskalTree::_reset()
     mTreeEdges.clear();
 }
 
-void KruskalTree::_bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componentNode)
+void KruskalGraph::_bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componentNode)
 {
     mComponentNumbers[orphanNode] = mComponentNumbers[componentNode];
     mComponents[mComponentNumbers[componentNode]].push_back(orphanNode);
 }
 
-void KruskalTree::_bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode)
+void KruskalGraph::_bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode)
 {
     // add both to component corresponding to lowest numbered node (this is edge.first as edges are increasingly ordered: first < second)
     assert(firstOrphanNode < secondOrphanNode);
@@ -150,7 +150,7 @@ void KruskalTree::_bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode)
     mComponentNumbers[secondOrphanNode] = firstOrphanNode;
 }
 
-void KruskalTree::_mergeComponents(Node enclosingComponentNode, Node mergedComponentNode)
+void KruskalGraph::_mergeComponents(Node enclosingComponentNode, Node mergedComponentNode)
 {
     size_t c_MergedComponentNumber{mComponentNumbers[mergedComponentNode]};
 

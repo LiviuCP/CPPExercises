@@ -1,5 +1,5 @@
-#ifndef KRUSKALTREE_H
-#define KRUSKALTREE_H
+#ifndef KRUSKALGRAPH_H
+#define KRUSKALGRAPH_H
 
 #include <vector>
 #include <utility>
@@ -16,10 +16,10 @@ using GraphMatrix = Matrix<Cost>;
 using EdgeCostsMap = std::multimap<Cost, Edge>;
 using EdgeList = std::list<Edge>;
 
-class KruskalTree
+class KruskalGraph
 {
 public:
-    explicit KruskalTree();
+    explicit KruskalGraph();
 
     bool build(const GraphMatrix& graphMatrix);
     const EdgeList& getTreeEdges() const;
@@ -43,4 +43,4 @@ private:
     EdgeList mTreeEdges;
 };
 
-#endif // KRUSKALTREE_H
+#endif // KRUSKALGRAPH_H

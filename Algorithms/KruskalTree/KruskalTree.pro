@@ -7,8 +7,8 @@ INCLUDEPATH += ../../External/Matrix/MatrixLib/Matrix
 INCLUDEPATH += ../../Shared
 
 SOURCES += \
-    main.cpp \
-    kruskaltree.cpp
+    kruskalgraph.cpp \
+    main.cpp
 
 HEADERS += \
-    kruskaltree.h
+    kruskalgraph.h
