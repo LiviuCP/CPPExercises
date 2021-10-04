@@ -8,25 +8,29 @@
 
 #include "matrix.h"
 
-using Node = size_t;
-using Edge = std::pair<Node, Node>;
-using Component = std::list<Node>;
-using Cost = int;
-using GraphMatrix = Matrix<Cost>;
-using EdgeCostsMap = std::multimap<Cost, Edge>;
-using EdgeList = std::list<Edge>;
-
 class KruskalGraph
 {
 public:
+    using Node = size_t;
+    using Edge = std::pair<Node, Node>;
+    using Cost = int;
+    using GraphMatrix = Matrix<Cost>;
+    using Tree = std::list<Edge>;
+
     explicit KruskalGraph();
 
     bool build(const GraphMatrix& graphMatrix);
-    const EdgeList& getTreeEdges() const;
+
+    const Tree& getMinTreeEdges() const;
+    const Tree& getMaxTreeEdges() const;
 
 private:
+    using Component = std::list<Node>;
+    using EdgeCostsMap = std::multimap<Cost, Edge>;
+
     void _buildGraph(const Matrix<int>& edgeCostsMatrix);
-    void _buildTreeFromGraph();
+    void _buildMinTreeFromGraph();
+    void _buildMaxTreeFromGraph();
     void _buildEmptyComponents();
     void _reset();
 
@@ -41,7 +45,8 @@ private:
     EdgeCostsMap mEdgeCostsMap;
     std::vector<Component> mComponents;
     std::vector<size_t> mComponentNumbers;
-    EdgeList mTreeEdges;
+    Tree mMinTreeEdges;
+    Tree mMaxTreeEdges;
 };
 
 #endif // KRUSKALGRAPH_H

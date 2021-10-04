@@ -6,10 +6,8 @@
 
 #include <iostream>
 #include <fstream>
-#include <cassert>
 
 #include "kruskalgraph.h"
-#include "matrix.h"
 #include "utils.h"
 #include "matrixutils.h"
 
@@ -18,7 +16,7 @@ using namespace std;
 const string c_InFile{"/tmp/kruskalinput.txt"};  // check CPPExercises/InputFileExamples directory
 const string c_OutFile{"/tmp/kruskaloutput.txt"};
 
-void writeOutputToFile(ofstream& out, const GraphMatrix& graph, const EdgeList& edgeList);
+void writeTreeToFile(ofstream& out, const KruskalGraph::GraphMatrix& graph, const KruskalGraph::Tree& tree);
 
 int main()
 {
@@ -29,7 +27,7 @@ int main()
 
     if(in.is_open() && out.is_open())
     {
-        GraphMatrix graphMatrix;
+        KruskalGraph::GraphMatrix graphMatrix;
         in >> graphMatrix;
 
         const size_t c_NodesCount{static_cast<size_t>(graphMatrix.getNrOfRows())};
@@ -41,15 +39,23 @@ int main()
 
             if (success)
             {
-                writeOutputToFile(out, graphMatrix, kruskalGraph.getTreeEdges());
+                out << "The MINIMUM cost Kruskal tree edges are: " << endl << endl;
 
-                if (c_NodesCount - 1 == kruskalGraph.getTreeEdges().size())
+                writeTreeToFile(out, graphMatrix, kruskalGraph.getMinTreeEdges());
+
+                out << "========================================" << endl << endl;
+                out << "The MAXIMUM cost Kruskal tree edges are: " << endl << endl;
+
+                writeTreeToFile(out, graphMatrix, kruskalGraph.getMaxTreeEdges());
+
+                // no need to check the count of the maximum tree (if any nodes are loose then both trees will be incomplete)
+                if (c_NodesCount - 1 == kruskalGraph.getMinTreeEdges().size())
                 {
-                    cout << "Kruskal minimum cost tree successfully written to: " << endl << endl << c_OutFile << endl << endl;
+                    cout << "Kruskal minimum and maximum cost trees successfully written to: " << endl << endl << c_OutFile << endl << endl;
                 }
                 else
                 {
-                    cout << "The Kruskal minimum cost tree has been incompletely built (insufficient edges provided)" << endl << endl;
+                    cout << "The Kruskal minimum and maximum cost trees have been incompletely built (insufficient edges provided)" << endl << endl;
                     cout << "Please check input file: " << endl << endl << c_InFile << endl << endl;
                 }
             }
@@ -71,26 +77,24 @@ int main()
     return 0;
 }
 
-void writeOutputToFile(ofstream& out, const GraphMatrix& graph, const EdgeList& edgeList)
+void writeTreeToFile(ofstream& out, const KruskalGraph::GraphMatrix& graph, const KruskalGraph::Tree& tree)
 {
     assert(out.is_open());
 
-    Cost totalCost{0};
+    KruskalGraph::Cost totalCost{0};
 
-    if (edgeList.size() > 0u)
+    if (tree.size() > 0u)
     {
-        out << "The minimum cost Kruskal tree edges are: " << endl << endl;
-
-        for (EdgeList::const_iterator it{edgeList.cbegin()}; it != edgeList.cend(); ++it)
+        for (KruskalGraph::Tree::const_iterator it{tree.cbegin()}; it != tree.cend(); ++it)
         {
             // it's safe to convert the indexes to int as long as the same matrix passed to the KruskalGraph is passed to the current function
-            Cost cost{graph.at(static_cast<int>(it->first), static_cast<int>(it->second))};
+            KruskalGraph::Cost cost{graph.at(static_cast<int>(it->first), static_cast<int>(it->second))};
             totalCost += cost;
 
             out << "(" << (it->first + 1) << "," << (it->second + 1) << ") - cost: " << cost << endl;
         }
 
-        out << endl << "Total cost: " << totalCost << endl;
+        out << endl << "Total cost: " << totalCost << endl << endl;
     }
     else
     {

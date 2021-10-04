@@ -16,7 +16,8 @@ bool KruskalGraph::build(const GraphMatrix& graphMatrix)
     if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
         _buildGraph(graphMatrix);
-        _buildTreeFromGraph();
+        _buildMinTreeFromGraph();
+        _buildMaxTreeFromGraph();
 
         success = true;
     }
@@ -24,9 +25,14 @@ bool KruskalGraph::build(const GraphMatrix& graphMatrix)
     return success;
 }
 
-const EdgeList& KruskalGraph::getTreeEdges() const
+const KruskalGraph::Tree& KruskalGraph::getMinTreeEdges() const
 {
-    return mTreeEdges;
+    return mMinTreeEdges;
+}
+
+const KruskalGraph::Tree& KruskalGraph::getMaxTreeEdges() const
+{
+    return mMaxTreeEdges;
 }
 
 void KruskalGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
@@ -51,7 +57,7 @@ void KruskalGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
 
 /* Edges should be appended in increasing cost size order to ensure a minimum total cost.
 */
-void KruskalGraph::_buildTreeFromGraph()
+void KruskalGraph::_buildMinTreeFromGraph()
 {
     assert(mNodesCount > 0u);
 
@@ -65,6 +71,27 @@ void KruskalGraph::_buildTreeFromGraph()
 
         if (edgeAdded)
         {
+            mMinTreeEdges.push_back(it->second);
+            --requiredEdgesCount;
+        }
+    }
+}
+
+void KruskalGraph::_buildMaxTreeFromGraph()
+{
+    assert(mNodesCount > 0u);
+
+    _buildEmptyComponents();
+
+    size_t requiredEdgesCount{mNodesCount - 1};
+
+    for (EdgeCostsMap::const_reverse_iterator it{mEdgeCostsMap.crbegin()}; it != mEdgeCostsMap.crend() && requiredEdgesCount > 0u; ++it)
+    {
+        bool edgeAdded{_addEdgeToTree(it->second)};
+
+        if (edgeAdded)
+        {
+            mMaxTreeEdges.push_back(it->second);
             --requiredEdgesCount;
         }
     }
@@ -75,6 +102,12 @@ void KruskalGraph::_buildTreeFromGraph()
 */
 void KruskalGraph::_buildEmptyComponents()
 {
+    if (mComponents.size() > 0u || mComponentNumbers.size() > 0u)
+    {
+        mComponents.clear();
+        mComponentNumbers.clear();
+    }
+
     mComponents.resize(mNodesCount);
     mComponentNumbers.resize(mNodesCount);
 
@@ -90,7 +123,8 @@ void KruskalGraph::_reset()
     mEdgeCostsMap.clear();
     mComponents.clear();
     mComponentNumbers.clear();
-    mTreeEdges.clear();
+    mMinTreeEdges.clear();
+    mMaxTreeEdges.clear();
 }
 
 /* Add the nodes to components and merge the components together until only one component remains which contains all nodes.
@@ -137,11 +171,6 @@ bool KruskalGraph::_addEdgeToTree(const Edge& edge)
             _bindOrphanNodes(edge.first, edge.second);
             success = true;
         }
-    }
-
-    if (success)
-    {
-        mTreeEdges.push_back(edge);
     }
 
     return success;
