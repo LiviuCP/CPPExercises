@@ -39,19 +39,24 @@ void KruskalGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
 {
     const int c_RowsCount{edgeCostsMatrix.getNrOfRows()};
 
-    assert(c_RowsCount > 0 && c_RowsCount == edgeCostsMatrix.getNrOfColumns());
-
-    mNodesCount = static_cast<size_t>(c_RowsCount);
-
-    for (int row{0}; row < c_RowsCount - 1; ++row)
+    if (c_RowsCount > 0 && c_RowsCount == edgeCostsMatrix.getNrOfColumns())
     {
-        for (Matrix<int>::ConstZIterator it{edgeCostsMatrix.getConstZIterator(row, row + 1)}; it != edgeCostsMatrix.constZRowEnd(row); ++it)
+        mNodesCount = static_cast<size_t>(c_RowsCount);
+
+        for (int row{0}; row < c_RowsCount - 1; ++row)
         {
-            if (*it != 0)
+            for (Matrix<int>::ConstZIterator it{edgeCostsMatrix.getConstZIterator(row, row + 1)}; it != edgeCostsMatrix.constZRowEnd(row); ++it)
             {
-                mEdgeCostsMap.insert(std::pair<Cost, Edge>{*it, Edge{it.getRowNr(), it.getColumnNr()}});
+                if (*it != 0)
+                {
+                    mEdgeCostsMap.insert(std::pair<Cost, Edge>{*it, Edge{it.getRowNr(), it.getColumnNr()}});
+                }
             }
         }
+    }
+    else
+    {
+        assert(false);
     }
 }
 
@@ -59,41 +64,51 @@ void KruskalGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
 */
 void KruskalGraph::_buildMinTreeFromGraph()
 {
-    assert(mNodesCount > 0u);
-
-    _buildEmptyComponents();
-
-    size_t requiredEdgesCount{mNodesCount - 1};
-
-    for (EdgeCostsMap::const_iterator it{mEdgeCostsMap.cbegin()}; it != mEdgeCostsMap.cend() && requiredEdgesCount > 0u; ++it)
+    if (mNodesCount > 0u)
     {
-        bool edgeAdded{_addEdgeToTree(it->second)};
+        _buildEmptyComponents();
 
-        if (edgeAdded)
+        size_t requiredEdgesCount{mNodesCount - 1};
+
+        for (EdgeCostsMap::const_iterator it{mEdgeCostsMap.cbegin()}; it != mEdgeCostsMap.cend() && requiredEdgesCount > 0u; ++it)
         {
-            mMinTreeEdges.push_back(it->second);
-            --requiredEdgesCount;
+            bool edgeAdded{_addEdgeToTree(it->second)};
+
+            if (edgeAdded)
+            {
+                mMinTreeEdges.push_back(it->second);
+                --requiredEdgesCount;
+            }
         }
+    }
+    else
+    {
+        assert(false);
     }
 }
 
 void KruskalGraph::_buildMaxTreeFromGraph()
 {
-    assert(mNodesCount > 0u);
-
-    _buildEmptyComponents();
-
-    size_t requiredEdgesCount{mNodesCount - 1};
-
-    for (EdgeCostsMap::const_reverse_iterator it{mEdgeCostsMap.crbegin()}; it != mEdgeCostsMap.crend() && requiredEdgesCount > 0u; ++it)
+    if (mNodesCount > 0u)
     {
-        bool edgeAdded{_addEdgeToTree(it->second)};
+        _buildEmptyComponents();
 
-        if (edgeAdded)
+        size_t requiredEdgesCount{mNodesCount - 1};
+
+        for (EdgeCostsMap::const_reverse_iterator it{mEdgeCostsMap.crbegin()}; it != mEdgeCostsMap.crend() && requiredEdgesCount > 0u; ++it)
         {
-            mMaxTreeEdges.push_back(it->second);
-            --requiredEdgesCount;
+            bool edgeAdded{_addEdgeToTree(it->second)};
+
+            if (edgeAdded)
+            {
+                mMaxTreeEdges.push_back(it->second);
+                --requiredEdgesCount;
+            }
         }
+    }
+    else
+    {
+        assert(false);
     }
 }
 
@@ -102,18 +117,25 @@ void KruskalGraph::_buildMaxTreeFromGraph()
 */
 void KruskalGraph::_buildEmptyComponents()
 {
-    if (mComponents.size() > 0u || mComponentNumbers.size() > 0u)
+    if (mNodesCount > 0u)
     {
-        mComponents.clear();
-        mComponentNumbers.clear();
+        if (mComponents.size() > 0u || mComponentNumbers.size() > 0u)
+        {
+            mComponents.clear();
+            mComponentNumbers.clear();
+        }
+
+        mComponents.resize(mNodesCount);
+        mComponentNumbers.resize(mNodesCount);
+
+        for (Node currentNodeNumber{0u}; currentNodeNumber < mNodesCount; ++currentNodeNumber)
+        {
+            mComponentNumbers.at(currentNodeNumber) = scNullComponent;
+        }
     }
-
-    mComponents.resize(mNodesCount);
-    mComponentNumbers.resize(mNodesCount);
-
-    for (Node currentNodeNumber{0u}; currentNodeNumber < mNodesCount; ++currentNodeNumber)
+    else
     {
-        mComponentNumbers.at(currentNodeNumber) = scNullComponent;
+        assert(false);
     }
 }
 
@@ -138,9 +160,6 @@ void KruskalGraph::_reset()
 */
 bool KruskalGraph::_addEdgeToTree(const Edge& edge)
 {
-    // to keep consistency only edges with higher numbered right node are considered
-    assert(edge.first < edge.second);
-
     bool success{false};
 
     if (mComponentNumbers[edge.first] != mComponentNumbers[edge.second])
