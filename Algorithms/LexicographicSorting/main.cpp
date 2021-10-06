@@ -7,8 +7,8 @@
 
 using namespace std;
 
-const std::string c_InFile{"/tmp/matrixinput.txt"};
-const std::string c_OutFile{"/tmp/matrixoutput.txt"};
+const std::string c_InFile{"/tmp/lexicographicinput.txt"};  // check CPPExercises/InputFileExamples directory
+const std::string c_OutFile{"/tmp/lexicographicoutput.txt"};
 
 void logLexicographicalSortOutput(ofstream& outStream, const Matrix<double>& sortedMatrix, const Matrix<int>& originalRowNumbersMatrix);
 
