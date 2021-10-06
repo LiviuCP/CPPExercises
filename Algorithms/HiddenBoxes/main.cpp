@@ -15,7 +15,7 @@
 
 using namespace std;
 
-const std::string c_InFile{"/tmp/boxesinput.txt"};
+const std::string c_InFile{"/tmp/boxesinput.txt"};  // check CPPExercises/InputFileExamples directory
 const std::string c_OutFile{"/tmp/boxesoutput.txt"};
 
 void logFittingBoxesToFile(ofstream& outStream, const Matrix<int>& fittingBoxIndexes, const Matrix<int>& originalIndexes);
