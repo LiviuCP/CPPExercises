@@ -19,7 +19,7 @@
 
 using namespace std;
 
-const std::string c_InFile{"/tmp/countriesinput.txt"};
+const std::string c_InFile{"/tmp/countriesinput.txt"}; // check CPPExercises/InputFileExamples directory
 const std::string c_OutFile{"/tmp/countriesoutput.txt"};
 
 void printCountryColoursToFile(ofstream& output, const Matrix<int>& countryColours, const Matrix<bool>& uniqueColours);
