@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp \
+    factorypatternmain.cpp \
     server.cpp \
     servertypes.cpp
 

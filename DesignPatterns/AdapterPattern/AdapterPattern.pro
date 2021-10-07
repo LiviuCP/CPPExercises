@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp \
+    adapterpatternmain.cpp \
     hdmidisplay.cpp \
     hdmicard.cpp \
     vgadisplay.cpp \

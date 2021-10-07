@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp \
+    clientmain.cpp \
     client.cpp
 
 HEADERS += \

@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp \
+    concurrentclientsmain.cpp \
     ../Client/client.cpp
 
 HEADERS += \

@@ -8,8 +8,9 @@ INCLUDEPATH += ../../Shared
 INCLUDEPATH += ../LexicographicSorting
 
 SOURCES += \
-        main.cpp \
+    hiddenboxesmain.cpp \
     boxutils.cpp
+
 
 HEADERS += \
     boxutils.h

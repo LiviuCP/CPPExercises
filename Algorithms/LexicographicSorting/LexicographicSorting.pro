@@ -8,8 +8,8 @@ INCLUDEPATH += ../../Shared
 
 
 SOURCES += \
-        main.cpp \
-        lexicographicalsorter.cpp \
+    lexicographicsortingmain.cpp \
+    lexicographicalsorter.cpp
 
 HEADERS += \
     lexicographicalsorter.h

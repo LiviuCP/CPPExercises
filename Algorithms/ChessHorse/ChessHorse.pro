@@ -7,8 +7,8 @@ INCLUDEPATH += ../../External/Matrix/MatrixLib/Matrix
 INCLUDEPATH += ../../Shared
 
 SOURCES += \
-        main.cpp \
-        chesstable.cpp
+    chesshorsemain.cpp \
+    chesstable.cpp
 
 HEADERS += \
     chesstable.h

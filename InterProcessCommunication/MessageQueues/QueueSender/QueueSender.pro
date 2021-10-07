@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        main.cpp \
+    queuesendermain.cpp \
     queuesender.cpp  \
     ../QueueUtils/queuedataobjects.cpp \
     ../QueueUtils/queuedatamessages.cpp
