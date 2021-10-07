@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "utils.h"
+
 using namespace std;
 
 /* This small program shows the difference between early and late binding. */
@@ -40,6 +42,8 @@ public:
 
 int main()
 {
+    Utilities::clearScreen();
+
     Derived derived;
 
     /* foo1() is declared virtual in Base class so a late binding is performed at runtime when invoking it from bar1() even if bar1() belongs to Base and is not declared virtual.

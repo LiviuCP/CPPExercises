@@ -6,6 +6,7 @@
 
 #include "queuereceiver.h"
 #include "../QueueUtils/queuedataobjects.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -15,6 +16,8 @@ const string c_QueueFilename{"/tmp/messagequeue"};
 
 int main()
 {
+    Utilities::clearScreen();
+
     int intBuffer;
     double doubleBuffer;
     MeteoData meteoDataBuffer;

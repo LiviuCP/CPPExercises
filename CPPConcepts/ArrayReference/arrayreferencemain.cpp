@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "utils.h"
+
 using namespace std;
 
 constexpr size_t c_ArraySize{10};
@@ -10,6 +12,8 @@ void displayArrayInformation(const int (&array)[c_ArraySize]);
 int main()
 {
     int testArray[c_ArraySize]{2, -5, 4, 2, 3, 4, 8, 0, -1, 2};
+
+    Utilities::clearScreen();
 
     displayArrayInformation(testArray);
     incrementArrayElements(testArray);

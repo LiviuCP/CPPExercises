@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include "../Client/client.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -12,6 +13,8 @@ void executeOperation(Client& client, size_t valuesCount);
 
 int main(int argc, char* argv[])
 {
+    Utilities::clearScreen();
+
     const string c_IpAddress{argc == 1 ? c_InternalLoopbackAddress : argv[1]};
 
     cout << "*** Creating clients and launching them into execution ***" << endl;

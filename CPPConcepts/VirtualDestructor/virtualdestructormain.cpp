@@ -10,11 +10,14 @@
 
 #include "nonvirtualdestructor.h"
 #include "virtualdestructor.h"
+#include "utils.h"
 
 using namespace std;
 
 int main()
 {
+    Utilities::clearScreen();
+
     cout << "Case 1a: base pointer to derived class, no virtual destructor" << endl;
     BaseNonVirtual* baseNonVirtual{new DerivedNonVirtual};
     delete baseNonVirtual; // only destructor of BaseNonVirtual is called (no virtual keyword in destructor)

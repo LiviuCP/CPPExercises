@@ -3,6 +3,7 @@
 #include <thread>
 
 #include "semaphore.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -10,6 +11,8 @@ void useResource(const string& threadName, int milliseconds, Semaphore& semaphor
 
 int main(int argc, char** argv)
 {
+    Utilities::clearScreen();
+
     const int c_ConcurrencyFactor{argc == 1 ? 0 : atoi(argv[1])}; // number of concurrent threads allowed by semaphore
     Semaphore semaphore{c_ConcurrencyFactor};
 

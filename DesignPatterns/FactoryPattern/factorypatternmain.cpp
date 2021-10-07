@@ -3,11 +3,14 @@
 #include <iostream>
 
 #include "server.h"
+#include "utils.h"
 
 using namespace std;
 
 int main()
 {
+    Utilities::clearScreen();
+
     cout << "Let's create three server objects" << endl;
     Server* webServer{Server::createServer(Server::ServerTypes::WEB)};
     Server* mailServer{Server::createServer(Server::ServerTypes::MAIL)};

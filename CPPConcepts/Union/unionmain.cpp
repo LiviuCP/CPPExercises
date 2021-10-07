@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstring>
 
+#include "utils.h"
+
 using namespace std;
 
 static constexpr size_t c_MaskSize{32};
@@ -28,6 +30,8 @@ int main()
 {
     Primitives src, dest;
     Endian endian;
+
+    Utilities::clearScreen();
 
     cout << "Created union. We will test some stuff by using it." << endl << endl;
     cout << "First, let's retrieve the byte sizes of some primitive variable types" << endl;

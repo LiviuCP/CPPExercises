@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include "client.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -12,6 +13,8 @@ void displayRetrievedData(const Client& client);
 
 int main(int argc, char* argv[])
 {
+    Utilities::clearScreen();
+
     const string c_IpAddress{argc == 1 ? c_InternalLoopbackAddress : argv[1]};
 
     Client client{1024, 9010, c_IpAddress, "C1"};

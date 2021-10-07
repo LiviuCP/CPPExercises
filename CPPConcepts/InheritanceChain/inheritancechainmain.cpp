@@ -8,11 +8,14 @@
 #include <iostream>
 
 #include "inheritancechain.h"
+#include "utils.h"
 
 using namespace std;
 
 int main()
 {
+    Utilities::clearScreen();
+
     cout << "OBJECT CREATION" << endl;
     cout << endl << "1) Parent object" << endl;
     Parent parent;
@@ -21,6 +24,7 @@ int main()
     cout << endl << "3) Grandchild object" << endl;
     GrandChild grandChild;
     cout << endl << "OBJECT DESTRUCTION" << endl << endl;
+
     return 0;
 }
 

@@ -17,11 +17,14 @@
 #include "hdmidisplay.h"
 #include "vgadisplay.h"
 #include "vgaadapter.h"
+#include "utils.h"
 
 using namespace std;
 
 int main()
 {
+    Utilities::clearScreen();
+
     cout << "We bought a new HDMI card" << endl;
     HDMICard card;
     card.controlDisplay();

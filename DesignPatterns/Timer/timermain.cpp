@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "timer.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -41,6 +42,8 @@ private:
 
 int main()
 {
+    Utilities::clearScreen();
+
     SimpleObserver simpleObserver;
     ComplexObserver complexObserver;
 

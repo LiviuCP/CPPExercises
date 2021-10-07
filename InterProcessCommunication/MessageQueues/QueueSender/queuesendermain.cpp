@@ -5,6 +5,7 @@
 
 #include "queuesender.h"
 #include "../QueueUtils/queuedataobjects.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -14,6 +15,8 @@ const string c_QueueFilename{"/tmp/messagequeue"};
 
 int main()
 {
+    Utilities::clearScreen();
+
     int firstInt{5}, secondInt{4};
     double firstDouble{5.24}, secondDouble{-2.45};
     MeteoData firstMeteoData{-5, 22.4, 56.2f}, secondMeteoData{23, 2.2, 0.0f};
