@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "chesstable.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -15,6 +16,8 @@ int main()
     int tableWidth{-1};
     int startPositionX{-1};
     int startPositionY{-1};
+
+    Utilities::clearScreen();
 
     cout << "Enter the chess table dimensions:" << endl;
     retrieveInput(tableLength, "Length = ");

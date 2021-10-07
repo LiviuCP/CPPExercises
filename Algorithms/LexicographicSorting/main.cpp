@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "lexicographicalsorter.h"
+#include "utils.h"
 #include "matrixutils.h"
 
 using namespace std;
@@ -17,6 +18,8 @@ int main()
     Matrix<double> matrix;
     Matrix<int> originalRowNumbers;
     std::ifstream in{c_InFile};
+
+    Utilities::clearScreen();
 
     if (in.is_open())
     {

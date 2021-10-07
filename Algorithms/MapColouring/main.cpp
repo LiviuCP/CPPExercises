@@ -14,6 +14,7 @@
 #include <iostream>
 
 #include "matrix.h"
+#include "utils.h"
 #include "matrixutils.h"
 #include "mapcolouringutils.h"
 
@@ -28,6 +29,8 @@ int main()
 {
     ifstream in{c_InFile};
     ofstream out{c_OutFile};
+
+    Utilities::clearScreen();
 
     if(in.is_open() && out.is_open())
     {

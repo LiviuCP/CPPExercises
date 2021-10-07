@@ -10,6 +10,7 @@
 #include <string>
 
 #include "lexicographicalsorter.h"
+#include "utils.h"
 #include "matrixutils.h"
 #include "boxutils.h"
 
@@ -24,6 +25,8 @@ int main()
 {
     ifstream in{c_InFile};
     ofstream out{c_OutFile};
+
+    Utilities::clearScreen();
 
     if(in.is_open() && out.is_open())
     {

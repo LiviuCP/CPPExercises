@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 INCLUDEPATH += ../../External/Matrix/MatrixLib/Matrix
+INCLUDEPATH += ../../Shared
 
 SOURCES += \
         main.cpp \
