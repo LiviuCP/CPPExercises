@@ -115,7 +115,7 @@ void HuffmanEncoder::_buildTree()
     if (c_CharsCount >= scMinRequiredCharsCount && nullptr == mpRoot)
     {
         // resulting nodes count after connecting first 2 leaf nodes to a non-leaf (binding) node and then each other leaf to the previously obtained binding node
-        const size_t c_RequiredNodesCount{2 * c_CharsCount - 2};
+        const size_t c_RequiredNodesCount{2 * c_CharsCount - 1};
 
         mTreeContainer.resize(c_RequiredNodesCount);
         Node* pCurrentNode{&(*mTreeContainer.begin())}; // use pointers to bind the nodes with each other for building the binary tree

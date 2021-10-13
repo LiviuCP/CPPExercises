@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include "huffmanencoder.h"
 #include "matrixutils.h"
