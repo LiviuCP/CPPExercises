@@ -6,4 +6,5 @@ SUBDIRS += \
     LexicographicSorting \
     ChessHorse \
     MapColouring \
-    KruskalTree
+    KruskalTree \
+    HuffmanEncoding
