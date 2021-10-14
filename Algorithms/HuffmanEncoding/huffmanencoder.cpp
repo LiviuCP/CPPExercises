@@ -226,7 +226,7 @@ void HuffmanEncoder::_computeEncodingEfficiency()
         {
             const ssize_t c_CurrentCharacterOccurrencesCount{it->first};
             const char c_CurrentCharacter{it->second};
-            totalBitsCountPrefixCoding += (c_CurrentCharacterOccurrencesCount) * mEncodingResult[c_CurrentCharacter].size();
+            totalBitsCountPrefixCoding += c_CurrentCharacterOccurrencesCount * static_cast<ssize_t>(mEncodingResult[c_CurrentCharacter].size());
             totalOccurrencesCount += c_CurrentCharacterOccurrencesCount;
         }
 
