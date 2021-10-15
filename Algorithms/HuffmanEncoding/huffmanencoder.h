@@ -55,7 +55,7 @@ private:
     static constexpr char scNullCharacter{'\0'};
     static constexpr ssize_t scMinRequiredCharsCount{2};
 
-    CharOccurrenceMap mHuffmanOccurrenceMap;
+    CharOccurrenceMap mOccurrenceMap;
 
     Node* mpRoot;
     TreeContainer mTreeContainer;

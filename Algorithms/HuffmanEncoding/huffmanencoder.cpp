@@ -87,7 +87,7 @@ bool HuffmanEncoder::_buildOccurrenceMap(const EncodingInput& encodingInput)
 
     if (isDataValid)
     {
-        mHuffmanOccurrenceMap = std::move(huffmanOccurrenceMap);
+        mOccurrenceMap = std::move(huffmanOccurrenceMap);
     }
 
     return isDataValid;
@@ -109,7 +109,7 @@ bool HuffmanEncoder::_buildOccurrenceMap(const EncodingInput& encodingInput)
 */
 void HuffmanEncoder::_buildTree()
 {
-    size_t c_CharsCount{mHuffmanOccurrenceMap.size()};
+    size_t c_CharsCount{mOccurrenceMap.size()};
 
     // There should be at least 2 characters to encode and the tree should be initially empty (reset method to be called before executing this method)
     if (c_CharsCount >= scMinRequiredCharsCount)
@@ -123,10 +123,10 @@ void HuffmanEncoder::_buildTree()
         mTreeContainer.resize(c_RequiredNodesCount);
 
         TreeContainer::iterator treeContainerIt{mTreeContainer.begin()};
-        CharOccurrenceMap::const_iterator occurrenceMapIt{mHuffmanOccurrenceMap.cbegin()};
+        CharOccurrenceMap::const_iterator occurrenceMapIt{mOccurrenceMap.cbegin()};
 
         // set first node as initial root
-        if (treeContainerIt != mTreeContainer.end() && occurrenceMapIt != mHuffmanOccurrenceMap.cend())
+        if (treeContainerIt != mTreeContainer.end() && occurrenceMapIt != mOccurrenceMap.cend())
         {
             mpRoot = &(*treeContainerIt);
             mpRoot->mCharacter = occurrenceMapIt->second;
@@ -137,7 +137,7 @@ void HuffmanEncoder::_buildTree()
         }
 
         // connect all other nodes in increasing occurrence order and move the root upwards (in order to obtain a smaller code size for higher character occurrence)
-        while (occurrenceMapIt != mHuffmanOccurrenceMap.cend() && treeContainerIt != mTreeContainer.end())
+        while (occurrenceMapIt != mOccurrenceMap.cend() && treeContainerIt != mTreeContainer.end())
         {
             Node* const pNewNode{&(*treeContainerIt)};
             pNewNode->mCharacter = occurrenceMapIt->second;
@@ -167,7 +167,7 @@ void HuffmanEncoder::_buildTree()
         }
 
         // defensive programming: all elements from both containers should get consumed
-        assert(occurrenceMapIt == mHuffmanOccurrenceMap.cend() && treeContainerIt == mTreeContainer.end());
+        assert(occurrenceMapIt == mOccurrenceMap.cend() && treeContainerIt == mTreeContainer.end());
     }
 }
 
@@ -237,7 +237,7 @@ void HuffmanEncoder::_computeEncodingEfficiency()
         ssize_t totalBitsCountPrefixCoding{0u};
         ssize_t totalOccurrencesCount{0u};
 
-        for (CharOccurrenceMap::const_iterator it{mHuffmanOccurrenceMap.cbegin()}; it != mHuffmanOccurrenceMap.cend(); ++it)
+        for (CharOccurrenceMap::const_iterator it{mOccurrenceMap.cbegin()}; it != mOccurrenceMap.cend(); ++it)
         {
             const ssize_t c_CurrentCharacterOccurrencesCount{it->first};
             const char c_CurrentCharacter{it->second};
@@ -261,7 +261,7 @@ void HuffmanEncoder::_reset()
 
     mpRoot = nullptr;
 
-    mHuffmanOccurrenceMap.clear();
+    mOccurrenceMap.clear();
     mTreeContainer.clear();
     mEncodingResult.clear();
 
