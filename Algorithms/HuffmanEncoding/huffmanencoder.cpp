@@ -112,47 +112,62 @@ void HuffmanEncoder::_buildTree()
     size_t c_CharsCount{mHuffmanOccurrenceMap.size()};
 
     // There should be at least 2 characters to encode and the tree should be initially empty (reset method to be called before executing this method)
-    if (c_CharsCount >= scMinRequiredCharsCount && nullptr == mpRoot)
+    if (c_CharsCount >= scMinRequiredCharsCount)
     {
+        // ensure the tree has been previously reset to ensure a valid result
+        assert (nullptr == mpRoot && 0u == mTreeContainer.size());
+
         // resulting nodes count after connecting first 2 leaf nodes to a non-leaf (binding) node and then each other leaf to the previously obtained binding node
         const size_t c_RequiredNodesCount{2 * c_CharsCount - 1};
 
         mTreeContainer.resize(c_RequiredNodesCount);
-        Node* pCurrentNode{&(*mTreeContainer.begin())}; // use pointers to bind the nodes with each other for building the binary tree
+
+        TreeContainer::iterator treeContainerIt{mTreeContainer.begin()};
+        CharOccurrenceMap::const_iterator occurrenceMapIt{mHuffmanOccurrenceMap.cbegin()};
 
         // set first node as initial root
-        CharOccurrenceMap::const_iterator occurrenceMapBeginIter{mHuffmanOccurrenceMap.cbegin()};
-        mpRoot = pCurrentNode;
-        mpRoot->mCharacter = occurrenceMapBeginIter->second;
-        mpRoot->mOccurrence = occurrenceMapBeginIter->first;
+        if (treeContainerIt != mTreeContainer.end() && occurrenceMapIt != mHuffmanOccurrenceMap.cend())
+        {
+            mpRoot = &(*treeContainerIt);
+            mpRoot->mCharacter = occurrenceMapIt->second;
+            mpRoot->mOccurrence = occurrenceMapIt->first;
 
-        ++pCurrentNode;
+            ++treeContainerIt;
+            ++occurrenceMapIt;
+        }
 
         // connect all other nodes in increasing occurrence order and move the root upwards (in order to obtain a smaller code size for higher character occurrence)
-        for (CharOccurrenceMap::const_iterator it{++occurrenceMapBeginIter}; it != mHuffmanOccurrenceMap.cend(); ++it)
+        while (occurrenceMapIt != mHuffmanOccurrenceMap.cend() && treeContainerIt != mTreeContainer.end())
         {
-            Node* pNewNode = pCurrentNode;
-            pNewNode->mCharacter = it->second;
-            pNewNode->mOccurrence = it->first;
-            ++pCurrentNode;
+            Node* const pNewNode{&(*treeContainerIt)};
+            pNewNode->mCharacter = occurrenceMapIt->second;
+            pNewNode->mOccurrence = occurrenceMapIt->first;
+            ++treeContainerIt;
 
-            Node* pNewRoot = pCurrentNode;
-            pNewRoot->mOccurrence = mpRoot->mOccurrence + pNewNode->mOccurrence;
-            ++pCurrentNode;
-
-            if (pNewNode->mOccurrence >= mpRoot->mOccurrence)
+            if (treeContainerIt != mTreeContainer.end())
             {
-                pNewRoot->mpLeftChild = mpRoot;
-                pNewRoot->mpRightChild = pNewNode;
-            }
-            else
-            {
-                pNewRoot->mpLeftChild = pNewNode;
-                pNewRoot->mpRightChild = mpRoot;
-            }
+                Node* const pNewRoot{&(*treeContainerIt)};
+                pNewRoot->mOccurrence = mpRoot->mOccurrence + pNewNode->mOccurrence;
 
-            mpRoot = pNewRoot;
+                if (pNewNode->mOccurrence >= mpRoot->mOccurrence)
+                {
+                    pNewRoot->mpLeftChild = mpRoot;
+                    pNewRoot->mpRightChild = pNewNode;
+                }
+                else
+                {
+                    pNewRoot->mpLeftChild = pNewNode;
+                    pNewRoot->mpRightChild = mpRoot;
+                }
+
+                mpRoot = pNewRoot;
+                ++treeContainerIt;
+                ++occurrenceMapIt;
+            }
         }
+
+        // defensive programming: all elements from both containers should get consumed
+        assert(occurrenceMapIt == mHuffmanOccurrenceMap.cend() && treeContainerIt == mTreeContainer.end());
     }
 }
 
