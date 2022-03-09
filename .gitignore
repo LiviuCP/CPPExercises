@@ -32,5 +32,6 @@
 *.app
 
 # Other
-*.pro.user
+*.user
 build-*
+*~*
