@@ -6,9 +6,14 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+find_package(QT NAMES Qt5 Qt6 COMPONENTS Test QUIET)
+
+if (QT_FOUND)
+    add_subdirectory(PartialTemplateSpecialization)
+endif()
+
 add_subdirectory(ArrayReference)
 add_subdirectory(EarlyAndLateBinding)
 add_subdirectory(InheritanceChain)
-add_subdirectory(PartialTemplateSpecialization)
 add_subdirectory(Union)
 add_subdirectory(VirtualDestructor)
