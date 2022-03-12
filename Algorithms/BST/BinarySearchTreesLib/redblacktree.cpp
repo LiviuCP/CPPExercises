@@ -90,7 +90,7 @@ void RedBlackTree::printTree() const
     for (std::vector<Node*>::const_iterator it{nodesArray.cbegin()}; it != nodesArray.cend(); ++it)
     {
         std::cout << "Node: " << (*it)->getKey();
-        std::cout << "/ Colour: " << (static_cast<RedBlackNode*>(*it)->isBlack() ? "B" : "R");
+        std::cout << " / Colour: " << (static_cast<RedBlackNode*>(*it)->isBlack() ? "B" : "R");
         std::cout << " / Is child: " << ((*it)->isLeftChild() ? "L" : (*it)->isRightChild() ? "R" : "N");
 
         _printNodeRelatives(*it);

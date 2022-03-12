@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_subdirectory(BinarySearchTrees)
+add_subdirectory(BinarySearchTreesApp)
+add_subdirectory(BinarySearchTreesLib)
 
 find_package(QT NAMES Qt5 Qt6 COMPONENTS Test QUIET)
 

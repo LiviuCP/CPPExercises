@@ -14,7 +14,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(../BinarySearchTrees)
+include_directories(../BinarySearchTreesLib)
 
 enable_testing()
 
@@ -31,13 +31,13 @@ add_executable(MixedTreeTypesTests tst_mixedtreetypestests.cpp testutils.cpp)
 add_test(NAME MixedTreeTypesTests COMMAND MixedTreeTypesTests)
 
 target_link_libraries(SimpleBSTTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
-target_link_libraries(SimpleBSTTests PRIVATE BinarySearchTrees)
+target_link_libraries(SimpleBSTTests PRIVATE BinarySearchTreesLib)
 
 target_link_libraries(RedBlackTreesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
-target_link_libraries(RedBlackTreesTests PRIVATE BinarySearchTrees)
+target_link_libraries(RedBlackTreesTests PRIVATE BinarySearchTreesLib)
 
 target_link_libraries(AVLTreesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
-target_link_libraries(AVLTreesTests PRIVATE BinarySearchTrees)
+target_link_libraries(AVLTreesTests PRIVATE BinarySearchTreesLib)
 
 target_link_libraries(MixedTreeTypesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
-target_link_libraries(MixedTreeTypesTests PRIVATE BinarySearchTrees)
+target_link_libraries(MixedTreeTypesTests PRIVATE BinarySearchTreesLib)

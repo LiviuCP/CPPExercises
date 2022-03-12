@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(BinarySearchTrees LANGUAGES CXX)
+project(BinarySearchTreesLib LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,4 +12,4 @@ add_library(${PROJECT_NAME} STATIC
     avltree.cpp
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE BINARYSEARCHTREES_LIBRARY)
+target_compile_definitions(${PROJECT_NAME} PRIVATE BINARYSEARCHTREESLIB_LIBRARY)
