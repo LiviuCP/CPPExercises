@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_subdirectory(MessageQueues)
-add_subdirectory(NetworkSockets)
+if(UNIX)
+    add_subdirectory(MessageQueues)
+    add_subdirectory(NetworkSockets)
+endif()
+
 add_subdirectory(Semaphore)
