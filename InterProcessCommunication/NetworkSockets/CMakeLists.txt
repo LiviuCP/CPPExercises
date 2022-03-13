@@ -7,27 +7,29 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(
+    Clients
+    Servers
     ../../Shared
 )
 
 add_executable(Client
-    clientmain.cpp
-    client.cpp
+    Clients/clientmain.cpp
+    Clients/client.cpp
 )
 
 add_executable(Server
-    servermain.cpp
-    server.cpp
+    Servers/servermain.cpp
+    Servers/server.cpp
 )
 
 add_executable(ConcurrentClients
-    concurrentclientsmain.cpp
-    client.cpp
+    Clients/concurrentclientsmain.cpp
+    Clients/client.cpp
 )
 
 add_executable(ConcurrentServer
-    concurrentservermain.cpp
-    server.cpp
+    Servers/concurrentservermain.cpp
+    Servers/server.cpp
 )
 
 if(UNIX AND NOT APPLE)
