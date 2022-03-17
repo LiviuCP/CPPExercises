@@ -10,4 +10,6 @@ include_directories(../../../Shared)
 include_directories(../BinarySearchTreesLib)
 
 add_executable(${PROJECT_NAME} binarysearchtreesappmain.cpp)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE BinarySearchTreesLib)
+target_link_libraries(${PROJECT_NAME} PRIVATE Shared)

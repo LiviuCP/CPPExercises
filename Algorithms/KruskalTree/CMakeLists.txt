@@ -15,3 +15,5 @@ add_executable(${PROJECT_NAME}
     kruskaltreemain.cpp
     kruskalgraph.cpp
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Shared)

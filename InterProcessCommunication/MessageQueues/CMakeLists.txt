@@ -23,3 +23,6 @@ add_executable(QueueReceiver
     queuedataobjects.cpp
     queuedatamessages.cpp
 )
+
+target_link_libraries(QueueSender PRIVATE Shared)
+target_link_libraries(QueueReceiver PRIVATE Shared)

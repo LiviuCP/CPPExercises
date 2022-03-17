@@ -15,6 +15,8 @@ add_executable(${PROJECT_NAME}
     timer.cpp
 )
 
+target_link_libraries(${PROJECT_NAME} PRIVATE Shared)
+
 if(UNIX AND NOT APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
 endif()

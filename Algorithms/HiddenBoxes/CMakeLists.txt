@@ -16,3 +16,5 @@ add_executable(${PROJECT_NAME}
     hiddenboxesmain.cpp
     boxutils.cpp
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Shared)

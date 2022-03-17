@@ -4,7 +4,6 @@
 
 #include "huffmanencoder.h"
 #include "matrixutils.h"
-#include "utils.h"
 
 using namespace std;
 

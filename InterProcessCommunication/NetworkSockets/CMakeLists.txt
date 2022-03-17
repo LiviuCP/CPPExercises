@@ -32,6 +32,11 @@ add_executable(ConcurrentServer
     Servers/server.cpp
 )
 
+target_link_libraries(Client PRIVATE Shared)
+target_link_libraries(Server PRIVATE Shared)
+target_link_libraries(ConcurrentClients PRIVATE Shared)
+target_link_libraries(ConcurrentServer PRIVATE Shared)
+
 if(UNIX AND NOT APPLE)
     target_link_libraries(Client PRIVATE pthread)
     target_link_libraries(Server PRIVATE pthread)

@@ -9,6 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(
     ../../Shared
 )
+
 add_executable(${PROJECT_NAME}
     adapterpatternmain.cpp
     hdmidisplay.cpp
@@ -16,3 +17,5 @@ add_executable(${PROJECT_NAME}
     vgadisplay.cpp
     vgaadapter.cpp
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Shared)

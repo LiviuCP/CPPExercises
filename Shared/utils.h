@@ -2,18 +2,14 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <cstdlib>
+//ssize_t is not properly implemented on Windows so it has to be manually defined
+#ifdef _WIN32
+using ssize_t = long long;
+#endif
 
 namespace Utilities
 {
-    void clearScreen()
-    {
-    #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-        system("clear"); // Linux & Mac
-    #else
-        system("cls"); // Windows
-    #endif
-    }
+    void clearScreen();
 }
 
 #endif // UTILS_H

@@ -9,8 +9,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(
     ../../Shared
 )
+
 add_executable(${PROJECT_NAME}
     factorypatternmain.cpp
     server.cpp
     servertypes.cpp
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Shared)
