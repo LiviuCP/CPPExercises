@@ -23,7 +23,7 @@ add_subdirectory(Shared)
 set(INPUT_OUTPUT_DIR /tmp/InputOutputFiles)
 
 if(WIN32)
-    set(INPUT_OUTPUT_DIR C:\InputOutputFiles)
+    set(INPUT_OUTPUT_DIR C:\\InputOutputFiles)
 endif()
 
 # copy_directory copies the content of the source dir (not the dir itself) so it should be ensured
