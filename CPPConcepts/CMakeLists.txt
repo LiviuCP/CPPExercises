@@ -8,7 +8,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(QT NAMES Qt5 Qt6 COMPONENTS Test QUIET)
 
-if (QT_FOUND)
+# excluded from Windows due to some MOC file issues
+if (QT_FOUND AND NOT WIN32)
     add_subdirectory(PartialTemplateSpecialization)
 endif()
 
