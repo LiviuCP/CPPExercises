@@ -13,8 +13,8 @@
 
 using namespace std;
 
-const string c_InFile{"/tmp/kruskalinput.txt"};  // check CPPExercises/InputFileExamples directory
-const string c_OutFile{"/tmp/kruskaloutput.txt"};
+static const string c_InFile{Utilities::c_InputOutputDir + "kruskalinput.txt"};
+static const string c_OutFile{Utilities::c_InputOutputDir + "kruskaloutput.txt"};
 
 void writeTreeToFile(ofstream& out, const KruskalGraph::GraphMatrix& graph, const KruskalGraph::Tree& tree);
 

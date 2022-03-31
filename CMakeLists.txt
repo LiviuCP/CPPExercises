@@ -19,3 +19,19 @@ add_subdirectory(CPPConcepts)
 add_subdirectory(DesignPatterns)
 add_subdirectory(InterProcessCommunication)
 add_subdirectory(Shared)
+
+set(INPUT_OUTPUT_DIR /tmp/InputOutputFiles)
+
+if(WIN32)
+    set(INPUT_OUTPUT_DIR C:\InputOutputFiles)
+endif()
+
+# copy_directory copies the content of the source dir (not the dir itself) so it should be ensured
+# a destination dir has previously been created in order to avoid polluting /tmp or C: with multiple IO files
+
+add_custom_target(${PROJECT_NAME} ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${INPUT_OUTPUT_DIR})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/InputFileExamples ${INPUT_OUTPUT_DIR})

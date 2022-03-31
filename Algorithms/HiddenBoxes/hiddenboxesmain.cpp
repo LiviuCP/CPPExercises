@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
 
 #include "lexicographicalsorter.h"
 #include "utils.h"
@@ -16,8 +15,8 @@
 
 using namespace std;
 
-const std::string c_InFile{"/tmp/boxesinput.txt"};  // check CPPExercises/InputFileExamples directory
-const std::string c_OutFile{"/tmp/boxesoutput.txt"};
+static const string c_InFile{Utilities::c_InputOutputDir + "boxesinput.txt"};
+static const string c_OutFile{Utilities::c_InputOutputDir + "boxesoutput.txt"};
 
 void logFittingBoxesToFile(ofstream& outStream, const Matrix<int>& fittingBoxIndexes, const Matrix<int>& originalIndexes);
 

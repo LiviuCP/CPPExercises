@@ -3,12 +3,13 @@
 #include <iomanip>
 
 #include "huffmanencoder.h"
+#include "utils.h"
 #include "matrixutils.h"
 
 using namespace std;
 
-const string c_InFile{"/tmp/huffmaninput.txt"};  // check CPPExercises/InputFileExamples directory
-const string c_OutFile{"/tmp/huffmanoutput.txt"};
+static const string c_InFile{Utilities::c_InputOutputDir + "huffmaninput.txt"};
+static const string c_OutFile{Utilities::c_InputOutputDir + "huffmanoutput.txt"};
 
 void writeToFile(ofstream& out, const EncodingOutput& encodingOutput, double efficiencyPercentage);
 
