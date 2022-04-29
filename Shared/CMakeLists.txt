@@ -9,6 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 add_library(${PROJECT_NAME} ${LIB_TYPE}
     shared.cpp
     utils.cpp
+    datautils.cpp
     matrixutils.cpp
 )
 

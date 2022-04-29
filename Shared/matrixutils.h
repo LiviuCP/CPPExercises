@@ -64,6 +64,7 @@ std::ifstream& operator>>(std::ifstream& in, Matrix<T>& data)
     return in;
 }
 
+// this operator needs to be included (by including "matrixutils.h") otherwise the boolean value of the matrix will get printed
 template<typename T>
 std::ofstream& operator<<(std::ofstream& out, const Matrix<T>& data)
 {

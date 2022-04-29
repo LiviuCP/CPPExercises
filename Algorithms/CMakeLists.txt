@@ -11,6 +11,7 @@ add_subdirectory(ChessHorse)
 add_subdirectory(HuffmanEncoding)
 add_subdirectory(KruskalTree)
 add_subdirectory(MapColouring)
+add_subdirectory(DataOrdering)
 
 # Some compiling errors occurred with these projects which were caused by the specific implementation of the std::sort algorithm
 # so it has been decided to exclude them from Windows
