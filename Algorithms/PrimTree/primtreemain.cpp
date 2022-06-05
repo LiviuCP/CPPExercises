@@ -1,4 +1,4 @@
-/* This is a small application that illustrates the "greedy" Kruskal algorithm for determining the minimum/maximum cost tree.
+/* This is a small application that illustrates the "greedy" Prim algorithm for determining the minimum/maximum cost tree.
    The purpose is to build a loop-free tree that connects all graph nodes: n graph nodes connected by n-1 edges.
    Input is the whole graph where every node might be connected to every other node by an edge that has a specific value (cost).
    The output is a list of edges that create the loop-free tree connecting all nodes at minimum cost.
@@ -7,16 +7,16 @@
 #include <iostream>
 #include <fstream>
 
-#include "kruskalgraph.h"
+#include "primgraph.h"
 #include "utils.h"
 #include "matrixutils.h"
 
 using namespace std;
 
 static const string c_InFile{Utilities::c_InputOutputDir + "kruskalpriminput.txt"};
-static const string c_OutFile{Utilities::c_InputOutputDir + "kruskaloutput.txt"};
+static const string c_OutFile{Utilities::c_InputOutputDir + "primoutput.txt"};
 
-void writeTreeToFile(ofstream& out, const KruskalGraph::GraphMatrix& graph, const KruskalGraph::Tree& tree);
+void writeTreeToFile(ofstream& out, const PrimGraph::GraphMatrix& graph, const PrimGraph::Tree& tree);
 
 int main()
 {
@@ -27,35 +27,35 @@ int main()
 
     if(in.is_open() && out.is_open())
     {
-        KruskalGraph::GraphMatrix graphMatrix;
+        PrimGraph::GraphMatrix graphMatrix;
         in >> graphMatrix;
 
         const size_t c_NodesCount{static_cast<size_t>(graphMatrix.getNrOfRows())};
 
         if (c_NodesCount > 0u)
         {
-            KruskalGraph kruskalGraph;
-            bool success{kruskalGraph.build(graphMatrix)};
+            PrimGraph primGraph;
+            bool success{primGraph.build(graphMatrix)};
 
             if (success)
             {
-                out << "The MINIMUM cost Kruskal tree edges are: " << endl << endl;
+                out << "The MINIMUM cost Prim tree edges are: " << endl << endl;
 
-                writeTreeToFile(out, graphMatrix, kruskalGraph.getMinTreeEdges());
+                writeTreeToFile(out, graphMatrix, primGraph.getMinTree());
 
                 out << "========================================" << endl << endl;
-                out << "The MAXIMUM cost Kruskal tree edges are: " << endl << endl;
+                out << "The MAXIMUM cost Prim tree edges are: " << endl << endl;
 
-                writeTreeToFile(out, graphMatrix, kruskalGraph.getMaxTreeEdges());
+                writeTreeToFile(out, graphMatrix, primGraph.getMaxTree());
 
                 // no need to check the count of the maximum tree (if any nodes are loose then both trees will be incomplete)
-                if (c_NodesCount - 1 == kruskalGraph.getMinTreeEdges().size())
+                if (c_NodesCount - 1 == primGraph.getMinTree().size())
                 {
-                    cout << "Kruskal minimum and maximum cost trees successfully written to: " << endl << endl << c_OutFile << endl << endl;
+                    cout << "Prim minimum and maximum cost trees successfully written to: " << endl << endl << c_OutFile << endl << endl;
                 }
                 else
                 {
-                    cout << "The Kruskal minimum and maximum cost trees have been incompletely built (insufficient edges provided)" << endl << endl;
+                    cout << "The Prim minimum and maximum cost trees have been incompletely built (insufficient edges provided)" << endl << endl;
                     cout << "Please check input file: " << endl << endl << c_InFile << endl << endl;
                 }
             }
@@ -77,18 +77,18 @@ int main()
     return 0;
 }
 
-void writeTreeToFile(ofstream& out, const KruskalGraph::GraphMatrix& graph, const KruskalGraph::Tree& tree)
+void writeTreeToFile(ofstream& out, const PrimGraph::GraphMatrix& graph, const PrimGraph::Tree& tree)
 {
     assert(out.is_open());
 
-    KruskalGraph::Cost totalCost{0};
+    PrimGraph::Cost totalCost{0};
 
     if (tree.size() > 0u)
     {
-        for (KruskalGraph::Tree::const_iterator it{tree.cbegin()}; it != tree.cend(); ++it)
+        for (PrimGraph::Tree::const_iterator it{tree.cbegin()}; it != tree.cend(); ++it)
         {
-            // it's safe to convert the indexes to int as long as the same matrix passed to the KruskalGraph is passed to the current function
-            KruskalGraph::Cost cost{graph.at(static_cast<int>(it->first), static_cast<int>(it->second))};
+            // it's safe to convert the indexes to int as long as the same matrix passed to the PrimGraph is passed to the current function
+            PrimGraph::Cost cost{graph.at(static_cast<int>(it->first), static_cast<int>(it->second))};
             totalCost += cost;
 
             out << "(" << (it->first + 1) << "," << (it->second + 1) << ") - cost: " << cost << endl;

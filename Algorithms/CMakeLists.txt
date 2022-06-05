@@ -10,6 +10,7 @@ add_subdirectory(BST)
 add_subdirectory(ChessHorse)
 add_subdirectory(HuffmanEncoding)
 add_subdirectory(KruskalTree)
+add_subdirectory(PrimTree)
 add_subdirectory(MapColouring)
 add_subdirectory(DataOrdering)
 
