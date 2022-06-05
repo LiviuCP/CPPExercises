@@ -11,7 +11,7 @@ bool KruskalGraph::build(const GraphMatrix& graphMatrix)
 
     _reset();
 
-    const int c_RowsCount{graphMatrix.getNrOfRows()};
+    const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
 
     if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
@@ -25,27 +25,27 @@ bool KruskalGraph::build(const GraphMatrix& graphMatrix)
     return success;
 }
 
-const KruskalGraph::Tree& KruskalGraph::getMinTreeEdges() const
+const KruskalGraph::Tree& KruskalGraph::getMinTree() const
 {
-    return mMinTreeEdges;
+    return mMinTree;
 }
 
-const KruskalGraph::Tree& KruskalGraph::getMaxTreeEdges() const
+const KruskalGraph::Tree& KruskalGraph::getMaxTree() const
 {
-    return mMaxTreeEdges;
+    return mMaxTree;
 }
 
-void KruskalGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
+void KruskalGraph::_buildGraph(const GraphMatrix& graphMatrix)
 {
-    const int c_RowsCount{edgeCostsMatrix.getNrOfRows()};
+    const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
 
-    if (c_RowsCount > 0 && c_RowsCount == edgeCostsMatrix.getNrOfColumns())
+    if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
         mNodesCount = static_cast<size_t>(c_RowsCount);
 
-        for (int row{0}; row < c_RowsCount - 1; ++row)
+        for (GraphMatrix::size_type row{0}; row < c_RowsCount - 1; ++row)
         {
-            for (Matrix<int>::ConstZIterator it{edgeCostsMatrix.getConstZIterator(row, row + 1)}; it != edgeCostsMatrix.constZRowEnd(row); ++it)
+            for (Matrix<int>::ConstZIterator it{graphMatrix.getConstZIterator(row, row + 1)}; it != graphMatrix.constZRowEnd(row); ++it)
             {
                 if (*it != 0)
                 {
@@ -76,7 +76,7 @@ void KruskalGraph::_buildMinTreeFromGraph()
 
             if (edgeAdded)
             {
-                mMinTreeEdges.push_back(it->second);
+                mMinTree.push_back(it->second);
                 --requiredEdgesCount;
             }
         }
@@ -101,7 +101,7 @@ void KruskalGraph::_buildMaxTreeFromGraph()
 
             if (edgeAdded)
             {
-                mMaxTreeEdges.push_back(it->second);
+                mMaxTree.push_back(it->second);
                 --requiredEdgesCount;
             }
         }
@@ -141,12 +141,12 @@ void KruskalGraph::_buildEmptyComponents()
 
 void KruskalGraph::_reset()
 {
-    mNodesCount = 0;
+    mNodesCount = 0u;
     mEdgeCostsMap.clear();
     mComponents.clear();
     mComponentNumbers.clear();
-    mMinTreeEdges.clear();
-    mMaxTreeEdges.clear();
+    mMinTree.clear();
+    mMaxTree.clear();
 }
 
 /* Add the nodes to components and merge the components together until only one component remains which contains all nodes.

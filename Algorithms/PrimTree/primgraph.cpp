@@ -35,14 +35,14 @@ const PrimGraph::Tree& PrimGraph::getMaxTree() const
     return mMaxTree;
 }
 
-void PrimGraph::_buildGraph(const Matrix<int>& edgeCostsMatrix)
+void PrimGraph::_buildGraph(const GraphMatrix& graphMatrix)
 {
-    const int c_RowsCount{edgeCostsMatrix.getNrOfRows()};
+    const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
 
-    if (c_RowsCount > 0 && c_RowsCount == edgeCostsMatrix.getNrOfColumns())
+    if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
         mNodesCount = static_cast<size_t>(c_RowsCount);
-        mGraphMatrix = edgeCostsMatrix;
+        mGraphMatrix = graphMatrix;
     }
     else
     {

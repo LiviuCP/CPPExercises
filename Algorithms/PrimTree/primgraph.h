@@ -37,7 +37,7 @@ private:
 
     using NodeInfoMap = std::vector<NodeInfo>;
 
-    void _buildGraph(const Matrix<int>& edgeCostsMatrix);
+    void _buildGraph(const GraphMatrix& graphMatrix);
     void _buildTreeFromGraph(bool isMinTree);
     void _doBuildTree(const NodeInfoMap& nodeInfoMap, bool isMinTree);
     void _updateNeighborCosts(Node node, NodeInfoMap& nodeInfoMap, bool (*isNewCostBetter)(Cost newCost, Cost oldCost));

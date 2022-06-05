@@ -41,15 +41,15 @@ int main()
             {
                 out << "The MINIMUM cost Kruskal tree edges are: " << endl << endl;
 
-                writeTreeToFile(out, graphMatrix, kruskalGraph.getMinTreeEdges());
+                writeTreeToFile(out, graphMatrix, kruskalGraph.getMinTree());
 
                 out << "========================================" << endl << endl;
                 out << "The MAXIMUM cost Kruskal tree edges are: " << endl << endl;
 
-                writeTreeToFile(out, graphMatrix, kruskalGraph.getMaxTreeEdges());
+                writeTreeToFile(out, graphMatrix, kruskalGraph.getMaxTree());
 
                 // no need to check the count of the maximum tree (if any nodes are loose then both trees will be incomplete)
-                if (c_NodesCount - 1 == kruskalGraph.getMinTreeEdges().size())
+                if (c_NodesCount - 1 == kruskalGraph.getMinTree().size())
                 {
                     cout << "Kruskal minimum and maximum cost trees successfully written to: " << endl << endl << c_OutFile << endl << endl;
                 }

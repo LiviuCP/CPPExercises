@@ -5,6 +5,7 @@
 #include <utility>
 #include <map>
 #include <list>
+#include <limits>
 
 #include "matrix.h"
 
@@ -21,14 +22,14 @@ public:
 
     bool build(const GraphMatrix& graphMatrix);
 
-    const Tree& getMinTreeEdges() const;
-    const Tree& getMaxTreeEdges() const;
+    const Tree& getMinTree() const;
+    const Tree& getMaxTree() const;
 
 private:
     using Component = std::list<Node>;
     using EdgeCostsMap = std::multimap<Cost, Edge>;
 
-    void _buildGraph(const Matrix<int>& edgeCostsMatrix);
+    void _buildGraph(const GraphMatrix& graphMatrix);
     void _buildMinTreeFromGraph();
     void _buildMaxTreeFromGraph();
     void _buildEmptyComponents();
@@ -39,14 +40,14 @@ private:
     void _bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode);
     void _mergeComponents(Node enclosingComponentNode, Node mergedComponentNode);
 
-    static constexpr size_t scNullComponent{-1u};
+    static constexpr size_t scNullComponent{std::numeric_limits<size_t>::max()};
 
     size_t mNodesCount;
     EdgeCostsMap mEdgeCostsMap;
     std::vector<Component> mComponents;
     std::vector<size_t> mComponentNumbers;
-    Tree mMinTreeEdges;
-    Tree mMaxTreeEdges;
+    Tree mMinTree;
+    Tree mMaxTree;
 };
 
 #endif // KRUSKALGRAPH_H
