@@ -1,11 +1,11 @@
-#include "primgraph.h"
+#include "prim.h"
 
-PrimGraph::PrimGraph()
-    : mNodesCount{0u}
+PrimEngine::PrimEngine()
+    : BaseEngine{"Prim"}
 {
 }
 
-bool PrimGraph::build(const GraphMatrix& graphMatrix)
+bool PrimEngine::buildTrees(const GraphMatrix& graphMatrix)
 {
     bool success{false};
 
@@ -25,17 +25,7 @@ bool PrimGraph::build(const GraphMatrix& graphMatrix)
     return success;
 }
 
-const PrimGraph::Tree& PrimGraph::getMinTree() const
-{
-    return mMinTree;
-}
-
-const PrimGraph::Tree& PrimGraph::getMaxTree() const
-{
-    return mMaxTree;
-}
-
-void PrimGraph::_buildGraph(const GraphMatrix& graphMatrix)
+void PrimEngine::_buildGraph(const GraphMatrix& graphMatrix)
 {
     const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
 
@@ -50,7 +40,7 @@ void PrimGraph::_buildGraph(const GraphMatrix& graphMatrix)
     }
 }
 
-void PrimGraph::_buildTreeFromGraph(bool isMinTree)
+void PrimEngine::_buildTreeFromGraph(bool isMinTree)
 {
     NodeInfoMap nodeInfoMap;
 
@@ -98,7 +88,7 @@ void PrimGraph::_buildTreeFromGraph(bool isMinTree)
     }
 }
 
-void PrimGraph::_doBuildTree(const NodeInfoMap& nodeInfoMap, bool isMinTree)
+void PrimEngine::_doBuildTree(const NodeInfoMap& nodeInfoMap, bool isMinTree)
 {
     Tree& tree{isMinTree ? mMinTree : mMaxTree};
 
@@ -110,12 +100,18 @@ void PrimGraph::_doBuildTree(const NodeInfoMap& nodeInfoMap, bool isMinTree)
     {
         for (Node node{1u}; node < c_NodesCount; ++node)
         {
-            tree.push_back(Edge{nodeInfoMap.at(node).mPrecedingNode, node});
+            const Node currentPrecedingNode{nodeInfoMap.at(node).mPrecedingNode};
+
+            // handle incomplete tree scenario (graph is broken into separate parts) and only take nodes with concrete predecessor into account
+            if (currentPrecedingNode < mNodesCount)
+            {
+                tree.push_back(Edge{currentPrecedingNode, node});
+            }
         }
     }
 }
 
-void PrimGraph::_updateNeighborCosts(PrimGraph::Node node, NodeInfoMap& nodeInfoMap, bool (*isNewCostBetter)(Cost newCost, Cost oldCost))
+void PrimEngine::_updateNeighborCosts(Node node, NodeInfoMap& nodeInfoMap, bool (*isNewCostBetter)(Cost newCost, Cost oldCost))
 {
     for (GraphMatrix::ConstZIterator it{mGraphMatrix.constZRowBegin(node)}; it != mGraphMatrix.constZRowEnd(node); ++it)
     {
@@ -132,15 +128,13 @@ void PrimGraph::_updateNeighborCosts(PrimGraph::Node node, NodeInfoMap& nodeInfo
     }
 }
 
-void PrimGraph::_reset()
+void PrimEngine::_reset()
 {
-    mNodesCount = 0u;
-    mMinTree.clear();
-    mMaxTree.clear();
+    BaseEngine::_reset();
     mGraphMatrix.clear();
 }
 
-PrimGraph::NodeInfo::NodeInfo(PrimGraph::Cost cost)
+PrimEngine::NodeInfo::NodeInfo(Cost cost)
     : mNodeCost{cost}
     , mPrecedingNode{scNullNode}
     , mIsAddedToTree{false}

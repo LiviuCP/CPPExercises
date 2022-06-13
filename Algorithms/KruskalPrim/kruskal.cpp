@@ -1,11 +1,11 @@
-#include "kruskalgraph.h"
+#include "kruskal.h"
 
-KruskalGraph::KruskalGraph()
-    : mNodesCount{0u}
+KruskalEngine::KruskalEngine()
+    : BaseEngine{"Kruskal"}
 {
 }
 
-bool KruskalGraph::build(const GraphMatrix& graphMatrix)
+bool KruskalEngine::buildTrees(const GraphMatrix& graphMatrix)
 {
     bool success{false};
 
@@ -25,17 +25,7 @@ bool KruskalGraph::build(const GraphMatrix& graphMatrix)
     return success;
 }
 
-const KruskalGraph::Tree& KruskalGraph::getMinTree() const
-{
-    return mMinTree;
-}
-
-const KruskalGraph::Tree& KruskalGraph::getMaxTree() const
-{
-    return mMaxTree;
-}
-
-void KruskalGraph::_buildGraph(const GraphMatrix& graphMatrix)
+void KruskalEngine::_buildGraph(const GraphMatrix& graphMatrix)
 {
     const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
 
@@ -62,7 +52,7 @@ void KruskalGraph::_buildGraph(const GraphMatrix& graphMatrix)
 
 /* Edges should be appended in increasing cost size order to ensure a minimum total cost.
 */
-void KruskalGraph::_buildMinTreeFromGraph()
+void KruskalEngine::_buildMinTreeFromGraph()
 {
     if (mNodesCount > 0u)
     {
@@ -87,7 +77,7 @@ void KruskalGraph::_buildMinTreeFromGraph()
     }
 }
 
-void KruskalGraph::_buildMaxTreeFromGraph()
+void KruskalEngine::_buildMaxTreeFromGraph()
 {
     if (mNodesCount > 0u)
     {
@@ -115,7 +105,7 @@ void KruskalGraph::_buildMaxTreeFromGraph()
 /* Empty components (one per node) are created. However initially no node "belongs" to its component but instead is considered standalone ("orphan")
    Nodes would then be progressively added to components and these ones are merged until finally a single component representing the Kruskal tree remains.
 */
-void KruskalGraph::_buildEmptyComponents()
+void KruskalEngine::_buildEmptyComponents()
 {
     if (mNodesCount > 0u)
     {
@@ -139,14 +129,13 @@ void KruskalGraph::_buildEmptyComponents()
     }
 }
 
-void KruskalGraph::_reset()
+void KruskalEngine::_reset()
 {
-    mNodesCount = 0u;
+    BaseEngine::_reset();
+
     mEdgeCostsMap.clear();
     mComponents.clear();
     mComponentNumbers.clear();
-    mMinTree.clear();
-    mMaxTree.clear();
 }
 
 /* Add the nodes to components and merge the components together until only one component remains which contains all nodes.
@@ -158,7 +147,7 @@ void KruskalGraph::_reset()
 
    The goal is to avoid creating any loops within minimum cost tree by ensuring only edges containing nodes from different components (or no component) are appended to it.
 */
-bool KruskalGraph::_addEdgeToTree(const Edge& edge)
+bool KruskalEngine::_addEdgeToTree(const Edge& edge)
 {
     bool success{false};
 
@@ -195,7 +184,7 @@ bool KruskalGraph::_addEdgeToTree(const Edge& edge)
     return success;
 }
 
-void KruskalGraph::_bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componentNode)
+void KruskalEngine::_bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componentNode)
 {
     mComponentNumbers[orphanNode] = mComponentNumbers[componentNode];
     mComponents[mComponentNumbers[componentNode]].push_back(orphanNode);
@@ -204,7 +193,7 @@ void KruskalGraph::_bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componen
 /* add both nodes to component corresponding to lowest numbered node
    (this is edge.first as edges are increasingly ordered: first < second)
 */
-void KruskalGraph::_bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode)
+void KruskalEngine::_bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode)
 {
     mComponents[firstOrphanNode].push_back(firstOrphanNode);
     mComponents[firstOrphanNode].push_back(secondOrphanNode);
@@ -212,7 +201,7 @@ void KruskalGraph::_bindOrphanNodes(Node firstOrphanNode, Node secondOrphanNode)
     mComponentNumbers[secondOrphanNode] = firstOrphanNode;
 }
 
-void KruskalGraph::_mergeComponents(Node enclosingComponentNode, Node mergedComponentNode)
+void KruskalEngine::_mergeComponents(Node enclosingComponentNode, Node mergedComponentNode)
 {
     size_t c_MergedComponentNumber{mComponentNumbers[mergedComponentNode]};
 

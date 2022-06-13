@@ -1,29 +1,17 @@
-#ifndef KRUSKALGRAPH_H
-#define KRUSKALGRAPH_H
+#ifndef KRUSKAL_H
+#define KRUSKAL_H
 
 #include <vector>
-#include <utility>
 #include <map>
-#include <list>
 #include <limits>
 
-#include "matrix.h"
+#include "baseengine.h"
 
-class KruskalGraph
+class KruskalEngine : public BaseEngine
 {
 public:
-    using Node = size_t;
-    using Edge = std::pair<Node, Node>;
-    using Cost = int;
-    using GraphMatrix = Matrix<Cost>;
-    using Tree = std::list<Edge>;
-
-    explicit KruskalGraph();
-
-    bool build(const GraphMatrix& graphMatrix);
-
-    const Tree& getMinTree() const;
-    const Tree& getMaxTree() const;
+    explicit KruskalEngine();
+    bool buildTrees(const GraphMatrix& graphMatrix) override;
 
 private:
     using Component = std::list<Node>;
@@ -33,7 +21,7 @@ private:
     void _buildMinTreeFromGraph();
     void _buildMaxTreeFromGraph();
     void _buildEmptyComponents();
-    void _reset();
+    void _reset() override;
 
     bool _addEdgeToTree(const Edge& edge);
     void _bindOrphanNodeToNonOrphanNode(Node orphanNode, Node componentNode);
@@ -42,12 +30,9 @@ private:
 
     static constexpr size_t scNullComponent{std::numeric_limits<size_t>::max()};
 
-    size_t mNodesCount;
     EdgeCostsMap mEdgeCostsMap;
     std::vector<Component> mComponents;
     std::vector<size_t> mComponentNumbers;
-    Tree mMinTree;
-    Tree mMaxTree;
 };
 
-#endif // KRUSKALGRAPH_H
+#endif // KRUSKAL_H
