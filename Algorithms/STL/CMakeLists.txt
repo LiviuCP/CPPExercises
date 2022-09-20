@@ -23,4 +23,8 @@ enable_testing()
 add_executable(SortingTests tst_sortingtests.cpp)
 add_test(NAME SortingTests COMMAND SortingTests)
 
+add_executable(PartitioningTests tst_partitioningtests.cpp)
+add_test(NAME PartitioningTests COMMAND PartitioningTests)
+
 target_link_libraries(SortingTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
