@@ -39,12 +39,12 @@ SortingTests::SortingTests()
 void SortingTests::testSorting()
 {
     StringIntPairMatrix matrix{2, 4, {{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}}};
-    const StringIntPairMatrix matrixRef{2, 4, {{"Alex", 10}, {"Alistair", 10}, {"George", 14}, {"Kevin", 11}, {"Cameron", 10}, {"Andrew", 11}, {"Reggie", 12}, {"Patrick", 14}}};
+    const StringIntPairMatrix c_MatrixRef{2, 4, {{"Alex", 10}, {"Alistair", 10}, {"George", 14}, {"Kevin", 11}, {"Cameron", 10}, {"Andrew", 11}, {"Reggie", 12}, {"Patrick", 14}}};
 
     std::sort(matrix.zBegin(), matrix.zRowEnd(0));
     std::sort(matrix.zRowBegin(1), matrix.zEnd(), [](StringIntPair firstPair, StringIntPair secondPair){return firstPair.second < secondPair.second;});
 
-    QVERIFY(matrix == matrixRef);
+    QVERIFY(c_MatrixRef == matrix);
 }
 
 void SortingTests::testStableSorting()
@@ -67,16 +67,16 @@ void SortingTests::testStableSorting()
 void SortingTests::testPartialSorting()
 {
     IntMatrix matrix{mPrimaryIntMatrix};
-    const IntMatrix matrixRef{3, 4, { -3, 0, 1, -9, -3, 1, -9, -9, -1, 1, -9, -9}};
+    const IntMatrix c_MatrixRef{3, 4, { -3, 0, 1, -9, -3, 1, -9, -9, -1, 1, -9, -9}};
 
     std::partial_sort(matrix.nBegin(), matrix.getNIterator(1, 2), matrix.nEnd());
 
     IntMatrix::ConstNIterator firstIt{matrix.constNBegin()};
-    IntMatrix::ConstNIterator secondIt{matrixRef.constNBegin()};
+    IntMatrix::ConstNIterator secondIt{c_MatrixRef.constNBegin()};
 
     bool areElementsEqual{true};
 
-    while(firstIt != matrix.getConstNIterator(1, 2) && secondIt != matrixRef.getConstNIterator(1, 2))
+    while(firstIt != matrix.getConstNIterator(1, 2) && secondIt != c_MatrixRef.getConstNIterator(1, 2))
     {
         areElementsEqual = areElementsEqual && (*firstIt == *secondIt);
         ++firstIt;
