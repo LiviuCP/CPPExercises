@@ -50,8 +50,7 @@ void PartitioningTests::testPartitioning()
 {
     IntMatrix matrix{mPrimaryIntMatrix};
 
-    const IntMatrix::ZIterator c_ResultingIt{std::partition(matrix.zBegin(), matrix.zEnd(), [](int element) {return element > 0;})};
-    IntMatrix::ConstZIterator partitioningIt{matrix.getConstZIterator(c_ResultingIt.getRowNr(), c_ResultingIt.getColumnNr())};
+    IntMatrix::ConstZIterator partitioningIt{std::partition(matrix.zBegin(), matrix.zEnd(), [](int element) {return element > 0;})};
     const std::pair<IntMatrix::size_type, IntMatrix::size_type> c_RequiredCoordinates{1, 4};
 
     bool isValidPartitioning{c_RequiredCoordinates.first == partitioningIt.getRowNr() && c_RequiredCoordinates.second == partitioningIt.getColumnNr()};
