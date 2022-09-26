@@ -26,7 +26,7 @@ private slots:
     void testIsPartitioned();
 
 private:
-    IntMatrix mPrimaryIntMatrix;
+    const IntMatrix mPrimaryIntMatrix;
     const StringIntPairMatrix mPrimaryStringIntPairMatrix;
     const StringIntPairMatrix mSecondaryStringIntPairMatrix;
 };

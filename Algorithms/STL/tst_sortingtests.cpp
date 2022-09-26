@@ -28,7 +28,7 @@ private slots:
     void testIsSorted(); // is_sorted, is_sorted_until
 
 private:
-    IntMatrix mPrimaryIntMatrix;
+    const IntMatrix mPrimaryIntMatrix;
 };
 
 SortingTests::SortingTests()
