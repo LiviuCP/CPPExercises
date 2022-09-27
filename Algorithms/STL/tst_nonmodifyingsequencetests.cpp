@@ -115,6 +115,8 @@ void NonModifyingSequenceTests::testCount()
 {
     QVERIFY(2 == std::count(mPrimaryIntMatrix.getConstZIterator(0, 1), mPrimaryIntMatrix.getConstZIterator(1, 3), 1));
     QVERIFY(0 == std::count(mPrimaryIntMatrix.getConstNIterator(0, 1), mPrimaryIntMatrix.getConstNIterator(2, 1), -3));
+    QVERIFY(3 == std::count_if(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.first.size() <= 5;}));
+    QVERIFY(0 == std::count_if(mPrimaryStringIntPairMatrix.constZRowBegin(1), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return element.second > 14;}));
 }
 
 void NonModifyingSequenceTests::testMismatch()
