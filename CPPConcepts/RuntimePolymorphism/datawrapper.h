@@ -2,6 +2,7 @@
 #define DATAWRAPPER_H
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <cassert>
 
