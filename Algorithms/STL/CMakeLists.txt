@@ -15,7 +15,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
@@ -29,6 +29,10 @@ add_test(NAME PartitioningTests COMMAND PartitioningTests)
 add_executable(NonModifyingSequenceTests tst_nonmodifyingsequencetests.cpp)
 add_test(NAME NonModifyingSequenceTests COMMAND NonModifyingSequenceTests)
 
+add_executable(ModifyingSequenceTests tst_modifyingsequencetests.cpp)
+add_test(NAME ModifyingSequenceTests COMMAND ModifyingSequenceTests)
+
 target_link_libraries(SortingTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(NonModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(ModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
