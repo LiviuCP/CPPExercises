@@ -23,6 +23,9 @@ enable_testing()
 add_executable(SortingTests tst_sortingtests.cpp)
 add_test(NAME SortingTests COMMAND SortingTests)
 
+add_executable(SortedRangesTests tst_sortedrangestests.cpp)
+add_test(NAME SortedRangesTests COMMAND SortedRangesTests)
+
 add_executable(PartitioningTests tst_partitioningtests.cpp)
 add_test(NAME PartitioningTests COMMAND PartitioningTests)
 
@@ -33,6 +36,7 @@ add_executable(ModifyingSequenceTests tst_modifyingsequencetests.cpp)
 add_test(NAME ModifyingSequenceTests COMMAND ModifyingSequenceTests)
 
 target_link_libraries(SortingTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(SortedRangesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(NonModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(ModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
