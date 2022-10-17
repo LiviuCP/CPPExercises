@@ -29,17 +29,42 @@ private slots:
 
 private:
     const IntMatrix mPrimaryIntMatrix;
+    const IntMatrix mSecondaryIntMatrix;
+    const IntPairMatrix mPrimaryIntPairMatrix;
+    const IntPairMatrix mSecondaryIntPairMatrix;
+    const StringIntPairMatrix mPrimaryStringIntPairMatrix;
 };
 
 SortingTests::SortingTests()
-    : mPrimaryIntMatrix{3, 4, {-1, 1, 1, 0, 2, 4, 5, 1, 3, -3, -3, 2}}
+    : mPrimaryIntMatrix{3, 4, {-1,  1, 1,  0,
+                                2,  4, 5,  1,
+                                3, -3, -3, 2
+                        }}
+    , mSecondaryIntMatrix{2, 2, {-2, 8,
+                                 -5, 9
+                          }}
+    , mPrimaryIntPairMatrix{4, 3, {{1, 4}, {-1, 0}, {-1, 2},
+                                   {4, -5}, {1, 2}, {1, 3},
+                                   {-2, 4}, {2, 0}, {-3, -3},
+                                   {3, 2}, {-1, 0}, {3, -1}
+                            }}
+    , mSecondaryIntPairMatrix{4, 3, {{4, 1}, {0, -1}, {2, -1},
+                                     {-5, 4}, {2, 1}, {3,  1},
+                                     {4, -2}, {0, 2}, {-3, -3},
+                                     {2, 3}, {0, -1},  {-1, 3}
+                              }}
+    , mPrimaryStringIntPairMatrix{2, 4, {{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14},
+                                         {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}
+                                  }}
 {
 }
 
 void SortingTests::testSorting()
 {
-    StringIntPairMatrix matrix{2, 4, {{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}}};
-    const StringIntPairMatrix c_MatrixRef{2, 4, {{"Alex", 10}, {"Alistair", 10}, {"George", 14}, {"Kevin", 11}, {"Cameron", 10}, {"Andrew", 11}, {"Reggie", 12}, {"Patrick", 14}}};
+    StringIntPairMatrix matrix{mPrimaryStringIntPairMatrix};
+    const StringIntPairMatrix c_MatrixRef{2, 4, {{"Alex", 10}, {"Alistair", 10}, {"George", 14}, {"Kevin", 11},
+                                                 {"Cameron", 10}, {"Andrew", 11}, {"Reggie", 12}, {"Patrick", 14}
+                                          }};
 
     std::sort(matrix.zBegin(), matrix.zRowEnd(0));
     std::sort(matrix.zRowBegin(1), matrix.zEnd(), [](StringIntPair firstPair, StringIntPair secondPair){return firstPair.second < secondPair.second;});
@@ -49,15 +74,23 @@ void SortingTests::testSorting()
 
 void SortingTests::testStableSorting()
 {
-    IntPairMatrix matrix{4, 3, {{1, 4}, {-1, 0}, {-1, 2}, {4, -5}, {1, 2}, {1, 3}, {-2, 4}, {2, 0}, {-3, -3}, {3, 2}, {-1, 0}, {3, -1}}};
-    IntPairMatrix matrixRef{4, 3, {{-3, -3}, {-2, 4}, {-1, 0}, {-1, 2}, {-1, 0}, {1, 4}, {1, 2}, {1, 3}, {2, 0}, {3, 2}, {3, -1}, {4, -5}}};
+    IntPairMatrix matrix{mPrimaryIntPairMatrix};
+    IntPairMatrix matrixRef{4, 3, {{-3, -3}, {-2, 4}, {-1, 0},
+                                   {-1, 2},  {-1, 0}, {1, 4},
+                                    {1, 2},  {1, 3},  {2, 0},
+                                    {3, 2},  {3, -1}, {4, -5}
+                            }};
 
     std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](IntPair firstPair, IntPair secondPair){return firstPair.first < secondPair.first;});
 
     QVERIFY(matrix == matrixRef);
 
-    matrix = {4, 3, {{4, 1}, {0, -1}, {2, -1}, {-5, 4}, {2, 1}, {3,1}, {4, -2}, {0, 2}, {-3, -3}, {2, 3}, {0, -1}, {-1, 3}}};
-    matrixRef = {4, 3, {{-3, -3}, {4, -2}, {0, -1}, {2, -1}, {0, -1}, {4, 1}, {2, 1}, {3, 1}, {0, 2}, {2, 3}, {-1, 3}, {-5, 4}}};
+    matrix = mSecondaryIntPairMatrix;
+    matrixRef = {4, 3, {{-3, -3}, {4, -2}, {0, -1},
+                         {2, -1}, {0, -1}, {4, 1},
+                         {2, 1},  {3, 1},  {0, 2},
+                         {2, 3},  {-1, 3}, {-5, 4}
+                 }};
 
     std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](IntPair firstPair, IntPair secondPair){return firstPair.second < secondPair.second;});
 
@@ -67,7 +100,10 @@ void SortingTests::testStableSorting()
 void SortingTests::testPartialSorting()
 {
     IntMatrix matrix{mPrimaryIntMatrix};
-    const IntMatrix c_MatrixRef{3, 4, { -3, 0, 1, -9, -3, 1, -9, -9, -1, 1, -9, -9}};
+    const IntMatrix c_MatrixRef{3, 4, {-3, 0, 1, -9,
+                                       -3, 1, -9, -9,
+                                       -1, 1, -9, -9
+                                }};
 
     std::partial_sort(matrix.nBegin(), matrix.getNIterator(1, 2), matrix.nEnd());
 
@@ -89,15 +125,19 @@ void SortingTests::testPartialSorting()
 void SortingTests::testPartialSortingWithCopy()
 {
     IntMatrix srcMatrix{mPrimaryIntMatrix};
-    IntMatrix destMatrix{2, 2, {-2, 8, -5, 9}};
-    IntMatrix destMatrixRef{2, 2, {1, 5, 2, 9}};
+    IntMatrix destMatrix{mSecondaryIntMatrix};
+    IntMatrix destMatrixRef{2, 2, {1, 5,
+                                   2, 9
+                            }};
 
     std::partial_sort_copy(srcMatrix.constDBegin(1), srcMatrix.constDEnd(1), destMatrix.nBegin(), destMatrix.nEnd());
 
     QVERIFY(destMatrix == destMatrixRef);
 
-    destMatrix = {2, 2, {-2, 8, -5, 9}};
-    destMatrixRef = {2, 2, {2, 8, -5, 1}};
+    destMatrix = mSecondaryIntMatrix;
+    destMatrixRef = {2, 2, {2, 8,
+                            -5, 1
+                     }};
 
     std::partial_sort_copy(srcMatrix.constDBegin(1), srcMatrix.constDEnd(1), destMatrix.reverseDBegin(0), destMatrix.reverseDEnd(0));
 
