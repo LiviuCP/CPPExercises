@@ -44,6 +44,9 @@ add_test(NAME MinMaxTests COMMAND MinMaxTests)
 add_executable(ComparisonPermutationTests tst_comparisonpermutationtests.cpp)
 add_test(NAME ComparisonPermutationTests COMMAND ComparisonPermutationTests)
 
+add_executable(NumericOperationsTests tst_numericoperationstests.cpp)
+add_test(NAME NumericOperationsTests COMMAND NumericOperationsTests)
+
 target_link_libraries(SortingTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(SortedRangesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
@@ -52,3 +55,4 @@ target_link_libraries(ModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test
 target_link_libraries(HeapTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(MinMaxTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(ComparisonPermutationTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(NumericOperationsTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
