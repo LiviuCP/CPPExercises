@@ -89,12 +89,12 @@ void NumericOperationsTests::testAccumulate()
 
     QVERIFY(c_MatrixRef == matrix);
 
-    // start with initial value: 1 + 2 * (-3) + 2 * 1 + ... + 2 * (-6)
+    // start with initial value (1), add each element multiplied by 2: 1 + 2 * (-3) + 2 * 1 + ... + 2 * (-6)
     int result{std::accumulate(matrix.constMBegin(0), matrix.constMEnd(0), 1, [](const int& firstElement, const int& secondElement) {return firstElement + 2 * secondElement;})};
 
     QVERIFY(5 == result);
 
-    // start with initial value, multiply each partial result with 2 before adding to next element: ((((2 * 1 - 3) * 2 + 1) * 2 + 3) * 2 + 7) * 2 - 6
+    // start with initial value, multiply each partial result with 2 before adding to next element: ((((2 * 1 + (-3)) * 2 + 1) * 2 + 3) * 2 + 7) * 2 + (-6)
     result = std::accumulate(matrix.constMBegin(0), matrix.constMEnd(0), 1, [](const int& firstElement, const int& secondElement) {return 2 * firstElement + secondElement;});
 
     QVERIFY(12 == result);
@@ -117,17 +117,21 @@ void NumericOperationsTests::testInnerProduct()
     QVERIFY(c_MatrixRef == matrix);
 
     /* Initialize the resulting value (acc) with the init value
-       Then apply: acc = f1(acc, f2(firstElement, secondElement)), where on the right hand side we have:
-       acc = current result value; firstElement, secondElement = current dereferenced inner product operands
-       f1 = first lambda function (here: firstElement - 2 * secondElement)
-       f2 = second lambda function (here: 2 * firstElement - secondElement)
-    */
+       Then apply: acc = f1(acc, f2(firstElement, secondElement)), where on the right hand side of the expression we have:
+            acc = current result value
+            firstElement, secondElement = current dereferenced inner product operands
+            f1 = first lambda function (here: firstElement - 2 * secondElement)
+            f2 = second lambda function (here: 2 * firstElement - secondElement)
 
-    // acc = 2
-    // acc = acc - 2 * (2 * firstElement - secondElement) =   2 - 2 * (2 * 8 - (-3))  = -36
-    // acc = acc - 2 * (2 * firstElement - secondElement) = -36 - 2 * (2 * 4 - 5)     = -42
-    // acc = acc - 2 * (2 * firstElement - secondElement) = -42 - 2 * (2 * (-2) - 10) = -14
-    // acc = acc - 2 * (2 * firstElement - secondElement) = -14 - 2 * (2 * 7 - (-4))  = -50
+       ---- the concrete example ----
+
+       Init: acc = 2
+       Then apply: acc = acc - 2 * f2 in each step as follows:
+            acc = acc - 2 * (2 * firstElement - secondElement) =   2 - 2 * (2 * 8 - (-3))  = -36
+            acc = acc - 2 * (2 * firstElement - secondElement) = -36 - 2 * (2 * 4 - 5)     = -42
+            acc = acc - 2 * (2 * firstElement - secondElement) = -42 - 2 * (2 * (-2) - 10) = -14
+            acc = acc - 2 * (2 * firstElement - secondElement) = -14 - 2 * (2 * 7 - (-4))  = -50
+    */
     const int c_Result{std::inner_product(mFourthIntMatrix.constNColumnBegin(1),
                                           mFourthIntMatrix.constNColumnEnd(1),
                                           mFourthIntMatrix.constNColumnBegin(2),
@@ -158,7 +162,10 @@ void NumericOperationsTests::testAdjacentDifference()
                        3, 11, 0, 0
                  }};
 
-    it = std::adjacent_difference(mFourthIntMatrix.getConstReverseZIterator(3, 2), mFourthIntMatrix.getConstReverseZIterator(1, 3), matrix.getNIterator(2, 0), [](const int& firstElement, const int& secondElement) {return 2 + (firstElement + secondElement) / 2;});
+    it = std::adjacent_difference(mFourthIntMatrix.getConstReverseZIterator(3, 2),
+                                  mFourthIntMatrix.getConstReverseZIterator(1, 3),
+                                  matrix.getNIterator(2, 0),
+                                  [](const int& firstElement, const int& secondElement) {return 2 + (firstElement + secondElement) / 2;});
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(3, 2) == it);
 }
@@ -183,26 +190,30 @@ void NumericOperationsTests::testPartialSum()
                        9, 7,  3, 0
                  }};
 
-    /* Each new value (partial "sum") is calculated based on:
-       - previous value (previous partial "sum")
+    /* Each new value (partial result, cannot call it sum in this case) is calculated based on:
+       - previous value (previous partial result)
        - current element
        -> to which the binary operation is applied:
             newValue = 1 + (prevValue + currentElement) / 2
        First value is the first element (copied from source).
-    */
 
-    // first value (first element copied): 9
-    // second: 1 + (9 + (-4)) / 2 => 3
-    // third: 1 + (3 + 7) / 2 => 6
-    // fourth: 1 + (6 + 5) / 2 => 6 ...
-    it = std::partial_sum(mFourthIntMatrix.getConstReverseZIterator(3, 3), mFourthIntMatrix.getConstReverseZIterator(1, 3), matrix.getNIterator(3, 0), [](const int& firstElement, const int& secondElement) {return 1 + (firstElement + secondElement) / 2;});
+        ---- the concrete example ----
+
+       First partial result is the first element (copied): 9
+       Then the binary operation is applied for next partial results as follows:
+            second result: 1 + (9 + (-4)) / 2 => 3
+            third result: 1 + (3 + 7) / 2 => 6
+            fourth result: 1 + (6 + 5) / 2 => 6 ...
+    */
+    it = std::partial_sum(mFourthIntMatrix.getConstReverseZIterator(3, 3),
+                          mFourthIntMatrix.getConstReverseZIterator(1, 3),
+                          matrix.getNIterator(3, 0),
+                          [](const int& firstElement, const int& secondElement) {return 1 + (firstElement + secondElement) / 2;});
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(1, 3) == it);
 }
 
-/* std::reduce is similar with std::accumulate, however it might be used in parallel operations (multi-threading)
-   Also the initial value is no longer optional, instead the default constructed value (here 0) is used
-*/
+// std::reduce is similar with std::accumulate, however it might be used in parallel operations (multi-threading) by applying policy (parallel operations not contained within example)
 void NumericOperationsTests::testReduce()
 {
     IntMatrix matrix{mPrimaryIntMatrix};
@@ -216,7 +227,7 @@ void NumericOperationsTests::testReduce()
     const IntMatrix::size_type c_LastRowNrAfterInsert{matrix.getNrOfRows()};
     matrix.insertRow(c_LastRowNrAfterInsert);
 
-    // For this particular case and the one provided for std::accumulate (for which init value 0 was provided - see 3rd argument) it's the same thing to use either of these operations
+    // Same example as the first one provided for std::accumulate; both algorithms can be used with same results here (for std::reduce the init value is not provided - it's implicitly 0)
     for(IntMatrix::ZIterator it{matrix.zRowBegin(c_LastRowNrAfterInsert)}; it != matrix.zEnd(); ++it)
     {
         *it = std::reduce(matrix.constNColumnBegin(it.getColumnNr()), matrix.getConstNIterator(c_LastRowNrAfterInsert, it.getColumnNr()));
@@ -229,12 +240,16 @@ void NumericOperationsTests::testReduce()
 
     QVERIFY(6 == result);
 
-    // additional cases, use binary function (for predictible results operation should be commutative or associative)
+    /* additional cases, use binary function
+       (if the execution was parallelized, for predictible results the binary function should contain an operation that is either commutative or associative)
+    */
+
+    // init value and all elements multiplied: ((((5 * (-9)) * -1) * 3) * 11) * 16
     result = std::reduce(matrix.constDBegin(0), matrix.constDEnd(0), 5, [](const int& firstElement, const int& secondElement) {return firstElement * secondElement;});
 
     QVERIFY(23760 == result);
 
-    // ((((2 + (-9) - 10) + (-1) -10) + 3 - 10) + 11 - 10) + 16 - 10
+    // binary function applied on init value and first element, then recursively for following elements: ((((2 + (-9) - 10) + (-1) -10) + 3 - 10) + 11 - 10) + 16 - 10
     result = std::reduce(matrix.constDBegin(0), matrix.constDEnd(0), 2, [](const int& firstElement, const int& secondElement) {return firstElement + secondElement - 10;});
 
     QVERIFY(-28 == result);
@@ -260,7 +275,11 @@ void NumericOperationsTests::testExclusiveScan()
                        -18, 17640, 0,    0
                  }};
 
-    it = std::exclusive_scan(mFourthIntMatrix.getConstReverseZIterator(3, 3), mFourthIntMatrix.getConstReverseZIterator(2, 1), matrix.getNIterator(2, 0), -2, [](const int& firstElement, const int& secondElement) {return (firstElement * secondElement);});
+    it = std::exclusive_scan(mFourthIntMatrix.getConstReverseZIterator(3, 3),
+                             mFourthIntMatrix.getConstReverseZIterator(2, 1),
+                             matrix.getNIterator(2, 0),
+                             -2,
+                             [](const int& firstElement, const int& secondElement) {return (firstElement * secondElement);});
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(1, 2) == it);
 }
@@ -274,7 +293,7 @@ void NumericOperationsTests::testInclusiveScan()
                               8, 31, 0,  0
                         }};
 
-    // for this particular case it works exactly as partial_sum() - see above example
+    // same example (and same result) as for partial_sum(), see above
     IntMatrix::ConstNIterator it{std::inclusive_scan(mFourthIntMatrix.getConstReverseZIterator(3, 2), mFourthIntMatrix.getConstReverseZIterator(1, 2), matrix.getNIterator(1, 0))};
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(3, 2) == it);
@@ -286,9 +305,13 @@ void NumericOperationsTests::testInclusiveScan()
                         1, 11, 0, 0
                  }};
 
-    // init value and first element used for calculating the first partial sum: 9 + 4 - 5 = 8
-    // second partial sum 8 + (-4) - 5 = -1 ...
-    it = std::inclusive_scan(mFourthIntMatrix.getConstReverseZIterator(3, 3), mFourthIntMatrix.getConstReverseZIterator(1, 3), matrix.getNIterator(1, 0), [](const int& firstElement, const int& secondElement) {return (firstElement + secondElement - 5);}, 4);
+    // init value and first element used for calculating the first partial result: 9 + 4 - 5 = 8
+    // second partial result: 8 + (-4) - 5 = -1 etc.
+    it = std::inclusive_scan(mFourthIntMatrix.getConstReverseZIterator(3, 3),
+                             mFourthIntMatrix.getConstReverseZIterator(1, 3),
+                             matrix.getNIterator(1, 0),
+                             [](const int& firstElement, const int& secondElement) {return (firstElement + secondElement - 5);},
+                             4);
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(3, 2) == it);
 
@@ -299,38 +322,43 @@ void NumericOperationsTests::testInclusiveScan()
                         5, 43, 48, 0
                  }};
 
-    // first partial sum is the first element: -4
-    // then the binary operation is being applied starting with second element/sum: -4 + 7 + 2 = 5 ...
-    it = std::inclusive_scan(mFourthIntMatrix.getConstReverseZIterator(3, 2), mFourthIntMatrix.getConstReverseZIterator(1, 2), matrix.getNIterator(2, 0), [](const int& firstElement, const int& secondElement) {return (firstElement + secondElement + 2);});
+    // first partial result is the first element: -4
+    // then the binary operation is being applied recursively starting with second element: -4 + 7 + 2 = 5 ...
+    it = std::inclusive_scan(mFourthIntMatrix.getConstReverseZIterator(3, 2),
+                             mFourthIntMatrix.getConstReverseZIterator(1, 2),
+                             matrix.getNIterator(2, 0),
+                             [](const int& firstElement, const int& secondElement) {return (firstElement + secondElement + 2);});
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(0, 3) == it);
 }
 
 void NumericOperationsTests::testTransformReduce()
 {
-    // 5 + (-7) * (-4) + (-1) * 10 + ... (* - transform, + - reduce)
+    // transform is multiplication, reduce is addition which makes the operation equivalent to inner product: 5 + (-7) * (-4) + (-1) * 10 + ...
     int result{std::transform_reduce(mPrimaryIntMatrix.constNColumnBegin(1), mPrimaryIntMatrix.constNColumnEnd(1), mFourthIntMatrix.constReverseNColumnBegin(2), 5)};
 
     QVERIFY(12 == result);
 
+    // binary transform function example
     result = std::transform_reduce(mPrimaryIntMatrix.constReverseNColumnBegin(2),
                                    mPrimaryIntMatrix.constReverseNColumnEnd(2),
                                    mFourthIntMatrix.constNColumnBegin(3),
                                    -3,
-                                   [](const int& firstElement, const int& secondElement) {return 1 + firstElement + secondElement;}, // reduce
-                                   [](const int& firstElement, const int& secondElement) {return (firstElement + secondElement) / 2;}); // transform (binary)
+                                   [](const int& firstElement, const int& secondElement) {return 1 + firstElement + secondElement;},    // reduce
+                                   [](const int& firstElement, const int& secondElement) {return (firstElement + secondElement) / 2;}); // transform
 
     QVERIFY(14 == result); // -3 + (1 + (11 + 2) / 2) + (1 + (3 + (-1)) / 2) + ...
 
-    // result = 2 * init * (mFourthIntMatrix[0][1] / 3)
-    // result = 2 * result * (mFourthIntMatrix[1][2] / 3)
-    // result = 2 * result * (mFourthIntMatrix[2][3] / 3)
-    // result = 2 * result * (mFourthIntMatrix[3][4] / 3)
+    // unary transform function example
+    // result = 2 * init value * (mFourthIntMatrix[0][1] / 3)
+    // result = 2 * result     * (mFourthIntMatrix[1][2] / 3)
+    // result = 2 * result     * (mFourthIntMatrix[2][3] / 3)
+    // result = 2 * result     * (mFourthIntMatrix[3][4] / 3)
     result = std::transform_reduce(mFourthIntMatrix.constDBegin(1),
                                    mFourthIntMatrix.constDEnd(1),
                                    5,
                                    [](const int& firstElement, const int& secondElement) {return 2 * firstElement * secondElement;}, // reduce
-                                   [](const int& element){return element / 3;}); // transform (unary)
+                                   [](const int& element){return element / 3;});                                                     // transform
 
     QVERIFY(1280 == result);
 }
@@ -345,7 +373,8 @@ void NumericOperationsTests::testTransformExclusiveScan()
                                        3,  1, 17, 1  // 11 + 2 * 4 - 2
                                 }};
 
-    // each new "partial sum": (preceding "partial sum" (not transformed) + previous element (transformed) - 2) -> first "partial sum" is the init value (see matrixRef comments)
+    // first partial result is the init value (7)
+    // each new partial result: (preceding partial result (not transformed) + previous element (transformed) - 2)
     IntMatrix::ConstNIterator it{std::transform_exclusive_scan(mFourthIntMatrix.constReverseZRowBegin(1),
                                                                mFourthIntMatrix.constReverseZRowEnd(1),
                                                                matrix.nColumnBegin(2),
@@ -359,14 +388,15 @@ void NumericOperationsTests::testTransformExclusiveScan()
 void NumericOperationsTests::testTransformInclusiveScan()
 {
     IntMatrix matrix{mSecondaryIntMatrix};
-    IntMatrix matrixRef{5, 4, {1, -2, 7, -4, // 7 + 2 * 1 - 2: init value 7 is taken into account as previous "partial sum" ("seed")
+    IntMatrix matrixRef{5, 4, {1, -2, 7, -4, // 7 + 2 * 1 - 2: init value 7 is taken into account as previous partial result ("seed")
                                0, -4, 3, -4, // 7 + 2 * (-1) - 2
                               -3,  4, 11, 4, // 3 + 2 * 5 - 2
                                4, -2, 17, 5, // 11 + 2 * 4 - 2
                                3,  1, 15, 1  // 17 + 2 * 0 - 2
                         }};
 
-    // each new "partial sum": (preceding "partial sum" (not transformed) + current element (transformed) - 2) -> first "partial sum" ("seed", not memorized within any element) is the init value (see matrixRef comments)
+    // first partial result ("seed", not written to any element) is the init value (see matrixRef comments)
+    // each new partial result is obtained as follows: (preceding partial result (not transformed) + current element (transformed) - 2)
     IntMatrix::ConstNIterator it{std::transform_inclusive_scan(mFourthIntMatrix.constReverseZRowBegin(1),
                                                                mFourthIntMatrix.constReverseZRowEnd(1),
                                                                matrix.nColumnBegin(2),
@@ -377,8 +407,8 @@ void NumericOperationsTests::testTransformInclusiveScan()
     QVERIFY(matrixRef == matrix && matrix.constNColumnEnd(2) == it);
 
     matrix = mThirdIntMatrix;
-    matrixRef = {4, 4, {0,  4,  0, 0, // 1 + 7 / 2 : first element is only transformed and written back
-                        0, -16, 0, 0, // 4 * (1 + 3 / 2) * (-2)
+    matrixRef = {4, 4, {0,  4,  0, 0, // 1 + 7 / 2 => 4 : first element (7) is only transformed and written back (no binary operation)
+                        0, -16, 0, 0, // 4 * (1 + 3 / 2) * (-2) : then binary operation is applied recursively along with transform ...
                         0,  32, 0, 0, // -16 * (1 + 1 / 2) * (-2)
                         0,  0,  0, 0  // 32 * (1 + (-3) / 2) * (-2)
                  }};
