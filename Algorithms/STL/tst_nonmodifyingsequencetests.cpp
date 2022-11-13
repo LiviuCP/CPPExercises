@@ -1,17 +1,9 @@
 #include <QtTest>
 
 #include <algorithm>
-#include <utility>
-#include <string>
-#include <vector>
 #include <cmath>
 
-#include "matrix.h"
-
-using IntMatrix = Matrix<int>;
-using StringIntPair = std::pair<std::string, int>;
-using StringIntPairMatrix = Matrix<StringIntPair>;
-using IntVector = std::vector<int>;
+#include "datautils.h"
 
 class NonModifyingSequenceTests : public QObject
 {

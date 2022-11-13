@@ -1,18 +1,8 @@
 #include <QtTest>
 
 #include <algorithm>
-#include <utility>
-#include <string>
 
-#include "QtTest/qtestcase.h"
-#include "matrix.h"
-
-using IntMatrix = Matrix<int>;
-using IntPair = std::pair<int, int>;
-using StringIntPair = std::pair<std::string, int>;
-using StringIntPairMatrix = Matrix<StringIntPair>;
-using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
-using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
+#include "datautils.h"
 
 class MinMaxTests : public QObject
 {

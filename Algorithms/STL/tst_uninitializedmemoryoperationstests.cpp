@@ -1,29 +1,9 @@
 #include <QtTest>
 
-#include <algorithm>
-#include <utility>
-#include <string>
-#include <vector>
+#include <memory>
 
-#include "matrix.h"
+#include "datautils.h"
 
-#define FAIL_DEALLOC(ptr, message) \
-    std::free(ptr); \
-    ptr = nullptr; \
-    QFAIL(message);
-
-#define DEALLOC(ptr) \
-    std::free(ptr); \
-    ptr = nullptr;
-
-#if (defined (__APPLE__) && defined (__MACH__))
-#define MACOS
-#endif
-
-using IntMatrix = Matrix<int>;
-using StringIntPair = std::pair<std::string, int>;
-using StringIntPairVector = std::vector<StringIntPair>;
-using StringIntPairMatrix = Matrix<StringIntPair>;
 
 class UninitializedMemoryOperationsTests : public QObject
 {

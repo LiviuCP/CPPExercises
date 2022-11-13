@@ -2,10 +2,7 @@
 
 #include <numeric>
 
-#include "QtTest/qtestcase.h"
-#include "matrix.h"
-
-using IntMatrix = Matrix<int>;
+#include "datautils.h"
 
 class NumericOperationsTests : public QObject
 {
