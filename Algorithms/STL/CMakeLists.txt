@@ -27,14 +27,14 @@ add_test(NAME NonModifyingSequenceTests COMMAND NonModifyingSequenceTests)
 add_executable(ModifyingSequenceTests tst_modifyingsequencetests.cpp)
 add_test(NAME ModifyingSequenceTests COMMAND ModifyingSequenceTests)
 
+add_executable(PartitioningTests tst_partitioningtests.cpp)
+add_test(NAME PartitioningTests COMMAND PartitioningTests)
+
 add_executable(SortingTests tst_sortingtests.cpp)
 add_test(NAME SortingTests COMMAND SortingTests)
 
 add_executable(SortedRangesTests tst_sortedrangestests.cpp)
 add_test(NAME SortedRangesTests COMMAND SortedRangesTests)
-
-add_executable(PartitioningTests tst_partitioningtests.cpp)
-add_test(NAME PartitioningTests COMMAND PartitioningTests)
 
 add_executable(HeapTests tst_heaptests.cpp)
 add_test(NAME HeapTests COMMAND HeapTests)
@@ -53,9 +53,9 @@ add_test(NAME UninitializedMemoryOperationsTests COMMAND UninitializedMemoryOper
 
 target_link_libraries(NonModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(ModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(SortingTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(SortedRangesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
-target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(HeapTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(MinMaxTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(ComparisonPermutationTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)

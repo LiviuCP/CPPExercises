@@ -12,12 +12,12 @@ public:
     SortingTests();
 
 private slots:
-    void testSorting();
-    void testStableSorting();
-    void testPartialSorting();
-    void testPartialSortingWithCopy();
-    void testNthElement();
     void testIsSorted(); // is_sorted, is_sorted_until
+    void testSort();
+    void testPartialSort();
+    void testPartialSortCopy();
+    void testStableSort();
+    void testNthElement();
 
 private:
     const IntMatrix mPrimaryIntMatrix;
@@ -51,7 +51,14 @@ SortingTests::SortingTests()
 {
 }
 
-void SortingTests::testSorting()
+void SortingTests::testIsSorted()
+{
+    QVERIFY(!std::is_sorted(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd()));
+    QVERIFY(std::is_sorted(mPrimaryIntMatrix.getConstZIterator(0, 3), mPrimaryIntMatrix.getConstZIterator(1, 2)));
+    QVERIFY(std::is_sorted_until(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd()) == mPrimaryIntMatrix.getConstZIterator(0, 3));
+}
+
+void SortingTests::testSort()
 {
     StringIntPairMatrix matrix{mPrimaryStringIntPairMatrix};
     const StringIntPairMatrix c_MatrixRef{2, 4, {{"Alex", 10}, {"Alistair", 10}, {"George", 14}, {"Kevin", 11},
@@ -64,32 +71,7 @@ void SortingTests::testSorting()
     QVERIFY(c_MatrixRef == matrix);
 }
 
-void SortingTests::testStableSorting()
-{
-    IntPairMatrix matrix{mPrimaryIntPairMatrix};
-    IntPairMatrix matrixRef{4, 3, {{-3, -3}, {-2, 4}, {-1, 0},
-                                   {-1, 2},  {-1, 0}, {1, 4},
-                                    {1, 2},  {1, 3},  {2, 0},
-                                    {3, 2},  {3, -1}, {4, -5}
-                            }};
-
-    std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](IntPair firstPair, IntPair secondPair){return firstPair.first < secondPair.first;});
-
-    QVERIFY(matrix == matrixRef);
-
-    matrix = mSecondaryIntPairMatrix;
-    matrixRef = {4, 3, {{-3, -3}, {4, -2}, {0, -1},
-                         {2, -1}, {0, -1}, {4, 1},
-                         {2, 1},  {3, 1},  {0, 2},
-                         {2, 3},  {-1, 3}, {-5, 4}
-                 }};
-
-    std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](IntPair firstPair, IntPair secondPair){return firstPair.second < secondPair.second;});
-
-    QVERIFY(matrix == matrixRef);
-}
-
-void SortingTests::testPartialSorting()
+void SortingTests::testPartialSort()
 {
     IntMatrix matrix{mPrimaryIntMatrix};
     const IntMatrix c_MatrixRef{3, 4, {-3, 0, 1, -9,
@@ -114,7 +96,7 @@ void SortingTests::testPartialSorting()
     QVERIFY(areElementsEqual);
 }
 
-void SortingTests::testPartialSortingWithCopy()
+void SortingTests::testPartialSortCopy()
 {
     IntMatrix srcMatrix{mPrimaryIntMatrix};
     IntMatrix destMatrix{mSecondaryIntMatrix};
@@ -134,6 +116,31 @@ void SortingTests::testPartialSortingWithCopy()
     std::partial_sort_copy(srcMatrix.constDBegin(1), srcMatrix.constDEnd(1), destMatrix.reverseDBegin(0), destMatrix.reverseDEnd(0));
 
     QVERIFY(destMatrix == destMatrixRef);
+}
+
+void SortingTests::testStableSort()
+{
+    IntPairMatrix matrix{mPrimaryIntPairMatrix};
+    IntPairMatrix matrixRef{4, 3, {{-3, -3}, {-2, 4}, {-1, 0},
+                                   {-1, 2},  {-1, 0}, {1, 4},
+                                    {1, 2},  {1, 3},  {2, 0},
+                                    {3, 2},  {3, -1}, {4, -5}
+                            }};
+
+    std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](IntPair firstPair, IntPair secondPair){return firstPair.first < secondPair.first;});
+
+    QVERIFY(matrix == matrixRef);
+
+    matrix = mSecondaryIntPairMatrix;
+    matrixRef = {4, 3, {{-3, -3}, {4, -2}, {0, -1},
+                         {2, -1}, {0, -1}, {4, 1},
+                         {2, 1},  {3, 1},  {0, 2},
+                         {2, 3},  {-1, 3}, {-5, 4}
+                 }};
+
+    std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](IntPair firstPair, IntPair secondPair){return firstPair.second < secondPair.second;});
+
+    QVERIFY(matrix == matrixRef);
 }
 
 void SortingTests::testNthElement()
@@ -163,13 +170,6 @@ void SortingTests::testNthElement()
     }
 
     QVERIFY(areLeftElementsLowerEqual && areRightElementsHigherEqual);
-}
-
-void SortingTests::testIsSorted()
-{
-    QVERIFY(!std::is_sorted(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd()));
-    QVERIFY(std::is_sorted(mPrimaryIntMatrix.getConstZIterator(0, 3), mPrimaryIntMatrix.getConstZIterator(1, 2)));
-    QVERIFY(std::is_sorted_until(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd()) == mPrimaryIntMatrix.getConstZIterator(0, 3));
 }
 
 QTEST_APPLESS_MAIN(SortingTests)
