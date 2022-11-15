@@ -52,10 +52,10 @@ SortedRangesTests::SortedRangesTests()
                               9,  5,  5,   3,  3,
                               2,  1,  1,   1, -3,
                              -5, -9, -10, -10, -14
-                        }}
-    , mFourthIntMatrix{4, 5, {25, 14, 14,  12,  9,
-                               9,  7,  5,   4,  3,
-                               3,  2,  1,   1,  1,
+                      }}
+    , mFourthIntMatrix{4, 5, {25, 14,  14,  12,  9,
+                               9,  7,   5,   4,  3,
+                               3,  2,   1,   1,  1,
                                0, -7, -11, -11, -14
                        }}
     , mFifthIntMatrix{4, 5, {20, 16, 12, 11, 10,
@@ -63,10 +63,10 @@ SortedRangesTests::SortedRangesTests()
                               4,  3,  3,  2,  1,
                               0,  0, -2, -10, -20
                       }}
-    , mSixthIntMatrix{4, 5, {-1, 6, 0, 5, 3,
-                             -5, -1, -3, 3, 2,
-                             -2, 1, 9, -8, 4,
-                              0, 7, -4, 6, 8
+    , mSixthIntMatrix{4, 5, {-1,  6,  0,  5, 3,
+                             -5, -1, -3,  3, 2,
+                             -2,  1,  9, -8, 4,
+                              0,  7, -4,  6, 8
                       }}
     , mSeventhIntMatrix{4, 5, -50}
     , mPrimaryStringIntPairMatrix{2, 5, {{"Mark", 7}, {"Alex", 8}, {"Alistair", 8}, {"Cameron", 9}, {"Andrew", 10},
@@ -75,10 +75,10 @@ SortedRangesTests::SortedRangesTests()
     , mSecondaryStringIntPairMatrix{2, 5, {{"Christian", 13}, {"Patrick", 15}, {"Cameron", 9}, {"Andrew", 10}, {"Reggie", 12},
                                            {"George", 14}, {"Gordon", 7}, {"John", 11}, {"Alex", 8}, {"Mark", 7}
                                   }} // sorted decreasingly by number of characters of the child name
-    , mThirdStringIntPairMatrix{2, 5, {{"Alex", 8}, {"Chris", 9}, {"Erwin", 5}, {"Edgar", 7}, {"Reggie", 12},
-                                       {"Camilla", 14}, {"Cameron", 11}, {"Patrick", 15}, {"Reginald", 10}, {"Alexander", 9}
-                                }} // sorted increasingly by number of characters
-    , mFourthStringIntPairMatrix{4, 5, {"RESERVED", 0}}
+    , mThirdStringIntPairMatrix{4, 5, {"RESERVED", 0}}
+    , mFourthStringIntPairMatrix{2, 5, {{"Alex", 8}, {"Chris", 9}, {"Erwin", 5}, {"Edgar", 7}, {"Reggie", 12},
+                                        {"Camilla", 14}, {"Cameron", 11}, {"Patrick", 15}, {"Reginald", 10}, {"Alexander", 9}
+                                 }} // sorted increasingly by number of characters
 {
 }
 
@@ -267,7 +267,7 @@ void SortedRangesTests::testSetDifference()
     QVERIFY(c_MatrixRef == matrix && matrix.getConstReverseNIterator(2, 4) == it2);
 
     // same considerations as for the union scenario
-    StringIntPairMatrix secondMatrix{mFourthStringIntPairMatrix};
+    StringIntPairMatrix secondMatrix{mThirdStringIntPairMatrix};
     StringIntPairMatrix secondMatrixRef{4, 5, {{"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"Reggie", 12},
                                                {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"George", 14},
                                                {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"John", 11},
@@ -276,22 +276,22 @@ void SortedRangesTests::testSetDifference()
 
     StringIntPairMatrix::ConstReverseNIterator it3{std::set_difference(mSecondaryStringIntPairMatrix.constReverseZBegin(),
                                                                 mSecondaryStringIntPairMatrix.constReverseZEnd(),
-                                                                mThirdStringIntPairMatrix.constZBegin(),
-                                                                mThirdStringIntPairMatrix.constZEnd(),
+                                                                mFourthStringIntPairMatrix.constZBegin(),
+                                                                mFourthStringIntPairMatrix.constZEnd(),
                                                                 secondMatrix.reverseNBegin(),
                                                                 [](const StringIntPair& firstElement, const StringIntPair& secondElement) {return firstElement.first.size() < secondElement.first.size();})};
 
     QVERIFY(secondMatrixRef == secondMatrix && secondMatrix.getConstReverseNIterator(2, 3) == it3);
 
-    secondMatrix = mFourthStringIntPairMatrix;
+    secondMatrix = mThirdStringIntPairMatrix;
     secondMatrixRef = {4, 5, {{"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Patrick", 15},
                               {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Edgar", 7},
                               {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Erwin", 5},
                               {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"Reginald", 10}, {"Chris", 9}
                        }};
 
-    it3 = std::set_difference(mThirdStringIntPairMatrix.constZBegin(),
-                              mThirdStringIntPairMatrix.constZEnd(),
+    it3 = std::set_difference(mFourthStringIntPairMatrix.constZBegin(),
+                              mFourthStringIntPairMatrix.constZEnd(),
                               mSecondaryStringIntPairMatrix.constReverseZBegin(),
                               mSecondaryStringIntPairMatrix.constReverseZEnd(),
                               secondMatrix.reverseNBegin(),
@@ -318,7 +318,7 @@ void SortedRangesTests::testSetIntersection()
     QVERIFY(c_FirstMatrixRef == firstMatrix && firstMatrix.constReverseNColumnBegin(3) == it2);
 
     // same considerations as for the union scenario
-    StringIntPairMatrix secondMatrix{mFourthStringIntPairMatrix};
+    StringIntPairMatrix secondMatrix{mThirdStringIntPairMatrix};
     StringIntPairMatrix secondMatrixRef{4, 5, {{"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},   {"Patrick", 15},
                                                {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},   {"Cameron", 9},
                                                {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},   {"Gordon", 7},
@@ -327,22 +327,22 @@ void SortedRangesTests::testSetIntersection()
 
     StringIntPairMatrix::ConstReverseNIterator it3{std::set_intersection(mSecondaryStringIntPairMatrix.constReverseZBegin(),
                                                                 mSecondaryStringIntPairMatrix.constReverseZEnd(),
-                                                                mThirdStringIntPairMatrix.constZBegin(),
-                                                                mThirdStringIntPairMatrix.constZEnd(),
+                                                                mFourthStringIntPairMatrix.constZBegin(),
+                                                                mFourthStringIntPairMatrix.constZEnd(),
                                                                 secondMatrix.reverseNBegin(),
                                                                 [](const StringIntPair& firstElement, const StringIntPair& secondElement) {return firstElement.first.size() < secondElement.first.size();})};
 
     QVERIFY(secondMatrixRef == secondMatrix && secondMatrix.getConstReverseNIterator(2, 3) == it3);
 
-    secondMatrix = mFourthStringIntPairMatrix;
+    secondMatrix = mThirdStringIntPairMatrix;
     secondMatrixRef = {4, 5, {{"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Cameron", 11},
                               {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Camilla", 14},
                               {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Reggie", 12},
                               {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0}, {"Alexander", 9}, {"Alex", 8}
                        }};
 
-    it3 = std::set_intersection(mThirdStringIntPairMatrix.constZBegin(),
-                                mThirdStringIntPairMatrix.constZEnd(),
+    it3 = std::set_intersection(mFourthStringIntPairMatrix.constZBegin(),
+                                mFourthStringIntPairMatrix.constZEnd(),
                                 mSecondaryStringIntPairMatrix.constReverseZBegin(),
                                 mSecondaryStringIntPairMatrix.constReverseZEnd(),
                                 secondMatrix.reverseNBegin(),
@@ -370,7 +370,7 @@ void SortedRangesTests::testSetSymmetricDifference()
 
     // same considerations as for the union scenario
     // +: the symmetric difference is always the same regardless of order of operands (it mixes the two differences and sorts the elements by preserving their relative order when "equal")
-    StringIntPairMatrix secondMatrix{mFourthStringIntPairMatrix};
+    StringIntPairMatrix secondMatrix{mThirdStringIntPairMatrix};
     const StringIntPairMatrix c_SecondMatrixRef{4, 5, {{"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Andrew", 10}, {"Erwin", 5},
                                                        {"RESERVED", 0}, {"RESERVED", 0}, {"RESERVED", 0},  {"Reggie", 12}, {"Chris", 9},
                                                        {"RESERVED", 0}, {"RESERVED", 0}, {"Reginald", 10}, {"George", 14}, {"John", 11},
@@ -379,17 +379,17 @@ void SortedRangesTests::testSetSymmetricDifference()
 
     StringIntPairMatrix::ConstReverseNIterator it3{std::set_symmetric_difference(mSecondaryStringIntPairMatrix.constReverseZBegin(),
                                                                                  mSecondaryStringIntPairMatrix.constReverseZEnd(),
-                                                                                 mThirdStringIntPairMatrix.constZBegin(),
-                                                                                 mThirdStringIntPairMatrix.constZEnd(),
+                                                                                 mFourthStringIntPairMatrix.constZBegin(),
+                                                                                 mFourthStringIntPairMatrix.constZEnd(),
                                                                                  secondMatrix.reverseNBegin(),
                                                                                  [](const StringIntPair& firstElement, const StringIntPair& secondElement) {return firstElement.first.size() < secondElement.first.size();})};
 
     QVERIFY(c_SecondMatrixRef == secondMatrix && secondMatrix.getConstReverseNIterator(1, 2) == it3);
 
-    secondMatrix = mFourthStringIntPairMatrix;
+    secondMatrix = mThirdStringIntPairMatrix;
 
-    it3 = std::set_symmetric_difference(mThirdStringIntPairMatrix.constZBegin(),
-                                        mThirdStringIntPairMatrix.constZEnd(),
+    it3 = std::set_symmetric_difference(mFourthStringIntPairMatrix.constZBegin(),
+                                        mFourthStringIntPairMatrix.constZEnd(),
                                         mSecondaryStringIntPairMatrix.constReverseZBegin(),
                                         mSecondaryStringIntPairMatrix.constReverseZEnd(),
                                         secondMatrix.reverseNBegin(),
@@ -412,7 +412,7 @@ void SortedRangesTests::testSetUnion()
     QVERIFY(c_MatrixRef == matrix && matrix.getConstNIterator(2, 3) == it1);
 
     // in this scenario two elements are considered "equal" if they have the same number of characters (no matter the value of the integer pair element)
-    StringIntPairMatrix secondMatrix{mFourthStringIntPairMatrix};
+    StringIntPairMatrix secondMatrix{mThirdStringIntPairMatrix};
     StringIntPairMatrix secondMatrixRef{4, 5, {{"RESERVED", 0}, {"RESERVED", 0        }, {"Patrick", 15 /*1*/}, {"George", 14 /*1*/}, {"Chris", 9 /*2*/}, // 1: from mSecondaryStringIntPairMatrix
                                                {"RESERVED", 0}, {"Christian", 13 /*1*/}, {"Cameron", 9  /*1*/}, {"Gordon", 7  /*1*/}, {"John", 11 /*1*/}, // 2: from mThirdStringIntPairMatrix
                                                {"RESERVED", 0}, {"Reginald", 10  /*2*/}, {"Andrew", 10  /*1*/}, {"Edgar", 7   /*2*/}, {"Alex", 8  /*1*/},
@@ -421,22 +421,22 @@ void SortedRangesTests::testSetUnion()
 
     StringIntPairMatrix::ConstReverseNIterator it2{std::set_union(mSecondaryStringIntPairMatrix.constReverseZBegin(),
                                                                   mSecondaryStringIntPairMatrix.constReverseZEnd(),
-                                                                  mThirdStringIntPairMatrix.constZBegin(),
-                                                                  mThirdStringIntPairMatrix.constZEnd(),
+                                                                  mFourthStringIntPairMatrix.constZBegin(),
+                                                                  mFourthStringIntPairMatrix.constZEnd(),
                                                                   secondMatrix.reverseNBegin(),
                                                                   [](const StringIntPair& firstElement, const StringIntPair& secondElement) {return firstElement.first.size() < secondElement.first.size();})};
 
     QVERIFY(secondMatrixRef == secondMatrix && secondMatrix.getConstReverseNIterator(0, 1) == it2);
 
-    secondMatrix = mFourthStringIntPairMatrix;
+    secondMatrix = mThirdStringIntPairMatrix;
     secondMatrixRef = {4, 5, {{"RESERVED", 0}, {"RESERVED", 0       }, {"Cameron", 11 /*2*/}, {"George", 14 /*1*/}, {"Chris", 9 /*2*/}, // 1: from mSecondaryStringIntPairMatrix
                               {"RESERVED", 0}, {"Alexander", 9 /*2*/}, {"Camilla", 14 /*2*/}, {"Reggie", 12 /*2*/}, {"John", 11 /*1*/}, // 2: from mThirdStringIntPairMatrix
                               {"RESERVED", 0}, {"Reginald", 10 /*2*/}, {"Andrew", 10  /*1*/}, {"Edgar", 7   /*2*/}, {"Alex", 8  /*1*/},
                               {"RESERVED", 0}, {"Patrick", 15  /*2*/}, {"Reggie", 12  /*1*/}, {"Erwin", 5   /*2*/}, {"Alex", 8  /*2*/}
                        }};
 
-    it2 = std::set_union(mThirdStringIntPairMatrix.constZBegin(),
-                         mThirdStringIntPairMatrix.constZEnd(),
+    it2 = std::set_union(mFourthStringIntPairMatrix.constZBegin(),
+                         mFourthStringIntPairMatrix.constZEnd(),
                          mSecondaryStringIntPairMatrix.constReverseZBegin(),
                          mSecondaryStringIntPairMatrix.constReverseZEnd(),
                          secondMatrix.reverseNBegin(),

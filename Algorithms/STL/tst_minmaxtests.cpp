@@ -26,15 +26,15 @@ private:
 };
 
 MinMaxTests::MinMaxTests()
-    : mPrimaryIntMatrix{4, 5, {-9, -7, -5, -5, -3,
-                               -3, -1,  0,  1,  1,
-                                1,  2,  3,  3,  4,
-                                5,  7,  11, 11, 14
+    : mPrimaryIntMatrix{4, 5, {32,  20, 11,  11, -6,
+                               28,  20,  12,  3, -6,
+                               25,  18,  14,  1, -9,
+                               20,  16,  15, -5, -15
                         }}
-    , mSecondaryIntMatrix{4, 5, {32,  20, 11,  11, -6,
-                                 28,  20,  12,  3, -6,
-                                 25,  18,  14,  1, -9,
-                                 20,  16,  15, -5, -15
+    , mSecondaryIntMatrix{4, 5, {-9, -7, -5, -5, -3,
+                                 -3, -1,  0,  1,  1,
+                                  1,  2,  3,  3,  4,
+                                  5,  7,  11, 11, 14
                           }}
     , mThirdIntMatrix{4, 5, {1, -2, -4, -4, 3,
                              0, -4, -4, -4, 1,
@@ -55,11 +55,11 @@ MinMaxTests::MinMaxTests()
 
 void MinMaxTests::testMinMax()
 {
-    QVERIFY(mSecondaryIntMatrix.at(3, 3) == std::min(mSecondaryIntMatrix.at(3, 3), mSecondaryIntMatrix.at(2, 1)));
-    QVERIFY(mPrimaryIntMatrix.at(3, 1) == std::max(mPrimaryIntMatrix.at(1, 3), mPrimaryIntMatrix.at(3, 1)));
+    QVERIFY(mPrimaryIntMatrix.at(3, 3) == std::min(mPrimaryIntMatrix.at(3, 3), mPrimaryIntMatrix.at(2, 1)));
+    QVERIFY(mSecondaryIntMatrix.at(3, 1) == std::max(mSecondaryIntMatrix.at(1, 3), mSecondaryIntMatrix.at(3, 1)));
 
-    const IntPair c_IntMinMaxValues{std::minmax(mSecondaryIntMatrix.at(1, 2), mPrimaryIntMatrix.at(3, 2))};
-    const IntPair c_IntMinMaxValuesRef{mPrimaryIntMatrix.at(3, 2), mSecondaryIntMatrix.at(1, 2)};
+    const IntPair c_IntMinMaxValues{std::minmax(mPrimaryIntMatrix.at(1, 2), mSecondaryIntMatrix.at(3, 2))};
+    const IntPair c_IntMinMaxValuesRef{mSecondaryIntMatrix.at(3, 2), mPrimaryIntMatrix.at(1, 2)};
 
     QVERIFY(c_IntMinMaxValuesRef == c_IntMinMaxValues);
 
@@ -109,8 +109,8 @@ void MinMaxTests::testMinMax()
 
 void MinMaxTests::testMinMaxElement()
 {
-    QVERIFY(mPrimaryIntMatrix.getConstReverseZIterator(2, 0) == std::min_element(mPrimaryIntMatrix.constReverseZRowBegin(2), mPrimaryIntMatrix.getConstReverseZIterator(1, 2)));
-    QVERIFY(mPrimaryIntMatrix.getConstReverseZIterator(2, 3) == std::max_element(mPrimaryIntMatrix.getConstReverseZIterator(2, 3), mPrimaryIntMatrix.getConstReverseZIterator(1, 2)));
+    QVERIFY(mSecondaryIntMatrix.getConstReverseZIterator(2, 0) == std::min_element(mSecondaryIntMatrix.constReverseZRowBegin(2), mSecondaryIntMatrix.getConstReverseZIterator(1, 2)));
+    QVERIFY(mSecondaryIntMatrix.getConstReverseZIterator(2, 3) == std::max_element(mSecondaryIntMatrix.getConstReverseZIterator(2, 3), mSecondaryIntMatrix.getConstReverseZIterator(1, 2)));
     QVERIFY(mThirdIntMatrix.getConstDIterator(1, 1, true) == std::min_element(mThirdIntMatrix.constDBegin(1), mThirdIntMatrix.constDEnd(1)));
     QVERIFY(mThirdIntMatrix.getConstMIterator(0, 2, true) == std::max_element(mThirdIntMatrix.constMBegin(0), mThirdIntMatrix.constMEnd(0)));
 
@@ -119,8 +119,8 @@ void MinMaxTests::testMinMaxElement()
 
     QVERIFY(itPairRef1 == itPair1);
 
-    itPair1 = std::minmax_element(mSecondaryIntMatrix.getConstZIterator(1, 2), mSecondaryIntMatrix.getConstZIterator(2, 3));
-    itPairRef1 = {mSecondaryIntMatrix.getConstZIterator(1, 4), mSecondaryIntMatrix.constZRowBegin(2)};
+    itPair1 = std::minmax_element(mPrimaryIntMatrix.getConstZIterator(1, 2), mPrimaryIntMatrix.getConstZIterator(2, 3));
+    itPairRef1 = {mPrimaryIntMatrix.getConstZIterator(1, 4), mPrimaryIntMatrix.constZRowBegin(2)};
 
     QVERIFY(itPairRef1 == itPair1);
 
@@ -154,12 +154,12 @@ void MinMaxTests::testMinMaxElement()
 
 void MinMaxTests::testClamp()
 {
-    QVERIFY(mPrimaryIntMatrix.at(3, 0) == std::clamp(mPrimaryIntMatrix.at(2, 4), mPrimaryIntMatrix.at(3, 0), mPrimaryIntMatrix.at(3, 2)));
-    QVERIFY(mPrimaryIntMatrix.at(3, 0) == std::clamp(mPrimaryIntMatrix.at(3, 0), mPrimaryIntMatrix.at(3, 0), mPrimaryIntMatrix.at(3, 2)));
-    QVERIFY(mPrimaryIntMatrix.at(3, 1) == std::clamp(mPrimaryIntMatrix.at(3, 1), mPrimaryIntMatrix.at(3, 0), mPrimaryIntMatrix.at(3, 2)));
-    QVERIFY(mPrimaryIntMatrix.at(3, 2) == std::clamp(mPrimaryIntMatrix.at(3, 2), mPrimaryIntMatrix.at(3, 0), mPrimaryIntMatrix.at(3, 2)));
-    QVERIFY(mPrimaryIntMatrix.at(3, 2) == std::clamp(mPrimaryIntMatrix.at(3, 3), mPrimaryIntMatrix.at(3, 0), mPrimaryIntMatrix.at(3, 2)));
-    QVERIFY(mPrimaryIntMatrix.at(3, 2) == std::clamp(mPrimaryIntMatrix.at(3, 4), mPrimaryIntMatrix.at(3, 0), mPrimaryIntMatrix.at(3, 2)));
+    QVERIFY(mSecondaryIntMatrix.at(3, 0) == std::clamp(mSecondaryIntMatrix.at(2, 4), mSecondaryIntMatrix.at(3, 0), mSecondaryIntMatrix.at(3, 2)));
+    QVERIFY(mSecondaryIntMatrix.at(3, 0) == std::clamp(mSecondaryIntMatrix.at(3, 0), mSecondaryIntMatrix.at(3, 0), mSecondaryIntMatrix.at(3, 2)));
+    QVERIFY(mSecondaryIntMatrix.at(3, 1) == std::clamp(mSecondaryIntMatrix.at(3, 1), mSecondaryIntMatrix.at(3, 0), mSecondaryIntMatrix.at(3, 2)));
+    QVERIFY(mSecondaryIntMatrix.at(3, 2) == std::clamp(mSecondaryIntMatrix.at(3, 2), mSecondaryIntMatrix.at(3, 0), mSecondaryIntMatrix.at(3, 2)));
+    QVERIFY(mSecondaryIntMatrix.at(3, 2) == std::clamp(mSecondaryIntMatrix.at(3, 3), mSecondaryIntMatrix.at(3, 0), mSecondaryIntMatrix.at(3, 2)));
+    QVERIFY(mSecondaryIntMatrix.at(3, 2) == std::clamp(mSecondaryIntMatrix.at(3, 4), mSecondaryIntMatrix.at(3, 0), mSecondaryIntMatrix.at(3, 2)));
 
     QVERIFY(mPrimaryStringIntPairMatrix.at(0, 2) == std::clamp(mPrimaryStringIntPairMatrix.at(0, 0),
                                                                mPrimaryStringIntPairMatrix.at(0, 2),

@@ -30,21 +30,21 @@ PartitioningTests::PartitioningTests()
                                 3, 3, -3, -4, -2,
                                -5, -5, 2, -1, 4
                         }}
-    , mPrimaryStringIntPairMatrix{2, 5, {{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
-                                         {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}
+    , mPrimaryStringIntPairMatrix{2, 5, {{"Alex", 10}, {"Alistair", 10}, {"Mark", 9}, {"Kevin", 11}, {"George", 14},
+                                         {"Andrew", 11}, {"Reggie", 12}, {"Cameron", 10}, {"Patrick", 14}, {"John", 11}
                                   }}
-    , mSecondaryStringIntPairMatrix{2, 5, {{"Alex", 10}, {"Alistair", 10}, {"Mark", 9}, {"Kevin", 11}, {"George", 14},
-                                           {"Andrew", 11}, {"Reggie", 12}, {"Cameron", 10}, {"Patrick", 14}, {"John", 11}
-                                   }}
+    , mSecondaryStringIntPairMatrix{2, 5, {{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
+                                           {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}
+                                    }}
 {
 }
 
 void PartitioningTests::testIsPartitioned()
 {
-    QVERIFY(std::is_partitioned(mSecondaryStringIntPairMatrix.constZBegin(), mSecondaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.second < 11;}));
-    QVERIFY(!std::is_partitioned(mSecondaryStringIntPairMatrix.constZBegin(), mSecondaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.first.size() < 5;}));
-    QVERIFY(std::is_partitioned(mSecondaryStringIntPairMatrix.constZRowBegin(1), mSecondaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return 6 == element.first.size();}));
-    QVERIFY(!std::is_partitioned(mSecondaryStringIntPairMatrix.constZRowBegin(1), mSecondaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return element.second < 14;}));
+    QVERIFY(std::is_partitioned(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.second < 11;}));
+    QVERIFY(!std::is_partitioned(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.first.size() < 5;}));
+    QVERIFY(std::is_partitioned(mPrimaryStringIntPairMatrix.constZRowBegin(1), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return 6 == element.first.size();}));
+    QVERIFY(!std::is_partitioned(mPrimaryStringIntPairMatrix.constZRowBegin(1), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return element.second < 14;}));
 }
 
 void PartitioningTests::testPartition()
@@ -89,7 +89,7 @@ void PartitioningTests::testPartition()
 
 void PartitioningTests::testPartitionCopy()
 {
-    StringIntPairMatrix sourceMatrix{mPrimaryStringIntPairMatrix};
+    StringIntPairMatrix sourceMatrix{mSecondaryStringIntPairMatrix};
     const StringIntPairMatrix::size_type c_DestinationElementsCount{sourceMatrix.getNrOfColumns()};
 
     StringIntPairMatrix firstDestinationMatrix{c_DestinationElementsCount, 1, {"Zorba", 100}};
@@ -122,8 +122,8 @@ void PartitioningTests::testStablePartition()
 
     QVERIFY(c_FirstMatrixRef == firstMatrix);
 
-    StringIntPairMatrix secondMatrix{mPrimaryStringIntPairMatrix};
-    const StringIntPairMatrix c_SecondMatrixRef{mSecondaryStringIntPairMatrix};
+    StringIntPairMatrix secondMatrix{mSecondaryStringIntPairMatrix};
+    const StringIntPairMatrix c_SecondMatrixRef{mPrimaryStringIntPairMatrix};
 
     std::stable_partition(secondMatrix.zBegin(), secondMatrix.zRowEnd(0), [](StringIntPair element) {return element.second < 11;});
     std::stable_partition(secondMatrix.zRowBegin(1), secondMatrix.zEnd(), [](StringIntPair element) {return 6 == element.first.size();});
@@ -133,10 +133,10 @@ void PartitioningTests::testStablePartition()
 
 void PartitioningTests::testPartitionPoint()
 {
-    QVERIFY(mSecondaryStringIntPairMatrix.getConstZIterator(0,3) == std::partition_point(mSecondaryStringIntPairMatrix.constZBegin(), mSecondaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.second < 11;}));
-    QVERIFY(mSecondaryStringIntPairMatrix.getConstZIterator(1,2) == std::partition_point(mSecondaryStringIntPairMatrix.constZRowBegin(1), mSecondaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return 6 == element.first.size();}));
-    QVERIFY(mSecondaryStringIntPairMatrix.constZEnd() == std::partition_point(mSecondaryStringIntPairMatrix.constZBegin(), mSecondaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return element.second > 8;}));
-    QVERIFY(mSecondaryStringIntPairMatrix.getConstZIterator(1,2) == std::partition_point(mSecondaryStringIntPairMatrix.constZRowBegin(1), mSecondaryStringIntPairMatrix.getConstZIterator(1,2), [](StringIntPair element) {return 6 == element.first.size();}));
+    QVERIFY(mPrimaryStringIntPairMatrix.getConstZIterator(0,3) == std::partition_point(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.second < 11;}));
+    QVERIFY(mPrimaryStringIntPairMatrix.getConstZIterator(1,2) == std::partition_point(mPrimaryStringIntPairMatrix.constZRowBegin(1), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return 6 == element.first.size();}));
+    QVERIFY(mPrimaryStringIntPairMatrix.constZEnd() == std::partition_point(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return element.second > 8;}));
+    QVERIFY(mPrimaryStringIntPairMatrix.getConstZIterator(1,2) == std::partition_point(mPrimaryStringIntPairMatrix.constZRowBegin(1), mPrimaryStringIntPairMatrix.getConstZIterator(1,2), [](StringIntPair element) {return 6 == element.first.size();}));
 }
 
 QTEST_APPLESS_MAIN(PartitioningTests)

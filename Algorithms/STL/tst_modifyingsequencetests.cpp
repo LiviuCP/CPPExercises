@@ -122,15 +122,15 @@ ModifyingSequenceTests::ModifyingSequenceTests()
                                  -3, 2, 4, 2, 4,
                                   0, 1, 3, 5, -2
                           }}
-    , mThirdIntMatrix{3, 9, {-1,  2, 4, 5, 6,  7,  2, 4, 5,
-                              8, -2, 5, 6, 7,  2,  7, 8, 2,
-                              4,  5, 6, 7, 2, -10, 8, -2, 4
+    , mThirdIntMatrix{4, 5, {1, -2, -4, -4, 3,
+                             0, -4, -4, -4, 1,
+                            -3,  4,  4,  4, 4,
+                             4, -2,  3,  5, 1
 
                       }}
-    , mFourthIntMatrix{4, 5, {1, -2, -4, -4, 3,
-                              0, -4, -4, -4, 1,
-                             -3,  4,  4,  4, 4,
-                              4, -2,  3,  5, 1
+    , mFourthIntMatrix{3, 9, {-1,  2, 4, 5, 6,  7,  2, 4, 5,
+                               8, -2, 5, 6, 7,  2,  7, 8, 2,
+                               4,  5, 6, 7, 2, -10, 8, -2, 4
 
                        }}
     , mPrimaryStringIntPairMatrix{2, 5, {{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
@@ -193,7 +193,7 @@ void ModifyingSequenceTests::testCopy()
 
 void ModifyingSequenceTests::testCopyN()
 {
-    IntMatrix matrix{mFourthIntMatrix};
+    IntMatrix matrix{mThirdIntMatrix};
     const IntMatrix c_MatrixRef{4, 5, {1, -2, -4, -4, 3,
                                        0, -4, 1,  0, 1,
                                       -3,  8, 7,  2, 4,
@@ -201,7 +201,7 @@ void ModifyingSequenceTests::testCopyN()
 
                                 }};
 
-    IntMatrix::ConstZIterator it{std::copy_n(mThirdIntMatrix.getConstReverseZIterator(1, 7), 3, matrix.getZIterator(2, 1))};
+    IntMatrix::ConstZIterator it{std::copy_n(mFourthIntMatrix.getConstReverseZIterator(1, 7), 3, matrix.getZIterator(2, 1))};
 
     QVERIFY(matrix.getConstZIterator(2, 4) == it);
 
@@ -212,7 +212,7 @@ void ModifyingSequenceTests::testCopyN()
 
 void ModifyingSequenceTests::testCopyBackward()
 {
-    IntMatrix firstMatrix{mFourthIntMatrix};
+    IntMatrix firstMatrix{mThirdIntMatrix};
     IntMatrix firstMatrixRef{4, 5, {1, -2, -4, -4, 3,
                                     0, -4, -4, -4, 1,
                                     -3, 2, 5,  4, 1,
@@ -311,7 +311,7 @@ void ModifyingSequenceTests::testMoveBackward()
 
 void ModifyingSequenceTests::testFill()
 {
-    IntMatrix matrix{mFourthIntMatrix};
+    IntMatrix matrix{mThirdIntMatrix};
     const IntMatrix c_MatrixRef{4, 5, {1, -2, -4, -10, 3,
                                        0, -4, -10, -4, 1,
                                       -3, -10, 4,  4,  4,
@@ -326,7 +326,7 @@ void ModifyingSequenceTests::testFill()
 
 void ModifyingSequenceTests::testFillN()
 {
-    IntMatrix matrix{mThirdIntMatrix};
+    IntMatrix matrix{mFourthIntMatrix};
     const IntMatrix c_MatrixRef{3, 9, {-1,  2, 4,  5, 6,  7,  2,  4,  5,
                                         8, -2, 5, 14, 14, 14, 14, 14, 2,
                                         4,  5, 6,  7, 2, -10,  8, -2, 4
@@ -346,7 +346,7 @@ void ModifyingSequenceTests::testTransform()
                                 3, -3, -3, 2
                         }};
 
-    IntMatrix::ConstReverseZIterator it1{std::transform(mSecondaryIntMatrix.constDBegin(1), mSecondaryIntMatrix.constDEnd(1), mFourthIntMatrix.constMBegin(0), matrix.reverseZRowBegin(1), [](int firstElement, int secondElement) {return std::abs(firstElement * secondElement);})};
+    IntMatrix::ConstReverseZIterator it1{std::transform(mSecondaryIntMatrix.constDBegin(1), mSecondaryIntMatrix.constDEnd(1), mThirdIntMatrix.constMBegin(0), matrix.reverseZRowBegin(1), [](int firstElement, int secondElement) {return std::abs(firstElement * secondElement);})};
 
     QVERIFY(matrixRef == matrix && matrix.getConstReverseZIterator(3) == it1);
 
@@ -368,7 +368,7 @@ void ModifyingSequenceTests::testTransform()
                         -4, 3, 0, 0, -3
                  }};
 
-    it2 = std::transform(matrix.constZBegin(), matrix.constZEnd(), mFourthIntMatrix.constZBegin(), matrix.zBegin(), [](int firstElement, int secondElement) {return firstElement - secondElement;});
+    it2 = std::transform(matrix.constZBegin(), matrix.constZEnd(), mThirdIntMatrix.constZBegin(), matrix.zBegin(), [](int firstElement, int secondElement) {return firstElement - secondElement;});
     QVERIFY(matrixRef == matrix && matrix.constZEnd() == it2);
 
     matrix = mSecondaryIntMatrix;
@@ -389,14 +389,14 @@ void ModifyingSequenceTests::testTransform()
                         3, 0, 0, 0, 1
                  }};
 
-    it2 = std::transform(mFourthIntMatrix.constReverseZBegin(), mFourthIntMatrix.constReverseZEnd(), matrix.zBegin(), [](int element) {return element < 0 ? 0 : element;});
+    it2 = std::transform(mThirdIntMatrix.constReverseZBegin(), mThirdIntMatrix.constReverseZEnd(), matrix.zBegin(), [](int element) {return element < 0 ? 0 : element;});
 
     QVERIFY(matrixRef == matrix && matrix.zEnd() == it2);
 }
 
 void ModifyingSequenceTests::testGenerate()
 {
-    IntMatrix matrix{mFourthIntMatrix};
+    IntMatrix matrix{mThirdIntMatrix};
     const IntMatrix c_MatrixRef{4, 5, {4,  6,  8,  10, 12,
                                        14, 16, 18, 20, 22,
                                        24, 26, 28, 30, 32,
@@ -426,7 +426,7 @@ void ModifyingSequenceTests::testGenerateN()
 
 void ModifyingSequenceTests::testRemove()
 {
-    IntMatrix firstMatrix{mFourthIntMatrix};
+    IntMatrix firstMatrix{mThirdIntMatrix};
     IntMatrix firstMatrixRef{3, 5, {1, -2, 3, 0, 1,
                                    -3, 4, 4, 4, 4,
                                     4, -2, 3, 5, 1
@@ -441,7 +441,7 @@ void ModifyingSequenceTests::testRemove()
 
     QVERIFY(firstMatrixRef == firstMatrix);
 
-    firstMatrix = mFourthIntMatrix;
+    firstMatrix = mThirdIntMatrix;
     firstMatrixRef = {4, 4, {1, -2, 4, 3,
                              0, -4, 3, 1,
                             -3, 4, 4, 4,
@@ -479,7 +479,7 @@ void ModifyingSequenceTests::testRemoveCopy()
                                              0, 1, 3, 5, -2
                                      }};
 
-    IntMatrix::ConstZIterator it1{std::remove_copy(mFourthIntMatrix.constReverseZRowBegin(1), mFourthIntMatrix.constReverseZEnd(), firstMatrix.zRowBegin(2), -4)};
+    IntMatrix::ConstZIterator it1{std::remove_copy(mThirdIntMatrix.constReverseZRowBegin(1), mThirdIntMatrix.constReverseZEnd(), firstMatrix.zRowBegin(2), -4)};
 
     QVERIFY(c_FirstMatrixRef == firstMatrix && firstMatrix.constZRowBegin(3) == it1);
 
@@ -495,7 +495,7 @@ void ModifyingSequenceTests::testRemoveCopy()
 
 void ModifyingSequenceTests::testReplace()
 {
-    IntMatrix firstMatrix{mThirdIntMatrix};
+    IntMatrix firstMatrix{mFourthIntMatrix};
     const IntMatrix c_FirstMatrixRef{3, 9, {-1, 2,  4, 5, 6, -14, 2,  4, 5,
                                              8, -2, 5, 6, -14, 2, 7,  8, 2,
                                              4, 5,  6, 7, 2, -10, 8, -2, 4
@@ -518,7 +518,7 @@ void ModifyingSequenceTests::testReplace()
 
 void ModifyingSequenceTests::testReplaceCopy()
 {
-    IntMatrix firstMatrix{mFourthIntMatrix};
+    IntMatrix firstMatrix{mThirdIntMatrix};
     const IntMatrix c_FirstMatrixRef{4, 5, {1, -2, -4, 1, 3,
                                             0, -4, 20, -4, 1,
                                            -3, 20, 4, 4, 4,
@@ -558,7 +558,7 @@ void ModifyingSequenceTests::testSwap()
 
 void ModifyingSequenceTests::testSwapRanges()
 {
-    IntMatrix matrix{mThirdIntMatrix};
+    IntMatrix matrix{mFourthIntMatrix};
     const IntMatrix c_MatrixRef{3, 9, {-1, 4,  4,  5,  6, 7, 2, 2,  5,
                                         8, -2, 7,  6,  7, 2, 5, 8,  2,
                                         4, 5,  6, -10, 2, 7, 8, -2, 4
@@ -622,11 +622,11 @@ void ModifyingSequenceTests::testReverseCopy()
                                -2, 1, 3, 5, -2
                         }};
 
-    IntMatrix::ConstMIterator it1{std::reverse_copy(mFourthIntMatrix.constDBegin(1), mFourthIntMatrix.constDEnd(1), matrix.mBegin(1))};
+    IntMatrix::ConstMIterator it1{std::reverse_copy(mThirdIntMatrix.constDBegin(1), mThirdIntMatrix.constDEnd(1), matrix.mBegin(1))};
 
     QVERIFY(matrixRef == matrix && matrix.constMEnd(1) == it1);
 
-    matrix = mFourthIntMatrix;
+    matrix = mThirdIntMatrix;
     matrixRef = {4, 5, {1, -2, -4, 2, 3,
                         0, -4, -4, 4, 1,
                         -3, 4, 4, 5,  4,
@@ -673,7 +673,7 @@ void ModifyingSequenceTests::testRotate()
 
     QVERIFY(matrixRef == matrix && matrix.getReverseZIterator(1, 0) == it2);
 
-    matrix = mFourthIntMatrix;
+    matrix = mThirdIntMatrix;
     matrixRef = {4, 5, {1, -2, -4, -4, -4,
                         0, -4, -4,  5,  4,
                        -3,  4,  4,  3,  4,
@@ -688,7 +688,7 @@ void ModifyingSequenceTests::testRotate()
 
 void ModifyingSequenceTests::testRotateCopy()
 {
-    IntMatrix matrix{mFourthIntMatrix};
+    IntMatrix matrix{mThirdIntMatrix};
     IntMatrix matrixRef{4, 5, {1, -2, 4, -4, 3,
                                0, -4, 5, -4, 1,
                               -3, -3, -3, 4, 4,
@@ -700,7 +700,7 @@ void ModifyingSequenceTests::testRotateCopy()
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(3, 2) == it);
 
-    matrix = mThirdIntMatrix;
+    matrix = mFourthIntMatrix;
     matrixRef = {3, 9, {-1,  2, 4, 5, 6, 7, 2, 4, 5,
                          8, -2, 5, 6, 7, 2, 7, 8, 2,
                          4,  5, 6, 5, 4, 2, 7, 6, 4
@@ -793,7 +793,7 @@ void ModifyingSequenceTests::testSample()
 
 void ModifyingSequenceTests::testUnique()
 {
-    IntMatrix matrix{mFourthIntMatrix};
+    IntMatrix matrix{mThirdIntMatrix};
     const IntMatrix c_MatrixRef{4, 5, {-9, -9, -9, -9, -9,
                                        -9, -9,  1, -2, -4,
                                         3,  0, -4,  1, -3,
@@ -815,7 +815,7 @@ void ModifyingSequenceTests::testUniqueCopy()
                                        3, -3, 5,  5, -2
                                 }};
 
-    IntMatrix::ConstNIterator it{std::unique_copy(mFourthIntMatrix.constZBegin(), mFourthIntMatrix.constZEnd(), matrix.nBegin())};
+    IntMatrix::ConstNIterator it{std::unique_copy(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), matrix.nBegin())};
 
     QVERIFY(c_MatrixRef == matrix && matrix.getConstNIterator(1, 3) == it);
 }

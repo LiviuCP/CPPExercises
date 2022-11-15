@@ -69,20 +69,20 @@ private:
 };
 
 UninitializedMemoryOperationsTests::UninitializedMemoryOperationsTests()
-    : mPrimaryIntMatrix{3, 4, {-1, 1, 1, 0,
-                                2, 4, 5, 1,
-                                3, -3, -3, 2
+    : mPrimaryIntMatrix{4, 5, {-1, 1, 1, 0, 2,
+                                4, 9, 2, 5, -3,
+                               -3, 2, 4, 2, 4,
+                                0, 1, 3, 5, -2
                         }}
-    , mSecondaryIntMatrix{4, 5, {-1, 1, 1, 0, 2,
-                                  4, 9, 2, 5, -3,
-                                 -3, 2, 4, 2, 4,
-                                  0, 1, 3, 5, -2
+    , mSecondaryIntMatrix{3, 4, {-1,  1,  1, 0,
+                                  2,  4,  5, 1,
+                                  3, -3, -3, 2
                           }}
     , mPrimaryStringIntPairMatrix{2, 5, {{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
                                          {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}
                                   }}
     , mSecondaryStringIntPairMatrix{2, 5, {{"Anna", 18}, {"Kelly", 12}, {"Annabel", 11}, {"Juan", 10}, {"Jack", 8},
-                                         {"Barbara", 10}, {"Barney", 20}, {"Joseph", 11}, {"Johnny", 9}, {"Jeff", 15}
+                                           {"Barbara", 10}, {"Barney", 20}, {"Joseph", 11}, {"Johnny", 9}, {"Jeff", 15}
                                     }}
     , mPrimaryStringIntPairVector{{"Alex", 10}, {"Kevin", 11}, {"Cameron", 10}, {"Alistair", 10}, {"George", 14}, {"Mark", 9}}
 {
@@ -90,7 +90,7 @@ UninitializedMemoryOperationsTests::UninitializedMemoryOperationsTests()
 
 void UninitializedMemoryOperationsTests::testUninitializedCopy()
 {
-    const size_t c_UninitializedElementsCount{static_cast<size_t>(mSecondaryIntMatrix.constNColumnEnd(3) - mSecondaryIntMatrix.constNColumnBegin(2))};
+    const size_t c_UninitializedElementsCount{static_cast<size_t>(mPrimaryIntMatrix.constNColumnEnd(3) - mPrimaryIntMatrix.constNColumnBegin(2))};
     int* pFirst{static_cast<int*>(std::malloc(c_UninitializedElementsCount * sizeof(int)))};
 
     if (!pFirst)
@@ -103,14 +103,14 @@ void UninitializedMemoryOperationsTests::testUninitializedCopy()
 
     try
     {
-        int* const pLast{std::uninitialized_copy(mSecondaryIntMatrix.constNColumnBegin(2), mSecondaryIntMatrix.constNColumnEnd(3), pFirst)};
+        int* const pLast{std::uninitialized_copy(mPrimaryIntMatrix.constNColumnBegin(2), mPrimaryIntMatrix.constNColumnEnd(3), pFirst)};
 
         if (pLast != pFirst + c_UninitializedElementsCount)
         {
             FAIL_DEALLOC(pFirst, "std::uninitialized_copy() returned invalid iterator");
         }
 
-        IntMatrix matrix{mPrimaryIntMatrix};
+        IntMatrix matrix{mSecondaryIntMatrix};
         const IntMatrix c_MatrixRef{3, 4, {-1, 1, 1, 0,
                                             1, 2, 4, 3,
                                             0, 5, 2, 5
@@ -181,7 +181,7 @@ void UninitializedMemoryOperationsTests::testUninitializedCopyN()
 
 void UninitializedMemoryOperationsTests::testUninitializedFill()
 {
-    const size_t c_UninitializedElementsCount{static_cast<size_t>(mSecondaryIntMatrix.constNColumnEnd(3) - mSecondaryIntMatrix.constNColumnBegin(2))};
+    const size_t c_UninitializedElementsCount{static_cast<size_t>(mPrimaryIntMatrix.constNColumnEnd(3) - mPrimaryIntMatrix.constNColumnBegin(2))};
     int* pFirst{static_cast<int*>(std::malloc(c_UninitializedElementsCount * sizeof(int)))};
 
     if (!pFirst)
@@ -197,7 +197,7 @@ void UninitializedMemoryOperationsTests::testUninitializedFill()
         int* const pLast{pFirst + c_UninitializedElementsCount};
         std::uninitialized_fill(pFirst, pLast, 20);
 
-        IntMatrix matrix{mPrimaryIntMatrix};
+        IntMatrix matrix{mSecondaryIntMatrix};
         const IntMatrix c_MatrixRef{3, 4, {-1, 1, 1, 0,
                                             20, 20, 20, 20,
                                             20, 20, 20, 20
@@ -264,7 +264,7 @@ void UninitializedMemoryOperationsTests::testUninitializedFillN()
 
 void UninitializedMemoryOperationsTests::testUninitializedMove()
 {
-    const size_t c_UninitializedElementsCount{static_cast<size_t>(mSecondaryIntMatrix.constNColumnEnd(2) - mSecondaryIntMatrix.constNColumnBegin(2))};
+    const size_t c_UninitializedElementsCount{static_cast<size_t>(mPrimaryIntMatrix.constNColumnEnd(2) - mPrimaryIntMatrix.constNColumnBegin(2))};
     int* pFirst{static_cast<int*>(std::malloc(c_UninitializedElementsCount * sizeof(int)))};
 
     if (!pFirst)
@@ -277,7 +277,7 @@ void UninitializedMemoryOperationsTests::testUninitializedMove()
 
     try
     {
-        IntMatrix srcMatrix{mSecondaryIntMatrix};
+        IntMatrix srcMatrix{mPrimaryIntMatrix};
         const IntMatrix c_SrcMatrixRef{4, 4, {-1, 1, 0,  2,
                                                4, 9, 5, -3,
                                               -3, 2, 2,  4,
@@ -292,7 +292,7 @@ void UninitializedMemoryOperationsTests::testUninitializedMove()
 
         srcMatrix.eraseColumn(2);
 
-        IntMatrix destMatrix{mPrimaryIntMatrix};
+        IntMatrix destMatrix{mSecondaryIntMatrix};
         const IntMatrix c_DestMatrixRef{3, 4, {-1,  1,  1, 0,
                                                 3,  4,  2, 1,
                                                 3, -3, -3, 2
@@ -407,7 +407,7 @@ void UninitializedMemoryOperationsTests::testUninitializedDefaultConstruct()
         TestData1* const pLast{pFirst + c_UninitializedElementsCount};
         std::uninitialized_default_construct(pFirst, pLast);
 
-        IntMatrix matrix{mSecondaryIntMatrix};
+        IntMatrix matrix{mPrimaryIntMatrix};
         const IntMatrix c_MatrixRef{4, 5, {-1,  1,  1, -101, 2,
                                             4,  9, -101, 5, -3,
                                            -3, -101, 4,  2,  4,
@@ -500,7 +500,7 @@ void UninitializedMemoryOperationsTests::testUninitializedValueConstruct()
         TestData1* const pLast{pFirst + c_UninitializedElementsCount};
         std::uninitialized_value_construct(pFirst, pLast);
 
-        IntMatrix matrix{mSecondaryIntMatrix};
+        IntMatrix matrix{mPrimaryIntMatrix};
 
         // if a default constructor is defined by user then same result is obtained as when applying std::uninitialized_default_construct(_n)
         const IntMatrix c_MatrixRef{4, 5, {-1,  1,  1, -101, 2,
@@ -585,7 +585,7 @@ void UninitializedMemoryOperationsTests::testDestroy()
            In the everyday work it should obviously not be used on uninitialized memory (or to set member variables)! */
         std::destroy(pFirst, pLast);
 
-        IntMatrix matrix{mSecondaryIntMatrix};
+        IntMatrix matrix{mPrimaryIntMatrix};
         const IntMatrix c_MatrixRef{4, 5, {-1,  1,  1, 50, 2,
                                             4,  9, 50, 5, -3,
                                            -3, 50, 4,  2,  4,
@@ -626,7 +626,7 @@ void UninitializedMemoryOperationsTests::testDestroyN()
         std::uninitialized_default_construct(pFirst, pLast);
         std::destroy_n(pFirst + 1, c_ElementsToDestroyCount);
 
-        IntMatrix matrix{mSecondaryIntMatrix};
+        IntMatrix matrix{mPrimaryIntMatrix};
         const IntMatrix c_MatrixRef{4, 5, {-1, -101, 1,  0,  2,
                                             4,   9,  50, 5, -3,
                                            -3,   2,  4,  50, 4,
@@ -667,7 +667,7 @@ void UninitializedMemoryOperationsTests::testDestroyAt()
         std::uninitialized_default_construct(pFirst, pLast);
         std::destroy_at(pFirst + c_ElementToDestroyIndex);
 
-        IntMatrix matrix{mSecondaryIntMatrix};
+        IntMatrix matrix{mPrimaryIntMatrix};
         const IntMatrix c_MatrixRef{4, 5, {-1, -101, 1,   0,  2,
                                             4,   9, -101, 5, -3,
                                            -3,   2,  4,   50, 4,
@@ -693,7 +693,7 @@ void UninitializedMemoryOperationsTests::testDestroyAt()
 
 void UninitializedMemoryOperationsTests::testConstructAt()
 {
-    const size_t c_UninitializedElementsCount{static_cast<size_t>(mSecondaryIntMatrix.getNrOfRows())};
+    const size_t c_UninitializedElementsCount{static_cast<size_t>(mPrimaryIntMatrix.getNrOfRows())};
     TestData1* pFirst{static_cast<TestData1*>(std::malloc(c_UninitializedElementsCount * sizeof(TestData1)))};
 
     if (!pFirst)
@@ -705,8 +705,8 @@ void UninitializedMemoryOperationsTests::testConstructAt()
     {
         TestData1* const pLast{pFirst + c_UninitializedElementsCount};
 
-        IntMatrix::ConstNIterator firstIt{mSecondaryIntMatrix.constNColumnBegin(1)};
-        IntMatrix::ConstNIterator secondIt{mSecondaryIntMatrix.constNColumnBegin(2)};
+        IntMatrix::ConstNIterator firstIt{mPrimaryIntMatrix.constNColumnBegin(1)};
+        IntMatrix::ConstNIterator secondIt{mPrimaryIntMatrix.constNColumnBegin(2)};
 
         for (TestData1* pIt{pFirst}; pIt != pLast; ++pIt)
         {
@@ -716,7 +716,7 @@ void UninitializedMemoryOperationsTests::testConstructAt()
             ++secondIt;
         }
 
-        IntMatrix matrix{mPrimaryIntMatrix};
+        IntMatrix matrix{mSecondaryIntMatrix};
         const IntMatrix c_MatrixRef{3, 4, {-1, 1, 1, 0,
                                             1, 5, 3, 2,
                                             3, -3, -3, 2

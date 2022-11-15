@@ -37,13 +37,13 @@ NumericOperationsTests::NumericOperationsTests()
                                 1,  2,  3,  3,  4,
                                 5,  7,  11, 11, 14
                         }}
-    , mSecondaryIntMatrix{5, 4, {1, -2, -3, -4,
-                                 0, -4, -4, -4,
-                                -3,  4,  4,  4,
-                                 4, -2,  3,  5,
-                                 3,  1,  4,  1
-                          }}
-    , mThirdIntMatrix{4, 4, 0}
+    , mSecondaryIntMatrix{4, 4, 0}
+    , mThirdIntMatrix{5, 4, {1, -2, -3, -4,
+                             0, -4, -4, -4,
+                            -3,  4,  4,  4,
+                             4, -2,  3,  5,
+                             3,  1,  4,  1
+                      }}
     , mFourthIntMatrix{4, 5, {2,  8, -3,  2, -1,
                               0,  4,  5, -1,  1,
                              -1, -2,  10, 8,  7,
@@ -99,7 +99,7 @@ void NumericOperationsTests::testAccumulate()
 
 void NumericOperationsTests::testInnerProduct()
 {
-    IntMatrix matrix{mThirdIntMatrix};
+    IntMatrix matrix{mSecondaryIntMatrix};
     const IntMatrix c_MatrixRef{4, 4,{-23, 33,  8, 16,
                                        4,   9, 20, 22,
                                        16,  0, 26, 19,
@@ -108,7 +108,7 @@ void NumericOperationsTests::testInnerProduct()
 
     for(IntMatrix::ZIterator it{matrix.zBegin()}; it != matrix.zEnd(); ++it)
     {
-        *it = std::inner_product(mPrimaryIntMatrix.constZRowBegin(it.getRowNr()), mPrimaryIntMatrix.constZRowEnd(it.getRowNr()), mSecondaryIntMatrix.constNColumnBegin(it.getColumnNr()), 0);
+        *it = std::inner_product(mPrimaryIntMatrix.constZRowBegin(it.getRowNr()), mPrimaryIntMatrix.constZRowEnd(it.getRowNr()), mThirdIntMatrix.constNColumnBegin(it.getColumnNr()), 0);
     }
 
     QVERIFY(c_MatrixRef == matrix);
@@ -141,7 +141,7 @@ void NumericOperationsTests::testInnerProduct()
 
 void NumericOperationsTests::testAdjacentDifference()
 {
-    IntMatrix matrix{mThirdIntMatrix};
+    IntMatrix matrix{mSecondaryIntMatrix};
     IntMatrix matrixRef{4, 4,{0,  2,  1, 0,
                              -4,  1,  2, 0,
                               11, 2,  0, 0,
@@ -152,7 +152,7 @@ void NumericOperationsTests::testAdjacentDifference()
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(2, 2) == it);
 
-    matrix = mThirdIntMatrix;
+    matrix = mSecondaryIntMatrix;
     matrixRef = {4, 4,{0,  8, 6, 0,
                        0,  8, 1, 0,
                       -4,  9, 2, 0,
@@ -169,7 +169,7 @@ void NumericOperationsTests::testAdjacentDifference()
 
 void NumericOperationsTests::testPartialSum()
 {
-    IntMatrix matrix{mThirdIntMatrix};
+    IntMatrix matrix{mSecondaryIntMatrix};
     IntMatrix matrixRef{4, 4,{0, 15, 30, 0,
                              -4, 23, 31, 0,
                               3, 33, 30, 0,
@@ -180,7 +180,7 @@ void NumericOperationsTests::testPartialSum()
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(3, 2) == it);
 
-    matrix = mThirdIntMatrix;
+    matrix = mSecondaryIntMatrix;
     matrixRef = {4, 4,{0, 3,  8, 3,
                        0, 6, 10, 0,
                        0, 6,  5, 0,
@@ -254,7 +254,7 @@ void NumericOperationsTests::testReduce()
 
 void NumericOperationsTests::testExclusiveScan()
 {
-    IntMatrix matrix{mThirdIntMatrix};
+    IntMatrix matrix{mSecondaryIntMatrix};
     IntMatrix matrixRef{4, 4, { 0, 18, 41, 0,
                                10, 25, 40, 0,
                                 6, 33,  0, 0,
@@ -265,7 +265,7 @@ void NumericOperationsTests::testExclusiveScan()
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(2, 2) == it);
 
-    matrix = mThirdIntMatrix;
+    matrix = mSecondaryIntMatrix;
     matrixRef = {4, 4, {0,   72, 141120, 0,
                         0,  504,   0,    0,
                        -2,  2520,  0,    0,
@@ -283,7 +283,7 @@ void NumericOperationsTests::testExclusiveScan()
 
 void NumericOperationsTests::testInclusiveScan()
 {
-    IntMatrix matrix{mThirdIntMatrix};
+    IntMatrix matrix{mSecondaryIntMatrix};
     IntMatrix matrixRef{4, 4,{0, 15, 30, 0,
                              -4, 23, 31, 0,
                               3, 33, 30, 0,
@@ -295,7 +295,7 @@ void NumericOperationsTests::testInclusiveScan()
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(3, 2) == it);
 
-    matrix = mThirdIntMatrix;
+    matrix = mSecondaryIntMatrix;
     matrixRef = {4, 4, {0, 1, 4, 0,
                         8, 3, -2, 0,
                         -1, 6, -6, 0,
@@ -312,7 +312,7 @@ void NumericOperationsTests::testInclusiveScan()
 
     QVERIFY(matrixRef == matrix && matrix.getConstNIterator(3, 2) == it);
 
-    matrix = mThirdIntMatrix;
+    matrix = mSecondaryIntMatrix;
     matrixRef = {4, 4, {0, 12, 43, 0,
                         0, 21, 44, 0,
                        -4, 31, 47, 0,
@@ -362,7 +362,7 @@ void NumericOperationsTests::testTransformReduce()
 
 void NumericOperationsTests::testTransformExclusiveScan()
 {
-    IntMatrix matrix{mSecondaryIntMatrix};
+    IntMatrix matrix{mThirdIntMatrix};
     const IntMatrix c_MatrixRef{5, 4, {1, -2, 7, -4, // init: 7
                                        0, -4, 7, -4, // 7 + 2 * 1 - 2
                                       -3,  4, 3,  4, // 7 + 2 * (-1) - 2
@@ -384,7 +384,7 @@ void NumericOperationsTests::testTransformExclusiveScan()
 
 void NumericOperationsTests::testTransformInclusiveScan()
 {
-    IntMatrix matrix{mSecondaryIntMatrix};
+    IntMatrix matrix{mThirdIntMatrix};
     IntMatrix matrixRef{5, 4, {1, -2, 7, -4, // 7 + 2 * 1 - 2: init value 7 is taken into account as previous partial result ("seed")
                                0, -4, 3, -4, // 7 + 2 * (-1) - 2
                               -3,  4, 11, 4, // 3 + 2 * 5 - 2
@@ -403,7 +403,7 @@ void NumericOperationsTests::testTransformInclusiveScan()
 
     QVERIFY(matrixRef == matrix && matrix.constNColumnEnd(2) == it);
 
-    matrix = mThirdIntMatrix;
+    matrix = mSecondaryIntMatrix;
     matrixRef = {4, 4, {0,  4,  0, 0, // 1 + 7 / 2 => 4 : first element (7) is only transformed and written back (no binary operation)
                         0, -16, 0, 0, // 4 * (1 + 3 / 2) * (-2) : then binary operation is applied recursively along with transform ...
                         0,  32, 0, 0, // -16 * (1 + 1 / 2) * (-2)
