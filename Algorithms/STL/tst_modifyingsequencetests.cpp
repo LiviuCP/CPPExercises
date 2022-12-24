@@ -86,12 +86,12 @@ private:
             return *this;
         }
 
-        bool operator==(const Movable& movable)
+        bool operator==(const Movable& movable) const
         {
             return movable.mValue == mValue;
         }
 
-        bool operator!=(const Movable& movable)
+        bool operator!=(const Movable& movable) const
         {
             return movable.mValue != mValue;
         }
