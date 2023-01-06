@@ -24,10 +24,12 @@
 using IntMatrix = Matrix<int>;
 using IntPair = std::pair<int, int>;
 using IntPairMatrix = Matrix<IntPair>;
+using StringMatrix = Matrix<std::string>;
 using StringIntPair = std::pair<std::string, int>;
 using StringIntPairMatrix = Matrix<StringIntPair>;
 using IntVector = std::vector<int>;
 using StringIntPairVector = std::vector<StringIntPair>;
+using BoolMatrix = Matrix<bool>;
 
 using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
 using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
