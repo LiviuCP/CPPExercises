@@ -28,6 +28,7 @@ using StringMatrix = Matrix<std::string>;
 using StringIntPair = std::pair<std::string, int>;
 using StringIntPairMatrix = Matrix<StringIntPair>;
 using IntVector = std::vector<int>;
+using IntVectorMatrix = Matrix<IntVector>;
 using StringIntPairVector = std::vector<StringIntPair>;
 using BoolMatrix = Matrix<bool>;
 

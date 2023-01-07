@@ -18,24 +18,21 @@ private slots:
 private:
     template<typename DataType> auto _getSum(const Matrix<DataType>& matrix)
     {
-        auto sum{0};
-
-        if (!matrix.isEmpty())
+        if constexpr (std::is_integral<DataType>::value)
         {
-            if constexpr (std::is_integral<DataType>::value)
-            {
-                sum = std::accumulate(matrix.constZBegin(), matrix.constZEnd(), 0);
-            }
-            else
-            {
-                for (const auto& element : matrix)
-                {
-                    sum += element.size();
-                }
-            }
+            return std::accumulate(matrix.constZBegin(), matrix.constZEnd(), 0);
         }
+        else
+        {
+            size_t sum{0};
 
-        return sum;
+            for (const auto& element : matrix)
+            {
+                sum += element.size();
+            }
+
+            return sum;
+        }
     }
 };
 
@@ -227,6 +224,12 @@ void CPP17ConceptsTests::testConstexprIf()
                                   }};
 
     QVERIFY(7 == _getSum(c_BoolMatrix));
+
+    const Matrix<IntVector> c_IntVectorMatrix{2, 3, {{1, 4, -2, 3              }, {-2, 2}, {        },
+                                                     {2, -4, 2, 5, 10, 14, 3, 2}, {0    }, {4, 2, -1}
+                                              }};
+
+    QVERIFY(18 == _getSum(c_IntVectorMatrix));
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
