@@ -1,4 +1,6 @@
 #include <QtTest>
+#include <QString>
+
 #include <array>
 #include <type_traits>
 #include <cassert>
@@ -14,27 +16,99 @@ private slots:
     void testVariableDeclarationInSwitch();
     void testStructuredBindings();
     void testConstexprIf();
+    void testConstexprIfIsSame();
 
 private:
-    template<typename DataType> auto _getSum(const Matrix<DataType>& matrix)
+    enum class DataTypes
     {
-        if constexpr (std::is_integral<DataType>::value)
-        {
-            return std::accumulate(matrix.constZBegin(), matrix.constZEnd(), 0);
-        }
-        else
-        {
-            size_t sum{0};
+        BOOLEAN,
+        CHARACTER,
+        SIGNED_INTEGER,
+        UNSIGNED_INTEGER,
+        DECIMAL,
+        STRING,
+        CSTYLESTRING,
+        STRINGINTPAIR,
+        INTMATRIX,
+        UNKNOWN,
+    };
 
-            for (const auto& element : matrix)
-            {
-                sum += element.size();
-            }
-
-            return sum;
-        }
-    }
+    template<typename DataType> auto _getSum(const Matrix<DataType>& matrix) const;
+    template<typename DataType> DataTypes _getType(DataType myType) const;
 };
+
+template<typename DataType> auto CPP17ConceptsTests::_getSum(const Matrix<DataType>& matrix) const
+{
+    if constexpr (std::is_integral<DataType>::value)
+    {
+        return std::accumulate(matrix.constZBegin(), matrix.constZEnd(), 0);
+    }
+    else
+    {
+        size_t sum{0};
+
+        for (const auto& element : matrix)
+        {
+            sum += element.size();
+        }
+
+        return sum;
+    }
+}
+
+template<typename DataType> CPP17ConceptsTests::DataTypes CPP17ConceptsTests::_getType(DataType myType) const
+{
+    (void)myType; // this function only needs to check the type, value is discarded
+
+    if constexpr (std::is_same<DataType, bool>::value)
+    {
+        return DataTypes::BOOLEAN;
+    }
+    else if constexpr (std::is_same<DataType, char>::value)
+    {
+        return DataTypes::CHARACTER;
+    }
+    else if constexpr (std::is_same<DataType, int>::value ||
+                       std::is_same<DataType, short>::value ||
+                       std::is_same<DataType, long>::value ||
+                       std::is_same<DataType, long long>::value)
+    {
+        return DataTypes::SIGNED_INTEGER;
+    }
+    else if constexpr (std::is_same<DataType, unsigned int>::value ||
+                       std::is_same<DataType, unsigned char>::value ||
+                       std::is_same<DataType, unsigned short>::value ||
+                       std::is_same<DataType, unsigned long>::value ||
+                       std::is_same<DataType, unsigned long long>::value)
+    {
+        return DataTypes::UNSIGNED_INTEGER;
+    }
+    else if constexpr (std::is_same<DataType, float>::value ||
+                       std::is_same<DataType, double>::value)
+    {
+        return DataTypes::DECIMAL;
+    }
+    else if constexpr (std::is_same<DataType, std::string>::value)
+    {
+        return DataTypes::STRING;
+    }
+    else if constexpr (std::is_same<DataType, const char*>::value)
+    {
+        return DataTypes::CSTYLESTRING;
+    }
+    else if constexpr(std::is_same<DataType, StringIntPair>::value)
+    {
+        return DataTypes::STRINGINTPAIR;
+    }
+    else if constexpr(std::is_same<DataType, IntMatrix>::value)
+    {
+        return DataTypes::INTMATRIX;
+    }
+    else
+    {
+        return DataTypes::UNKNOWN;
+    }
+}
 
 void CPP17ConceptsTests::testVariableDeclarationInIf()
 {
@@ -230,6 +304,37 @@ void CPP17ConceptsTests::testConstexprIf()
                                               }};
 
     QVERIFY(18 == _getSum(c_IntVectorMatrix));
+}
+
+void CPP17ConceptsTests::testConstexprIfIsSame()
+{
+    QVERIFY(DataTypes::BOOLEAN == _getType(true));
+    QVERIFY(DataTypes::BOOLEAN == _getType(false));
+    QVERIFY(DataTypes::CHARACTER == _getType('a'));
+    QVERIFY(DataTypes::SIGNED_INTEGER == _getType(5));
+    QVERIFY(DataTypes::SIGNED_INTEGER == _getType(-7));
+    QVERIFY(DataTypes::UNSIGNED_INTEGER == _getType(5u));
+    QVERIFY(DataTypes::UNSIGNED_INTEGER == _getType(-1u));
+    QVERIFY(DataTypes::DECIMAL == _getType(-1.1));
+    QVERIFY(DataTypes::DECIMAL == _getType(1.0000));
+    QVERIFY(DataTypes::DECIMAL == _getType(-1.0));
+    QVERIFY(DataTypes::DECIMAL == _getType(1.0000001));
+    QVERIFY(DataTypes::STRING == _getType(std::string{"abcd"}));
+    QVERIFY(DataTypes::CSTYLESTRING == _getType("abcd"));
+    QVERIFY(DataTypes::STRINGINTPAIR == _getType(StringIntPair{"Robert", 16}));
+    QVERIFY(DataTypes::INTMATRIX == _getType(IntMatrix{2, 3, 5}));
+    QVERIFY(DataTypes::UNKNOWN == _getType(StringMatrix{2, 3, "abcd"}));
+    QVERIFY(DataTypes::UNKNOWN == _getType(Matrix<unsigned int>{2, 3, 5}));
+
+    const unsigned char ch{'a'};
+    QVERIFY(DataTypes::UNSIGNED_INTEGER == _getType(ch));
+
+    std::string str{"abcd"};
+    char* pCh{&str[1]};
+    QVERIFY(DataTypes::UNKNOWN == _getType(pCh));
+
+    QString qstr{"abcd"};
+    QVERIFY(DataTypes::UNKNOWN == _getType(qstr));
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
