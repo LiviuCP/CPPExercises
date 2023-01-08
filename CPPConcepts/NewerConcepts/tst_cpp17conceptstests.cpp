@@ -4,6 +4,7 @@
 #include <array>
 #include <type_traits>
 #include <cassert>
+#include <climits>
 
 #include "datautils.h"
 
@@ -17,6 +18,7 @@ private slots:
     void testStructuredBindings();
     void testConstexprIf();
     void testConstexprIfIsSame();
+    void testStdApply();
 
 private:
     enum class DataTypes
@@ -335,6 +337,37 @@ void CPP17ConceptsTests::testConstexprIfIsSame()
 
     QString qstr{"abcd"};
     QVERIFY(DataTypes::UNKNOWN == _getType(qstr));
+}
+
+void CPP17ConceptsTests::testStdApply()
+{
+    auto floorAverage = [](const IntMatrix& matrix, int initValue)
+    {
+        int average{INT_MIN};
+
+        if (!matrix.isEmpty())
+        {
+            average = std::accumulate(matrix.constZBegin(), matrix.constZEnd(), initValue) / (matrix.getNrOfRows() * matrix.getNrOfColumns());
+        }
+
+        return average;
+    };
+
+    IntMatrix matrix{2, 3, {-5,  50, 40,
+                            20, -10, 4
+                     }};
+
+    const int initValue{15};
+
+    QVERIFY(19 == std::apply(floorAverage, std::make_tuple(matrix, initValue)));
+
+    matrix.resizeWithValue(3, 4, 11);
+
+    QVERIFY(13 == std::apply(floorAverage, std::make_tuple(matrix, 0)));
+
+    matrix.clear();
+
+    QVERIFY(INT_MIN == std::apply(floorAverage, std::make_tuple(matrix, initValue)));
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
