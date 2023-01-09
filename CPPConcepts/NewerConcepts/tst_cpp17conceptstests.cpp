@@ -2,11 +2,14 @@
 #include <QString>
 
 #include <array>
+#include <string_view>
 #include <type_traits>
 #include <cassert>
 #include <climits>
 
 #include "datautils.h"
+
+using namespace std::literals;
 
 class CPP17ConceptsTests : public QObject
 {
@@ -29,6 +32,7 @@ private:
         UNSIGNED_INTEGER,
         DECIMAL,
         STRING,
+        STRING_VIEW,
         CSTYLESTRING,
         STRINGINTPAIR,
         INTMATRIX,
@@ -93,6 +97,10 @@ template<typename DataType> CPP17ConceptsTests::DataTypes CPP17ConceptsTests::_g
     else if constexpr (std::is_same<DataType, std::string>::value)
     {
         return DataTypes::STRING;
+    }
+    else if constexpr(std::is_same<DataType, std::string_view>::value)
+    {
+        return DataTypes::STRING_VIEW;
     }
     else if constexpr (std::is_same<DataType, const char*>::value)
     {
@@ -322,6 +330,7 @@ void CPP17ConceptsTests::testConstexprIfIsSame()
     QVERIFY(DataTypes::DECIMAL == _getType(-1.0));
     QVERIFY(DataTypes::DECIMAL == _getType(1.0000001));
     QVERIFY(DataTypes::STRING == _getType(std::string{"abcd"}));
+    QVERIFY(DataTypes::STRING_VIEW == _getType("abcd"sv));
     QVERIFY(DataTypes::CSTYLESTRING == _getType("abcd"));
     QVERIFY(DataTypes::STRINGINTPAIR == _getType(StringIntPair{"Robert", 16}));
     QVERIFY(DataTypes::INTMATRIX == _getType(IntMatrix{2, 3, 5}));
