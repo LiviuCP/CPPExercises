@@ -3,6 +3,7 @@
 
 #include <array>
 #include <string_view>
+#include <any>
 #include <type_traits>
 #include <cassert>
 #include <climits>
@@ -22,6 +23,7 @@ private slots:
     void testConstexprIf();
     void testConstexprIfIsSame();
     void testStdApply();
+    void testStdAny();
 
 private:
     enum class DataTypes
@@ -377,6 +379,70 @@ void CPP17ConceptsTests::testStdApply()
     matrix.clear();
 
     QVERIFY(INT_MIN == std::apply(floorAverage, std::make_tuple(matrix, initValue)));
+}
+
+void CPP17ConceptsTests::testStdAny()
+{
+    std::any anyType{std::string{"abcd"}};
+
+    QVERIFY(anyType.has_value() && "abcd" == any_cast<std::string>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<const char*>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<std::string_view>(anyType));
+
+    anyType = "abcd"sv;
+
+    QVERIFY(anyType.has_value() && "abcd"sv == any_cast<std::string_view>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<const char*>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<std::string>(anyType));
+
+    anyType.reset();
+    QVERIFY(!anyType.has_value());
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<std::string_view>(anyType));
+
+    anyType = IntMatrix{2, 3, {-1, 4, 5, 2, 3, 6}};
+
+    QVERIFY(anyType.has_value() && IntMatrix(2, 3, {-1, 4, 5, 2, 3, 6}) == any_cast<IntMatrix>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<Matrix<unsigned int>>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<Matrix<short>>(anyType));
+
+    anyType = 6;
+
+    QVERIFY_THROWS_NO_EXCEPTION(any_cast<int>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<short>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<unsigned int>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<long long>(anyType));
+
+    anyType = short{6};
+
+    QVERIFY_THROWS_NO_EXCEPTION(any_cast<short>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<int>(anyType));
+
+    unsigned int value{8};
+    anyType = value;
+
+    QVERIFY_THROWS_NO_EXCEPTION(any_cast<unsigned int>(anyType));
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<int>(anyType));
+
+    std::any anyOtherType{"abcd"};
+    anyOtherType.swap(anyType);
+
+    QVERIFY_THROWS_EXCEPTION(std::bad_any_cast, any_cast<unsigned int>(anyType));
+    QVERIFY(anyType.has_value() && "abcd" == std::string{any_cast<const char*>(anyType)});
+    QVERIFY(anyOtherType.has_value());
+
+    anyType.reset();
+    anyType.swap(anyOtherType);
+
+    QVERIFY(anyType.has_value() && 8 == any_cast<unsigned int>(anyType) &&
+            !anyOtherType.has_value());
+
+    anyType = IntMatrix{3, 2, {2, 0, -2, 5, 8, 7}};
+    anyOtherType = StringMatrix{2, 3, {"ab", "", "baC", "-d", "ef", "g"}};
+
+    std::swap(anyType, anyOtherType);
+
+    QVERIFY(StringMatrix(2, 3, {"ab", "", "baC", "-d", "ef", "g"}) == any_cast<StringMatrix>(anyType) &&
+            IntMatrix(3, 2, {2, 0, -2, 5, 8, 7}) == any_cast<IntMatrix>(anyOtherType));
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
