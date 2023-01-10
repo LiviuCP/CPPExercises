@@ -24,6 +24,7 @@ private slots:
     void testConstexprIfIsSame();
     void testStdApply();
     void testStdAny();
+    void testStdSize();
 
 private:
     enum class DataTypes
@@ -43,6 +44,46 @@ private:
 
     template<typename DataType> auto _getSum(const Matrix<DataType>& matrix) const;
     template<typename DataType> DataTypes _getType(DataType myType) const;
+
+    class RawContainer
+    {
+    public:
+        RawContainer() : mPtr{nullptr}, mLength{0} {}
+        RawContainer(size_t length) : mLength{length} {mPtr = std::malloc(length);}
+        ~RawContainer() {free(mPtr); mLength = 0;}
+
+        size_t size() const {return mLength;}
+
+    private:
+        void* mPtr;
+        size_t mLength;
+    };
+
+    class IntMatrixWrapper
+    {
+    public:
+        IntMatrixWrapper() {}
+        IntMatrixWrapper(int nrOfRows, int nrOfColumns, int value) : mIntMatrix{nrOfRows, nrOfColumns, value} {}
+
+        // it is possible to also use signed size with std::size
+        ssize_t size() const {return mIntMatrix.getNrOfRows() * mIntMatrix.getNrOfColumns();}
+
+    private:
+        IntMatrix mIntMatrix;
+    };
+
+    class StringMatrixWrapper
+    {
+    public:
+        StringMatrixWrapper() {}
+        StringMatrixWrapper(int nrOfRows, int nrOfColumns, std::string value) : mStringMatrix{nrOfRows, nrOfColumns, value} {}
+
+        // a pair can also be used with std::size
+        SizePair size() const {return {static_cast<size_t>(mStringMatrix.getNrOfRows()), static_cast<size_t>(mStringMatrix.getNrOfColumns())};}
+
+    private:
+        StringMatrix mStringMatrix;
+    };
 };
 
 template<typename DataType> auto CPP17ConceptsTests::_getSum(const Matrix<DataType>& matrix) const
@@ -443,6 +484,33 @@ void CPP17ConceptsTests::testStdAny()
 
     QVERIFY(StringMatrix(2, 3, {"ab", "", "baC", "-d", "ef", "g"}) == any_cast<StringMatrix>(anyType) &&
             IntMatrix(3, 2, {2, 0, -2, 5, 8, 7}) == any_cast<IntMatrix>(anyOtherType));
+}
+
+void CPP17ConceptsTests::testStdSize()
+{
+    std::vector<int> vect{1, -2, 3, 4};
+    QVERIFY(4 == std::size(vect));
+
+    vect.push_back(2);
+    QVERIFY(5 == std::size(vect));
+
+    const RawContainer c_EmptyContainer;
+    QVERIFY(0 == std::size(c_EmptyContainer));
+
+    const RawContainer c_Container{10};
+    QVERIFY(10 == std::size(c_Container));
+
+    const IntMatrixWrapper c_EmptyIntMatrix;
+    QVERIFY(0 == std::size(c_EmptyIntMatrix));
+
+    const IntMatrixWrapper c_IntMatrix{10, 15, -2};
+    QVERIFY(150 == std::size(c_IntMatrix));
+
+    const StringMatrixWrapper c_EmptyStringMatrix;
+    QVERIFY(SizePair(0, 0) == std::size(c_EmptyStringMatrix));
+
+    const StringMatrixWrapper c_StringMatrix{4, 6, "abc"};
+    QVERIFY(SizePair(4, 6) == std::size(c_StringMatrix));
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
