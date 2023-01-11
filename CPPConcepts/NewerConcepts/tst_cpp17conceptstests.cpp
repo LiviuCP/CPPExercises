@@ -4,6 +4,7 @@
 #include <array>
 #include <string_view>
 #include <any>
+#include <optional>
 #include <type_traits>
 #include <cassert>
 #include <climits>
@@ -25,6 +26,7 @@ private slots:
     void testStdApply();
     void testStdAny();
     void testStdSize();
+    void testStdOptional();
 
 private:
     enum class DataTypes
@@ -44,6 +46,8 @@ private:
 
     template<typename DataType> auto _getSum(const Matrix<DataType>& matrix) const;
     template<typename DataType> DataTypes _getType(DataType myType) const;
+    template<typename DataType> std::optional<typename Matrix<DataType>::size_type> _getLowestDiagonalNr(const Matrix<DataType> matrix);
+    template<typename DataType> std::optional<typename Matrix<DataType>::size_type> _getHighestDiagonalNr(const Matrix<DataType> matrix);
 
     class RawContainer
     {
@@ -161,6 +165,16 @@ template<typename DataType> CPP17ConceptsTests::DataTypes CPP17ConceptsTests::_g
     {
         return DataTypes::UNKNOWN;
     }
+}
+
+template<typename DataType> std::optional<typename Matrix<DataType>::size_type> CPP17ConceptsTests::_getLowestDiagonalNr(const Matrix<DataType> matrix)
+{
+    return !matrix.isEmpty() ? std::optional<typename Matrix<DataType>::size_type>{1 - matrix.getNrOfRows()} : std::nullopt;
+}
+
+template<typename DataType> std::optional<typename Matrix<DataType>::size_type> CPP17ConceptsTests::_getHighestDiagonalNr(const Matrix<DataType> matrix)
+{
+    return !matrix.isEmpty() ? std::optional<typename Matrix<DataType>::size_type>{matrix.getNrOfColumns() - 1} : std::nullopt;
 }
 
 void CPP17ConceptsTests::testVariableDeclarationInIf()
@@ -511,6 +525,52 @@ void CPP17ConceptsTests::testStdSize()
 
     const StringMatrixWrapper c_StringMatrix{4, 6, "abc"};
     QVERIFY(SizePair(4, 6) == std::size(c_StringMatrix));
+}
+
+void CPP17ConceptsTests::testStdOptional()
+{
+    IntMatrix intMatrix;
+    std::optional<IntMatrix::size_type> intMatrixLowestDiagonalNr{_getLowestDiagonalNr(intMatrix)};
+
+    QVERIFY(!intMatrixLowestDiagonalNr.has_value());
+
+    intMatrix.resizeWithValue(3, 2, -5);
+    intMatrixLowestDiagonalNr = _getLowestDiagonalNr(intMatrix);
+
+    QVERIFY(intMatrixLowestDiagonalNr.has_value() && -2 == intMatrixLowestDiagonalNr.value());
+
+    intMatrixLowestDiagonalNr.reset();
+
+    QVERIFY(std::nullopt == intMatrixLowestDiagonalNr);
+    QVERIFY(-1 == intMatrixLowestDiagonalNr.value_or(-1));
+
+    StringMatrix stringMatrix{1, 1, "abcd"};
+    std::optional<StringMatrix::size_type> stringMatrixLowestDiagonalNr{_getLowestDiagonalNr(stringMatrix)};
+    std::optional<StringMatrix::size_type> stringMatrixHighestDiagonalNr{_getHighestDiagonalNr(stringMatrix)};
+
+    QVERIFY(stringMatrixLowestDiagonalNr.has_value() && stringMatrixLowestDiagonalNr == stringMatrixHighestDiagonalNr && 0 == stringMatrixHighestDiagonalNr.value());
+
+    stringMatrix.resize(3, 2);
+    stringMatrixLowestDiagonalNr = _getLowestDiagonalNr(stringMatrix);
+    stringMatrixHighestDiagonalNr = _getHighestDiagonalNr(stringMatrix);
+
+    QVERIFY(stringMatrixLowestDiagonalNr.has_value() && stringMatrixHighestDiagonalNr.has_value() && stringMatrixLowestDiagonalNr < stringMatrixHighestDiagonalNr);
+    QVERIFY(-2 == stringMatrixLowestDiagonalNr.value_or(-1) && 1 == stringMatrixHighestDiagonalNr.value_or(0));
+
+    stringMatrixLowestDiagonalNr.swap(stringMatrixHighestDiagonalNr);
+
+    QVERIFY(stringMatrixLowestDiagonalNr.has_value() && stringMatrixHighestDiagonalNr.has_value() && 1 == stringMatrixLowestDiagonalNr.value() && -2 == stringMatrixHighestDiagonalNr.value());
+
+    stringMatrixLowestDiagonalNr.reset();
+    std::swap(stringMatrixHighestDiagonalNr, stringMatrixLowestDiagonalNr);
+
+    QVERIFY(stringMatrixLowestDiagonalNr.has_value() && !stringMatrixHighestDiagonalNr.has_value() && -2 == stringMatrixLowestDiagonalNr.value());
+
+    stringMatrixLowestDiagonalNr.reset();
+    stringMatrixHighestDiagonalNr.reset();
+
+    QVERIFY(!stringMatrixLowestDiagonalNr.has_value() && !stringMatrixHighestDiagonalNr.has_value() && stringMatrixLowestDiagonalNr == stringMatrixHighestDiagonalNr);
+    QVERIFY_THROWS_EXCEPTION(std::bad_optional_access, {const StringMatrix::size_type c_DiagNumber{stringMatrixLowestDiagonalNr.value()}; (void)c_DiagNumber;});
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
