@@ -542,7 +542,7 @@ void CPP17ConceptsTests::testStdOptional()
     intMatrixLowestDiagonalNr.reset();
 
     QVERIFY(std::nullopt == intMatrixLowestDiagonalNr);
-    QVERIFY(-1 == intMatrixLowestDiagonalNr.value_or(-1));
+    QVERIFY(INT_MIN == intMatrixLowestDiagonalNr.value_or(INT_MIN));
 
     StringMatrix stringMatrix{1, 1, "abcd"};
     std::optional<StringMatrix::size_type> stringMatrixLowestDiagonalNr{_getLowestDiagonalNr(stringMatrix)};
@@ -555,7 +555,7 @@ void CPP17ConceptsTests::testStdOptional()
     stringMatrixHighestDiagonalNr = _getHighestDiagonalNr(stringMatrix);
 
     QVERIFY(stringMatrixLowestDiagonalNr.has_value() && stringMatrixHighestDiagonalNr.has_value() && stringMatrixLowestDiagonalNr < stringMatrixHighestDiagonalNr);
-    QVERIFY(-2 == stringMatrixLowestDiagonalNr.value_or(-1) && 1 == stringMatrixHighestDiagonalNr.value_or(0));
+    QVERIFY(-2 == stringMatrixLowestDiagonalNr.value_or(INT_MIN) && 1 == stringMatrixHighestDiagonalNr.value_or(INT_MAX));
 
     stringMatrixLowestDiagonalNr.swap(stringMatrixHighestDiagonalNr);
 
