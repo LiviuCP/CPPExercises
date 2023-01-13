@@ -27,6 +27,7 @@ private slots:
     void testStdAny();
     void testStdSize();
     void testStdOptional();
+    void testStdStringView();
 
 private:
     enum class DataTypes
@@ -571,6 +572,126 @@ void CPP17ConceptsTests::testStdOptional()
 
     QVERIFY(!stringMatrixLowestDiagonalNr.has_value() && !stringMatrixHighestDiagonalNr.has_value() && stringMatrixLowestDiagonalNr == stringMatrixHighestDiagonalNr);
     QVERIFY_THROWS_EXCEPTION(std::bad_optional_access, {const StringMatrix::size_type c_DiagNumber{stringMatrixLowestDiagonalNr.value()}; (void)c_DiagNumber;});
+}
+
+void CPP17ConceptsTests::testStdStringView()
+{
+    // scenario 1: various initializations of string_views / string init based on string_view
+    {
+        const std::string_view c_FirstStringView{"My first string_view"};
+        const char c_CharArray[21]{'M', 'y', ' ', 'f', 'i', 'r', 's', 't', ' ', 's', 't', 'r', 'i', 'n', 'g', '_', 'v', 'i', 'e', 'w', '\0'};
+        const std::string_view c_SecondStringView{c_CharArray};
+
+        QVERIFY(20 == c_SecondStringView.size());
+
+        const std::string_view c_ThirdStringView{"My first string_view"sv};
+
+        const std::string c_FirstString{"My first string_view"};
+        const std::string_view c_FourthStringView{c_FirstString};
+        const std::string_view c_FifthStringView{c_FourthStringView};
+
+        QVERIFY("My first string_view" == c_FirstStringView &&
+                c_FirstStringView == c_SecondStringView && // the char array has terminating character which results in successful match of the views
+                c_SecondStringView == c_ThirdStringView &&
+                c_ThirdStringView == c_FourthStringView &&
+                c_FourthStringView == c_FifthStringView);
+
+        const std::string c_SecondString{c_FirstStringView};
+
+        QVERIFY(c_FirstString == c_SecondString);
+    }
+
+    // scenario 2: initialization starting point is char array, this gets modified in the meantime
+    {
+        char charArray[20]{'A', 'n', 'o', 't', 'h', 'e', 'r', ' ', 's', 't', 'r', 'i', 'n', 'g', '_', 'v', 'i', 'e', 'w', '\0'};
+        std::string_view firstStringView{charArray};
+        std::string_view secondStringView{"Another string_view"};
+
+        charArray[8] = 'S';
+
+        QVERIFY(secondStringView != firstStringView); // case sensitive compare
+
+        charArray[7] = '_';
+        firstStringView.remove_prefix(7);
+        firstStringView.remove_suffix(3);
+
+        QVERIFY("_String_v" == firstStringView);
+
+        firstStringView.remove_prefix(3);
+        firstStringView.remove_suffix(2);
+
+        QVERIFY(firstStringView == secondStringView.substr(10, 4));
+
+        secondStringView.remove_prefix(5);
+        secondStringView.remove_suffix(4);
+
+        // although a prefix and a suffix have been chopped the suffix part is still visible due to the null terminating character (string_view initialized with a C-style string)
+        QVERIFY(14 == std::strlen(secondStringView.data()));
+
+        firstStringView = secondStringView;
+        QVERIFY("er string_"sv == firstStringView &&
+                14 == std::strlen(firstStringView.data())); // same here, when creating a string_view copy both views are the same (point to same null-terminated string in this case)
+    }
+
+    // scenario 3: char array with multiple terminating characters
+    {
+        char charArray[14]{'A', 'r', 'r', 'a', 'y', 'O', 'f', 'C', 'h', 'a', 'r', 's', '\0', '\0'};
+        std::string_view firstStringView{charArray};
+
+        QVERIFY("ArrayOfChars"sv == firstStringView);
+
+        charArray[5] = '\0';
+        QVERIFY(12 == firstStringView.size() &&
+                "ArrayOfChars"sv != firstStringView &&
+                5 == std::strlen(firstStringView.data()));
+
+        firstStringView.remove_suffix(6);
+        QVERIFY(6 == firstStringView.size() &&
+                "Array" == firstStringView.substr(0, 5) &&
+                '\0' == firstStringView[5]);
+
+        const std::string c_FirstString{firstStringView.data()};
+        QVERIFY("Array" == c_FirstString);
+    }
+
+    // scenario 4: a string that grows its size
+    {
+        std::string firstString;
+        firstString.reserve(30); // this is to ensure string can grow without re-allocating memory (which might have an unwanted effect on string views bound to it)
+        firstString = "aString";
+        std::string_view firstStringView{firstString};
+
+        QVERIFY("aString" == firstStringView);
+
+        /* Generally speaking care should be taken when modifying strings to which string views are bound (best to avoid it if possible) */
+        firstString.append("FromManyOthers");
+        QVERIFY(7 == firstStringView.size() &&
+                21 == firstString.size()); // the string_view cannot grow while the string is able to do this
+
+        firstString.at(4) = '1';
+        QVERIFY("aStr1ng" == firstStringView); // however if one or more chars get replaced same happens within string_view
+
+        firstStringView.remove_prefix(1);
+        firstStringView.remove_suffix(2);
+
+        QVERIFY(4 == firstStringView.size() &&
+                firstStringView.substr(1, 3) == firstString.substr(2, 3));
+
+        QVERIFY("aStr1ngFromManyOthers" == firstString); // string retains its characters, no prefix/suffix removed
+        QVERIFY(static_cast<std::string>(firstStringView) == firstString.substr(1, 4)); // test cast to std::string too
+    }
+
+    // scenario 5: two string_views pointing to the same std::string
+    {
+        std::string firstString{"Abcdefghijkl"};
+        std::string_view firstStringView{firstString};
+        std::string_view secondStringView{firstStringView};
+
+        firstString.at(8) = '1';
+
+        QVERIFY("Abcdefgh1jkl"sv == firstStringView &&
+                firstStringView == secondStringView);
+    }
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
