@@ -28,6 +28,7 @@ private slots:
     void testStdSize();
     void testStdOptional();
     void testStdStringView();
+    void testTemplateTypeDeductionInConstructors();
 
 private:
     enum class DataTypes
@@ -692,6 +693,40 @@ void CPP17ConceptsTests::testStdStringView()
         QVERIFY("Abcdefgh1jkl"sv == firstStringView &&
                 firstStringView == secondStringView);
     }
+}
+
+void CPP17ConceptsTests::testTemplateTypeDeductionInConstructors()
+{
+    // std::string
+    const Matrix c_FirstStringMatrix{2, 4, std::string{"stringValue"}}; // std::string should be explicitly mentioned otherwise const char* assumed
+    const Matrix<std::string> c_SecondStringMatrix{2, 4, "stringValue"};
+
+    QVERIFY(c_FirstStringMatrix == c_SecondStringMatrix);
+
+    // std::pair<const char*, int>
+    const Matrix c_FirstConstCharPtrIntPairMatrix{8, 4, std::pair{"constCharValue", 2}}; // template type deduction both for pair and for matrix
+    const Matrix<std::pair<const char*, int>> c_SecondConstCharPtrIntPairMatrix{8, 4, std::pair<const char*, int>{"constCharValue", 2}};
+
+    QVERIFY(c_FirstConstCharPtrIntPairMatrix == c_SecondConstCharPtrIntPairMatrix);
+
+    // int
+    const Matrix c_FirstIntMatrix{2, 3, 5};
+    const Matrix<int> c_SecondIntMatrix{2, 3, 5};
+
+    QVERIFY(c_FirstIntMatrix == c_SecondIntMatrix);
+
+    // unsigned int
+    const Matrix c_FirstUnsignedIntMatrix{4, 5, 3u};
+    const Matrix<unsigned int> c_SecondUnsignedIntMatrix{4, 5, 3};
+
+    QVERIFY(c_FirstUnsignedIntMatrix == c_SecondUnsignedIntMatrix);
+
+    // unsigned short
+    unsigned short c_UnsignedShortVal{3u};
+    const Matrix c_FirstUnsignedShortMatrix{9, 8, c_UnsignedShortVal};
+    const Matrix<unsigned short> c_SecondUnsignedShortMatrix{9, 8, 3};
+
+    QVERIFY(c_FirstUnsignedShortMatrix == c_SecondUnsignedShortMatrix);
 }
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
