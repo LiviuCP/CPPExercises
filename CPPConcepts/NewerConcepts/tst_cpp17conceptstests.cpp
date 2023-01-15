@@ -115,51 +115,51 @@ template<typename DataType> CPP17ConceptsTests::DataTypes CPP17ConceptsTests::_g
 {
     (void)myType; // this function only needs to check the type, value is discarded
 
-    if constexpr (std::is_same<DataType, bool>::value)
+    if constexpr (std::is_same_v<DataType, bool>)
     {
         return DataTypes::BOOLEAN;
     }
-    else if constexpr (std::is_same<DataType, char>::value)
+    else if constexpr (std::is_same_v<DataType, char>)
     {
         return DataTypes::CHARACTER;
     }
-    else if constexpr (std::is_same<DataType, int>::value ||
-                       std::is_same<DataType, short>::value ||
-                       std::is_same<DataType, long>::value ||
-                       std::is_same<DataType, long long>::value)
+    else if constexpr (std::is_same_v<DataType, int> ||
+                       std::is_same_v<DataType, short> ||
+                       std::is_same_v<DataType, long> ||
+                       std::is_same_v<DataType, long long>)
     {
         return DataTypes::SIGNED_INTEGER;
     }
-    else if constexpr (std::is_same<DataType, unsigned int>::value ||
-                       std::is_same<DataType, unsigned char>::value ||
-                       std::is_same<DataType, unsigned short>::value ||
-                       std::is_same<DataType, unsigned long>::value ||
-                       std::is_same<DataType, unsigned long long>::value)
+    else if constexpr (std::is_same_v<DataType, unsigned int> ||
+                       std::is_same_v<DataType, unsigned char> ||
+                       std::is_same_v<DataType, unsigned short> ||
+                       std::is_same_v<DataType, unsigned long> ||
+                       std::is_same_v<DataType, unsigned long long>)
     {
         return DataTypes::UNSIGNED_INTEGER;
     }
-    else if constexpr (std::is_same<DataType, float>::value ||
-                       std::is_same<DataType, double>::value)
+    else if constexpr (std::is_same_v<DataType, float> ||
+                       std::is_same_v<DataType, double>)
     {
         return DataTypes::DECIMAL;
     }
-    else if constexpr (std::is_same<DataType, std::string>::value)
+    else if constexpr (std::is_same_v<DataType, std::string>)
     {
         return DataTypes::STRING;
     }
-    else if constexpr(std::is_same<DataType, std::string_view>::value)
+    else if constexpr(std::is_same_v<DataType, std::string_view>)
     {
         return DataTypes::STRING_VIEW;
     }
-    else if constexpr (std::is_same<DataType, const char*>::value)
+    else if constexpr (std::is_same_v<DataType, const char*>)
     {
         return DataTypes::CSTYLESTRING;
     }
-    else if constexpr(std::is_same<DataType, StringIntPair>::value)
+    else if constexpr(std::is_same_v<DataType, StringIntPair>)
     {
         return DataTypes::STRINGINTPAIR;
     }
-    else if constexpr(std::is_same<DataType, IntMatrix>::value)
+    else if constexpr(std::is_same_v<DataType, IntMatrix>)
     {
         return DataTypes::INTMATRIX;
     }
