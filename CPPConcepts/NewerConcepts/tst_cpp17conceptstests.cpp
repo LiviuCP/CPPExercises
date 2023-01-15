@@ -579,23 +579,27 @@ void CPP17ConceptsTests::testStdStringView()
 {
     // scenario 1: various initializations of string_views / string init based on string_view
     {
-        const std::string_view c_FirstStringView{"My first string_view"};
-        const char c_CharArray[21]{'M', 'y', ' ', 'f', 'i', 'r', 's', 't', ' ', 's', 't', 'r', 'i', 'n', 'g', '_', 'v', 'i', 'e', 'w', '\0'};
-        const std::string_view c_SecondStringView{c_CharArray};
+        constexpr std::string_view c_FirstStringView{"My first string_view"};
+        constexpr char c_CharArray[21]{'M', 'y', ' ', 'f', 'i', 'r', 's', 't', ' ', 's', 't', 'r', 'i', 'n', 'g', '_', 'v', 'i', 'e', 'w', '\0'};
+        const std::string_view c_SecondStringView{c_CharArray}; // cannot constexpr when being initialized by char array (not a literal)
 
         QVERIFY(20 == c_SecondStringView.size());
 
-        const std::string_view c_ThirdStringView{"My first string_view"sv};
+        constexpr std::string_view c_ThirdStringView{"My first string_view"sv};
 
         const std::string c_FirstString{"My first string_view"};
-        const std::string_view c_FourthStringView{c_FirstString};
-        const std::string_view c_FifthStringView{c_FourthStringView};
+        const std::string_view c_FourthStringView{c_FirstString}; // cannot constexpr when being initialized by std::string
+        const std::string_view c_FifthStringView{c_FourthStringView}; // cannot constexpr (c_FourthStringView was initialized const)
+        constexpr std::string_view c_SixthStringView{c_FirstStringView};
+        constexpr std::string_view c_SeventhStringView{c_ThirdStringView};
 
         QVERIFY("My first string_view" == c_FirstStringView &&
                 c_FirstStringView == c_SecondStringView && // the char array has terminating character which results in successful match of the views
                 c_SecondStringView == c_ThirdStringView &&
                 c_ThirdStringView == c_FourthStringView &&
-                c_FourthStringView == c_FifthStringView);
+                c_FourthStringView == c_FifthStringView &&
+                c_FifthStringView == c_SixthStringView &&
+                c_SixthStringView == c_SeventhStringView);
 
         const std::string c_SecondString{c_FirstStringView};
 
