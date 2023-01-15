@@ -26,7 +26,7 @@ int main()
         cout << "Reading matrix elements from input file: " << c_InFile << endl << endl;
         in >> matrix;
 
-        if (matrix)
+        if (!matrix.isEmpty())
         {
             (void)LexicographicalSorter<double>::sort(matrix, originalRowNumbers, true);
             cout << "The matrix has been successfully read and lexicographically sorted" << endl;
