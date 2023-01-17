@@ -3,8 +3,10 @@
 #define DATAUTILS_H
 
 #include <vector>
-#include <string>
+#include <set>
+#include <map>
 #include <utility>
+#include <string>
 
 #include "matrix.h"
 
@@ -25,8 +27,10 @@ using IntMatrix = Matrix<int>;
 using IntPair = std::pair<int, int>;
 using IntPairMatrix = Matrix<IntPair>;
 using StringMatrix = Matrix<std::string>;
+using StringSet = std::set<std::string>;
 using StringIntPair = std::pair<std::string, int>;
 using StringIntPairMatrix = Matrix<StringIntPair>;
+using StringIntMap = std::map<std::string, int>;
 using IntVector = std::vector<int>;
 using IntVectorMatrix = Matrix<IntVector>;
 using StringIntPairVector = std::vector<StringIntPair>;

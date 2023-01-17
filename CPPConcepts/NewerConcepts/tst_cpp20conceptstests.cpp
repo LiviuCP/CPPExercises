@@ -14,6 +14,8 @@ class CPP20ConceptsTests : public QObject
 
 private slots:
     void testAbbreviatedFunctionTemplatesWithAutoParams();
+    void testRangeBasedForLoopInit();
+    void testMapSetContains();
 
 private:
     class RawContainer
@@ -76,6 +78,63 @@ void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
     const auto[c_SecondMinSize, c_SecondAvgSize, c_SecondMaxSize]{_getMinMaxAvgSize(c_IntWrapper, c_RawContainer, c_ShortArray)};
 
     QVERIFY(10 == c_SecondMinSize && 20 == c_SecondAvgSize && 33 == c_SecondMaxSize);
+}
+
+void CPP20ConceptsTests::testRangeBasedForLoopInit()
+{
+    int totalAge{0};
+    int peopleCount{0};
+
+    for (const StringIntPairMatrix c_Matrix{2, 4, {{"Alexander", 7}, {"Kevin", 14}, {"John", 5}, {"Mary", 10},
+                                                 {"Donald", 16}, {"Henrietta", 10}, {"Wilhelm", 8}, {"Ansel", 6}}};
+         const auto&[name, age] : c_Matrix)
+    {
+        if (name.size() > 5)
+        {
+            totalAge += age;
+            ++peopleCount;
+        }
+    }
+
+    if (peopleCount <= 0)
+    {
+        QFAIL("Invalid people count");
+    }
+
+    const int c_AverageAge{totalAge / peopleCount};
+
+    QVERIFY(10 == c_AverageAge);
+}
+
+void CPP20ConceptsTests::testMapSetContains()
+{
+    const StringIntMap c_PersonsMap
+    {
+        {"George", 7},
+        {"Alex", 6},
+        {"Kevin", 10},
+        {"Roberta", 8},
+        {"Alistair", 15}
+    };
+
+    QVERIFY(c_PersonsMap.contains("Roberta"));
+    QVERIFY(!c_PersonsMap.contains("Robert"));
+    QVERIFY(!c_PersonsMap.contains("roberta"));
+    QVERIFY(!c_PersonsMap.contains("Alastair"));
+
+    const StringSet c_PersonsSet
+    {
+        {"Kyle"},
+        {"Albert"},
+        {"Anna"},
+        {"George"},
+        {"Alfred"}
+    };
+
+    QVERIFY(c_PersonsSet.contains("Anna"));
+    QVERIFY(!c_PersonsSet.contains("Anne"));
+    QVERIFY(!c_PersonsSet.contains("Alberto"));
+    QVERIFY(!c_PersonsSet.contains("george"));
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
