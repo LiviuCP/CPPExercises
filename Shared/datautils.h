@@ -32,6 +32,7 @@ using IntVectorMatrix = Matrix<IntVector>;
 using StringIntPairVector = std::vector<StringIntPair>;
 using BoolMatrix = Matrix<bool>;
 using SizePair = std::pair<size_t, size_t>;
+using TripleSizeTuple = std::tuple<size_t, size_t, size_t>;
 
 using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
 using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
