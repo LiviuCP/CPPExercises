@@ -16,6 +16,7 @@ private slots:
     void testAbbreviatedFunctionTemplatesWithAutoParams();
     void testRangeBasedForLoopInit();
     void testMapSetContains();
+    void testStringStartsEndsWith();
 
 private:
     class RawContainer
@@ -135,6 +136,24 @@ void CPP20ConceptsTests::testMapSetContains()
     QVERIFY(!c_PersonsSet.contains("Anne"));
     QVERIFY(!c_PersonsSet.contains("Alberto"));
     QVERIFY(!c_PersonsSet.contains("george"));
+}
+
+void CPP20ConceptsTests::testStringStartsEndsWith()
+{
+    const std::string c_aString{"Good that we still code!"};
+
+    // case-sensitive methods
+    QVERIFY(c_aString.starts_with("Good"));
+    QVERIFY(!c_aString.starts_with("good"));
+    QVERIFY(c_aString.ends_with("code!"));
+    QVERIFY(!c_aString.ends_with("Code!"));
+
+    std::string_view aStringView{c_aString};
+    aStringView.remove_prefix(4);
+    aStringView.remove_suffix(5);
+
+    // same methods for string_view
+    QVERIFY(aStringView.starts_with(" that") && aStringView.ends_with("still "));
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
