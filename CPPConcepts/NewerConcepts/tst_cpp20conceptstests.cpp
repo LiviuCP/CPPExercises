@@ -17,6 +17,7 @@ private slots:
     void testRangeBasedForLoopInit();
     void testMapSetContains();
     void testStringStartsEndsWith();
+    void testStdErase();
 
 private:
     class RawContainer
@@ -154,6 +155,23 @@ void CPP20ConceptsTests::testStringStartsEndsWith()
 
     // same methods for string_view
     QVERIFY(aStringView.starts_with(" that") && aStringView.ends_with("still "));
+}
+
+void CPP20ConceptsTests::testStdErase()
+{
+    IntVector intVector{5, -2, 4, 2, -6, 0, 5, 4, 2, -3, 4, 4, -1, 8};
+    const IntVector c_IntVectorRef{5, -2, 2, -6, 0, 5, 2, -3, -1, 8};
+
+    std::erase(intVector, 4);
+
+    QVERIFY(c_IntVectorRef == intVector);
+
+    StringIntPairVector stringIntPairVector{{"John", 5}, {"Alistair", 10}, {"Georgia", 8}, {"Kevin", 7}, {"Alexander", 11}, {"Josh", 9}, {"Mary-Anne", 5}, {"Finch", 12}};
+    const StringIntPairVector c_StringIntPairVectorRef{{"John", 5}, {"Alistair", 10}, {"Kevin", 7}, {"Alexander", 11}, {"Josh", 9}, {"Finch", 12}};
+
+    std::erase_if(stringIntPairVector, [](const StringIntPair& element) {return element.first.size() > 5 && element.second < 10;});
+
+    QVERIFY(c_StringIntPairVectorRef == stringIntPairVector);
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
