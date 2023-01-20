@@ -3,6 +3,7 @@
 #include <array>
 #include <string_view>
 #include <algorithm>
+#include <span>
 
 #include "datautils.h"
 
@@ -18,6 +19,7 @@ private slots:
     void testMapSetContains();
     void testStringStartsEndsWith();
     void testStdErase();
+    void testStdSpan();
 
 private:
     class RawContainer
@@ -172,6 +174,97 @@ void CPP20ConceptsTests::testStdErase()
     std::erase_if(stringIntPairVector, [](const StringIntPair& element) {return element.first.size() > 5 && element.second < 10;});
 
     QVERIFY(c_StringIntPairVectorRef == stringIntPairVector);
+}
+
+void CPP20ConceptsTests::testStdSpan()
+{
+    /* Scenario 1: std::vector */
+    {
+        StringIntPairVector stringIntPairVector{{"Jack", 10}, {"Anne", 8}, {"Robert", 5}, {"Annabel", 12}, {"Jim", 9}, {"Alastair", 14}, {"Abigail", 8}, {"Marjorie", 4}};
+
+        std::span<StringIntPair> stringIntPairSpan{stringIntPairVector};
+
+        QVERIFY(8 == stringIntPairSpan.size() && "Anne" == stringIntPairSpan[1].first && 12 == stringIntPairSpan[3].second);
+
+        std::span<StringIntPair>::iterator firstIt{stringIntPairSpan.begin()};
+        std::span<StringIntPair>::iterator secondIt{std::find_if(stringIntPairSpan.begin(), stringIntPairSpan.end(), [](const StringIntPair& element) {return 3 == element.first.size();})};
+
+        QVERIFY(4 == std::distance(firstIt, secondIt));
+
+        std::span<StringIntPair> stringIntPairSubSpan{stringIntPairSpan.subspan(3, 3)};
+
+        QVERIFY(3 == stringIntPairSubSpan.size() && "Jim" == stringIntPairSubSpan[1].first);
+
+        const StringIntPair* pStringIntPair{stringIntPairSpan.data() + 5};
+
+        QVERIFY("Alastair" == pStringIntPair->first &&
+                14 == pStringIntPair->second &&
+                stringIntPairSubSpan.data() + 2 == pStringIntPair);
+    }
+
+    /* Scenario 2: plain array decayed to pointer (actually a Matrix converted to plain array) */
+    {
+        IntMatrix matrix{3, 4, {-1, 2, 3, -4, -5, 6, 7, -8, 9, -10, 11, 12}};
+
+        IntMatrix::size_type elementsCount{0};
+
+        // to note: the matrix should NOT be passed to std::span because due to its internal structure its elements are usually not contiguous (std::span supports contiguous containers only)
+        int* pArray = (int*)matrix.getBaseArray(elementsCount); // however by converting it to a plain unidimensional array it can be "spanned"
+        const int c_ArrayRef[12] {-1, 2, 9, 16, -10, 6, -8, 7, 9, -10, 11, 12};
+
+        std::span<int> intSpan{pArray + 2, static_cast<size_t>(elementsCount / 2)};
+
+        QVERIFY(6 == intSpan.size() && 3 == intSpan[0] && -1 == std::accumulate(intSpan.begin(), intSpan.end(), 0));
+
+        intSpan[2] *= 2; // unlike std::string_view std::span can be used to modify the container elements
+
+        std::span<int> firstIntSubSpan{intSpan.first(2)};
+        std::span<int> secondIntSubSpan{intSpan.last(2)};
+
+        // further array modifications done by using the sub-spans
+        std::transform(firstIntSubSpan.begin(), firstIntSubSpan.end(), firstIntSubSpan.begin(), [](const int& element) {return element * element;});
+        std::swap(secondIntSubSpan[0], secondIntSubSpan[1]);
+
+        QVERIFY(std::equal(pArray, pArray + elementsCount, c_ArrayRef));
+    }
+
+    /* Scenario 3: std::array */
+    {
+        std::array<std::string, 8> namesArray{"Robert", "Christine", "Josh", "Jimmy", "Marie Anne", "Abigail", "Corinne", "Arthur"};
+        const std::array<std::string, 8> c_NamesArrayRef{"Christine", "Jimmy", "Josh", "Marie Anne", "Robert", "Corinne", "Arthur", "Abigail"};
+
+        std::span<std::string> stringSpan{namesArray};
+
+        std::span<std::string> leftStringSubSpan{stringSpan.first(4)};
+        std::span<std::string> middleStringSubSpan{std::span{namesArray}.subspan(2, 4)}; // just for exercise's sake: it is possible to create sub-spans out of unnamed spans too!
+        std::span<std::string> rightStringSubSpan{stringSpan.last(4)};
+
+        QVERIFY("Robert" == leftStringSubSpan.front() && 4 == leftStringSubSpan.size());
+        QVERIFY("Josh" == middleStringSubSpan.front() && "Abigail" == middleStringSubSpan.back());
+        QVERIFY(4 == rightStringSubSpan.size() && "Arthur" == rightStringSubSpan.back());
+
+        QVERIFY(leftStringSubSpan.data() + 2 == middleStringSubSpan.data() &&
+                "Jimmy" == *(middleStringSubSpan.data() + 1) &&
+                middleStringSubSpan.data() + 3 == rightStringSubSpan.data() + 1);
+
+        std::sort(leftStringSubSpan.begin(), leftStringSubSpan.end(), [](const std::string& firstElement, const std::string& secondElement) {return std::lexicographical_compare(firstElement.begin(), firstElement.end(), secondElement.begin(), secondElement.end());});
+        std::sort(rightStringSubSpan.rbegin(), rightStringSubSpan.rend(), [](const std::string& firstElement, const std::string& secondElement) {return std::lexicographical_compare(firstElement.begin(), firstElement.end(), secondElement.begin(), secondElement.end());});
+
+        QVERIFY("Josh" == middleStringSubSpan.front() && "Corinne" == middleStringSubSpan.back());
+
+        std::iter_swap(middleStringSubSpan.begin() + 1, middleStringSubSpan.end() - 2);
+
+        QVERIFY(std::is_sorted(leftStringSubSpan.begin(), leftStringSubSpan.end()) &&
+                middleStringSubSpan.end() - 1 == std::is_sorted_until(middleStringSubSpan.begin(), middleStringSubSpan.end()) &&
+                std::is_sorted(rightStringSubSpan.rbegin(), rightStringSubSpan.rend()));
+
+        QVERIFY(c_NamesArrayRef == namesArray);
+        QVERIFY(8 == stringSpan.size() && "Christine" == stringSpan.front() && "Abigail" == stringSpan.back());
+
+        // test assignment operator too
+        stringSpan = middleStringSubSpan;
+        QVERIFY(4 == stringSpan.size() && "Josh" == stringSpan.front() && "Corinne" == stringSpan.back());
+    }
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
