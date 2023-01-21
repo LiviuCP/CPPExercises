@@ -181,6 +181,7 @@ void CPP20ConceptsTests::testStdSpan()
     /* Scenario 1: std::vector */
     {
         StringIntPairVector stringIntPairVector{{"Jack", 10}, {"Anne", 8}, {"Robert", 5}, {"Annabel", 12}, {"Jim", 9}, {"Alastair", 14}, {"Abigail", 8}, {"Marjorie", 4}};
+        const StringIntPairVector c_StringIntPairVectorRef{{"Jack", 10}, {"RESERVED", -1}, {"Robert", 5}, {"Annabelle", 12}, {"Jim", 27}, {"Alastair", 14}, {"UNKNOWN", 0}, {"UNKNOWN", 0}};
 
         std::span<StringIntPair> stringIntPairSpan{stringIntPairVector};
 
@@ -195,11 +196,31 @@ void CPP20ConceptsTests::testStdSpan()
 
         QVERIFY(3 == stringIntPairSubSpan.size() && "Jim" == stringIntPairSubSpan[1].first);
 
-        const StringIntPair* pStringIntPair{stringIntPairSpan.data() + 5};
+        StringIntPair* pStringIntPair{stringIntPairSpan.data() + 5};
 
         QVERIFY("Alastair" == pStringIntPair->first &&
                 14 == pStringIntPair->second &&
                 stringIntPairSubSpan.data() + 2 == pStringIntPair);
+
+        std::fill(pStringIntPair + 1, pStringIntPair + 3, StringIntPair{"UNKNOWN", 0});
+
+        pStringIntPair = stringIntPairSubSpan.data();
+        pStringIntPair->first.append("le");
+        ++pStringIntPair;
+        pStringIntPair->second *= 3;
+
+        QVERIFY("Annabelle" == stringIntPairSpan[3].first && 27 == stringIntPairSpan[4].second); // when subspan changes so does the surrounding span
+
+        pStringIntPair = stringIntPairSpan.data() + 1;
+        *pStringIntPair = StringIntPair{"RESERVED", -1};
+
+        // finally main span gets shrunk
+        stringIntPairSpan = stringIntPairSpan.subspan(2, 2);
+
+        QVERIFY(StringIntPair("Robert", 5) == stringIntPairSpan.front() && 2 == stringIntPairSpan.size());
+        QVERIFY(3 == stringIntPairSubSpan.size() && StringIntPair("Alastair", 14) == stringIntPairSubSpan.back());
+
+        QVERIFY(c_StringIntPairVectorRef == stringIntPairVector);
     }
 
     /* Scenario 2: plain array decayed to pointer (actually a Matrix converted to plain array) */
