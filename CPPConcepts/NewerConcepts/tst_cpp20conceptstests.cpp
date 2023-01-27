@@ -4,10 +4,19 @@
 #include <string_view>
 #include <algorithm>
 #include <span>
+#include <concepts>
 
 #include "datautils.h"
 
 using namespace std::literals;
+
+template<typename DataType> concept hasSizeMethod = requires(DataType dataType) // "requires" expression (resulting concept can be fed to a "requires" clause, see below)
+{
+    {dataType.size()} -> std::same_as<size_t>;
+};
+
+template<typename DataType> concept nonBooleanIntegral = std::integral<DataType> && (!std::same_as<DataType, bool>);
+template<typename DataType> concept numeric = nonBooleanIntegral<DataType> || std::floating_point<DataType>;
 
 class CPP20ConceptsTests : public QObject
 {
@@ -20,6 +29,7 @@ private slots:
     void testStringStartsEndsWith();
     void testStdErase();
     void testStdSpan();
+    void testCPP20Concepts();
 
 private:
     class RawContainer
@@ -49,7 +59,36 @@ private:
         Matrix<DataType> mMatrix;
     };
 
+    class StringWrapper
+    {
+    public:
+        StringWrapper() = delete;
+        StringWrapper(const std::string& str) : myStr{str} {}
+
+        ssize_t size() const {return static_cast<ssize_t>(myStr.size());}
+
+    private:
+        std::string myStr;
+    };
+
     TripleSizeTuple _getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const;
+
+    template<typename DataType>
+    requires nonBooleanIntegral<DataType> // "requires" clause
+    DataType _getMatrixElementsSum(const Matrix<DataType>& matrix);
+
+    template<typename DataType>
+    requires hasSizeMethod<DataType>
+    size_t _getTotalElementsSize(const Matrix<DataType>& matrix);
+
+    // shorter way of writing "requires" (std::floating_point) - combined with abbreviated template
+    auto _getDecimalValueCopy(const std::floating_point auto& value); // constraint is on argument, not return value; equivalent to template<typename T> requires std::floating_point auto _getDecimalCopy(const T& object)
+
+    template<typename DataType>
+    requires std::floating_point<DataType>
+    bool _areDecimalValuesEqual(DataType firstValue, DataType secondValue, const DataType epsilon);
+
+    template<numeric DataType> Matrix<DataType> _getCumulativeTotals(const Matrix<DataType> matrix); // another shorter way of writing "requires" (numeric concept defined above)
 };
 
 TripleSizeTuple CPP20ConceptsTests::_getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const
@@ -63,6 +102,51 @@ TripleSizeTuple CPP20ConceptsTests::_getMinMaxAvgSize(const auto& leftContainer,
     const size_t c_MaxSize{std::max(c_LeftContainerSize, std::max(c_MiddleContainerSize, c_RightContainerSize))};
 
     return std::tuple{c_MinSize, c_AvgSize, c_MaxSize};
+}
+
+template<typename DataType>
+requires nonBooleanIntegral<DataType>
+DataType CPP20ConceptsTests::_getMatrixElementsSum(const Matrix<DataType>& matrix)
+{
+    return std::accumulate(matrix.constZBegin(), matrix.constZEnd(), 0);
+}
+
+template<typename DataType>
+requires hasSizeMethod<DataType>
+size_t CPP20ConceptsTests::_getTotalElementsSize(const Matrix<DataType>& matrix)
+{
+    size_t result{0};
+
+    for (const auto& element : matrix)
+    {
+        result += element.size();
+    }
+
+    return result;
+}
+
+auto CPP20ConceptsTests::_getDecimalValueCopy(const std::floating_point auto& value)
+{
+    return value;
+}
+
+template<typename DataType>
+requires std::floating_point<DataType>
+bool CPP20ConceptsTests::_areDecimalValuesEqual(DataType firstValue, DataType secondValue, const DataType epsilon)
+{
+    return std::abs(firstValue - secondValue) < std::abs(epsilon);
+}
+
+template<numeric DataType> Matrix<DataType> CPP20ConceptsTests::_getCumulativeTotals(const Matrix<DataType> matrix)
+{
+    Matrix result{matrix};
+
+    for (auto it{result.getZIterator(1)}; it != result.zEnd(); ++it)
+    {
+        *it += it[-1];
+    }
+
+    return result;
 }
 
 void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
@@ -285,6 +369,100 @@ void CPP20ConceptsTests::testStdSpan()
         // test assignment operator too
         stringSpan = middleStringSubSpan;
         QVERIFY(4 == stringSpan.size() && "Josh" == stringSpan.front() && "Corinne" == stringSpan.back());
+    }
+}
+
+void CPP20ConceptsTests::testCPP20Concepts()
+{
+
+    const IntMatrix c_IntMatrix{2, 3, {4, 5, -2, 9, 8, -3}};
+    const Matrix<size_t> c_SizeMatrix{3, 2, {4, 8, 9, 12, 14, 5}};
+    const Matrix c_DecimalMatrix{2, 2, {1.2, 2.5, 5.003, -3.0}};
+    const Matrix c_BooleanMatrix{3, 3, {false, true, false, false, true, true, false, true, false}};
+    const StringMatrix c_StringMatrix{4, 2, {"abc", "d", "efgh", "", "i", "jkl", "mno", "p"}};
+    const Matrix<IntVector> c_IntVectorMatrix{2, 2, {{2, 3, 5}, {1, -2, 4, 10, 2}, {}, {0}}};
+    const Matrix<StringWrapper> c_StringWrapperMatrix{2, 4, {{"p"}, {"mno"}, {"jkl"}, {"i"}, {""}, {"efgh"}, {"d"}, {"abc"}}};
+
+    const double c_DoubleEpsilon{1.0e-9};
+    const float c_FloatEpsilon{1.0e-9f};
+
+    // scenario 1: template type constrained to integral (but NOT boolean)
+    {
+        QVERIFY(21 == _getMatrixElementsSum(c_IntMatrix));
+        QVERIFY(52 == _getMatrixElementsSum(c_SizeMatrix));
+//        QVERIFY(2.703 == _getMatrixElementsSum(c_DecimalMatrix)); // uncomment to reveal compiling error (constraints not satisfied: floating point is not integral)
+//        QVERIFY(_getMatrixElementsSum(c_BooleanMatrix)); // uncomment to reveal compiling error (constraints not satisfied: is boolean)
+//        QVERIFY(_getMatrixElementsSum(c_StringMatrix)); // uncomment to reveal compiling error (constraints not satisfied: std::string is not integral)
+    }
+
+    // scenario 2: template type should have a size() method returning a size_t (unsigned integer) value
+    {
+        QVERIFY(16 == _getTotalElementsSize(c_StringMatrix));
+        QVERIFY(9 == _getTotalElementsSize(c_IntVectorMatrix));
+//        QVERIFY(6 == _getTotalElementsSize(c_IntMatrix)); // uncomment to reveal compiling error (constraints not satisfied: the int type does not have size() method)
+//        QVERIFY(16 == _getTotalElementsSize(c_StringWrapperMatrix)); // uncomment to reveal compiling error (constraints not satisfied: the template type has a size() method but it returns a signed value)
+    }
+
+    // scenario 3: template type should be a floating point, a single argument of the template type is used
+    {
+        QVERIFY(2.5034 == _getDecimalValueCopy(2.5034));
+        QVERIFY(-2.5034f == _getDecimalValueCopy(-2.5034f));
+        QVERIFY(-4.0 == _getDecimalValueCopy(-4.0));
+        QVERIFY(2.0f == _getDecimalValueCopy(2.0f));
+//        QVERIFY(2 == _getDecimalValueCopy(2)); // uncomment to reveal compiling error (constraints not satisfied: auto is deduced to int which in turn is not floating point)
+    }
+
+    // scenario 4: template type should be a floating point, multiple arguments of the SAME template type are required
+    {
+        QVERIFY(_areDecimalValuesEqual(2.5, 2.5000000, c_DoubleEpsilon));
+        QVERIFY(_areDecimalValuesEqual(-1.22f, -1.2200f, c_FloatEpsilon)); // all members should be float (not double) - first member determines the required type
+        QVERIFY(!_areDecimalValuesEqual(-4.5, -4.500000001, c_DoubleEpsilon));
+        QVERIFY(_areDecimalValuesEqual(-4.5, -4.5000000001, c_DoubleEpsilon));
+//        QVERIFY(_areDecimalValuesEqual(-1.22f, -1.2200f, c_DoubleEpsilon)); // uncomment to reveal compiling error (conflicting types: float vs. double)
+//        QVERIFY(_areDecimalValuesEqual(2.00, 2, c_DoubleEpsilon)); // uncomment to reveal compiling error (conflicting types: double vs. int)
+        QVERIFY(_areDecimalValuesEqual(2.00, static_cast<double>(2), c_DoubleEpsilon)); // a static_cast solves the matter
+//        QVERIFY(_areDecimalValuesEqual(2.00, 2.000f, c_FloatEpsilon)); // uncomment to reveal compiling error (conflicting types: double vs. float)
+//        QVERIFY(_areDecimalValuesEqual(12, 12, 0)); // uncomment to reveal compiling error (type does not satisfy constraints: int is not floating point)
+    }
+
+    // scenario 5: template type constrained to either non-boolean integral (like in scenario 1) OR floating point (like in scenarios 3 and 4)
+    {
+        IntMatrix firstNumericMatrix{2, 4, {3, -2, 5, 7,
+                                            0, -1, 14, 10
+                                     }};
+
+        const IntMatrix c_FirstNumericMatrixRef{2, 4, {3, 1, 6, 13,
+                                                       13, 12, 26, 36
+                                                }};
+
+        firstNumericMatrix = _getCumulativeTotals(firstNumericMatrix);
+
+        QVERIFY(c_FirstNumericMatrixRef == firstNumericMatrix);
+
+        Matrix<double> secondNumericMatrix{3, 2, {-2.5, 1.67,
+                                                   3.9, -0.1,
+                                                   2.4, 0.0
+                                           }};
+
+        const Matrix<double> c_SecondNumericMatrixRef{3, 2, {-2.5, -0.83,
+                                                              3.07, 2.97,
+                                                              5.37, 5.37
+                                                      }};
+
+        secondNumericMatrix = _getCumulativeTotals(secondNumericMatrix);
+
+        // this workaround for checking the two Matrix<double> objects for equality is required as the == operator of the Matrix class cannot be used reliably when the Matrix template type is floating point
+        QVERIFY(std::equal(c_SecondNumericMatrixRef.constZBegin(),
+                           c_SecondNumericMatrixRef.constZEnd(),
+                           secondNumericMatrix.constZBegin(),
+                           secondNumericMatrix.constZEnd(),
+                           [this, c_DoubleEpsilon](const double& firstElement, const double& secondElement) {return _areDecimalValuesEqual(firstElement, secondElement, c_DoubleEpsilon);}));
+
+//        (void)_getCumulativeTotals(c_BooleanMatrix); // uncomment to reveal compiling error (constraints not satisfied, argument is not allowed to be bool)
+//        (void)_getCumulativeTotals(c_StringMatrix); // uncomment to reveal compiling error (constraints not satisfied, argument is not allowed to be std::string - can either be non-boolean integer or decimal)
+
+        const auto c_ThirdNumericMatrix{_getCumulativeTotals(c_SizeMatrix)};
+        QVERIFY(169 == std::accumulate(c_ThirdNumericMatrix.constZBegin(), c_ThirdNumericMatrix.constZEnd(), 0));
     }
 }
 
