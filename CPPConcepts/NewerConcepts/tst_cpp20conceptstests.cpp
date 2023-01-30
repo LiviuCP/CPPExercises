@@ -29,7 +29,7 @@ private slots:
     void testStringStartsEndsWith();
     void testStdErase();
     void testStdSpan();
-    void testCPP20Concepts();
+    void testConcept(); // test functionality contained in header <concepts>
 
 private:
     class RawContainer
@@ -372,7 +372,7 @@ void CPP20ConceptsTests::testStdSpan()
     }
 }
 
-void CPP20ConceptsTests::testCPP20Concepts()
+void CPP20ConceptsTests::testConcept()
 {
 
     const IntMatrix c_IntMatrix{2, 3, {4, 5, -2, 9, 8, -3}};
