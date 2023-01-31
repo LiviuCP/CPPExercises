@@ -30,6 +30,7 @@ private slots:
     void testStdErase();
     void testStdSpan();
     void testConcept(); // test functionality contained in header <concepts>
+    void testGenericLambda();
 
 private:
     class RawContainer
@@ -89,6 +90,8 @@ private:
     bool _areDecimalValuesEqual(DataType firstValue, DataType secondValue, const DataType epsilon);
 
     template<numeric DataType> Matrix<DataType> _getCumulativeTotals(const Matrix<DataType> matrix); // another shorter way of writing "requires" (numeric concept defined above)
+
+    template<typename DataType> void _sortMatrixByVectorSize(Matrix<std::vector<DataType>>& matrix);
 };
 
 TripleSizeTuple CPP20ConceptsTests::_getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const
@@ -147,6 +150,11 @@ template<numeric DataType> Matrix<DataType> CPP20ConceptsTests::_getCumulativeTo
     }
 
     return result;
+}
+
+template<typename DataType> void CPP20ConceptsTests::_sortMatrixByVectorSize(Matrix<std::vector<DataType>>& matrix)
+{
+    std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](const std::vector<DataType>& firstVector, const std::vector<DataType>& secondVector) {return firstVector.size() < secondVector.size();});
 }
 
 void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
@@ -463,6 +471,124 @@ void CPP20ConceptsTests::testConcept()
 
         const auto c_ThirdNumericMatrix{_getCumulativeTotals(c_SizeMatrix)};
         QVERIFY(169 == std::accumulate(c_ThirdNumericMatrix.constZBegin(), c_ThirdNumericMatrix.constZEnd(), 0));
+    }
+}
+
+void CPP20ConceptsTests::testGenericLambda()
+{
+    // Scenario 1: compare sizes of two std::vector objects
+    {
+        auto compareVectorSizes = []<typename DataType>(const std::vector<DataType>& firstVector, const std::vector<DataType>& secondVector){return firstVector.size() < secondVector.size();};
+
+        IntVectorMatrix intVectorMatrix{2, 3, {{-1, 2, 4, 5}, {2, 3}, {},
+                                               {2, 3, -2, 1, 8}, {4, 3, 4, 4}, {1, -2, 3}
+                                        }};
+
+        const IntVectorMatrix c_IntVectorMatrixRef{2, 3, {{2, 3, -2, 1, 8}, {-1, 2, 4, 5}, {4, 3, 4, 4},
+                                                          {1, -2, 3}, {2, 3}, {}
+                                                   }};
+
+        std::stable_sort(intVectorMatrix.reverseZBegin(), intVectorMatrix.reverseZEnd(), compareVectorSizes);
+
+        QVERIFY(c_IntVectorMatrixRef == intVectorMatrix);
+
+        StringVectorMatrix stringVectorMatrix{2, 2, {{"ab", "d", "-cd"}, {"acd", "dcb", "abo", "obd"},
+                                                     {"abcd", "efgh"}, {"a", "", "bc", "d", "f"}
+                                              }};
+
+        const StringVectorMatrix c_StringVectorMatrixRef{2, 2, {{"a", "", "bc", "d", "f"}, {"ab", "d", "-cd"},
+                                                                {"acd", "dcb", "abo", "obd"}, {"abcd", "efgh"}
+                                                         }};
+
+        std::sort(stringVectorMatrix.reverseNBegin(), stringVectorMatrix.reverseNEnd(), compareVectorSizes);
+
+        QVERIFY(c_StringVectorMatrixRef == stringVectorMatrix);
+    }
+
+    // Scenario 2: let's make it more generic now! (with restrictions)
+    {
+        auto compareContainerSizes = []<hasSizeMethod DataType>(const DataType& firstContainer, const DataType& secondContainer) {return firstContainer.size() < secondContainer.size();};
+
+        StringMatrix stringMatrix{3, 2, {"ab", "dbba", "abcd",
+                                         "", "acd", "afghi"
+                                  }};
+
+        const StringMatrix c_StringMatrixRef{3, 2, {"afghi", "dbba", "abcd",
+                                                    "acd", "ab", ""
+                                             }};
+
+        std::stable_sort(stringMatrix.reverseZBegin(), stringMatrix.reverseZEnd(), compareContainerSizes);
+
+        QVERIFY(c_StringMatrixRef == stringMatrix);
+
+        IntVectorMatrix intVectorMatrix{2, 2, {{2, 3, 5}, {-1, 2},
+                                               {4, 4, 4, 4}, {-3}
+                                        }};
+
+        const IntVectorMatrix c_IntVectorMatrixRef{2, 2, {{-3}, {2, 3, 5},
+                                                          {-1, 2}, {4, 4, 4, 4}
+                                                   }};
+
+        std::sort(intVectorMatrix.nBegin(), intVectorMatrix.nEnd(), compareContainerSizes);
+
+        QVERIFY(c_IntVectorMatrixRef == intVectorMatrix);
+
+        IntMatrix intMatrix{2, 4, {-2, 5, 3, 4, 5, 6, -1, 0}};
+
+//        std::sort(intMatrix.zBegin(), intMatrix.zEnd(), compareContainerSizes); // uncomment to reveal the compiling error (int does not have size())
+
+        Matrix<StringWrapper> stringWrapperMatrix{2, 2, {{"ab"}, {"dcb"}, {"fxcd"}, {""}}};
+
+//        std::sort(stringWrapperMatrix.reverseNBegin(), stringWrapperMatrix.reverseNEnd(), compareContainerSizes); // uncomment to reveal the compiling error (size() does not return size_t but signed integer)
+    }
+
+    // Scenario 3: lambda with abbreviated template type (with restrictions)
+    {
+        const size_t c_SizeRefValue{5};
+        auto isSizeGreaterThanRefValue = [c_SizeRefValue](const hasSizeMethod auto& container) {return container.size() > c_SizeRefValue;};
+
+        const StringMatrix c_StringMatrix{2, 3, {"ab", "hcbadcba", "cdef", "ijklmn", "abab", ""}};
+
+        QVERIFY(2 == std::count_if(c_StringMatrix.constZBegin(), c_StringMatrix.constZEnd(), isSizeGreaterThanRefValue));
+
+        const IntVectorMatrix c_IntVectorMatrix{2, 3, {{2, 3, -1}, {4, 4, 0, 2, 5, 6, 7}, {},
+                                                       {2, 8}, {5, 4, 3, 2, -1}, {2, 3, -1}
+                                                }};
+
+        QVERIFY(1 == std::count_if(c_IntVectorMatrix.constReverseNBegin(), c_IntVectorMatrix.constReverseNColumnEnd(1), isSizeGreaterThanRefValue));
+
+        const IntMatrix c_IntMatrix{2, 2, {-1, 3, 2, 4}};
+//        (void)std::count_if(c_IntMatrix.constReverseZBegin(), c_IntMatrix.constReverseZEnd(), isSizeGreaterThanRefValue); // uncomment to reveal the compiling error (int does not have size())
+
+        const Matrix<StringWrapper> c_StringWrapperMatrix{2, 2, {{"abdfecge"}, {"dcbe"}, {"excd"}, {""}}};
+//        (void)std::count_if(c_StringWrapperMatrix.constDBegin(0), c_StringWrapperMatrix.constDEnd(0), isSizeGreaterThanRefValue); // uncomment to reveal the compiling error (size() does not return size_t but signed integer)
+    }
+
+    // Scenario 4: lambda included in template method
+    {
+        IntVectorMatrix intVectorMatrix{2, 3, {{-1, 2, 4, 5}, {2, 3}, {},
+                                               {2, 3, -2, 1, 8}, {4, 3, 4, 4}, {1, -2, 3}
+                                        }};
+
+        const IntVectorMatrix c_IntVectorMatrixRef{2, 3, {{}, {2, 3}, {1, -2, 3},
+                                                          {-1, 2, 4, 5}, {4, 3, 4, 4}, {2, 3, -2, 1, 8}
+                                                   }};
+
+        _sortMatrixByVectorSize(intVectorMatrix);
+
+        QVERIFY(c_IntVectorMatrixRef == intVectorMatrix);
+
+        StringVectorMatrix stringVectorMatrix{2, 2, {{"ab", "d", "-cd"}, {"acd", "dcb", "abo", "obd"},
+                                                     {"abcd", "efgh"}, {"a", "", "bc", "d", "f"}
+                                              }};
+
+        const StringVectorMatrix c_StringVectorMatrixRef{2, 2, {{"abcd", "efgh"}, {"ab", "d", "-cd"},
+                                                                {"acd", "dcb", "abo", "obd"}, {"a", "", "bc", "d", "f"}
+                                                         }};
+
+        _sortMatrixByVectorSize(stringVectorMatrix);
+
+        QVERIFY(c_StringVectorMatrixRef == stringVectorMatrix);
     }
 }
 
