@@ -161,17 +161,17 @@ void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
 {
     constexpr std::string_view c_StringView{"This is another string from my code....."sv};
     const StringIntPairVector c_StringIntPairVector{{"ab", 1}, {"cd", 2}, {"ef", 3}, {"gh", 4}, {"ij", 5}, {"kl", 6}};
-    const MatrixWrapper c_StringWrapper{4, 8, std::string{"abcd"}};
+    const MatrixWrapper c_StringMatrixWrapper{4, 8, std::string{"abcd"}};
 
-    const auto[c_FirstMinSize, c_FirstAvgSize, c_FirstMaxSize]{_getMinMaxAvgSize(c_StringView, c_StringIntPairVector, c_StringWrapper)};
+    const auto[c_FirstMinSize, c_FirstAvgSize, c_FirstMaxSize]{_getMinMaxAvgSize(c_StringView, c_StringIntPairVector, c_StringMatrixWrapper)};
 
     QVERIFY(6 == c_FirstMinSize && 26 == c_FirstAvgSize && 40 == c_FirstMaxSize);
 
-    const MatrixWrapper c_IntWrapper{11, 3, -5};
+    const MatrixWrapper c_IntMatrixWrapper{11, 3, -5};
     const RawContainer c_RawContainer{17};
     constexpr std::array<unsigned short, 10> c_ShortArray{2, 5, 4, 1, 0, 20, 15, 8, 11, 3};
 
-    const auto[c_SecondMinSize, c_SecondAvgSize, c_SecondMaxSize]{_getMinMaxAvgSize(c_IntWrapper, c_RawContainer, c_ShortArray)};
+    const auto[c_SecondMinSize, c_SecondAvgSize, c_SecondMaxSize]{_getMinMaxAvgSize(c_IntMatrixWrapper, c_RawContainer, c_ShortArray)};
 
     QVERIFY(10 == c_SecondMinSize && 20 == c_SecondAvgSize && 33 == c_SecondMaxSize);
 }
