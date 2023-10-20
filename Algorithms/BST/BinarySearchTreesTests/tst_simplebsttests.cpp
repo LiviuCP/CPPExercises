@@ -1,9 +1,11 @@
 #include <QtTest>
+#include <algorithm>
 
 #include "testutils.h"
 #include "binarysearchtree.h"
 
 using namespace TestUtils;
+using BSTIterator = BinarySearchTree::InOrderForwardIterator;
 
 class SimpleBSTTests : public QObject
 {
@@ -22,6 +24,7 @@ private slots:
     void testUpdateNodeValue();
     void testMoveSemantics();
     void testMergeTrees();
+    void testInOrderForwardIterators();
     void testPrintTree(); // only required for improving code coverage
 
 private:
@@ -721,6 +724,78 @@ void SimpleBSTTests::testMergeTrees()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0));
     QVERIFY(scCustomNullValue == mpSearchTree->getNullValue() &&
             scCustomNullValue == mpAuxSearchTree->getNullValue());
+}
+
+void SimpleBSTTests::testInOrderForwardIterators()
+{
+    mpSearchTree = new BinarySearchTree;
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "b");
+    (void)mpSearchTree->addOrUpdateNode(8, "z");
+    (void)mpSearchTree->addOrUpdateNode(-1, "_ca");
+    (void)mpSearchTree->addOrUpdateNode(2, "q1");
+    (void)mpSearchTree->addOrUpdateNode(-2, "55");
+    (void)mpSearchTree->addOrUpdateNode(7, "a");
+    (void)mpSearchTree->addOrUpdateNode(0, "fq");
+    (void)mpSearchTree->addOrUpdateNode(-9, scDefaultValue);
+    (void)mpSearchTree->addOrUpdateNode(16, "cCc");
+    (void)mpSearchTree->addOrUpdateNode(14, "abab");
+    (void)mpSearchTree->addOrUpdateNode(-23, "-c");
+    (void)mpSearchTree->addOrUpdateNode(17, "b");
+    (void)mpSearchTree->addOrUpdateNode(-16, "qa");
+    (void)mpSearchTree->addOrUpdateNode(-12, "dev");
+    (void)mpSearchTree->addOrUpdateNode(19, "_ca");
+    (void)mpSearchTree->addOrUpdateNode(-15, scDefaultValue);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree,
+            "-5:b:ROOT/-9:DF:-5/8:z:-5/-23:-c:-9L/-1:_ca:8/16:cCc:8/-16:qa:-23R/-2:55:-1/2:q1:-1/14:abab:16/17:b:16/-12:dev:-16R/0:fq:2/7:a:2/19:_ca:17R/-15:DF:-12L", 16, true));
+
+    BSTIterator it{mpSearchTree->begin()};
+    QVERIFY(it.getKey() == -23 && it.getValue() == "-c");
+
+    it = mpSearchTree->root();
+    QVERIFY(it.getKey() == -5 && it.getValue() == "b");
+
+    it = mpSearchTree->find(-2);
+    QVERIFY(it.getKey() == -2 && it.getValue() == "55");
+
+    QVERIFY(mpSearchTree->find(-23) == mpSearchTree->begin());
+    QVERIFY(mpSearchTree->find(-5) == mpSearchTree->root());
+    QVERIFY(mpSearchTree->find(12) == mpSearchTree->end());
+
+    std::vector<std::pair<int, std::string>> traversedElements;
+    const std::vector<std::pair<int, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
+                                                                          {0, "fq"}, {2, "q1"}, {7, "a"}, {8, "z"}, {14, "abab"}, {16, "cCc"}, {17, "b"}, {19, "_ca"}};
+
+    for (BSTIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
+    {
+        traversedElements.push_back({it.getKey(), it.getValue()});
+    }
+
+    QVERIFY(std::equal(traversedElements.cbegin(), traversedElements.cend(), c_TraversedElementsRef.cbegin()));
+
+    (void)mpSearchTree->addOrUpdateNode(14, "BaBa");
+    it = mpSearchTree->find(14);
+
+    QVERIFY(it.getValue() == "BaBa");
+
+    it.next();
+    QVERIFY(it.getKey() == 16);
+
+    it.setValue("bCCC");
+    QVERIFY(mpSearchTree->getNodeValue(16) == "bCCC");
+
+    it = mpSearchTree->find(19);
+    it.next();
+
+    QVERIFY(it == mpSearchTree->end());
+
+    QVERIFY(mpSearchTree->find(2) != mpSearchTree->end());
+    (void)mpSearchTree->removeNode(2);
+    QVERIFY(mpSearchTree->find(2) == mpSearchTree->end());
+
+    mpAuxSearchTree = new BinarySearchTree;
+    QVERIFY(mpAuxSearchTree->begin() == mpAuxSearchTree->end() && mpAuxSearchTree->root() == mpAuxSearchTree->end() && mpAuxSearchTree->find(14) == mpAuxSearchTree->end());
 }
 
 void SimpleBSTTests::testPrintTree()

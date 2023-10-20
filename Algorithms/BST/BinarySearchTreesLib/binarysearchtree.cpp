@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <numeric>
 
 #include <cassert>
 
@@ -600,6 +601,40 @@ bool BinarySearchTree::_isEqualTo(const BinarySearchTree& tree) const
     return areEqualTrees;
 }
 
+BinarySearchTree::InOrderForwardIterator BinarySearchTree::begin()
+{
+    Node* startingNode{m_Root};
+
+    if (startingNode)
+    {
+        Node* currentLeftChild{startingNode->getLeftChild()};
+
+        while (currentLeftChild)
+        {
+            startingNode = currentLeftChild;
+            currentLeftChild = startingNode->getLeftChild();
+        }
+    }
+
+    return InOrderForwardIterator{startingNode, m_NullValue};
+}
+
+BinarySearchTree::InOrderForwardIterator BinarySearchTree::end()
+{
+    return InOrderForwardIterator{nullptr, m_NullValue};
+}
+
+BinarySearchTree::InOrderForwardIterator BinarySearchTree::find(int key)
+{
+    Node* const currentNode{_findNode(key)};
+    return InOrderForwardIterator{currentNode, m_NullValue};
+}
+
+BinarySearchTree::InOrderForwardIterator BinarySearchTree::root()
+{
+    return InOrderForwardIterator{m_Root, m_NullValue};
+}
+
 BinarySearchTree::Node::Node(int key, std::string value)
     : m_Parent{nullptr}
     , m_LeftChild{nullptr}
@@ -716,7 +751,7 @@ void BinarySearchTree::Node::setRightChild(BinarySearchTree::Node* const rightCh
     }
 }
 
-BinarySearchTree::Node *BinarySearchTree::Node::getRightChild() const
+BinarySearchTree::Node* BinarySearchTree::Node::getRightChild() const
 {
     return m_RightChild;
 }
@@ -925,4 +960,98 @@ bool BinarySearchTree::Node::operator!=(const BinarySearchTree::Node& node) cons
     }
 
     return areNotEqualNodes;
+}
+
+BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator()
+    : m_Node{nullptr}
+{
+}
+
+void BinarySearchTree::InOrderForwardIterator::next()
+{
+    if (m_Node)
+    {
+        Node* nextNode{nullptr};
+        Node* currentChild{m_Node->getRightChild()};
+
+        // first check downwards by moving to the right child and then checking on the left side until no more left child is found
+        while (currentChild)
+        {
+            nextNode = currentChild;
+            currentChild = nextNode->getLeftChild();
+        }
+
+        // if no suitable child was found check upwards until a suitable parent (to which current node is right child) is found
+        if (!nextNode)
+        {
+            Node* currentNode{m_Node};
+            Node* currentParent{m_Node->getParent()};
+
+            // if no suitable parent is found then the end of the tree has been reached
+            while(currentParent)
+            {
+                if (currentNode->isLeftChild())
+                {
+                    nextNode = currentParent;
+                    break;
+                }
+                else
+                {
+                    currentNode = currentParent;
+                    currentParent = currentNode->getParent();
+                }
+            }
+        }
+
+        m_Node = nextNode;
+    }
+}
+
+int BinarySearchTree::InOrderForwardIterator::getKey() const
+{
+    int result{std::numeric_limits<int>::max()};
+
+    if (m_Node)
+    {
+        result = m_Node->getKey();
+    }
+
+    return result;
+}
+
+void BinarySearchTree::InOrderForwardIterator::setValue(const std::string& value)
+{
+    if (m_Node)
+    {
+        m_Node->setValue(value);
+    }
+}
+
+std::string BinarySearchTree::InOrderForwardIterator::getValue() const
+{
+    std::string result{m_NullValue};
+
+    if (m_Node)
+    {
+        result = m_Node->getValue();
+    }
+
+    return result;
+}
+
+BinarySearchTree::InOrderForwardIterator& BinarySearchTree::InOrderForwardIterator::operator=(const InOrderForwardIterator& other)
+{
+    m_Node = other.m_Node;
+    return *this;
+}
+
+bool BinarySearchTree::InOrderForwardIterator::operator==(const InOrderForwardIterator& other) const
+{
+    return m_Node == other.m_Node;
+}
+
+BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator(Node* node, const std::string& nullValue)
+    : m_Node{node}
+    , m_NullValue{nullValue}
+{
 }

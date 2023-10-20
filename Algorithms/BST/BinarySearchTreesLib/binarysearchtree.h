@@ -141,6 +141,35 @@ protected:
 private:
     // equivalence logic remains the same for all classes, no need for this function to be used by derived classes
     bool _isEqualTo(const BinarySearchTree& tree) const;
+
+public:
+    class InOrderForwardIterator
+    {
+        friend class BinarySearchTree;
+
+    public:
+        InOrderForwardIterator();
+
+        void next();
+        int getKey() const;
+
+        void setValue(const std::string& value);
+        std::string getValue() const;
+
+        InOrderForwardIterator& operator=(const InOrderForwardIterator& other);
+        bool operator==(const InOrderForwardIterator& other) const;
+
+    private:
+        InOrderForwardIterator(Node* node, const std::string& nullValue = "");
+
+        Node* m_Node;
+        const std::string m_NullValue;
+    };
+
+    InOrderForwardIterator begin();
+    InOrderForwardIterator end();
+    InOrderForwardIterator find(int key);
+    InOrderForwardIterator root();
 };
 
 #endif // BINARYSEARCHTREE_H
