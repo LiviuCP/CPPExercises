@@ -1,9 +1,12 @@
 #include <QtTest>
+#include <algorithm>
+#include <numeric>
 
 #include "testutils.h"
 #include "avltree.h"
 
 using namespace TestUtils;
+using AVLIterator = AVLTree::InOrderForwardIterator;
 
 class AVLTreesTests : public QObject
 {
@@ -22,6 +25,7 @@ private slots:
     void testUpdateNodeValue();
     void testMoveSemantics();
     void testMergeTrees();
+    void testInOrderForwardIterators();
 
 private:
     void _resetTreeObjects();
@@ -922,6 +926,88 @@ void AVLTreesTests::testMergeTrees()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, scEmptyTreeString, 0));
     QVERIFY(scCustomNullValue == mpSearchTree->getNullValue() &&
             scCustomNullValue == mpAuxSearchTree->getNullValue());
+}
+
+void AVLTreesTests::testInOrderForwardIterators()
+{
+    mpSearchTree = new AVLTree;
+
+    (void)mpSearchTree->addOrUpdateNode(-5, "b");
+    (void)mpSearchTree->addOrUpdateNode(8, "z");
+    (void)mpSearchTree->addOrUpdateNode(-1, "_ca");
+    (void)mpSearchTree->addOrUpdateNode(2, "q1");
+    (void)mpSearchTree->addOrUpdateNode(-2, "55");
+    (void)mpSearchTree->addOrUpdateNode(7, "a");
+    (void)mpSearchTree->addOrUpdateNode(0, "fq");
+    (void)mpSearchTree->addOrUpdateNode(-9, scDefaultValue);
+    (void)mpSearchTree->addOrUpdateNode(16, "cCc");
+    (void)mpSearchTree->addOrUpdateNode(14, "abab");
+    (void)mpSearchTree->addOrUpdateNode(-23, "-c");
+    (void)mpSearchTree->addOrUpdateNode(17, "b");
+    (void)mpSearchTree->addOrUpdateNode(-16, "qa");
+    (void)mpSearchTree->addOrUpdateNode(-12, "dev");
+    (void)mpSearchTree->addOrUpdateNode(19, "_ca");
+    (void)mpSearchTree->addOrUpdateNode(-15, scDefaultValue);
+
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree,
+                                     "-1:_ca:ROOT/-9:DF:-1/7:a:-1/-16:qa:-9/-5:b:-9/2:q1:7/14:abab:7/-23:-c:-16/-12:dev:-16/"
+                                     "-2:55:-5R/0:fq:2L/8:z:14/17:b:14/-15:DF:-12L/16:cCc:17/19:_ca:17",
+                                     16,
+                                     true));
+
+    AVLIterator it{mpSearchTree->begin()};
+    QVERIFY(it.getKey() == -23 && it.getValue() == "-c");
+
+    it = mpSearchTree->root();
+    QVERIFY(it.getKey() == -1 && it.getValue() == "_ca");
+
+    it = mpSearchTree->find(-2);
+    QVERIFY(it.getKey() == -2 && it.getValue() == "55");
+
+    QVERIFY(mpSearchTree->find(-23) == mpSearchTree->begin());
+    QVERIFY(mpSearchTree->find(-1) == mpSearchTree->root());
+    QVERIFY(mpSearchTree->find(12) == mpSearchTree->end());
+
+    std::vector<std::pair<int, std::string>> traversedElements;
+    const std::vector<std::pair<int, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
+                                                                          {0, "fq"}, {2, "q1"}, {7, "a"}, {8, "z"}, {14, "abab"}, {16, "cCc"}, {17, "b"}, {19, "_ca"}};
+
+    for (AVLIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
+    {
+        traversedElements.push_back({it.getKey(), it.getValue()});
+    }
+
+    QVERIFY(std::equal(traversedElements.cbegin(), traversedElements.cend(), c_TraversedElementsRef.cbegin()));
+
+    (void)mpSearchTree->addOrUpdateNode(14, "BaBa");
+    it = mpSearchTree->find(14);
+
+    QVERIFY(it.getValue() == "BaBa");
+
+    it.next();
+    QVERIFY(it.getKey() == 16);
+
+    it.setValue("bCCC");
+    QVERIFY(mpSearchTree->getNodeValue(16) == "bCCC");
+
+    it = mpSearchTree->find(19);
+    it.next();
+
+    QVERIFY(it == mpSearchTree->end());
+    QVERIFY(std::numeric_limits<int>::max() == it.getKey() && it.getValue().empty());
+
+    QVERIFY(mpSearchTree->find(2) != mpSearchTree->end());
+    (void)mpSearchTree->removeNode(2);
+    QVERIFY(mpSearchTree->find(2) == mpSearchTree->end());
+
+    mpAuxSearchTree = new AVLTree{"NullVal"};
+    QVERIFY(mpAuxSearchTree->begin() == mpAuxSearchTree->end() && mpAuxSearchTree->root() == mpAuxSearchTree->end() && mpAuxSearchTree->find(14) == mpAuxSearchTree->end());
+
+    AVLIterator itAux;
+    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
+
+    itAux = mpAuxSearchTree->end();
+    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue() == "NullVal");
 }
 
 void AVLTreesTests::_resetTreeObjects()
