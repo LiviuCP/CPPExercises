@@ -163,7 +163,7 @@ public:
         InOrderForwardIterator(Node* node, const std::string& nullValue = "");
 
         Node* m_Node;
-        const std::string m_NullValue;
+        std::string m_NullValue;
     };
 
     InOrderForwardIterator begin();

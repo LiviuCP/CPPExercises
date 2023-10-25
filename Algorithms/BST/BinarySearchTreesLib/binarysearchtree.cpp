@@ -967,6 +967,12 @@ BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator()
 {
 }
 
+BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator(Node* node, const std::string& nullValue)
+    : m_Node{node}
+    , m_NullValue{nullValue}
+{
+}
+
 void BinarySearchTree::InOrderForwardIterator::next()
 {
     if (m_Node)
@@ -1042,16 +1048,12 @@ std::string BinarySearchTree::InOrderForwardIterator::getValue() const
 BinarySearchTree::InOrderForwardIterator& BinarySearchTree::InOrderForwardIterator::operator=(const InOrderForwardIterator& other)
 {
     m_Node = other.m_Node;
+    m_NullValue = other.m_NullValue;
+
     return *this;
 }
 
 bool BinarySearchTree::InOrderForwardIterator::operator==(const InOrderForwardIterator& other) const
 {
-    return m_Node == other.m_Node;
-}
-
-BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator(Node* node, const std::string& nullValue)
-    : m_Node{node}
-    , m_NullValue{nullValue}
-{
+    return m_Node == other.m_Node && m_NullValue == other.m_NullValue;
 }

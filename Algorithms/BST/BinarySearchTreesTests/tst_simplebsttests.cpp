@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <algorithm>
+#include <numeric>
 
 #include "testutils.h"
 #include "binarysearchtree.h"
@@ -748,7 +749,9 @@ void SimpleBSTTests::testInOrderForwardIterators()
     (void)mpSearchTree->addOrUpdateNode(-15, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree,
-            "-5:b:ROOT/-9:DF:-5/8:z:-5/-23:-c:-9L/-1:_ca:8/16:cCc:8/-16:qa:-23R/-2:55:-1/2:q1:-1/14:abab:16/17:b:16/-12:dev:-16R/0:fq:2/7:a:2/19:_ca:17R/-15:DF:-12L", 16, true));
+                                     "-5:b:ROOT/-9:DF:-5/8:z:-5/-23:-c:-9L/-1:_ca:8/16:cCc:8/-16:qa:-23R/-2:55:-1/2:q1:-1/14:abab:16/17:b:16/-12:dev:-16R/0:fq:2/7:a:2/19:_ca:17R/-15:DF:-12L",
+                                     16,
+                                     true));
 
     BSTIterator it{mpSearchTree->begin()};
     QVERIFY(it.getKey() == -23 && it.getValue() == "-c");
@@ -789,13 +792,48 @@ void SimpleBSTTests::testInOrderForwardIterators()
     it.next();
 
     QVERIFY(it == mpSearchTree->end());
+    QVERIFY(std::numeric_limits<int>::max() == it.getKey() && it.getValue().empty());
 
     QVERIFY(mpSearchTree->find(2) != mpSearchTree->end());
     (void)mpSearchTree->removeNode(2);
     QVERIFY(mpSearchTree->find(2) == mpSearchTree->end());
 
-    mpAuxSearchTree = new BinarySearchTree;
+    mpAuxSearchTree = new BinarySearchTree{"NullVal"};
     QVERIFY(mpAuxSearchTree->begin() == mpAuxSearchTree->end() && mpAuxSearchTree->root() == mpAuxSearchTree->end() && mpAuxSearchTree->find(14) == mpAuxSearchTree->end());
+
+    BSTIterator itAux;
+    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
+
+    itAux = mpAuxSearchTree->end();
+    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue() == "NullVal");
+
+    // the last part of this test is only relevant for "simple" BSTs (for RB and AVL a balancing is being performed)
+    _resetTreeObjects();
+
+    mpSearchTree = new BinarySearchTree{std::vector<int>{-8, -4, -2, 0, 3, 5, 9, 12}, scDefaultValue};
+    QVERIFY(areExpectedTreeValuesMet(mpSearchTree, "-8:ROOT/-4:-8R/-2:-4R/0:-2R/3:0R/5:3R/9:5R/12:9R", 8));
+
+    mpAuxSearchTree = new BinarySearchTree{std::vector<int>{12, 9, 5, 3, 0, -2, -4, -8}, scDefaultValue};
+    QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree, "12:ROOT/9:12L/5:9L/3:5L/0:3L/-2:0L/-4:-2L/-8:-4L", 8));
+
+    std::vector<int> traversedKeys;
+    const std::vector<int> c_TraversedKeysRef{-8, -4, -2, 0, 3, 5, 9, 12};
+
+    for (BSTIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
+    {
+        traversedKeys.push_back(it.getKey());
+    }
+
+    QVERIFY(std::equal(traversedKeys.cbegin(), traversedKeys.cend(), c_TraversedKeysRef.cbegin()));
+
+    traversedKeys.clear();
+
+    for (BSTIterator it{mpAuxSearchTree->begin()}; it != mpAuxSearchTree->end(); it.next())
+    {
+        traversedKeys.push_back(it.getKey());
+    }
+
+    QVERIFY(std::equal(traversedKeys.cbegin(), traversedKeys.cend(), c_TraversedKeysRef.cbegin()));
 }
 
 void SimpleBSTTests::testPrintTree()
