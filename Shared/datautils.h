@@ -33,6 +33,7 @@ using StringIntPairMatrix = Matrix<StringIntPair>;
 using StringIntMap = std::map<std::string, int>;
 using IntVector = std::vector<int>;
 using IntVectorMatrix = Matrix<IntVector>;
+using IntVectorDiff = IntVector::difference_type;
 using StringVector = std::vector<std::string>;
 using StringVectorMatrix = Matrix<StringVector>;
 using StringIntPairVector = std::vector<StringIntPair>;
