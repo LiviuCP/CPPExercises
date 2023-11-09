@@ -23,6 +23,12 @@
 #define MACOS
 #endif
 
+template<typename DataType>
+using MatrixSizeType = typename Matrix<DataType>::size_type;
+
+template<typename DataType>
+using MatrixPoint = std::pair<MatrixSizeType<DataType>, MatrixSizeType<DataType>>;
+
 using IntMatrix = Matrix<int>;
 using IntPair = std::pair<int, int>;
 using IntPairMatrix = Matrix<IntPair>;
