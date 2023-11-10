@@ -32,6 +32,8 @@ private:
                                                                std::function<bool(const DataType&)>& predicate);
 
     const IntMatrix mPrimaryIntMatrix;
+    const IntMatrix mSecondaryIntMatrix;
+    const IntMatrix mThirdIntMatrix;
     const IntVector mPrimaryIntVector;
     const IntVector mSecondaryIntVector;
     const IntVector mThirdIntVector;
@@ -49,6 +51,8 @@ OtherTests::OtherTests()
                                 5,  5,  5,   5,   4,  3,   2, -10,  4,
                                48,  2, -3,  -4,  -5,  6,  -7,  18,  0
                        }}
+    , mSecondaryIntMatrix{1, 9, {1, -2, 0, 5, -4, -2, 3, 0, -8}}
+    , mThirdIntMatrix{9, 1, {-1, 5, 3, -3, 0, 4, -7, 9, -5}}
     , mPrimaryIntVector{2, -1, 5, -8, -7, 0, 3, 4, -5, 10, 8, -9, 0, 1}
     , mSecondaryIntVector{5, 14}
     , mThirdIntVector{-5, 14}
@@ -404,21 +408,139 @@ void OtherTests::testGatherAlgorithmMatrix_data()
     QTest::newRow("7c") << mPrimaryIntMatrix << MatrixPoint<int>{2, 3} << MatrixPoint<int>{2, 3} << MatrixPoint<int>{2, 3} << isNegativeInt << mPrimaryIntMatrix << MatrixPoint<int>{2, 3} << MatrixPoint<int>{2, 3} << MatrixSizeType<int>{0};
     QTest::newRow("7d") << mPrimaryIntMatrix << MatrixPoint<int>{2, 3} << MatrixPoint<int>{2, 3} << MatrixPoint<int>{1, 2} << isNegativeInt << mPrimaryIntMatrix << MatrixPoint<int>{2, 3} << MatrixPoint<int>{2, 3} << MatrixSizeType<int>{0};
 
-    QTest::newRow("8a") << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
-    QTest::newRow("8a") << IntMatrix{1, 1, -2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
-    QTest::newRow("8b") << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
-    QTest::newRow("8b") << IntMatrix{1, 1, -2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
-    QTest::newRow("8c") << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
-    QTest::newRow("8c") << IntMatrix{1, 1, -2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
-    QTest::newRow("8d") << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
-    QTest::newRow("8d") << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
-    QTest::newRow("8e") << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{0};
-    QTest::newRow("8e") << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{0};
-    QTest::newRow("8f") << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
-    QTest::newRow("8f") << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
+    inputMatrixRef = {1, 9, {1, 0, -2, -4, -2, -8, 5, 3, 0}};
 
-    QTest::newRow("9a") << IntMatrix{} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
-    QTest::newRow("9b") << IntMatrix{} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, -1} << isNegativeInt << IntMatrix{} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("8a") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 6} << MatrixSizeType<int>{4};
+    QTest::newRow("8a") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 6} << MatrixSizeType<int>{4};
+    QTest::newRow("8a") << mSecondaryIntMatrix << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 6} << MatrixSizeType<int>{4};
+    QTest::newRow("8a") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{0, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 6} << MatrixSizeType<int>{4};
+
+    inputMatrixRef = {1, 9, {-2, -4, -2, -8, 1, 0, 5, 3, 0}};
+
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{1, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+    QTest::newRow("8b") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{4};
+
+    inputMatrixRef = {1, 9, {1, 0, 5, 3, 0, -2, -4, -2, -8}};
+
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 8} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 8} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, 8} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, 8} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{1, 8} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 8} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{1, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+    QTest::newRow("8c") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{-1, 9} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 5} << MatrixPoint<int>{1, 9} << MatrixSizeType<int>{4};
+
+    inputMatrixRef = {1, 9, {1, 0, -2, -4, 5, -2, 3, 0, -8}};
+
+    QTest::newRow("8d") << mSecondaryIntMatrix << MatrixPoint<int>{0, 1} << MatrixPoint<int>{1, 5} << MatrixPoint<int>{0, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{2};
+    QTest::newRow("8d") << mSecondaryIntMatrix << MatrixPoint<int>{1, 5} << MatrixPoint<int>{0, 1} << MatrixPoint<int>{0, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{2};
+    QTest::newRow("8d") << mSecondaryIntMatrix << MatrixPoint<int>{-1, 1} << MatrixPoint<int>{1, 5} << MatrixPoint<int>{1, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{2};
+    QTest::newRow("8d") << mSecondaryIntMatrix << MatrixPoint<int>{1, 5} << MatrixPoint<int>{-1, 1} << MatrixPoint<int>{1, 3} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{2};
+
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{-1, 0} << MatrixPoint<int>{-1, 9} << MatrixPoint<int>{-1, 2} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 2} << MatrixPoint<int>{0, 2} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{-1, 9} << MatrixPoint<int>{-1, 0} << MatrixPoint<int>{-1, 2} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 2} << MatrixPoint<int>{0, 2} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 9} << MatrixPoint<int>{0, 3} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 3} << MatrixPoint<int>{0, 3} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{0, 9} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 3} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 3} << MatrixPoint<int>{0, 3} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{1, 0} << MatrixPoint<int>{1, 9} << MatrixPoint<int>{1, 4} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{1, 4} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{1, 9} << MatrixPoint<int>{1, 0} << MatrixPoint<int>{1, 4} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{1, 4} << MatrixPoint<int>{1, 4} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{0, 1} << MatrixPoint<int>{0, 5} << MatrixPoint<int>{0, 3} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 3} << MatrixPoint<int>{0, 3} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{0, 5} << MatrixPoint<int>{0, 1} << MatrixPoint<int>{0, 3} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 3} << MatrixPoint<int>{0, 3} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{0, 2} << MatrixPoint<int>{1, 4} << MatrixPoint<int>{0, 3} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 3} << MatrixPoint<int>{0, 3} << MatrixSizeType<int>{0};
+    QTest::newRow("8e") << mSecondaryIntMatrix << MatrixPoint<int>{1, 4} << MatrixPoint<int>{0, 2} << MatrixPoint<int>{0, 3} << isNegativeInt << mSecondaryIntMatrix << MatrixPoint<int>{0, 3} << MatrixPoint<int>{0, 3} << MatrixSizeType<int>{0};
+
+    inputMatrixRef = {9, 1, {5, 3, -1, -3, -7, -5, 0, 4, 9}};
+
+    QTest::newRow("9a") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{4, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{2, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9a") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{2, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9a") << mThirdIntMatrix << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{4, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{2, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9a") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{4, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{2, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{4};
+
+    inputMatrixRef = {9, 1, {-1, -3, -7, -5, 5, 3, 0, 4, 9}};
+
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{-1, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{-1, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9b") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{-1, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{0, 0} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{4};
+
+    inputMatrixRef = {9, 1, {5, 3, 0, 4, 9, -1, -3, -7, -5}};
+
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{8, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{8, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{8, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{8, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{9, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{9, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{8, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{8, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{9, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{9, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+    QTest::newRow("9c") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{9, -1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{5, 0} << MatrixPoint<int>{9, 1} << MatrixSizeType<int>{4};
+
+    inputMatrixRef = {9, 1, {-1, 5, 3, 0, -3, -7, 4, 9, -5}};
+
+    QTest::newRow("9d") << mThirdIntMatrix << MatrixPoint<int>{2, 0} << MatrixPoint<int>{7, 1} << MatrixPoint<int>{5, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{4, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{2};
+    QTest::newRow("9d") << mThirdIntMatrix << MatrixPoint<int>{7, 1} << MatrixPoint<int>{2, 0} << MatrixPoint<int>{5, 0} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{4, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{2};
+    QTest::newRow("9d") << mThirdIntMatrix << MatrixPoint<int>{2, -1} << MatrixPoint<int>{7, 1} << MatrixPoint<int>{5, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{4, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{2};
+    QTest::newRow("9d") << mThirdIntMatrix << MatrixPoint<int>{7, 1} << MatrixPoint<int>{2, -1} << MatrixPoint<int>{5, 1} << isNegativeInt << inputMatrixRef << MatrixPoint<int>{4, 0} << MatrixPoint<int>{6, 1} << MatrixSizeType<int>{2};
+
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{0, -1} << MatrixPoint<int>{9, -1} << MatrixPoint<int>{2, -1} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{2, 0} << MatrixPoint<int>{2, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{9, -1} << MatrixPoint<int>{0, -1} << MatrixPoint<int>{2, -1} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{2, 0} << MatrixPoint<int>{2, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{0, 0} << MatrixPoint<int>{9, 0} << MatrixPoint<int>{3, 0} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{3, 0} << MatrixPoint<int>{3, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{9, 0} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{3, 0} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{3, 0} << MatrixPoint<int>{3, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{0, 1} << MatrixPoint<int>{9, 1} << MatrixPoint<int>{4, 1} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{4, 1} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{9, 1} << MatrixPoint<int>{0, 1} << MatrixPoint<int>{4, 1} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{4, 1} << MatrixPoint<int>{4, 1} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{1, 0} << MatrixPoint<int>{5, 0} << MatrixPoint<int>{3, 0} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{3, 0} << MatrixPoint<int>{3, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{5, 0} << MatrixPoint<int>{1, 0} << MatrixPoint<int>{3, 0} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{3, 0} << MatrixPoint<int>{3, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{4, 0} << MatrixPoint<int>{6, 1} << MatrixPoint<int>{5, 0} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{5, 0} << MatrixPoint<int>{5, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("9e") << mThirdIntMatrix << MatrixPoint<int>{6, 1} << MatrixPoint<int>{4, 0} << MatrixPoint<int>{5, 0} << isNegativeInt << mThirdIntMatrix << MatrixPoint<int>{5, 0} << MatrixPoint<int>{5, 0} << MatrixSizeType<int>{0};
+
+    QTest::newRow("10a") << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
+    QTest::newRow("10a") << IntMatrix{1, 1, -2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
+    QTest::newRow("10b") << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
+    QTest::newRow("10b") << IntMatrix{1, 1, -2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
+    QTest::newRow("10c") << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
+    QTest::newRow("10c") << IntMatrix{1, 1, -2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, -2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{1};
+    QTest::newRow("10d") << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("10d") << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("10e") << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{0};
+    QTest::newRow("10e") << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{1, 1} << MatrixSizeType<int>{0};
+    QTest::newRow("10f") << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("10f") << IntMatrix{1, 1, 2} << MatrixPoint<int>{1, 1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{-1, -1} << isNegativeInt << IntMatrix{1, 1, 2} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
+
+    QTest::newRow("11a") << IntMatrix{} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << isNegativeInt << IntMatrix{} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
+    QTest::newRow("11b") << IntMatrix{} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, -1} << isNegativeInt << IntMatrix{} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
 }
 
 template<typename BidirectionalIt, typename Predicate>
