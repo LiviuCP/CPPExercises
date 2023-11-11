@@ -4,12 +4,12 @@
 
 #include "gather.h"
 
-class OtherTests : public QObject
+class CombinedSTLTests : public QObject
 {
     Q_OBJECT
 
 public:
-    OtherTests();
+    CombinedSTLTests();
 
 private slots:
     void testGatherAlgorithmStdVector();
@@ -29,7 +29,7 @@ private:
     const IntVector mFifthIntVector;
 };
 
-OtherTests::OtherTests()
+CombinedSTLTests::CombinedSTLTests()
     : mPrimaryIntMatrix{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                 4, 20, -7,   2,   2,  2,  10, -5,  -2,
                                 5, -5,  2,  -12, -2,  6,   7,  8,  -9,
@@ -49,7 +49,7 @@ OtherTests::OtherTests()
 {
 }
 
-void OtherTests::testGatherAlgorithmStdVector()
+void CombinedSTLTests::testGatherAlgorithmStdVector()
 {
     QFETCH(IntVector, inputVector);
     QFETCH(IntVector::difference_type, beginIteratorOffset);
@@ -69,7 +69,7 @@ void OtherTests::testGatherAlgorithmStdVector()
     QVERIFY(gatheringStartIt == inputVector.begin() + gatheringStartIteratorOffset && gatheringEndIt == inputVector.begin() + gatheringEndIteratorOffset);
 }
 
-void OtherTests::testGatherAlgorithmMatrix()
+void CombinedSTLTests::testGatherAlgorithmMatrix()
 {
     QFETCH(IntMatrix, inputMatrix);
     QFETCH(MatrixPoint<int>, startingPoint);
@@ -87,7 +87,7 @@ void OtherTests::testGatherAlgorithmMatrix()
     QVERIFY(gatheringStartingPoint == gatheringStartingPointRef && gatheringEndingPoint == gatheringEndingPointRef && gatheredElementsCount == gatheredElementsCountRef);
 }
 
-void OtherTests::testGatherAlgorithmStdVector_data()
+void CombinedSTLTests::testGatherAlgorithmStdVector_data()
 {
     QTest::addColumn<IntVector>("inputVector");
     QTest::addColumn<IntVector::difference_type>("beginIteratorOffset");
@@ -135,7 +135,7 @@ void OtherTests::testGatherAlgorithmStdVector_data()
     QTest::newRow("33") << IntVector{} << IntVectorDiff{0} << IntVectorDiff{0} << IntVectorDiff{0} << isNegativeInt << IntVector{} << IntVectorDiff{0} << IntVectorDiff{0};
 }
 
-void OtherTests::testGatherAlgorithmMatrix_data()
+void CombinedSTLTests::testGatherAlgorithmMatrix_data()
 {
     QTest::addColumn<IntMatrix>("inputMatrix");
     QTest::addColumn<MatrixPoint<int>>("startingPoint");
@@ -531,6 +531,6 @@ void OtherTests::testGatherAlgorithmMatrix_data()
     QTest::newRow("11b") << IntMatrix{} << MatrixPoint<int>{-1, -1} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, -1} << isNegativeInt << IntMatrix{} << MatrixPoint<int>{0, 0} << MatrixPoint<int>{0, 0} << MatrixSizeType<int>{0};
 }
 
-QTEST_APPLESS_MAIN(OtherTests)
+QTEST_APPLESS_MAIN(CombinedSTLTests)
 
-#include "tst_othertests.moc"
+#include "tst_combinedstltests.moc"
