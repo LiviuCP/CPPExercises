@@ -6,18 +6,30 @@
 /* Unidimensional gathering:
    - elements from a sequence are gathered around a chosen position (gathering point) by using a unary predicate
    - generic implementation using bidirectional iterators
+   - it is the responsibility of the user to ensure all three iterators are valid and in-order: the gathering point iterator should be between the other two iterators or at most equal to either of them
+     (however for random iterators the algorithm will clamp the value of the gathering point iterator to ensure it stands between start and end)
 */
 
 template<typename BidirectionalIt, typename Predicate>
 std::pair<BidirectionalIt, BidirectionalIt> gatherSequenceElements(BidirectionalIt startIt, BidirectionalIt endIt, BidirectionalIt gatheringPointIt, Predicate predicate)
 {
+    using category = typename std::iterator_traits<BidirectionalIt>::iterator_category;
+    static_assert(std::is_base_of_v<std::bidirectional_iterator_tag, category>);
+
     BidirectionalIt gatheringStartIt{startIt};
     BidirectionalIt gatheringEndIt{startIt};
 
     if (std::distance(startIt, endIt) > 0)
     {
-        gatheringPointIt = std::clamp<BidirectionalIt>(gatheringPointIt, startIt, endIt,
-                                                       [](const BidirectionalIt& first, const BidirectionalIt& second) {return std::distance(first, second) > 0;});
+        /* The gathering point will be clamped between the starting/ending iterator only for random access iterator types (e.g. for std::vector, Matrix)
+           For other iterator types (e.g. for std::list) it is the user's responsibility to ensure the gathering point is correctly placed between start/end
+        */
+        if constexpr(std::is_base_of_v<std::random_access_iterator_tag, category>)
+        {
+            gatheringPointIt = std::clamp<BidirectionalIt>(gatheringPointIt, startIt, endIt,
+                                                           [](const BidirectionalIt& first, const BidirectionalIt& second) {return std::distance(first, second) > 0;});
+        }
+
         gatheringStartIt = std::stable_partition(startIt, gatheringPointIt, [predicate](const auto& element) {return !predicate(element);});
         gatheringEndIt = std::stable_partition(gatheringPointIt, endIt, predicate);
     }

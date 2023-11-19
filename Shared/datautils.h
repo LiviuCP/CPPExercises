@@ -3,6 +3,7 @@
 #define DATAUTILS_H
 
 #include <vector>
+#include <list>
 #include <set>
 #include <map>
 #include <utility>
@@ -43,6 +44,7 @@ using IntVectorDiff = IntVector::difference_type;
 using StringVector = std::vector<std::string>;
 using StringVectorMatrix = Matrix<StringVector>;
 using StringIntPairVector = std::vector<StringIntPair>;
+using IntList = std::list<int>;
 using BoolMatrix = Matrix<bool>;
 using SizePair = std::pair<size_t, size_t>;
 using TripleSizeTuple = std::tuple<size_t, size_t, size_t>;
@@ -57,6 +59,21 @@ namespace Utilities
 {
     bool convertBitStringToDataWord(const std::string& bitString, DataWord& word);
     DataWord invertDataWord(const DataWord& word);
+
+    /* Convenience function for getting a std::list<DataType>::iterator based on a "virtual index", i.e. number of hops from the starting element */
+    template<typename DataType>
+    typename std::list<DataType>::iterator getListIteratorAtIndex(std::list<DataType>& myList, size_t index)
+    {
+        auto it{myList.begin()};
+
+        while (index > 0 && it != myList.end())
+        {
+            ++it;
+            --index;
+        }
+
+        return it;
+    }
 }
 
 #endif // DATAUTILS_H

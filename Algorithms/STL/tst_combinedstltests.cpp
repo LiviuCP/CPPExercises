@@ -14,9 +14,11 @@ public:
 
 private slots:
     void testGatherAlgorithmStdVector();
+    void testGatherAlgorithmStdList();
     void testGatherAlgorithmMatrix();
 
     void testGatherAlgorithmStdVector_data();
+    void testGatherAlgorithmStdList_data();
     void testGatherAlgorithmMatrix_data();
 
 private:
@@ -28,6 +30,11 @@ private:
     const IntVector mThirdIntVector;
     const IntVector mFourthIntVector;
     const IntVector mFifthIntVector;
+    const IntList mPrimaryIntList;
+    const IntList mSecondaryIntList;
+    const IntList mThirdIntList;
+    const IntList mFourthIntList;
+    const IntList mFifthIntList;
 };
 
 CombinedSTLTests::CombinedSTLTests()
@@ -47,6 +54,11 @@ CombinedSTLTests::CombinedSTLTests()
     , mThirdIntVector{-5, 14}
     , mFourthIntVector{5, -14}
     , mFifthIntVector{-5, -14}
+    , mPrimaryIntList{2, -1, 5, -8, -7, 0, 3, 4, -5, 10, 8, -9, 0, 1}
+    , mSecondaryIntList{5, 14}
+    , mThirdIntList{-5, 14}
+    , mFourthIntList{5, -14}
+    , mFifthIntList{-5, -14}
 {
 }
 
@@ -68,6 +80,27 @@ void CombinedSTLTests::testGatherAlgorithmStdVector()
 
     QVERIFY(std::equal(inputVector.cbegin(), inputVector.cend(), inputVectorRef.cbegin()));
     QVERIFY(gatheringStartIt == inputVector.begin() + gatheringStartIteratorOffset && gatheringEndIt == inputVector.begin() + gatheringEndIteratorOffset);
+}
+
+void CombinedSTLTests::testGatherAlgorithmStdList()
+{
+    QFETCH(IntList, inputList);
+    QFETCH(size_t, startIteratorIndex);
+    QFETCH(size_t, endIteratorIndex);
+    QFETCH(size_t, gatheringPointIteratorIndex);
+    QFETCH(std::function<bool(const int&)>, predicate);
+    QFETCH(IntList, inputListRef);
+    QFETCH(size_t, gatheringStartIteratorIndex);
+    QFETCH(size_t, gatheringEndIteratorIndex);
+
+    const auto&[gatheringStartIt, gatheringEndIt]{gatherSequenceElements(Utilities::getListIteratorAtIndex(inputList, startIteratorIndex),
+                                                                         Utilities::getListIteratorAtIndex(inputList, endIteratorIndex),
+                                                                         Utilities::getListIteratorAtIndex(inputList, gatheringPointIteratorIndex),
+                                                                         predicate)};
+
+    QVERIFY(std::equal(inputList.cbegin(), inputList.cend(), inputListRef.cbegin()));
+    QVERIFY(gatheringStartIt == Utilities::getListIteratorAtIndex(inputList, gatheringStartIteratorIndex) &&
+            gatheringEndIt == Utilities::getListIteratorAtIndex(inputList, gatheringEndIteratorIndex));
 }
 
 void CombinedSTLTests::testGatherAlgorithmMatrix()
@@ -113,7 +146,7 @@ void CombinedSTLTests::testGatherAlgorithmStdVector_data()
     QTest::newRow("10") << mPrimaryIntVector << IntVectorDiff{2} << IntVectorDiff{10} << IntVectorDiff{13} << isNegativeInt << IntVector{2, -1, 5, 0, 3, 4, 10, -8, -7, -5, 8, -9, 0, 1} << IntVectorDiff{7} << IntVectorDiff{10};
     QTest::newRow("11") << mPrimaryIntVector << IntVectorDiff{0} << IntVectorDiff{0} << IntVectorDiff{0} << isNegativeInt << mPrimaryIntVector << IntVectorDiff{0} << IntVectorDiff{0};
     QTest::newRow("12") << mPrimaryIntVector << IntVectorDiff{14} << IntVectorDiff{0} << IntVectorDiff{14} << isNegativeInt << mPrimaryIntVector << IntVectorDiff{14} << IntVectorDiff{14};
-    QTest::newRow("13") << mPrimaryIntVector << IntVectorDiff{4} << IntVectorDiff{4} << IntVectorDiff{4} << isNegativeInt << mPrimaryIntVector << IntVectorDiff{4} << IntVectorDiff{4};
+    QTest::newRow("13") << mPrimaryIntVector << IntVectorDiff{14} << IntVectorDiff{0} << IntVectorDiff{0} << isNegativeInt << mPrimaryIntVector << IntVectorDiff{14} << IntVectorDiff{14};
     QTest::newRow("14") << mPrimaryIntVector << IntVectorDiff{4} << IntVectorDiff{4} << IntVectorDiff{4} << isNegativeInt << mPrimaryIntVector << IntVectorDiff{4} << IntVectorDiff{4};
     QTest::newRow("15") << mPrimaryIntVector << IntVectorDiff{7} << IntVectorDiff{3} << IntVectorDiff{5} << isNegativeInt << mPrimaryIntVector << IntVectorDiff{7} << IntVectorDiff{7};
     QTest::newRow("16") << mPrimaryIntVector << IntVectorDiff{5} << IntVectorDiff{8} << IntVectorDiff{6} << isNegativeInt << mPrimaryIntVector << IntVectorDiff{6} << IntVectorDiff{6};
@@ -134,6 +167,49 @@ void CombinedSTLTests::testGatherAlgorithmStdVector_data()
     QTest::newRow("31") << IntVector{5} << IntVectorDiff{0} << IntVectorDiff{1} << IntVectorDiff{0} << isNegativeInt << IntVector{5} << IntVectorDiff{0} << IntVectorDiff{0};
     QTest::newRow("32") << IntVector{5} << IntVectorDiff{0} << IntVectorDiff{1} << IntVectorDiff{1} << isNegativeInt << IntVector{5} << IntVectorDiff{1} << IntVectorDiff{1};
     QTest::newRow("33") << IntVector{} << IntVectorDiff{0} << IntVectorDiff{0} << IntVectorDiff{0} << isNegativeInt << IntVector{} << IntVectorDiff{0} << IntVectorDiff{0};
+}
+
+void CombinedSTLTests::testGatherAlgorithmStdList_data()
+{
+    QTest::addColumn<IntList>("inputList");
+    QTest::addColumn<size_t>("startIteratorIndex");
+    QTest::addColumn<size_t>("endIteratorIndex");
+    QTest::addColumn<size_t>("gatheringPointIteratorIndex");
+    QTest::addColumn<std::function<bool(const int&)>>("predicate");
+    QTest::addColumn<IntList>("inputListRef");
+    QTest::addColumn<size_t>("gatheringStartIteratorIndex");
+    QTest::addColumn<size_t>("gatheringEndIteratorIndex");
+
+    std::function<bool(const int&)> isNegativeInt{[](const int& element) {return element < 0;}};
+
+    // same test data used as for std::vector (hence same row names), data entries that were not applicable to std::list have been skipped (TODO: investigate vector data rows "13" and "15" for std::list, they currently fail)
+    QTest::newRow("1") << mPrimaryIntList << size_t{0} << size_t{14} << size_t{4} << isNegativeInt << IntList{2, 5, -1, -8, -7, -5, -9, 0, 3, 4, 10, 8, 0, 1} << size_t{2} << size_t{7};
+    QTest::newRow("2") << mPrimaryIntList << size_t{0} << size_t{14} << size_t{0} << isNegativeInt << IntList{-1, -8, -7, -5, -9, 2, 5, 0, 3, 4, 10, 8, 0, 1} << size_t{0} << size_t{5};
+    QTest::newRow("3") << mPrimaryIntList << size_t{0} << size_t{14} << size_t{14} << isNegativeInt << IntList{2, 5, 0, 3, 4, 10, 8, 0, 1, -1, -8, -7, -5, -9} << size_t{9} << size_t{14};
+    QTest::newRow("4") << mPrimaryIntList << size_t{2} << size_t{10} << size_t{5} << isNegativeInt << IntList{2, -1, 5, -8, -7, -5, 0, 3, 4, 10, 8, -9, 0, 1} << size_t{3} << size_t{6};
+    QTest::newRow("5") << mPrimaryIntList << size_t{2} << size_t{10} << size_t{2} << isNegativeInt << IntList{2, -1, -8, -7, -5, 5, 0, 3, 4, 10, 8, -9, 0, 1} << size_t{2} << size_t{5};
+    QTest::newRow("8") << mPrimaryIntList << size_t{2} << size_t{10} << size_t{10} << isNegativeInt << IntList{2, -1, 5, 0, 3, 4, 10, -8, -7, -5, 8, -9, 0, 1} << size_t{7} << size_t{10};
+    QTest::newRow("11") << mPrimaryIntList << size_t{0} << size_t{0} << size_t{0} << isNegativeInt << mPrimaryIntList << size_t{0} << size_t{0};
+    QTest::newRow("12") << mPrimaryIntList << size_t{14} << size_t{0} << size_t{14} << isNegativeInt << mPrimaryIntList << size_t{14} << size_t{14};
+    QTest::newRow("14") << mPrimaryIntList << size_t{4} << size_t{4} << size_t{4} << isNegativeInt << mPrimaryIntList << size_t{4} << size_t{4};
+    QTest::newRow("16") << mPrimaryIntList << size_t{5} << size_t{8} << size_t{6} << isNegativeInt << mPrimaryIntList << size_t{6} << size_t{6};
+    QTest::newRow("17") << mSecondaryIntList << size_t{0} << size_t{2} << size_t{0} << isNegativeInt << mSecondaryIntList << size_t{0} << size_t{0};
+    QTest::newRow("18") << mSecondaryIntList << size_t{0} << size_t{2} << size_t{1} << isNegativeInt << mSecondaryIntList << size_t{1} << size_t{1};
+    QTest::newRow("19") << mSecondaryIntList << size_t{0} << size_t{2} << size_t{2} << isNegativeInt << mSecondaryIntList << size_t{2} << size_t{2};
+    QTest::newRow("20") << mThirdIntList << size_t{0} << size_t{2} << size_t{0} << isNegativeInt << mThirdIntList << size_t{0} << size_t{1};
+    QTest::newRow("21") << mThirdIntList << size_t{0} << size_t{2} << size_t{1} << isNegativeInt << mThirdIntList << size_t{0} << size_t{1};
+    QTest::newRow("22") << mThirdIntList << size_t{0} << size_t{2} << size_t{2} << isNegativeInt << IntList{14, -5} << size_t{1} << size_t{2};
+    QTest::newRow("23") << mFourthIntList << size_t{0} << size_t{2} << size_t{0} << isNegativeInt << IntList{-14, 5} << size_t{0} << size_t{1};
+    QTest::newRow("24") << mFourthIntList << size_t{0} << size_t{2} << size_t{1} << isNegativeInt << mFourthIntList << size_t{1} << size_t{2};
+    QTest::newRow("25") << mFourthIntList << size_t{0} << size_t{2} << size_t{2} << isNegativeInt << mFourthIntList << size_t{1} << size_t{2};
+    QTest::newRow("26") << mFifthIntList << size_t{0} << size_t{2} << size_t{0} << isNegativeInt << mFifthIntList << size_t{0} << size_t{2};
+    QTest::newRow("27") << mFifthIntList << size_t{0} << size_t{2} << size_t{1} << isNegativeInt << mFifthIntList << size_t{0} << size_t{2};
+    QTest::newRow("28") << mFifthIntList << size_t{0} << size_t{2} << size_t{2} << isNegativeInt << mFifthIntList << size_t{0} << size_t{2};
+    QTest::newRow("29") << IntList{-5} << size_t{0} << size_t{1} << size_t{0} << isNegativeInt << IntList{-5} << size_t{0} << size_t{1};
+    QTest::newRow("30") << IntList{-5} << size_t{0} << size_t{1} << size_t{1} << isNegativeInt << IntList{-5} << size_t{0} << size_t{1};
+    QTest::newRow("31") << IntList{5} << size_t{0} << size_t{1} << size_t{0} << isNegativeInt << IntList{5} << size_t{0} << size_t{0};
+    QTest::newRow("32") << IntList{5} << size_t{0} << size_t{1} << size_t{1} << isNegativeInt << IntList{5} << size_t{1} << size_t{1};
+    QTest::newRow("33") << IntList{} << size_t{0} << size_t{0} << size_t{0} << isNegativeInt << IntList{} << size_t{0} << size_t{0};
 }
 
 void CombinedSTLTests::testGatherAlgorithmMatrix_data()
