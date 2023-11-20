@@ -6,8 +6,14 @@
 /* Unidimensional gathering:
    - elements from a sequence are gathered around a chosen position (gathering point) by using a unary predicate
    - generic implementation using bidirectional iterators
-   - it is the responsibility of the user to ensure all three iterators are valid and in-order: the gathering point iterator should be between the other two iterators or at most equal to either of them
-     (however for random iterators the algorithm will clamp the value of the gathering point iterator to ensure it stands between start and end)
+   - for non-random-access bidirectional iterators it is the responsibility of the user to ensure all three argument iterators are valid and in-order (otherwise undefined behavior might occur):
+        - the start iterator should point to an element that is placed BEFORE the one pointed by the end iterator (relative to the incrementation direction)
+        - the gathering point iterator should be between the other two iterators or at most equal to either of them
+   - for random iterators the behavior is defined as follows:
+        - if the start iterator points to an element placed after the end iterator (relative to incrementation direction) no gathering takes place; the returned result
+          is a pair of iterators that are equal to the start iterator
+        - the algorithm clamps the value of the gathering point iterator to ensure it stands between the start and end iterators
+          (only if the start/end iterators point to different positions and are in increasing order, otherwise handling occurs as in previous point)
 */
 
 template<typename BidirectionalIt, typename Predicate>
