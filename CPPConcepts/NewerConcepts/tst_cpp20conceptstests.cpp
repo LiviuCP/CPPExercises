@@ -31,6 +31,7 @@ private slots:
     void testStdSpan();
     void testConcept(); // test functionality contained in header <concepts>
     void testGenericLambda();
+    void testAggregateInitialization(); // includes testing designated initializers (which were introduced in CPP20)
 
 private:
     class RawContainer
@@ -70,6 +71,22 @@ private:
 
     private:
         std::string myStr;
+    };
+
+    struct SimpleAggregate
+    {
+        int firstInteger{-1};
+        int secondInteger{2};
+        IntPair pairOfIntegers{-4, 5};
+        bool boolean{false};
+    };
+
+    struct AdvancedAggregate
+    {
+        IntMatrix matrix{2, 3, {-1, 3, 2, 8, -9, 5}};
+        int integer;
+        std::string stdString{"MyString"};
+        StringVector stringVector{"a2", "b1"};
     };
 
     TripleSizeTuple _getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const;
@@ -590,6 +607,67 @@ void CPP20ConceptsTests::testGenericLambda()
 
         QVERIFY(c_StringVectorMatrixRef == stringVectorMatrix);
     }
+}
+
+void CPP20ConceptsTests::testAggregateInitialization()
+{
+    SimpleAggregate firstSimpleAggregate{.firstInteger = 0, .pairOfIntegers = {3, -8}};
+    SimpleAggregate secondSimpleAggregate{4, 12, {-3, 5}, true};
+
+    QVERIFY(0 == firstSimpleAggregate.firstInteger && 2 == firstSimpleAggregate.secondInteger && 3 == firstSimpleAggregate.pairOfIntegers.first && -8 == firstSimpleAggregate.pairOfIntegers.second && !firstSimpleAggregate.boolean);
+    QVERIFY(4 == secondSimpleAggregate.firstInteger && 12 == secondSimpleAggregate.secondInteger && -3 == secondSimpleAggregate.pairOfIntegers.first && 5 == secondSimpleAggregate.pairOfIntegers.second && secondSimpleAggregate.boolean);
+
+    firstSimpleAggregate = {.secondInteger = 8, .pairOfIntegers = {2, -9}, .boolean = true};
+    secondSimpleAggregate = {2, 6, {5, -3}, false};
+
+    QVERIFY(-1 == firstSimpleAggregate.firstInteger && 8 == firstSimpleAggregate.secondInteger && 2 == firstSimpleAggregate.pairOfIntegers.first && -9 == firstSimpleAggregate.pairOfIntegers.second && firstSimpleAggregate.boolean);
+    QVERIFY(2 == secondSimpleAggregate.firstInteger && 6 == secondSimpleAggregate.secondInteger && 5 == secondSimpleAggregate.pairOfIntegers.first && -3 == secondSimpleAggregate.pairOfIntegers.second && !secondSimpleAggregate.boolean);
+
+    SimpleAggregate thirdSimpleAggregate{3, 12};
+
+    QVERIFY(3 == thirdSimpleAggregate.firstInteger && 12 == thirdSimpleAggregate.secondInteger && -4 == thirdSimpleAggregate.pairOfIntegers.first && 5 == thirdSimpleAggregate.pairOfIntegers.second && !thirdSimpleAggregate.boolean);
+
+    thirdSimpleAggregate.boolean = true;
+    thirdSimpleAggregate = {-3, -15, {-2, 10}};
+
+    QVERIFY(-3 == thirdSimpleAggregate.firstInteger && -15 == thirdSimpleAggregate.secondInteger && -2 == thirdSimpleAggregate.pairOfIntegers.first && 10 == thirdSimpleAggregate.pairOfIntegers.second && !thirdSimpleAggregate.boolean);
+
+    thirdSimpleAggregate = {.boolean = true};
+
+    QVERIFY(-1 == thirdSimpleAggregate.firstInteger && 2 == thirdSimpleAggregate.secondInteger && -4 == thirdSimpleAggregate.pairOfIntegers.first && 5 == thirdSimpleAggregate.pairOfIntegers.second && thirdSimpleAggregate.boolean);
+
+    AdvancedAggregate firstAdvancedAggregate{.stringVector = {"zy", "xw"}};
+    IntMatrix intMatrixRef{2, 3, {-1, 3, 2, 8, -9, 5}};
+    StringVector stringVectorRef{"zy", "xw"};
+
+    QVERIFY(intMatrixRef == firstAdvancedAggregate.matrix && 0 == firstAdvancedAggregate.integer && "MyString" == firstAdvancedAggregate.stdString && std::equal(stringVectorRef.cbegin(), stringVectorRef.cend(), firstAdvancedAggregate.stringVector.cbegin()));
+
+    AdvancedAggregate secondAdvancedAggregate{.integer = -2, .stringVector = {}};
+
+    QVERIFY(intMatrixRef == secondAdvancedAggregate.matrix && -2 == secondAdvancedAggregate.integer && "MyString" == secondAdvancedAggregate.stdString && secondAdvancedAggregate.stringVector.empty());
+
+    AdvancedAggregate thirdAdvancedAggregate{{3, 2, {-1, 2, -9, 3, 8, 5}}, 4};
+    intMatrixRef = {3, 2, {-1, 2, -9, 3, 8, 5}};
+    stringVectorRef = {"a2", "b1"};
+
+    QVERIFY(intMatrixRef == thirdAdvancedAggregate.matrix && 4 == thirdAdvancedAggregate.integer && "MyString" == thirdAdvancedAggregate.stdString && std::equal(stringVectorRef.cbegin(), stringVectorRef.cend(), thirdAdvancedAggregate.stringVector.cbegin()));
+
+    firstAdvancedAggregate = {.stdString = "AnotherString", .stringVector = {"Another", "String"}};
+    intMatrixRef = {2, 3, {-1, 3, 2, 8, -9, 5}};
+    stringVectorRef = {"Another", "String"};
+
+    QVERIFY(intMatrixRef == firstAdvancedAggregate.matrix && 0 == firstAdvancedAggregate.integer && "AnotherString" == firstAdvancedAggregate.stdString && std::equal(stringVectorRef.cbegin(), stringVectorRef.cend(), firstAdvancedAggregate.stringVector.cbegin()));
+
+    secondAdvancedAggregate.stringVector = {"ab", "cd"};
+    secondAdvancedAggregate = {.matrix = {}, .stdString = "", .stringVector = {}};
+
+    QVERIFY(secondAdvancedAggregate.matrix.isEmpty() && 0 == secondAdvancedAggregate.integer && secondAdvancedAggregate.stdString.empty() && secondAdvancedAggregate.stringVector.empty());
+
+    thirdAdvancedAggregate = {{3, 2, {-1, 0, 1, 0, 0, -1}}, -8, "aNewString", {"z1, yx, w1, vu"}};
+    intMatrixRef = {3, 2, {-1, 0, 1, 0, 0, -1}};
+    stringVectorRef = {"z1, yx, w1, vu"};
+
+    QVERIFY(intMatrixRef == thirdAdvancedAggregate.matrix && -8 == thirdAdvancedAggregate.integer && "aNewString" == thirdAdvancedAggregate.stdString && std::equal(stringVectorRef.cbegin(), stringVectorRef.cend(), thirdAdvancedAggregate.stringVector.cbegin()));
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
