@@ -9,9 +9,11 @@
 #include <cassert>
 #include <climits>
 
+#include "variadictemplates.h"
 #include "datautils.h"
 
 using namespace std::literals;
+namespace vrd = Variadic;
 
 class CPP17ConceptsTests : public QObject
 {
@@ -29,6 +31,7 @@ private slots:
     void testStdOptional();
     void testStdStringView();
     void testTemplateTypeDeductionInConstructors();
+    void testFoldExpressionsBinaryUnaryLeftRight();
 
 private:
     enum class DataTypes
@@ -732,6 +735,56 @@ void CPP17ConceptsTests::testTemplateTypeDeductionInConstructors()
 
     QVERIFY(c_FirstUnsignedShortMatrix == c_SecondUnsignedShortMatrix);
 }
+
+void CPP17ConceptsTests::testFoldExpressionsBinaryUnaryLeftRight()
+{
+    const auto[c_Result1, c_Count1]{vrd::binaryLeftFoldMinus(5, 2, -3, 5, 4, 9)}; // ((((5 - 2) - (-3)) - 5) - 4) - 9; initial value 5 is at the start of the expression
+    const auto[c_Result2, c_Count2]{vrd::binaryLeftFoldMinus(-3, -4, 9, 3, -8)};
+    const auto[c_Result3, c_Count3]{vrd::binaryLeftFoldMinus(8, 3, -2)};
+    const auto[c_Result4, c_Count4]{vrd::binaryLeftFoldMinus(4, -5)};
+    const auto[c_Result5, c_Count5]{vrd::binaryLeftFoldMinus(-2)}; // initial value -2
+
+    QVERIFY(-12 == c_Result1 && 5 == c_Count1);
+    QVERIFY(-3 == c_Result2 && 4 == c_Count2);
+    QVERIFY(7 == c_Result3 && 2 == c_Count3);
+    QVERIFY(9 == c_Result4 && 1 == c_Count4);
+    QVERIFY(-2 == c_Result5 && 0 == c_Count5);
+
+    const auto[c_Result6, c_Count6]{vrd::unaryLeftFoldMinus<int>(2, -3, 5, 4, 9)}; // (((2 - (-3)) - 5) - 4) - 9; no initial value
+    const auto[c_Result7, c_Count7]{vrd::unaryLeftFoldMinus<int>(-4, 9, 3, -8)};
+    const auto[c_Result8, c_Count8]{vrd::unaryLeftFoldMinus<int>(3, -2)};
+    const auto[c_Result9, c_Count9]{vrd::unaryLeftFoldMinus<int>(-5)};
+
+    // empty arguments pack not allowed
+    QVERIFY(-13 == c_Result6 && 5 == c_Count6);
+    QVERIFY(-8 == c_Result7 && 4 == c_Count7);
+    QVERIFY(5 == c_Result8 && 2 == c_Count8);
+    QVERIFY(-5 == c_Result9 && 1 == c_Count9);
+
+    const auto[c_Result10, c_Count10]{vrd::binaryRightFoldMinus(5, 2, -3, 5, 4, 9)}; // 2 - (-3 - (5 - (4 - (9 - 5)))); initial value 5 is at the end of the expression
+    const auto[c_Result11, c_Count11]{vrd::binaryRightFoldMinus(-3, -4, 9, 3, -8)};
+    const auto[c_Result12, c_Count12]{vrd::binaryRightFoldMinus(8, 3, -2)};
+    const auto[c_Result13, c_Count13]{vrd::binaryRightFoldMinus(4, -5)};
+    const auto[c_Result14, c_Count14]{vrd::binaryRightFoldMinus(-2)}; // initial value -2
+
+    QVERIFY(10 == c_Result10 && 5 == c_Count10);
+    QVERIFY(-5 == c_Result11 && 4 == c_Count11);
+    QVERIFY(13 == c_Result12 && 2 == c_Count12);
+    QVERIFY(-9 == c_Result13 && 1 == c_Count13);
+    QVERIFY(-2 == c_Result14 && 0 == c_Count14);
+
+    const auto[c_Result15, c_Count15]{vrd::unaryRightFoldMinus<int>(2, -3, 5, 4, 9)}; // 2 - (-3 - (5 - (4 - 9))); no initial value
+    const auto[c_Result16, c_Count16]{vrd::unaryRightFoldMinus<int>(-4, 9, 3, -8)};
+    const auto[c_Result17, c_Count17]{vrd::unaryRightFoldMinus<int>(3, -2)};
+    const auto[c_Result18, c_Count18]{vrd::unaryRightFoldMinus<int>(-5)};
+
+    // empty arguments pack not allowed
+    QVERIFY(15 == c_Result15 && 5 == c_Count15);
+    QVERIFY(-2 == c_Result16 && 4 == c_Count16);
+    QVERIFY(5 == c_Result17 && 2 == c_Count17);
+    QVERIFY(-5 == c_Result18 && 1 == c_Count18);
+}
+
 
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
 
