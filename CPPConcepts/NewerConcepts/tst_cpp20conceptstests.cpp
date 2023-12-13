@@ -32,6 +32,7 @@ private slots:
     void testConcept(); // test functionality contained in header <concepts>
     void testGenericLambda();
     void testAggregateInitialization(); // includes testing designated initializers (which were introduced in CPP20)
+    void testPackExpansionsInLambdaInitCaptures();
 
 private:
     class RawContainer
@@ -109,6 +110,12 @@ private:
     template<numeric DataType> Matrix<DataType> _getCumulativeTotals(const Matrix<DataType> matrix); // another shorter way of writing "requires" (numeric concept defined above)
 
     template<typename DataType> void _sortMatrixByVectorSize(Matrix<std::vector<DataType>>& matrix);
+
+    template<typename DataType, typename ...ArgumentsList>
+    DataType _computeAverageWithVariadicTemplateAndLambda(ArgumentsList ...argumentsList);
+
+    template<typename DataType, typename ...ArgumentsList>
+    void _addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList);
 };
 
 TripleSizeTuple CPP20ConceptsTests::_getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const
@@ -172,6 +179,33 @@ template<numeric DataType> Matrix<DataType> CPP20ConceptsTests::_getCumulativeTo
 template<typename DataType> void CPP20ConceptsTests::_sortMatrixByVectorSize(Matrix<std::vector<DataType>>& matrix)
 {
     std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](const std::vector<DataType>& firstVector, const std::vector<DataType>& secondVector) {return firstVector.size() < secondVector.size();});
+}
+
+template<typename DataType, typename ...ArgumentsList>
+DataType CPP20ConceptsTests::_computeAverageWithVariadicTemplateAndLambda(ArgumentsList... argumentsList)
+{
+    static_assert(sizeof...(argumentsList) > 0, "At least one argument required for calculating average!");
+
+    auto computeAverage{[argumentsList...]() {
+        const DataType c_Sum{(DataType{} + ... + argumentsList)};
+        const DataType c_Average{c_Sum / static_cast<DataType>(sizeof...(argumentsList))};
+
+        return c_Average;
+    }};
+
+    return computeAverage();
+}
+
+template<typename DataType, typename ...ArgumentsList>
+void CPP20ConceptsTests::_addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList)
+{
+    static_assert(sizeof...(argumentsList) > 0, "At least one pack argument required for prepending/appending the given values!");
+
+    auto addBeforeAndAfter{[before, after, &argumentsList...](){
+        (void(argumentsList = before + argumentsList + after),...);
+    }};
+
+    addBeforeAndAfter();
 }
 
 void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
@@ -668,6 +702,39 @@ void CPP20ConceptsTests::testAggregateInitialization()
     stringVectorRef = {"z1, yx, w1, vu"};
 
     QVERIFY(intMatrixRef == thirdAdvancedAggregate.matrix && -8 == thirdAdvancedAggregate.integer && "aNewString" == thirdAdvancedAggregate.stdString && std::equal(stringVectorRef.cbegin(), stringVectorRef.cend(), thirdAdvancedAggregate.stringVector.cbegin()));
+}
+
+void CPP20ConceptsTests::testPackExpansionsInLambdaInitCaptures()
+{
+    QVERIFY(2 == _computeAverageWithVariadicTemplateAndLambda<int>(5, -2, 4, 10, -5));
+    QVERIFY(-1 == _computeAverageWithVariadicTemplateAndLambda<int>(-15, 3, 8, -2));
+    QVERIFY(15 == _computeAverageWithVariadicTemplateAndLambda<int>(16, 14));
+    QVERIFY(-4 == _computeAverageWithVariadicTemplateAndLambda<int>(-4));
+
+    const double c_Epsilon{1.0e-9};
+
+    QVERIFY(std::abs(_computeAverageWithVariadicTemplateAndLambda<double>(5, -2, 4, 10, -5) - 2.4) < c_Epsilon);
+    QVERIFY(std::abs(-1.5 - _computeAverageWithVariadicTemplateAndLambda<double>(-15, 3, 8, -2)) < c_Epsilon);
+    QVERIFY(std::abs(_computeAverageWithVariadicTemplateAndLambda<double>(16, 14) - 15.0) < c_Epsilon);
+    QVERIFY(std::abs(-4.0 - _computeAverageWithVariadicTemplateAndLambda<double>(-4)) < c_Epsilon);
+
+    QVERIFY(std::abs(_computeAverageWithVariadicTemplateAndLambda<double>(2.3, -4.5, 10, 9.1, -3.2, -2, 18.002) - 4.2431428571) < c_Epsilon);
+
+    int intArg1{10}, intArg2{5}, intArg3{-3}, intArg4{2}, intArg5{22};
+
+    _addBeforeAndAfterWithVariadicTemplateAndLambda<int>(2, -5, intArg1, intArg2, intArg3, intArg4, intArg5);
+    QVERIFY(7 == intArg1 && 2 == intArg2 && -6 == intArg3 && -1 == intArg4 && 19 == intArg5);
+
+    _addBeforeAndAfterWithVariadicTemplateAndLambda<int>(-5, 9, intArg2, intArg4);
+    QVERIFY(7 == intArg1 && 6 == intArg2 && -6 == intArg3 && 3 == intArg4 && 19 == intArg5);
+
+    std::string strArg1{"Andrew"}, strArg2{"George"}, strArg3{"Joanna"};
+
+    _addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("Hello ", "!", strArg1, strArg2, strArg3);
+    QVERIFY("Hello Andrew!" == strArg1 && "Hello George!" == strArg2 &&  "Hello Joanna!" == strArg3);
+
+    _addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("What a surprise! ", " Cheerio!", strArg2);
+    QVERIFY("Hello Andrew!" == strArg1 && "What a surprise! Hello George! Cheerio!" == strArg2 &&  "Hello Joanna!" == strArg3);
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
