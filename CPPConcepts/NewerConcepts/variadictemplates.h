@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <cstdlib>
+#include <algorithm>
 
 template<typename DataType> using ValueSizePair = std::pair<DataType, size_t>;
 
@@ -31,6 +32,9 @@ namespace Variadic
 
     template<typename DataType, typename ...ArgumentsList>
     ValueSizePair<DataType> unaryRightFoldMinusRecursiveImplementation(ArgumentsList... argumentsList);
+
+    template<typename DataType, typename ...ArgumentsList>
+    std::pair<DataType,DataType> getMinMaxArgument(const DataType& first, const DataType& second, const ArgumentsList&... argumentsList);
 
     // helper functions
 
@@ -144,6 +148,19 @@ ValueSizePair<DataType> Variadic::unaryRightFoldMinusRecursiveImplementation(Arg
     }
 
     return {result, c_Count};
+}
+
+// there should be at least 2 arguments for retrieving min/max value and these arguments (first, second) are the starting point for calculating the two values
+template<typename DataType, typename ...ArgumentsList>
+std::pair<DataType,DataType> Variadic::getMinMaxArgument(const DataType& first, const DataType& second, const ArgumentsList&... argumentsList)
+{
+    DataType minValue{std::min(first, second)};
+    DataType maxValue{std::max(first, second)};
+
+    (void(minValue = std::min(minValue, argumentsList)),...);
+    (void(maxValue = std::max(maxValue, argumentsList)),...);
+
+    return {minValue, maxValue};
 }
 
 template<typename DataType, typename ...ArgumentsList>

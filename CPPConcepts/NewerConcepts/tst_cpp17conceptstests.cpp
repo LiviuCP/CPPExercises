@@ -33,6 +33,7 @@ private slots:
     void testTemplateTypeDeductionInConstructors();
     void testFoldExpressionsBinaryUnaryLeftRight();
     void testFoldExpressionsAlternativeRecursiveImplementations(); // equivalent to previous test, this time with recursion
+    void testFoldExpressionsCommaOperator();
 
 private:
     enum class DataTypes
@@ -847,6 +848,27 @@ void CPP17ConceptsTests::testFoldExpressionsAlternativeRecursiveImplementations(
     QVERIFY(9 == c_Result21 && 2 == c_Count21);
     QVERIFY(-1 == c_Result22 && 1 == c_Count22);
     QVERIFY(-2 == c_Result23 && 0 == c_Count23);
+}
+
+void CPP17ConceptsTests::testFoldExpressionsCommaOperator()
+{
+    auto[c_MinResult1, c_MaxResult1]{vrd::getMinMaxArgument<int>(3, 0, 1, -2, 4, 5, -9, 4, 7, 12, -3, -5)};
+    auto[c_MinResult2, c_MaxResult2]{vrd::getMinMaxArgument<int>(4, 4, 4)};
+    auto[c_MinResult3, c_MaxResult3]{vrd::getMinMaxArgument<int>(3, -2)};
+
+    QVERIFY(-9 == c_MinResult1 && 12 == c_MaxResult1);
+    QVERIFY(4 == c_MinResult2 && 4 == c_MaxResult2);
+    QVERIFY(-2 == c_MinResult3 && 3 == c_MaxResult3);
+
+    const double c_Epsilon{1.0e-9};
+
+    auto[c_MinResult4, c_MaxResult4]{vrd::getMinMaxArgument<double>(2.3, -1.2, 3.0, 5.4, -5.6, -5.59, 4.2, 0.0)};
+    auto[c_MinResult5, c_MaxResult5]{vrd::getMinMaxArgument<double>(static_cast<double>(5), 2.0000001, 5.00000001, static_cast<double>(2) )};
+    auto[c_MinResult6, c_MaxResult6]{vrd::getMinMaxArgument<double>(-4.00000001, -4.0000001)};
+
+    QVERIFY(std::abs(-5.6 - c_MinResult4) < c_Epsilon && std::abs(c_MaxResult4 - 5.4) < c_Epsilon);
+    QVERIFY(std::abs(c_MinResult5 - 2.0) < c_Epsilon && std::abs(c_MaxResult5 - 5.00000001) < c_Epsilon);
+    QVERIFY(std::abs(-4.0000001 - c_MinResult6) < c_Epsilon && std::abs(-4.00000001 - c_MaxResult6) < c_Epsilon);
 }
 
 
