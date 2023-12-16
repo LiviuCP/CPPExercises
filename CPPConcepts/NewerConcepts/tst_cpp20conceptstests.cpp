@@ -33,6 +33,7 @@ private slots:
     void testGenericLambda();
     void testAggregateInitialization(); // includes testing designated initializers (which were introduced in CPP20)
     void testPackExpansionsInLambdaInitCaptures();
+    void testPackExpansionsWithAbbreviatedTemplatesAndConcepts();
 
 private:
     class RawContainer
@@ -116,6 +117,9 @@ private:
 
     template<typename DataType, typename ...ArgumentsList>
     void _addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList);
+
+    auto _getSumOfArgumentSquares(auto initialValue, auto... argumentsList);
+    auto _square(numeric auto value);
 };
 
 TripleSizeTuple CPP20ConceptsTests::_getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const
@@ -206,6 +210,18 @@ void CPP20ConceptsTests::_addBeforeAndAfterWithVariadicTemplateAndLambda(DataTyp
     }};
 
     addBeforeAndAfter();
+}
+
+// return type of the function is deduced from the type of the first argument
+auto CPP20ConceptsTests::_getSumOfArgumentSquares(auto initialValue, auto... argumentsList)
+{
+    using Result_t = decltype(initialValue);
+    return (_square(initialValue) + ... + static_cast<Result_t>(_square(argumentsList)));
+}
+
+auto CPP20ConceptsTests::_square(numeric auto value)
+{
+    return value * value;
 }
 
 void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
@@ -735,6 +751,39 @@ void CPP20ConceptsTests::testPackExpansionsInLambdaInitCaptures()
 
     _addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("What a surprise! ", " Cheerio!", strArg2);
     QVERIFY("Hello Andrew!" == strArg1 && "What a surprise! Hello George! Cheerio!" == strArg2 &&  "Hello Joanna!" == strArg3);
+}
+
+void CPP20ConceptsTests::testPackExpansionsWithAbbreviatedTemplatesAndConcepts()
+{
+    const double c_Epsilon{1.0e-9};
+
+    const int c_IntResult1{_getSumOfArgumentSquares(-2, 5, 3, -1, 4)};
+    const int c_IntResult2{_getSumOfArgumentSquares(-2, 5.0, 3, -1, 4)};
+    const int c_IntResult3{_getSumOfArgumentSquares(-2, 5.1, 3, -1, 4)};
+    const int c_IntResult4{_getSumOfArgumentSquares(-2)};
+
+    QVERIFY(55 == c_IntResult1);
+    QVERIFY(55 == c_IntResult2);
+    QVERIFY(56 == c_IntResult3);
+    QVERIFY(4 == c_IntResult4);
+
+    // swapping the first two arguments changes result type and value: (5.1 * 5.1) + (double)(-2 * -2) + (double)(3 * 3) + (double)(-1 * -1) + (double)(4 * 4)
+    const double c_IntResult3ChangedToDouble{_getSumOfArgumentSquares(5.1, -2, 3, -1, 4)};
+    QVERIFY(std::abs(c_IntResult3ChangedToDouble - 56.01) < c_Epsilon);
+
+    const double c_DoubleResult1{_getSumOfArgumentSquares(2.1, 5.0, -4.3, 8.2)};
+    const double c_DoubleResult2{_getSumOfArgumentSquares(2.1, 5, -4.3, 8.2)};
+    const double c_DoubleResult3{_getSumOfArgumentSquares(2.1, 5, -4, 8)};
+    const double c_DoubleResult4{_getSumOfArgumentSquares(2.1)};
+
+    QVERIFY(std::abs(c_DoubleResult1 - 115.14) < c_Epsilon);
+    QVERIFY(std::abs(c_DoubleResult2 - 115.14) < c_Epsilon);
+    QVERIFY(std::abs(c_DoubleResult3 - 109.41) < c_Epsilon);
+    QVERIFY(std::abs(c_DoubleResult4 - 4.41) < c_Epsilon);
+
+    // swapping the first two arguments changes result type and value: (5 * 5) + (int)(2.1 * 2.1) + (int)(-4.3 * -4.3) + (int)(8.2 * 8.2)
+    const int c_DoubleResult2ChangedToInt{_getSumOfArgumentSquares(5, 2.1, -4.3, 8.2)};
+    QVERIFY(114 == c_DoubleResult2ChangedToInt);
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
