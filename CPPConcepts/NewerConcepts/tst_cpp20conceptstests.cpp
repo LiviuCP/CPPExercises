@@ -34,6 +34,7 @@ private slots:
     void testAggregateInitialization(); // includes testing designated initializers (which were introduced in CPP20)
     void testPackExpansionsInLambdaInitCaptures();
     void testPackExpansionsWithAbbreviatedTemplatesAndConcepts();
+    void testIndexSequences();
 
 private:
     class RawContainer
@@ -120,6 +121,15 @@ private:
 
     auto _getSumOfArgumentSquares(auto initialValue, auto... argumentsList);
     auto _square(numeric auto value);
+
+    template<typename ...ArgumentsList>
+    auto _createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList);
+
+    template<numeric DataType, std::same_as<DataType> ...ArgumentsList>
+    auto _createTupleWithCumulatedValues(DataType initialValue, const ArgumentsList& ...argumentsList);
+
+    template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
+    bool _areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon);
 };
 
 TripleSizeTuple CPP20ConceptsTests::_getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const
@@ -222,6 +232,87 @@ auto CPP20ConceptsTests::_getSumOfArgumentSquares(auto initialValue, auto... arg
 auto CPP20ConceptsTests::_square(numeric auto value)
 {
     return value * value;
+}
+
+template<typename ...ArgumentsList>
+auto CPP20ConceptsTests::_createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList)
+{
+    std::tuple result{argumentsList...};
+
+    auto setAlternatingSignsToTupleElements{[&result]<std::size_t... Idx>(std::index_sequence<Idx...>){
+        ((std::get<Idx>(result) = (1 == Idx % 2) ? -std::abs(std::get<Idx>(result))
+                                                 :  std::abs(std::get<Idx>(result))),...);
+    }};
+
+    setAlternatingSignsToTupleElements(std::make_index_sequence<sizeof...(argumentsList)>());
+
+    return result;
+}
+
+template<numeric DataType, std::same_as<DataType> ...ArgumentsList>
+auto CPP20ConceptsTests::_createTupleWithCumulatedValues(DataType initialValue, const ArgumentsList& ...argumentsList)
+{
+    constexpr size_t c_ArgumentsCount{sizeof...(argumentsList)};
+
+    if constexpr (c_ArgumentsCount > 0)
+    {
+        std::tuple result{argumentsList...};
+        DataType currentCumulatedValue{initialValue};
+
+        auto updateTupleWithCumulatedValues{[&result, &currentCumulatedValue]<std::size_t... Idx>(std::index_sequence<Idx...>){
+            ((std::get<Idx>(result) += currentCumulatedValue, currentCumulatedValue = std::get<Idx>(result)),...);
+        }};
+
+        updateTupleWithCumulatedValues(std::make_index_sequence<c_ArgumentsCount>());
+
+        return result;
+    }
+    else
+    {
+        return std::tuple{initialValue};
+    }
+}
+
+template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
+bool CPP20ConceptsTests::_areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon)
+{
+    auto areValuesEqual{[epsilon](auto first, auto second){
+        bool areEqualValues{first == second};
+
+        if constexpr (std::is_floating_point_v<decltype(first)>)
+        {
+            areEqualValues = std::abs(first - second) < std::abs(static_cast<decltype(first)>(epsilon));
+        }
+
+        return areEqualValues;
+    }};
+
+    auto areTuplesEqual{[&first, &second, areValuesEqual]<std::size_t... Idx>(std::index_sequence<Idx...>){
+        bool areEqualTuples{false};
+
+        if constexpr (((std::is_same_v<decltype(std::get<Idx>(first)), decltype(std::get<Idx>(second))>)&&...))
+        {
+            areEqualTuples = ((areValuesEqual(std::get<Idx>(first), std::get<Idx>(second))) &&...);
+        }
+
+        return areEqualTuples;
+    }};
+
+    bool result{false};
+
+    if constexpr (sizeof...(FirstTupleArgs) == sizeof...(SecondTupleArgs))
+    {
+        if constexpr (0 == sizeof...(FirstTupleArgs))
+        {
+            result = true;
+        }
+        else
+        {
+            result = areTuplesEqual(std::make_index_sequence<sizeof...(FirstTupleArgs)>());
+        }
+    }
+
+    return result;
 }
 
 void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
@@ -784,6 +875,75 @@ void CPP20ConceptsTests::testPackExpansionsWithAbbreviatedTemplatesAndConcepts()
     // swapping the first two arguments changes result type and value: (5 * 5) + (int)(2.1 * 2.1) + (int)(-4.3 * -4.3) + (int)(8.2 * 8.2)
     const int c_DoubleResult2ChangedToInt{_getSumOfArgumentSquares(5, 2.1, -4.3, 8.2)};
     QVERIFY(114 == c_DoubleResult2ChangedToInt);
+}
+
+void CPP20ConceptsTests::testIndexSequences()
+{
+    // first validate the (heterogenous) tuples equality check method as it will be used as helper for testing other methods (see below)
+    QVERIFY(_areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4, 5}, 0));
+    QVERIFY(!_areTuplesEqual(std::tuple{2, 4, 5u}, std::tuple{2, 4, 5}, 0));
+    QVERIFY(_areTuplesEqual(std::tuple{2, 4, 5u}, std::tuple{2, 4, static_cast<unsigned int>(5)}, 0));
+    QVERIFY(!_areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4, 5, 7}, 0));
+    QVERIFY(!_areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4.0, 5}, 0));
+    QVERIFY(_areTuplesEqual(std::tuple{2.5, -2.01, 4.001, -1.552}, std::tuple{2.50, -2.0100, 4.001000, -1.5520e0}, 1.0e-9));
+    QVERIFY(!_areTuplesEqual(std::tuple{2.5, -2.01f, 4.001, -1.552}, std::tuple{2.50, -2.0100, 4.001000, -1.5520e0}, 1.0e-9));
+    QVERIFY(_areTuplesEqual(std::tuple{1.2, -2.0, 4.5f}, std::tuple{static_cast<double>(1.2f), static_cast<double>(-2), static_cast<float>(4.5)}, 1.0e-7));
+    QVERIFY(_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.52000000}, 1.0e-9));
+    QVERIFY(!_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.520000001}, 1.0e-9));
+    QVERIFY(_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.520000001}, 1.0e-6));
+    QVERIFY(_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{static_cast<int>(2.001), -5.2000, static_cast<int>(3.8f), -static_cast<int>(2u), 4.520}, 1.0e-9));
+    QVERIFY(_areTuplesEqual(std::tuple{}, std::tuple{}, 0));
+    QVERIFY(!_areTuplesEqual(std::tuple{}, std::tuple{2.55}, 0));
+
+    const std::tuple c_Tuple1{_createTupleWithAlternatingSigns(2, 3, 5, 4, 9)};
+    const std::tuple c_Tuple1Ref{2, -3, 5, -4, 9};
+
+    const std::tuple c_Tuple2{_createTupleWithAlternatingSigns(2.5, -1.2, -2.3, 4.01, -5.12, -3.05, 2.44, 0.0)};
+    const std::tuple c_Tuple2Ref{2.5, -1.2, 2.3, -4.01, 5.12, -3.05, 2.44, 0.0};
+
+    const std::tuple c_Tuple3{_createTupleWithAlternatingSigns(2.8, -2, -3, 4.5, 5)};
+    const std::tuple c_Tuple3Ref{2.8, -2, 3, -4.5, 5};
+
+    const std::tuple c_Tuple4{_createTupleWithAlternatingSigns(-5.2, 2.1)};
+    const std::tuple c_Tuple4Ref{5.2, -2.1};
+
+    const std::tuple c_Tuple5{_createTupleWithAlternatingSigns(4)};
+    const std::tuple c_Tuple5Ref{4};
+
+    const std::tuple c_Tuple6{_createTupleWithAlternatingSigns()};
+    const std::tuple c_Tuple6Ref{};
+
+    QVERIFY(_areTuplesEqual(c_Tuple1Ref, c_Tuple1, 0));
+    QVERIFY(_areTuplesEqual(c_Tuple2Ref, c_Tuple2, 1.0e-9));
+    QVERIFY(_areTuplesEqual(c_Tuple3Ref, c_Tuple3, 1.0e-9));
+    QVERIFY(_areTuplesEqual(c_Tuple4Ref, c_Tuple4, 1.0e-9));
+    QVERIFY(_areTuplesEqual(c_Tuple5Ref, c_Tuple5, 0));
+    QVERIFY(_areTuplesEqual(c_Tuple6Ref, c_Tuple6, 0));
+
+    const std::tuple c_Tuple7{_createTupleWithCumulatedValues(3, -1, 2, 5, 8, 10)};
+    const std::tuple c_Tuple7Ref{2, 4, 9, 17, 27};
+
+    const std::tuple c_Tuple8{_createTupleWithCumulatedValues(-5, 8)};
+    const std::tuple c_Tuple8Ref{3};
+
+    const std::tuple c_Tuple9{_createTupleWithCumulatedValues(5)};
+    const std::tuple c_Tuple9Ref{5};
+
+    const std::tuple c_Tuple10{_createTupleWithCumulatedValues(-1.2, 3.5, 2.0, 4.8)};
+    const std::tuple c_Tuple10Ref{2.3, 4.3, 9.1};
+
+    const std::tuple c_Tuple11{_createTupleWithCumulatedValues(2.3, -1.2)};
+    const std::tuple c_Tuple11Ref{1.1};
+
+    const std::tuple c_Tuple12{_createTupleWithCumulatedValues(-5.2)};
+    const std::tuple c_Tuple12Ref{-5.2};
+
+    QVERIFY(_areTuplesEqual(c_Tuple7Ref, c_Tuple7, 0));
+    QVERIFY(_areTuplesEqual(c_Tuple8Ref, c_Tuple8, 0));
+    QVERIFY(_areTuplesEqual(c_Tuple9Ref, c_Tuple9, 0));
+    QVERIFY(_areTuplesEqual(c_Tuple10Ref, c_Tuple10, 1.0e-9));
+    QVERIFY(_areTuplesEqual(c_Tuple11Ref, c_Tuple11, 1.0e-9));
+    QVERIFY(_areTuplesEqual(c_Tuple12Ref, c_Tuple12, 1.0e-9));
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
