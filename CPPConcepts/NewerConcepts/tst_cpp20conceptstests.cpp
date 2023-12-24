@@ -4,7 +4,6 @@
 #include <string_view>
 #include <algorithm>
 #include <span>
-#include <concepts>
 
 #include "datautils.h"
 
