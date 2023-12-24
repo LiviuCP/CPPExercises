@@ -272,21 +272,27 @@ auto CPP20ConceptsTests::_createTupleWithCumulatedValues(DataType initialValue, 
     }
 }
 
+/* For (heterogenous) tuples to be equal three conditions should be fulfilled:
+   - equal sizes
+   - elements with same indexes should be of the same type (including sign)
+   - elements with same indexes should have the same value (for non-floating point types)
+     or the differences between values should be smaller than the provided epsilon (for floating point types)
+*/
 template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
 bool CPP20ConceptsTests::_areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon)
 {
-    auto areValuesEqual{[epsilon](auto first, auto second){
-        bool areEqualValues{first == second};
+    auto areTuplesEqual{[&first, &second, epsilon]<std::size_t... Idx>(std::index_sequence<Idx...>){
+        auto areValuesEqual{[epsilon](auto first, auto second){
+            if constexpr (std::is_floating_point_v<decltype(first)>)
+            {
+                return std::abs(first - second) < std::abs(static_cast<decltype(first)>(epsilon));
+            }
+            else
+            {
+                return first == second;
+            }
+        }};
 
-        if constexpr (std::is_floating_point_v<decltype(first)>)
-        {
-            areEqualValues = std::abs(first - second) < std::abs(static_cast<decltype(first)>(epsilon));
-        }
-
-        return areEqualValues;
-    }};
-
-    auto areTuplesEqual{[&first, &second, areValuesEqual]<std::size_t... Idx>(std::index_sequence<Idx...>){
         bool areEqualTuples{false};
 
         if constexpr (((std::is_same_v<decltype(std::get<Idx>(first)), decltype(std::get<Idx>(second))>)&&...))
