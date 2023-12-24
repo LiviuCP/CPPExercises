@@ -1,14 +1,16 @@
 #ifndef VARIADICTEMPLATES_H
 #define VARIADICTEMPLATES_H
 
-#include <utility>
 #include <cstdlib>
 #include <algorithm>
 
-template<typename DataType> using ValueSizePair = std::pair<DataType, size_t>;
+#include "customcpp20concepts.h"
+#include "datautils.h"
 
 namespace Variadic
 {
+    /* variadic functions created in connection to CPP17 standard */
+
     template<typename DataType, typename ...ArgumentsList>
     ValueSizePair<DataType> binaryLeftFoldMinus(DataType initialValue, ArgumentsList... argumentsList);
 
@@ -43,6 +45,28 @@ namespace Variadic
 
     template<typename DataType, typename ...ArgumentsList>
     ValueSizePair<DataType> binaryRightFoldMinusRecursiveImplementationHelper(DataType initialValue, ArgumentsList... argumentsList);
+
+    /* variadic functions created in connection to CPP20 standard */
+
+    template<typename DataType, typename ...ArgumentsList>
+    DataType computeAverageWithVariadicTemplateAndLambda(ArgumentsList ...argumentsList);
+
+    template<typename DataType, typename ...ArgumentsList>
+    void addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList);
+
+    auto getSumOfArgumentSquares(auto initialValue, auto... argumentsList);
+
+    template<typename ...ArgumentsList>
+    auto createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList);
+
+    template<numeric DataType, std::same_as<DataType> ...ArgumentsList>
+    auto createTupleWithCumulatedValues(DataType initialValue, const ArgumentsList& ...argumentsList);
+
+    template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
+    bool areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon);
+
+    // helper functions
+    auto square(numeric auto value);
 }
 
 template<typename DataType, typename ...ArgumentsList>
@@ -199,6 +223,132 @@ ValueSizePair<DataType> Variadic::binaryRightFoldMinusRecursiveImplementationHel
     }
 
     return {result, c_Count};
+}
+
+template<typename DataType, typename ...ArgumentsList>
+DataType Variadic::computeAverageWithVariadicTemplateAndLambda(ArgumentsList... argumentsList)
+{
+    static_assert(sizeof...(argumentsList) > 0, "At least one argument required for calculating average!");
+
+    auto computeAverage{[argumentsList...]() {
+        const DataType c_Sum{(DataType{} + ... + argumentsList)};
+        const DataType c_Average{c_Sum / static_cast<DataType>(sizeof...(argumentsList))};
+
+        return c_Average;
+    }};
+
+    return computeAverage();
+}
+
+template<typename DataType, typename ...ArgumentsList>
+void Variadic::addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList)
+{
+    static_assert(sizeof...(argumentsList) > 0, "At least one pack argument required for prepending/appending the given values!");
+
+    auto addBeforeAndAfter{[before, after, &argumentsList...](){
+        (void(argumentsList = before + argumentsList + after),...);
+    }};
+
+    addBeforeAndAfter();
+}
+
+// return type of the function is deduced from the type of the first argument
+auto Variadic::getSumOfArgumentSquares(auto initialValue, auto... argumentsList)
+{
+    using Result_t = decltype(initialValue);
+    return (square(initialValue) + ... + static_cast<Result_t>(square(argumentsList)));
+}
+
+template<typename ...ArgumentsList>
+auto Variadic::createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList)
+{
+    std::tuple result{argumentsList...};
+
+    auto setAlternatingSignsToTupleElements{[&result]<std::size_t... Idx>(std::index_sequence<Idx...>){
+        ((std::get<Idx>(result) = (1 == Idx % 2) ? -std::abs(std::get<Idx>(result))
+                                                 :  std::abs(std::get<Idx>(result))),...);
+    }};
+
+    setAlternatingSignsToTupleElements(std::make_index_sequence<sizeof...(argumentsList)>());
+
+    return result;
+}
+
+template<numeric DataType, std::same_as<DataType> ...ArgumentsList>
+auto Variadic::createTupleWithCumulatedValues(DataType initialValue, const ArgumentsList& ...argumentsList)
+{
+    constexpr size_t c_ArgumentsCount{sizeof...(argumentsList)};
+
+    if constexpr (c_ArgumentsCount > 0)
+    {
+        std::tuple result{argumentsList...};
+        DataType currentCumulatedValue{initialValue};
+
+        auto updateTupleWithCumulatedValues{[&result, &currentCumulatedValue]<std::size_t... Idx>(std::index_sequence<Idx...>){
+            ((std::get<Idx>(result) += currentCumulatedValue, currentCumulatedValue = std::get<Idx>(result)),...);
+        }};
+
+        updateTupleWithCumulatedValues(std::make_index_sequence<c_ArgumentsCount>());
+
+        return result;
+    }
+    else
+    {
+        return std::tuple{initialValue};
+    }
+}
+
+/* For (heterogenous) tuples to be equal three conditions should be fulfilled:
+   - equal sizes
+   - elements with same indexes should be of the same type (including sign)
+   - elements with same indexes should have the same value (for non-floating point types)
+     or the differences between values should be smaller than the provided epsilon (for floating point types)
+*/
+template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
+bool Variadic::areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon)
+{
+    auto areTupleTypesAndValuesEqual{[&first, &second, epsilon]<std::size_t... Idx>(std::index_sequence<Idx...>){
+        auto areValuesEqual{[epsilon](auto first, auto second){
+            if constexpr (std::is_floating_point_v<decltype(first)>)
+            {
+                return std::abs(first - second) < std::abs(static_cast<decltype(first)>(epsilon));
+            }
+            else
+            {
+                return first == second;
+            }
+        }};
+
+        bool areEqualTuples{false};
+
+        if constexpr (((std::is_same_v<decltype(std::get<Idx>(first)), decltype(std::get<Idx>(second))>)&&...))
+        {
+            areEqualTuples = ((areValuesEqual(std::get<Idx>(first), std::get<Idx>(second))) &&...);
+        }
+
+        return areEqualTuples;
+    }};
+
+    bool result{false};
+
+    if constexpr (sizeof...(FirstTupleArgs) == sizeof...(SecondTupleArgs))
+    {
+        if constexpr (0 == sizeof...(FirstTupleArgs))
+        {
+            result = true;
+        }
+        else
+        {
+            result = areTupleTypesAndValuesEqual(std::make_index_sequence<sizeof...(FirstTupleArgs)>());
+        }
+    }
+
+    return result;
+}
+
+auto Variadic::square(numeric auto value)
+{
+    return value * value;
 }
 
 #endif // VARIADICTEMPLATES_H

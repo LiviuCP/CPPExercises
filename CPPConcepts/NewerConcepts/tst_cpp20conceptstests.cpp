@@ -5,17 +5,10 @@
 #include <algorithm>
 #include <span>
 
-#include "datautils.h"
+#include "variadictemplates.h"
 
 using namespace std::literals;
-
-template<typename DataType> concept hasSizeMethod = requires(DataType dataType) // "requires" expression (resulting concept can be fed to a "requires" clause, see below)
-{
-    {dataType.size()} -> std::same_as<size_t>;
-};
-
-template<typename DataType> concept nonBooleanIntegral = std::integral<DataType> && (!std::same_as<DataType, bool>);
-template<typename DataType> concept numeric = nonBooleanIntegral<DataType> || std::floating_point<DataType>;
+namespace vrd = Variadic;
 
 class CPP20ConceptsTests : public QObject
 {
@@ -111,24 +104,6 @@ private:
     template<numeric DataType> Matrix<DataType> _getCumulativeTotals(const Matrix<DataType> matrix); // another shorter way of writing "requires" (numeric concept defined above)
 
     template<typename DataType> void _sortMatrixByVectorSize(Matrix<std::vector<DataType>>& matrix);
-
-    template<typename DataType, typename ...ArgumentsList>
-    DataType _computeAverageWithVariadicTemplateAndLambda(ArgumentsList ...argumentsList);
-
-    template<typename DataType, typename ...ArgumentsList>
-    void _addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList);
-
-    auto _getSumOfArgumentSquares(auto initialValue, auto... argumentsList);
-    auto _square(numeric auto value);
-
-    template<typename ...ArgumentsList>
-    auto _createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList);
-
-    template<numeric DataType, std::same_as<DataType> ...ArgumentsList>
-    auto _createTupleWithCumulatedValues(DataType initialValue, const ArgumentsList& ...argumentsList);
-
-    template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
-    bool _areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon);
 };
 
 TripleSizeTuple CPP20ConceptsTests::_getMinMaxAvgSize(const auto& leftContainer, const auto& middleContainer, const auto& rightContainer) const
@@ -192,132 +167,6 @@ template<numeric DataType> Matrix<DataType> CPP20ConceptsTests::_getCumulativeTo
 template<typename DataType> void CPP20ConceptsTests::_sortMatrixByVectorSize(Matrix<std::vector<DataType>>& matrix)
 {
     std::stable_sort(matrix.zBegin(), matrix.zEnd(), [](const std::vector<DataType>& firstVector, const std::vector<DataType>& secondVector) {return firstVector.size() < secondVector.size();});
-}
-
-template<typename DataType, typename ...ArgumentsList>
-DataType CPP20ConceptsTests::_computeAverageWithVariadicTemplateAndLambda(ArgumentsList... argumentsList)
-{
-    static_assert(sizeof...(argumentsList) > 0, "At least one argument required for calculating average!");
-
-    auto computeAverage{[argumentsList...]() {
-        const DataType c_Sum{(DataType{} + ... + argumentsList)};
-        const DataType c_Average{c_Sum / static_cast<DataType>(sizeof...(argumentsList))};
-
-        return c_Average;
-    }};
-
-    return computeAverage();
-}
-
-template<typename DataType, typename ...ArgumentsList>
-void CPP20ConceptsTests::_addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList)
-{
-    static_assert(sizeof...(argumentsList) > 0, "At least one pack argument required for prepending/appending the given values!");
-
-    auto addBeforeAndAfter{[before, after, &argumentsList...](){
-        (void(argumentsList = before + argumentsList + after),...);
-    }};
-
-    addBeforeAndAfter();
-}
-
-// return type of the function is deduced from the type of the first argument
-auto CPP20ConceptsTests::_getSumOfArgumentSquares(auto initialValue, auto... argumentsList)
-{
-    using Result_t = decltype(initialValue);
-    return (_square(initialValue) + ... + static_cast<Result_t>(_square(argumentsList)));
-}
-
-auto CPP20ConceptsTests::_square(numeric auto value)
-{
-    return value * value;
-}
-
-template<typename ...ArgumentsList>
-auto CPP20ConceptsTests::_createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList)
-{
-    std::tuple result{argumentsList...};
-
-    auto setAlternatingSignsToTupleElements{[&result]<std::size_t... Idx>(std::index_sequence<Idx...>){
-        ((std::get<Idx>(result) = (1 == Idx % 2) ? -std::abs(std::get<Idx>(result))
-                                                 :  std::abs(std::get<Idx>(result))),...);
-    }};
-
-    setAlternatingSignsToTupleElements(std::make_index_sequence<sizeof...(argumentsList)>());
-
-    return result;
-}
-
-template<numeric DataType, std::same_as<DataType> ...ArgumentsList>
-auto CPP20ConceptsTests::_createTupleWithCumulatedValues(DataType initialValue, const ArgumentsList& ...argumentsList)
-{
-    constexpr size_t c_ArgumentsCount{sizeof...(argumentsList)};
-
-    if constexpr (c_ArgumentsCount > 0)
-    {
-        std::tuple result{argumentsList...};
-        DataType currentCumulatedValue{initialValue};
-
-        auto updateTupleWithCumulatedValues{[&result, &currentCumulatedValue]<std::size_t... Idx>(std::index_sequence<Idx...>){
-            ((std::get<Idx>(result) += currentCumulatedValue, currentCumulatedValue = std::get<Idx>(result)),...);
-        }};
-
-        updateTupleWithCumulatedValues(std::make_index_sequence<c_ArgumentsCount>());
-
-        return result;
-    }
-    else
-    {
-        return std::tuple{initialValue};
-    }
-}
-
-/* For (heterogenous) tuples to be equal three conditions should be fulfilled:
-   - equal sizes
-   - elements with same indexes should be of the same type (including sign)
-   - elements with same indexes should have the same value (for non-floating point types)
-     or the differences between values should be smaller than the provided epsilon (for floating point types)
-*/
-template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
-bool CPP20ConceptsTests::_areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon)
-{
-    auto areTuplesEqual{[&first, &second, epsilon]<std::size_t... Idx>(std::index_sequence<Idx...>){
-        auto areValuesEqual{[epsilon](auto first, auto second){
-            if constexpr (std::is_floating_point_v<decltype(first)>)
-            {
-                return std::abs(first - second) < std::abs(static_cast<decltype(first)>(epsilon));
-            }
-            else
-            {
-                return first == second;
-            }
-        }};
-
-        bool areEqualTuples{false};
-
-        if constexpr (((std::is_same_v<decltype(std::get<Idx>(first)), decltype(std::get<Idx>(second))>)&&...))
-        {
-            areEqualTuples = ((areValuesEqual(std::get<Idx>(first), std::get<Idx>(second))) &&...);
-        }
-
-        return areEqualTuples;
-    }};
-
-    bool result{false};
-
-    if constexpr (sizeof...(FirstTupleArgs) == sizeof...(SecondTupleArgs))
-    {
-        if constexpr (0 == sizeof...(FirstTupleArgs))
-        {
-            result = true;
-        }
-        else
-        {
-            result = areTuplesEqual(std::make_index_sequence<sizeof...(FirstTupleArgs)>());
-        }
-    }
-
-    return result;
 }
 
 void CPP20ConceptsTests::testAbbreviatedFunctionTemplatesWithAutoParams()
@@ -818,34 +667,34 @@ void CPP20ConceptsTests::testAggregateInitialization()
 
 void CPP20ConceptsTests::testPackExpansionsInLambdaInitCaptures()
 {
-    QVERIFY(2 == _computeAverageWithVariadicTemplateAndLambda<int>(5, -2, 4, 10, -5));
-    QVERIFY(-1 == _computeAverageWithVariadicTemplateAndLambda<int>(-15, 3, 8, -2));
-    QVERIFY(15 == _computeAverageWithVariadicTemplateAndLambda<int>(16, 14));
-    QVERIFY(-4 == _computeAverageWithVariadicTemplateAndLambda<int>(-4));
+    QVERIFY(2 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(5, -2, 4, 10, -5));
+    QVERIFY(-1 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(-15, 3, 8, -2));
+    QVERIFY(15 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(16, 14));
+    QVERIFY(-4 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(-4));
 
     const double c_Epsilon{1.0e-9};
 
-    QVERIFY(std::abs(_computeAverageWithVariadicTemplateAndLambda<double>(5, -2, 4, 10, -5) - 2.4) < c_Epsilon);
-    QVERIFY(std::abs(-1.5 - _computeAverageWithVariadicTemplateAndLambda<double>(-15, 3, 8, -2)) < c_Epsilon);
-    QVERIFY(std::abs(_computeAverageWithVariadicTemplateAndLambda<double>(16, 14) - 15.0) < c_Epsilon);
-    QVERIFY(std::abs(-4.0 - _computeAverageWithVariadicTemplateAndLambda<double>(-4)) < c_Epsilon);
+    QVERIFY(std::abs(vrd::computeAverageWithVariadicTemplateAndLambda<double>(5, -2, 4, 10, -5) - 2.4) < c_Epsilon);
+    QVERIFY(std::abs(-1.5 - vrd::computeAverageWithVariadicTemplateAndLambda<double>(-15, 3, 8, -2)) < c_Epsilon);
+    QVERIFY(std::abs(vrd::computeAverageWithVariadicTemplateAndLambda<double>(16, 14) - 15.0) < c_Epsilon);
+    QVERIFY(std::abs(-4.0 - vrd::computeAverageWithVariadicTemplateAndLambda<double>(-4)) < c_Epsilon);
 
-    QVERIFY(std::abs(_computeAverageWithVariadicTemplateAndLambda<double>(2.3, -4.5, 10, 9.1, -3.2, -2, 18.002) - 4.2431428571) < c_Epsilon);
+    QVERIFY(std::abs(vrd::computeAverageWithVariadicTemplateAndLambda<double>(2.3, -4.5, 10, 9.1, -3.2, -2, 18.002) - 4.2431428571) < c_Epsilon);
 
     int intArg1{10}, intArg2{5}, intArg3{-3}, intArg4{2}, intArg5{22};
 
-    _addBeforeAndAfterWithVariadicTemplateAndLambda<int>(2, -5, intArg1, intArg2, intArg3, intArg4, intArg5);
+    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<int>(2, -5, intArg1, intArg2, intArg3, intArg4, intArg5);
     QVERIFY(7 == intArg1 && 2 == intArg2 && -6 == intArg3 && -1 == intArg4 && 19 == intArg5);
 
-    _addBeforeAndAfterWithVariadicTemplateAndLambda<int>(-5, 9, intArg2, intArg4);
+    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<int>(-5, 9, intArg2, intArg4);
     QVERIFY(7 == intArg1 && 6 == intArg2 && -6 == intArg3 && 3 == intArg4 && 19 == intArg5);
 
     std::string strArg1{"Andrew"}, strArg2{"George"}, strArg3{"Joanna"};
 
-    _addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("Hello ", "!", strArg1, strArg2, strArg3);
+    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("Hello ", "!", strArg1, strArg2, strArg3);
     QVERIFY("Hello Andrew!" == strArg1 && "Hello George!" == strArg2 &&  "Hello Joanna!" == strArg3);
 
-    _addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("What a surprise! ", " Cheerio!", strArg2);
+    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("What a surprise! ", " Cheerio!", strArg2);
     QVERIFY("Hello Andrew!" == strArg1 && "What a surprise! Hello George! Cheerio!" == strArg2 &&  "Hello Joanna!" == strArg3);
 }
 
@@ -853,10 +702,10 @@ void CPP20ConceptsTests::testPackExpansionsWithAbbreviatedTemplatesAndConcepts()
 {
     const double c_Epsilon{1.0e-9};
 
-    const int c_IntResult1{_getSumOfArgumentSquares(-2, 5, 3, -1, 4)};
-    const int c_IntResult2{_getSumOfArgumentSquares(-2, 5.0, 3, -1, 4)};
-    const int c_IntResult3{_getSumOfArgumentSquares(-2, 5.1, 3, -1, 4)};
-    const int c_IntResult4{_getSumOfArgumentSquares(-2)};
+    const int c_IntResult1{vrd::getSumOfArgumentSquares(-2, 5, 3, -1, 4)};
+    const int c_IntResult2{vrd::getSumOfArgumentSquares(-2, 5.0, 3, -1, 4)};
+    const int c_IntResult3{vrd::getSumOfArgumentSquares(-2, 5.1, 3, -1, 4)};
+    const int c_IntResult4{vrd::getSumOfArgumentSquares(-2)};
 
     QVERIFY(55 == c_IntResult1);
     QVERIFY(55 == c_IntResult2);
@@ -864,13 +713,13 @@ void CPP20ConceptsTests::testPackExpansionsWithAbbreviatedTemplatesAndConcepts()
     QVERIFY(4 == c_IntResult4);
 
     // swapping the first two arguments changes result type and value: (5.1 * 5.1) + (double)(-2 * -2) + (double)(3 * 3) + (double)(-1 * -1) + (double)(4 * 4)
-    const double c_IntResult3ChangedToDouble{_getSumOfArgumentSquares(5.1, -2, 3, -1, 4)};
+    const double c_IntResult3ChangedToDouble{vrd::getSumOfArgumentSquares(5.1, -2, 3, -1, 4)};
     QVERIFY(std::abs(c_IntResult3ChangedToDouble - 56.01) < c_Epsilon);
 
-    const double c_DoubleResult1{_getSumOfArgumentSquares(2.1, 5.0, -4.3, 8.2)};
-    const double c_DoubleResult2{_getSumOfArgumentSquares(2.1, 5, -4.3, 8.2)};
-    const double c_DoubleResult3{_getSumOfArgumentSquares(2.1, 5, -4, 8)};
-    const double c_DoubleResult4{_getSumOfArgumentSquares(2.1)};
+    const double c_DoubleResult1{vrd::getSumOfArgumentSquares(2.1, 5.0, -4.3, 8.2)};
+    const double c_DoubleResult2{vrd::getSumOfArgumentSquares(2.1, 5, -4.3, 8.2)};
+    const double c_DoubleResult3{vrd::getSumOfArgumentSquares(2.1, 5, -4, 8)};
+    const double c_DoubleResult4{vrd::getSumOfArgumentSquares(2.1)};
 
     QVERIFY(std::abs(c_DoubleResult1 - 115.14) < c_Epsilon);
     QVERIFY(std::abs(c_DoubleResult2 - 115.14) < c_Epsilon);
@@ -878,77 +727,77 @@ void CPP20ConceptsTests::testPackExpansionsWithAbbreviatedTemplatesAndConcepts()
     QVERIFY(std::abs(c_DoubleResult4 - 4.41) < c_Epsilon);
 
     // swapping the first two arguments changes result type and value: (5 * 5) + (int)(2.1 * 2.1) + (int)(-4.3 * -4.3) + (int)(8.2 * 8.2)
-    const int c_DoubleResult2ChangedToInt{_getSumOfArgumentSquares(5, 2.1, -4.3, 8.2)};
+    const int c_DoubleResult2ChangedToInt{vrd::getSumOfArgumentSquares(5, 2.1, -4.3, 8.2)};
     QVERIFY(114 == c_DoubleResult2ChangedToInt);
 }
 
 void CPP20ConceptsTests::testIndexSequences()
 {
     // first validate the (heterogenous) tuples equality check method as it will be used as helper for testing other methods (see below)
-    QVERIFY(_areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4, 5}, 0));
-    QVERIFY(!_areTuplesEqual(std::tuple{2, 4, 5u}, std::tuple{2, 4, 5}, 0));
-    QVERIFY(_areTuplesEqual(std::tuple{2, 4, 5u}, std::tuple{2, 4, static_cast<unsigned int>(5)}, 0));
-    QVERIFY(!_areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4, 5, 7}, 0));
-    QVERIFY(!_areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4.0, 5}, 0));
-    QVERIFY(_areTuplesEqual(std::tuple{2.5, -2.01, 4.001, -1.552}, std::tuple{2.50, -2.0100, 4.001000, -1.5520e0}, 1.0e-9));
-    QVERIFY(!_areTuplesEqual(std::tuple{2.5, -2.01f, 4.001, -1.552}, std::tuple{2.50, -2.0100, 4.001000, -1.5520e0}, 1.0e-9));
-    QVERIFY(_areTuplesEqual(std::tuple{1.2, -2.0, 4.5f}, std::tuple{static_cast<double>(1.2f), static_cast<double>(-2), static_cast<float>(4.5)}, 1.0e-7));
-    QVERIFY(_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.52000000}, 1.0e-9));
-    QVERIFY(!_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.520000001}, 1.0e-9));
-    QVERIFY(_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.520000001}, 1.0e-6));
-    QVERIFY(_areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{static_cast<int>(2.001), -5.2000, static_cast<int>(3.8f), -static_cast<int>(2u), 4.520}, 1.0e-9));
-    QVERIFY(_areTuplesEqual(std::tuple{}, std::tuple{}, 0));
-    QVERIFY(!_areTuplesEqual(std::tuple{}, std::tuple{2.55}, 0));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4, 5}, 0));
+    QVERIFY(!vrd::areTuplesEqual(std::tuple{2, 4, 5u}, std::tuple{2, 4, 5}, 0));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{2, 4, 5u}, std::tuple{2, 4, static_cast<unsigned int>(5)}, 0));
+    QVERIFY(!vrd::areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4, 5, 7}, 0));
+    QVERIFY(!vrd::areTuplesEqual(std::tuple{2, 4, 5}, std::tuple{2, 4.0, 5}, 0));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{2.5, -2.01, 4.001, -1.552}, std::tuple{2.50, -2.0100, 4.001000, -1.5520e0}, 1.0e-9));
+    QVERIFY(!vrd::areTuplesEqual(std::tuple{2.5, -2.01f, 4.001, -1.552}, std::tuple{2.50, -2.0100, 4.001000, -1.5520e0}, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{1.2, -2.0, 4.5f}, std::tuple{static_cast<double>(1.2f), static_cast<double>(-2), static_cast<float>(4.5)}, 1.0e-7));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.52000000}, 1.0e-9));
+    QVERIFY(!vrd::areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.520000001}, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{2, -5.2000, 3, -2, 4.520000001}, 1.0e-6));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{2, -5.2, 3, -2, 4.52}, std::tuple{static_cast<int>(2.001), -5.2000, static_cast<int>(3.8f), -static_cast<int>(2u), 4.520}, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(std::tuple{}, std::tuple{}, 0));
+    QVERIFY(!vrd::areTuplesEqual(std::tuple{}, std::tuple{2.55}, 0));
 
-    const std::tuple c_Tuple1{_createTupleWithAlternatingSigns(2, 3, 5, 4, 9)};
+    const std::tuple c_Tuple1{vrd::createTupleWithAlternatingSigns(2, 3, 5, 4, 9)};
     const std::tuple c_Tuple1Ref{2, -3, 5, -4, 9};
 
-    const std::tuple c_Tuple2{_createTupleWithAlternatingSigns(2.5, -1.2, -2.3, 4.01, -5.12, -3.05, 2.44, 0.0)};
+    const std::tuple c_Tuple2{vrd::createTupleWithAlternatingSigns(2.5, -1.2, -2.3, 4.01, -5.12, -3.05, 2.44, 0.0)};
     const std::tuple c_Tuple2Ref{2.5, -1.2, 2.3, -4.01, 5.12, -3.05, 2.44, 0.0};
 
-    const std::tuple c_Tuple3{_createTupleWithAlternatingSigns(2.8, -2, -3, 4.5, 5)};
+    const std::tuple c_Tuple3{vrd::createTupleWithAlternatingSigns(2.8, -2, -3, 4.5, 5)};
     const std::tuple c_Tuple3Ref{2.8, -2, 3, -4.5, 5};
 
-    const std::tuple c_Tuple4{_createTupleWithAlternatingSigns(-5.2, 2.1)};
+    const std::tuple c_Tuple4{vrd::createTupleWithAlternatingSigns(-5.2, 2.1)};
     const std::tuple c_Tuple4Ref{5.2, -2.1};
 
-    const std::tuple c_Tuple5{_createTupleWithAlternatingSigns(4)};
+    const std::tuple c_Tuple5{vrd::createTupleWithAlternatingSigns(4)};
     const std::tuple c_Tuple5Ref{4};
 
-    const std::tuple c_Tuple6{_createTupleWithAlternatingSigns()};
+    const std::tuple c_Tuple6{vrd::createTupleWithAlternatingSigns()};
     const std::tuple c_Tuple6Ref{};
 
-    QVERIFY(_areTuplesEqual(c_Tuple1Ref, c_Tuple1, 0));
-    QVERIFY(_areTuplesEqual(c_Tuple2Ref, c_Tuple2, 1.0e-9));
-    QVERIFY(_areTuplesEqual(c_Tuple3Ref, c_Tuple3, 1.0e-9));
-    QVERIFY(_areTuplesEqual(c_Tuple4Ref, c_Tuple4, 1.0e-9));
-    QVERIFY(_areTuplesEqual(c_Tuple5Ref, c_Tuple5, 0));
-    QVERIFY(_areTuplesEqual(c_Tuple6Ref, c_Tuple6, 0));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple1Ref, c_Tuple1, 0));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple2Ref, c_Tuple2, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple3Ref, c_Tuple3, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple4Ref, c_Tuple4, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple5Ref, c_Tuple5, 0));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple6Ref, c_Tuple6, 0));
 
-    const std::tuple c_Tuple7{_createTupleWithCumulatedValues(3, -1, 2, 5, 8, 10)};
+    const std::tuple c_Tuple7{vrd::createTupleWithCumulatedValues(3, -1, 2, 5, 8, 10)};
     const std::tuple c_Tuple7Ref{2, 4, 9, 17, 27};
 
-    const std::tuple c_Tuple8{_createTupleWithCumulatedValues(-5, 8)};
+    const std::tuple c_Tuple8{vrd::createTupleWithCumulatedValues(-5, 8)};
     const std::tuple c_Tuple8Ref{3};
 
-    const std::tuple c_Tuple9{_createTupleWithCumulatedValues(5)};
+    const std::tuple c_Tuple9{vrd::createTupleWithCumulatedValues(5)};
     const std::tuple c_Tuple9Ref{5};
 
-    const std::tuple c_Tuple10{_createTupleWithCumulatedValues(-1.2, 3.5, 2.0, 4.8)};
+    const std::tuple c_Tuple10{vrd::createTupleWithCumulatedValues(-1.2, 3.5, 2.0, 4.8)};
     const std::tuple c_Tuple10Ref{2.3, 4.3, 9.1};
 
-    const std::tuple c_Tuple11{_createTupleWithCumulatedValues(2.3, -1.2)};
+    const std::tuple c_Tuple11{vrd::createTupleWithCumulatedValues(2.3, -1.2)};
     const std::tuple c_Tuple11Ref{1.1};
 
-    const std::tuple c_Tuple12{_createTupleWithCumulatedValues(-5.2)};
+    const std::tuple c_Tuple12{vrd::createTupleWithCumulatedValues(-5.2)};
     const std::tuple c_Tuple12Ref{-5.2};
 
-    QVERIFY(_areTuplesEqual(c_Tuple7Ref, c_Tuple7, 0));
-    QVERIFY(_areTuplesEqual(c_Tuple8Ref, c_Tuple8, 0));
-    QVERIFY(_areTuplesEqual(c_Tuple9Ref, c_Tuple9, 0));
-    QVERIFY(_areTuplesEqual(c_Tuple10Ref, c_Tuple10, 1.0e-9));
-    QVERIFY(_areTuplesEqual(c_Tuple11Ref, c_Tuple11, 1.0e-9));
-    QVERIFY(_areTuplesEqual(c_Tuple12Ref, c_Tuple12, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple7Ref, c_Tuple7, 0));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple8Ref, c_Tuple8, 0));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple9Ref, c_Tuple9, 0));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple10Ref, c_Tuple10, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple11Ref, c_Tuple11, 1.0e-9));
+    QVERIFY(vrd::areTuplesEqual(c_Tuple12Ref, c_Tuple12, 1.0e-9));
 }
 
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)

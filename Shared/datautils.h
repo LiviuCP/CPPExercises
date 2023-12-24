@@ -25,6 +25,9 @@
 #endif
 
 template<typename DataType>
+using ValueSizePair = std::pair<DataType, size_t>;
+
+template<typename DataType>
 using MatrixSizeType = typename Matrix<DataType>::size_type;
 
 template<typename DataType>
