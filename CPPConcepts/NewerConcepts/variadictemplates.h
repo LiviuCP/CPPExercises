@@ -9,7 +9,7 @@
 
 namespace Variadic
 {
-    /* variadic functions created in connection to CPP17 standard */
+    /* variadic functions created in connection to CPP17 standard (no abbreviated templates or CPP20 concepts applied) */
 
     template<typename DataType, typename ...ArgumentsList>
     ValueSizePair<DataType> binaryLeftFoldMinus(DataType initialValue, ArgumentsList... argumentsList);
@@ -46,23 +46,23 @@ namespace Variadic
     template<typename DataType, typename ...ArgumentsList>
     ValueSizePair<DataType> binaryRightFoldMinusRecursiveImplementationHelper(DataType initialValue, ArgumentsList... argumentsList);
 
-    /* variadic functions created in connection to CPP20 standard */
+    /* variadic functions created in connection to CPP20 standard (abbreviated templates and CPP20 concepts applied) */
 
-    template<typename DataType, typename ...ArgumentsList>
+    template<numeric DataType, std::convertible_to<DataType> ...ArgumentsList>
     DataType computeAverageWithVariadicTemplateAndLambda(ArgumentsList ...argumentsList);
 
-    template<typename DataType, typename ...ArgumentsList>
+    template<hasAddOperator DataType, std::same_as<DataType> ...ArgumentsList>
     void addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList);
 
-    auto getSumOfArgumentSquares(auto initialValue, auto... argumentsList);
+    auto getSumOfArgumentSquares(numeric auto initialValue, std::convertible_to<decltype(initialValue)> auto... argumentsList);
 
-    template<typename ...ArgumentsList>
+    template<numeric ...ArgumentsList>
     auto createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList);
 
     template<numeric DataType, std::same_as<DataType> ...ArgumentsList>
     auto createTupleWithCumulatedValues(DataType initialValue, const ArgumentsList& ...argumentsList);
 
-    template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
+    template<numeric ...FirstTupleArgs, numeric ...SecondTupleArgs, numeric DataType>
     bool areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon);
 
     // helper functions
@@ -225,13 +225,14 @@ ValueSizePair<DataType> Variadic::binaryRightFoldMinusRecursiveImplementationHel
     return {result, c_Count};
 }
 
-template<typename DataType, typename ...ArgumentsList>
+template<numeric DataType, std::convertible_to<DataType> ...ArgumentsList>
 DataType Variadic::computeAverageWithVariadicTemplateAndLambda(ArgumentsList... argumentsList)
 {
     static_assert(sizeof...(argumentsList) > 0, "At least one argument required for calculating average!");
+    static_assert(std::is_convertible_v<decltype(sizeof...(argumentsList)), DataType>);
 
     auto computeAverage{[argumentsList...]() {
-        const DataType c_Sum{(DataType{} + ... + argumentsList)};
+        const DataType c_Sum{(DataType{} + ... + static_cast<DataType>(argumentsList))};
         const DataType c_Average{c_Sum / static_cast<DataType>(sizeof...(argumentsList))};
 
         return c_Average;
@@ -240,7 +241,7 @@ DataType Variadic::computeAverageWithVariadicTemplateAndLambda(ArgumentsList... 
     return computeAverage();
 }
 
-template<typename DataType, typename ...ArgumentsList>
+template<hasAddOperator DataType, std::same_as<DataType> ...ArgumentsList>
 void Variadic::addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, DataType after, ArgumentsList& ...argumentsList)
 {
     static_assert(sizeof...(argumentsList) > 0, "At least one pack argument required for prepending/appending the given values!");
@@ -253,13 +254,12 @@ void Variadic::addBeforeAndAfterWithVariadicTemplateAndLambda(DataType before, D
 }
 
 // return type of the function is deduced from the type of the first argument
-auto Variadic::getSumOfArgumentSquares(auto initialValue, auto... argumentsList)
+auto Variadic::getSumOfArgumentSquares(numeric auto initialValue, std::convertible_to<decltype(initialValue)> auto... argumentsList)
 {
-    using Result_t = decltype(initialValue);
-    return (square(initialValue) + ... + static_cast<Result_t>(square(argumentsList)));
+    return (square(initialValue) + ... + static_cast<decltype(initialValue)>(square(argumentsList)));
 }
 
-template<typename ...ArgumentsList>
+template<numeric ...ArgumentsList>
 auto Variadic::createTupleWithAlternatingSigns(const ArgumentsList& ...argumentsList)
 {
     std::tuple result{argumentsList...};
@@ -304,13 +304,14 @@ auto Variadic::createTupleWithCumulatedValues(DataType initialValue, const Argum
    - elements with same indexes should have the same value (for non-floating point types)
      or the differences between values should be smaller than the provided epsilon (for floating point types)
 */
-template<numeric DataType, numeric ...FirstTupleArgs, numeric ...SecondTupleArgs>
+template<numeric ...FirstTupleArgs, numeric ...SecondTupleArgs, numeric DataType>
 bool Variadic::areTuplesEqual(const std::tuple<FirstTupleArgs...>& first, const std::tuple<SecondTupleArgs...>& second, DataType epsilon)
 {
     auto areTupleTypesAndValuesEqual{[&first, &second, epsilon]<std::size_t... Idx>(std::index_sequence<Idx...>){
         auto areValuesEqual{[epsilon](auto first, auto second){
             if constexpr (std::is_floating_point_v<decltype(first)>)
             {
+                static_assert(std::is_convertible_v<DataType, decltype(first)>);
                 return std::abs(first - second) < std::abs(static_cast<decltype(first)>(epsilon));
             }
             else

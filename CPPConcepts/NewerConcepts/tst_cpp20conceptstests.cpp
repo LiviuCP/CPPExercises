@@ -25,7 +25,7 @@ private slots:
     void testGenericLambda();
     void testAggregateInitialization(); // includes testing designated initializers (which were introduced in CPP20)
     void testPackExpansionsInLambdaInitCaptures();
-    void testPackExpansionsWithAbbreviatedTemplatesAndConcepts();
+    void testPackExpansionsWithAbbreviatedTemplates();
     void testIndexSequences();
 
 private:
@@ -698,7 +698,7 @@ void CPP20ConceptsTests::testPackExpansionsInLambdaInitCaptures()
     QVERIFY("Hello Andrew!" == strArg1 && "What a surprise! Hello George! Cheerio!" == strArg2 &&  "Hello Joanna!" == strArg3);
 }
 
-void CPP20ConceptsTests::testPackExpansionsWithAbbreviatedTemplatesAndConcepts()
+void CPP20ConceptsTests::testPackExpansionsWithAbbreviatedTemplates()
 {
     const double c_Epsilon{1.0e-9};
 
