@@ -672,6 +672,8 @@ void CPP20ConceptsTests::testPackExpansionsInLambdaInitCaptures()
     QVERIFY(15 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(16, 14));
     QVERIFY(-4 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(-4));
 
+    QVERIFY(3 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(5, 2.4, 9, -1));
+
     const double c_Epsilon{1.0e-9};
 
     QVERIFY(std::abs(vrd::computeAverageWithVariadicTemplateAndLambda<double>(5, -2, 4, 10, -5) - 2.4) < c_Epsilon);
