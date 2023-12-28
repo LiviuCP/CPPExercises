@@ -667,6 +667,7 @@ void CPP20ConceptsTests::testAggregateInitialization()
 
 void CPP20ConceptsTests::testPackExpansionsInLambdaInitCaptures()
 {
+    // template type always required when calling computeAverage...() function, as this is the return type and it cannot be automatically deduced
     QVERIFY(2 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(5, -2, 4, 10, -5));
     QVERIFY(-1 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(-15, 3, 8, -2));
     QVERIFY(15 == vrd::computeAverageWithVariadicTemplateAndLambda<int>(16, 14));
@@ -685,18 +686,23 @@ void CPP20ConceptsTests::testPackExpansionsInLambdaInitCaptures()
 
     int intArg1{10}, intArg2{5}, intArg3{-3}, intArg4{2}, intArg5{22};
 
-    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<int>(2, -5, intArg1, intArg2, intArg3, intArg4, intArg5);
+    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda(2, -5, intArg1, intArg2, intArg3, intArg4, intArg5);
     QVERIFY(7 == intArg1 && 2 == intArg2 && -6 == intArg3 && -1 == intArg4 && 19 == intArg5);
 
-    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<int>(-5, 9, intArg2, intArg4);
+    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda(-5, 9, intArg2, intArg4);
     QVERIFY(7 == intArg1 && 6 == intArg2 && -6 == intArg3 && 3 == intArg4 && 19 == intArg5);
 
     std::string strArg1{"Andrew"}, strArg2{"George"}, strArg3{"Joanna"};
 
+    // template type cannot be automatically deduced, as first two arguments (before/after) are const char* while the others are std::string
     vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("Hello ", "!", strArg1, strArg2, strArg3);
     QVERIFY("Hello Andrew!" == strArg1 && "Hello George!" == strArg2 &&  "Hello Joanna!" == strArg3);
 
-    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda<std::string>("What a surprise! ", " Cheerio!", strArg2);
+    const std::string c_Before{"What a surprise! "};
+    const std::string c_After{" Cheerio!"};
+
+    // here all arguments are std::string, so template type can be deduced (<std::string> no longer required when calling the function)
+    vrd::addBeforeAndAfterWithVariadicTemplateAndLambda(c_Before, c_After, strArg2);
     QVERIFY("Hello Andrew!" == strArg1 && "What a surprise! Hello George! Cheerio!" == strArg2 &&  "Hello Joanna!" == strArg3);
 }
 
