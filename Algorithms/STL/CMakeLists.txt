@@ -54,6 +54,12 @@ add_test(NAME UninitializedMemoryOperationsTests COMMAND UninitializedMemoryOper
 add_executable(CombinedSTLTests tst_combinedstltests.cpp)
 add_test(NAME CombinedSTLTests COMMAND CombinedSTLTests)
 
+# I managed to make std::ranges work only on Linux so far, so I excluded this test case from building on the other major desktop OSes
+if (NOT WIN32 AND NOT APPLE)
+    add_executable(CPP2xRangesTests tst_cpp2xrangestests.cpp)
+    add_test(NAME CPP2xRangesTests COMMAND CPP2xRangesTests)
+endif()
+
 target_link_libraries(NonModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(ModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
@@ -65,3 +71,8 @@ target_link_libraries(ComparisonPermutationTests PRIVATE Qt${QT_VERSION_MAJOR}::
 target_link_libraries(NumericOperationsTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(UninitializedMemoryOperationsTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(CombinedSTLTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+
+# same here
+if (NOT WIN32 AND NOT APPLE)
+    target_link_libraries(CPP2xRangesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+endif()
