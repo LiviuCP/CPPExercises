@@ -17,11 +17,13 @@ private slots:
     void testSort();
 
 private:
+    const IntPairVector mPrimaryIntPairVector;
     const StringIntPairVector mPrimaryStringIntPairVector;
 };
 
 CPP2xRangesTests::CPP2xRangesTests()
-    : mPrimaryStringIntPairVector{{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
+    : mPrimaryIntPairVector{{-1, 2}, {0, 1}, {1, 2}, {1, 1}, {2, 1}, {-3, 2}, {2, -3}, {5, 1}, {0, 0}, {6, 2}, {-2, 3}, {4, 2}, {1, 0}, {2, 2}}
+    , mPrimaryStringIntPairVector{{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
                                   {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}}
 {
 }
@@ -65,6 +67,30 @@ void CPP2xRangesTests::testSort()
         [](const auto& person) {return person.first;});
 
     QVERIFY(c_SecondStringIntPairVectorRef == secondStringIntPairVector);
+
+    IntPairVector firstIntPairVector{mPrimaryIntPairVector};
+    const IntPairVector c_FirstIntPairVectorRef{{6, 2}, {5, 1}, {4, 2}, {2, 2}, {2, 1}, {2, -3}, {1, 2}, {1, 1}, {1, 0}, {0, 1}, {0, 0}, {-1, 2}, {-2, 3}, {-3, 2}};
+
+    auto lexicographicalCompare{[](const IntPair& firstIntPair, const IntPair& secondIntPair){
+        auto equivalence{firstIntPair.first <=> secondIntPair.first};
+        if (0 == equivalence)
+        {
+            equivalence = firstIntPair.second <=> secondIntPair.second;
+        }
+        return equivalence < 0;
+    }};
+
+    std::ranges::sort(firstIntPairVector.rbegin(), firstIntPairVector.rend(), lexicographicalCompare);
+
+    QVERIFY(c_FirstIntPairVectorRef == firstIntPairVector);
+
+    IntPairVector secondIntPairVector{mPrimaryIntPairVector};
+    const IntPairVector c_SecondIntPairVectorRef{{-2, 3}, {6, 2}, {4, 2}, {2, 2}, {1, 2}, {-1, 2}, {-3, 2}, {5, 1}, {2, 1}, {1, 1}, {0, 1}, {1, 0}, {0, 0}, {2, -3}};
+    auto reverseProjection{[](const IntPair& intPair) {return IntPair{intPair.second, intPair.first};}};
+
+    std::ranges::sort(secondIntPairVector.rbegin(), secondIntPairVector.rend(), lexicographicalCompare, reverseProjection);
+
+    QVERIFY(c_SecondIntPairVectorRef == secondIntPairVector);
 }
 
 QTEST_APPLESS_MAIN(CPP2xRangesTests)

@@ -46,6 +46,7 @@ using IntVectorMatrix = Matrix<IntVector>;
 using IntVectorDiff = IntVector::difference_type;
 using StringVector = std::vector<std::string>;
 using StringVectorMatrix = Matrix<StringVector>;
+using IntPairVector = std::vector<std::pair<int, int>>;
 using StringIntPairVector = std::vector<StringIntPair>;
 using IntList = std::list<int>;
 using BoolMatrix = Matrix<bool>;
