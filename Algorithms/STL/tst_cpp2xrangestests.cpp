@@ -28,6 +28,7 @@ private slots:
     void testAllAnyNoneOf();
     void testFind();
     void testSort();
+    void testReverse();
     void testViews();
 
 private:
@@ -38,6 +39,7 @@ private:
     const IntPairVector mSecondaryIntPairVector;
     const IntPairVector mThirdIntPairVector;
     const StringIntPairVector mPrimaryStringIntPairVector;
+    const StringIntPairMatrix mPrimaryStringIntPairMatrix;
 };
 
 CPP2xRangesTests::CPP2xRangesTests()
@@ -47,6 +49,9 @@ CPP2xRangesTests::CPP2xRangesTests()
     , mThirdIntPairVector{{7, 8}, {-2, 2}, {7, -5}, {3, 4}, {-2, 9}}
     , mPrimaryStringIntPairVector{{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
                                   {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}}
+    , mPrimaryStringIntPairMatrix{2, 5, {{"Anna", 18}, {"Kelly", 12}, {"Annabel", 11}, {"Juan", 10}, {"Jack", 8},
+                                         {"Barbara", 10}, {"Barney", 20}, {"Joseph", 11}, {"Johnny", 9}, {"Jeff", 15}
+                                 }}
 {
 }
 
@@ -103,6 +108,41 @@ void CPP2xRangesTests::testSort()
     std::ranges::sort(secondIntPairVector.rbegin(), secondIntPairVector.rend(), lexicographicalCompare, reverseProjection);
 
     QVERIFY(c_SecondIntPairVectorRef == secondIntPairVector);
+
+    StringIntPairMatrix stringIntPairMatrix{mPrimaryStringIntPairMatrix};
+    const StringIntPairMatrix c_StringIntPairMatrixRef{2, 5, {{"Annabel", 11}, {"Barbara", 10}, {"Barney", 20}, {"Joseph", 11}, {"Johnny", 9},
+                                                              {"Kelly", 12}, {"Anna", 18}, {"Juan", 10}, {"Jack", 8}, {"Jeff", 15}
+                                                      }};
+
+    std::ranges::stable_sort(stringIntPairMatrix, std::greater<std::size_t>(), [](const auto& person) {return std::size(person.first);});
+
+    QVERIFY(c_StringIntPairMatrixRef == stringIntPairMatrix);
+}
+
+void CPP2xRangesTests::testReverse()
+{
+    StringIntPairMatrix firstStringIntPairMatrix{mPrimaryStringIntPairMatrix};
+    const StringIntPairMatrix c_FirstStringIntPairMatrixRef{2, 5, {{"Jeff", 15}, {"Johnny", 9}, {"Joseph", 11}, {"Barney", 20}, {"Barbara", 10},
+                                                                   {"Jack", 8}, {"Juan", 10}, {"Annabel", 11}, {"Kelly", 12}, {"Anna", 18}
+                                                           }};
+    std::ranges::reverse(firstStringIntPairMatrix);
+
+    StringIntPairMatrix secondStringIntPairMatrix{mPrimaryStringIntPairMatrix};
+    const StringIntPairMatrix c_SecondStringIntPairMatrixRef{2, 5, {{"Anna", 18}, {"Annabel", 11}, {"Jack", 8}, {"Barney", 20}, {"Johnny", 9},
+                                                                    {"Kelly", 12}, {"Juan", 10}, {"Barbara", 10}, {"Joseph", 11}, {"Jeff", 15}
+                                                            }};
+
+    std::ranges::reverse_copy(firstStringIntPairMatrix, secondStringIntPairMatrix.nBegin());
+
+    StringIntPairVector stringIntPairVector{mPrimaryStringIntPairVector};
+    const StringIntPairVector c_StringIntPairVectorRef{{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
+                                                       {"Jeff", 15}, {"Joseph", 11}, {"Barbara", 10}, {"Patrick", 14}, {"John", 11}};
+
+    std::ranges::reverse_copy(secondStringIntPairMatrix.constReverseZBegin(), secondStringIntPairMatrix.getConstReverseZIterator(1, 1), stringIntPairVector.rbegin() + 2);
+
+    QVERIFY(c_FirstStringIntPairMatrixRef == firstStringIntPairMatrix &&
+            c_SecondStringIntPairMatrixRef == secondStringIntPairMatrix &&
+            c_StringIntPairVectorRef == stringIntPairVector);
 }
 
 void CPP2xRangesTests::testViews()
@@ -119,6 +159,17 @@ void CPP2xRangesTests::testViews()
     std::ranges::for_each(valuesDivisibleByThreeOrFive, [](int& element) {element += 15;});
 
     QVERIFY(std::ranges::equal(c_IntVectorRef, intVector));
+
+    auto fourCharactersNamesItemsReversed{mPrimaryStringIntPairMatrix | std::views::filter([](const auto& person) {return 4 == std::size(person.first);}) | std::views::reverse};
+    StringIntPairMatrix stringIntPairMatrix;
+    stringIntPairMatrix.resize(2, 2);
+    const StringIntPairMatrix c_StringIntPairMatrixRef{2, 2, {{"Jeff", 15}, {"Juan", 10},
+                                                              {"Jack", 8}, {"Anna", 18}
+                                                      }};
+
+    std::ranges::copy(fourCharactersNamesItemsReversed, stringIntPairMatrix.nBegin());
+
+    QVERIFY(c_StringIntPairMatrixRef == stringIntPairMatrix);
 
     QVERIFY(1 == _retrieveEuclidianDistance(mPrimaryIntPairVector));
     QVERIFY(8 == _retrieveEuclidianDistance(mSecondaryIntPairVector));
