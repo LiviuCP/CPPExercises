@@ -33,6 +33,8 @@ private slots:
 
 private:
     std::optional<int> _retrieveEuclidianDistance(const IntPairVector& pointVector);
+    IntVector _retrievePrimes(size_t count, std::optional<uint8_t> lastDigit = std::optional<char>{});
+    bool _isPrime(int number);
 
     const IntVector mPrimaryIntVector;
     const IntPairVector mPrimaryIntPairVector;
@@ -183,6 +185,55 @@ void CPP2xRangesTests::testViews()
     intPairVector.push_back({-4, -3});
 
     QVERIFY(0 == _retrieveEuclidianDistance(intPairVector));
+
+    const IntVector c_IntVector1{1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 53, 67, 79};
+    const IntVector c_IntVector2{3, 29, 4, 71};
+    const IntVector c_IntVector3{0, 9, 21, 33, 87};
+    const IntVector c_IntVector4{-6, -4, 0, 4, 14};
+    const IntVector c_IntVector5{-5, -9, -3, -2, -1};
+    const IntVector c_IntVector6{-17, -13, -11, -7, 5, 19, 113, 97, 43};
+
+    QVERIFY(std::ranges::all_of(c_IntVector1, [this](int number){return _isPrime(number);}));
+    QVERIFY(std::ranges::any_of(c_IntVector2, [this](int number){return !_isPrime(number);}));
+    QVERIFY(std::ranges::none_of(c_IntVector3, [this](int number){return _isPrime(number);}));
+    QVERIFY(std::ranges::all_of(c_IntVector4, [this](int number){return !_isPrime(number);}));
+    QVERIFY(std::ranges::any_of(c_IntVector5, [this](int number){return _isPrime(number);}));
+    QVERIFY(std::ranges::none_of(c_IntVector6, [this](int number){return !_isPrime(number);}));
+
+    const IntMatrix c_IntMatrix{3, 4, {1, -3,   2,  4,
+                                       19, 4, -13,  6,
+                                       7, -2,  15, -17
+                               }};
+
+    QVERIFY(std::ranges::any_of(c_IntMatrix.constMBegin(1), c_IntMatrix.constMEnd(1), [this](int number) {return _isPrime(number) && 0 == number % 2;}));
+    QVERIFY(-28 == std::accumulate(c_IntMatrix.constNColumnBegin(2), c_IntMatrix.constNEnd(), 0, [this](int first, int second){return first + (_isPrime(second) ? second : 0);}));
+
+    const IntVector c_PrimesVectorRef1{1, 2, 3, 5, 7, 11, 13, 17};
+    QVERIFY(c_PrimesVectorRef1 == _retrievePrimes(8));
+
+    const IntVector c_PrimesVectorRef2{1, 11, 31, 41, 61};
+    QVERIFY(c_PrimesVectorRef2 == _retrievePrimes(5, 1) && c_PrimesVectorRef2 == _retrievePrimes(5, 11));
+
+    const IntVector c_PrimesVectorRef3{3, 13, 23, 43, 53, 73, 83, 103, 113};
+    QVERIFY(c_PrimesVectorRef3 == _retrievePrimes(9, 3) && c_PrimesVectorRef3 == _retrievePrimes(9, 23));
+
+    const IntVector c_PrimesVectorRef4{7, 17, 37, 47, 67, 97};
+    QVERIFY(c_PrimesVectorRef4 == _retrievePrimes(6, 7) && c_PrimesVectorRef4 == _retrievePrimes(6, 67));
+
+    const IntVector c_PrimesVectorRef5{19};
+    QVERIFY(c_PrimesVectorRef5 == _retrievePrimes(1, 9) && c_PrimesVectorRef5 == _retrievePrimes(1, 109));
+
+    const IntVector c_PrimesVectorRef6{2};
+    QVERIFY(c_PrimesVectorRef6 == _retrievePrimes(2, 2) && c_PrimesVectorRef6 == _retrievePrimes(1, 2) && c_PrimesVectorRef6 == _retrievePrimes(3, 32));
+
+    const IntVector c_PrimesVectorRef7{5};
+    QVERIFY(c_PrimesVectorRef7 == _retrievePrimes(2, 5) && c_PrimesVectorRef7 == _retrievePrimes(1, 5) && c_PrimesVectorRef7 == _retrievePrimes(4, 45));
+
+    QVERIFY(_retrievePrimes(1, 0).empty() && _retrievePrimes(1, 4).empty() && _retrievePrimes(1, 6).empty() && _retrievePrimes(1, 8).empty());
+    QVERIFY(_retrievePrimes(1, 10).empty() && _retrievePrimes(1, 24).empty() && _retrievePrimes(1, 36).empty() && _retrievePrimes(1, 48).empty());
+    QVERIFY(_retrievePrimes(0, 2).empty() && _retrievePrimes(0, 5).empty() && _retrievePrimes(0, 7).empty() && _retrievePrimes(0, 8).empty());
+    QVERIFY(_retrievePrimes(0, 12).empty() && _retrievePrimes(0, 25).empty() && _retrievePrimes(0, 47).empty() && _retrievePrimes(0, 78).empty());
+    QVERIFY(_retrievePrimes(0).empty());
 }
 
 std::optional<int> CPP2xRangesTests::_retrieveEuclidianDistance(const IntPairVector& pointVector)
@@ -224,6 +275,92 @@ std::optional<int> CPP2xRangesTests::_retrieveEuclidianDistance(const IntPairVec
     }
 
     return distance;
+}
+
+IntVector CPP2xRangesTests::_retrievePrimes(size_t count, std::optional<uint8_t> lastDigit)
+{
+    IntVector result;
+
+    if (lastDigit.has_value())
+    {
+        lastDigit = lastDigit.value() % 10;
+    }
+
+    /* Generate all positive primes: 1, 2, 3, 5, 7, ...
+       - if no filtering by last digit is required, then the required count is taken from the (infinite) "raw" prime numbers sequence
+       - if filtering by last digit is required, then the required count is taken from the prime numbers sequence filtered by digit (which is also infinite)
+       - the (filtered) corner cases (2, 5) are handled separately (see below); the view is not used for retrieving them
+       - filtering by an even digits (other than 2) is also handled separately (see below) - obviously empty result (they are not prime)
+    */
+    auto primeNumbersView{std::views::iota(0)
+                          | std::views::transform([](int number){return number > 1 ? 2 * number - 1 : number + 1;})
+                          | std::views::filter([this](int number){return _isPrime(number);})
+                          | std::views::filter([lastDigit](int number) {return !lastDigit.has_value() || static_cast<uint8_t>(number % 10) == lastDigit;})
+                          | std::views::take(count)};
+
+    bool shouldUseView{!lastDigit.has_value()};
+
+    if (!shouldUseView)
+    {
+        if (2 == lastDigit || 5 == lastDigit)
+        {
+            if (count > 0)
+            {
+                result.push_back(lastDigit.value());
+            }
+        }
+        else if (lastDigit.value() % 2 != 0)
+        {
+            shouldUseView = true;
+        }
+    }
+
+    if (shouldUseView)
+    {
+        result.resize(count);
+        std::ranges::copy(primeNumbersView, result.begin());
+    }
+
+    return result;
+}
+
+bool CPP2xRangesTests::_isPrime(int number)
+{
+    number = std::abs(number);
+    bool isPrime{2 == number || 5 == number}; // rule out corner cases (these are the only prime numbers ending with these digits)
+
+    if (!isPrime)
+    {
+        constexpr std::array<uint8_t, 4> c_LastDigitsOfPrimes{1, 3, 7, 9}; // all prime numbers except the two above end with these digits
+
+        if (std::ranges::any_of(c_LastDigitsOfPrimes, [number](uint8_t digit) {return digit == static_cast<uint8_t>(number % 10);}))
+        {
+            isPrime = true;
+
+            /* generate all potential divisors (stop at upper bound), then check if they divide the number
+               - possible divisors should end with "prime number digits", so as many non-prime numbers as possible are excluded (to avoid unnecessary calculations)
+               - the resulting potential divisors are not necessarily prime (wanted to avoid checking them for prime-ness as well thereby preventing a recursion)
+               - however by ending with the required digits they include all possible prime divisors
+            */
+            const int c_DivisorsBound{static_cast<int>(std::sqrt(number)) + 1};
+            constexpr std::array<int, 4> c_StartingDivisors{3, 7, 9, 11};
+
+            for (const auto& startingDivisor : c_StartingDivisors)
+            {
+                auto divisorsView{std::views::iota(0) |
+                                  std::views::transform([startingDivisor](int index) {return startingDivisor + 10 * index;}) |
+                                  std::views::take_while([c_DivisorsBound](int divisor) {return divisor < c_DivisorsBound;})};
+
+                if (std::ranges::any_of(divisorsView, [number](int divisor){return 0 == number % divisor;}))
+                {
+                    isPrime = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return isPrime;
 }
 
 QTEST_APPLESS_MAIN(CPP2xRangesTests)
