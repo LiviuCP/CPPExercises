@@ -30,6 +30,7 @@ private slots:
     void testSort();
     void testReverse();
     void testViews();
+    void testKeyValueViews();
 
 private:
     std::optional<int> _retrieveEuclidianDistance(const IntPairVector& pointVector);
@@ -234,6 +235,38 @@ void CPP2xRangesTests::testViews()
     QVERIFY(_retrievePrimes(0, 2).empty() && _retrievePrimes(0, 5).empty() && _retrievePrimes(0, 7).empty() && _retrievePrimes(0, 8).empty());
     QVERIFY(_retrievePrimes(0, 12).empty() && _retrievePrimes(0, 25).empty() && _retrievePrimes(0, 47).empty() && _retrievePrimes(0, 78).empty());
     QVERIFY(_retrievePrimes(0).empty());
+}
+
+void CPP2xRangesTests::testKeyValueViews()
+{
+    auto keysView{mPrimaryStringIntPairMatrix | std::ranges::views::keys};
+    auto reverseValuesView{mPrimaryStringIntPairMatrix | std::ranges::views::values | std::ranges::views::reverse};
+
+    StringMatrix keysMatrix{5, 2, ""};
+
+    const StringMatrix c_KeysMatrixRef{5, 2, {"Jeff",    "Jack",
+                                              "Johnny",  "Juan",
+                                              "Joseph",  "Annabel",
+                                              "Barney",  "Kelly",
+                                              "Barbara", "Anna"
+                                      }};
+
+    std::ranges::copy(keysView, keysMatrix.reverseNBegin());
+
+    QVERIFY(c_KeysMatrixRef == keysMatrix);
+
+    IntMatrix valuesMatrix{5, 2, -1};
+
+    const IntMatrix c_ValuesMatrixRef{5, 2, {15,  8,
+                                              9, 10,
+                                             11, 11,
+                                             20, 12,
+                                             10, 18
+                                     }};
+
+    std::ranges::copy(reverseValuesView, valuesMatrix.nBegin());
+
+    QVERIFY(c_ValuesMatrixRef == valuesMatrix);
 }
 
 std::optional<int> CPP2xRangesTests::_retrieveEuclidianDistance(const IntPairVector& pointVector)
