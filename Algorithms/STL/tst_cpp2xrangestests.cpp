@@ -31,6 +31,7 @@ private slots:
     void testReverse();
     void testViews();
     void testKeyValueViews();
+    void testJoinView();
 
 private:
     std::optional<int> _retrieveEuclidianDistance(const IntPairVector& pointVector);
@@ -42,6 +43,8 @@ private:
     const IntPairVector mSecondaryIntPairVector;
     const IntPairVector mThirdIntPairVector;
     const StringIntPairVector mPrimaryStringIntPairVector;
+    const IntMatrix mPrimaryIntMatrix;
+    const IntMatrix mSecondaryIntMatrix;
     const StringIntPairMatrix mPrimaryStringIntPairMatrix;
 };
 
@@ -52,6 +55,8 @@ CPP2xRangesTests::CPP2xRangesTests()
     , mThirdIntPairVector{{7, 8}, {-2, 2}, {7, -5}, {3, 4}, {-2, 9}}
     , mPrimaryStringIntPairVector{{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
                                   {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}}
+    , mPrimaryIntMatrix{2, 3, {-1, 2, -3, 4, -5, 6}}
+    , mSecondaryIntMatrix{3, 3, {-7, 8, -9, 10, -11, 12, -13, 14, -15}}
     , mPrimaryStringIntPairMatrix{2, 5, {{"Anna", 18}, {"Kelly", 12}, {"Annabel", 11}, {"Juan", 10}, {"Jack", 8},
                                          {"Barbara", 10}, {"Barney", 20}, {"Joseph", 11}, {"Johnny", 9}, {"Jeff", 15}
                                  }}
@@ -267,6 +272,56 @@ void CPP2xRangesTests::testKeyValueViews()
     std::ranges::copy(reverseValuesView, valuesMatrix.nBegin());
 
     QVERIFY(c_ValuesMatrixRef == valuesMatrix);
+}
+
+void CPP2xRangesTests::testJoinView()
+{
+    /* Case 1: vertical concatenation of two matrixes */
+
+    IntMatrix firstIntMatrix{mPrimaryIntMatrix};
+    IntMatrix secondIntMatrix{mSecondaryIntMatrix};
+
+    std::vector<IntMatrix> matrixesToJoin{firstIntMatrix, secondIntMatrix};
+    auto joinMatrixesView{matrixesToJoin | std::ranges::views::join};
+
+    IntMatrix thirdIntMatrix{5, 3, 0};
+
+    std::ranges::copy(joinMatrixesView, thirdIntMatrix.begin());
+
+    QVERIFY(-1 == thirdIntMatrix.at(0, 0) &&
+            -15 == thirdIntMatrix.at(4, 2) &&
+            -7 == thirdIntMatrix.at(2, 0) &&
+            -8 == std::accumulate(thirdIntMatrix.constZBegin(), thirdIntMatrix.constZEnd(), 0));
+
+    firstIntMatrix.catByRow(firstIntMatrix, secondIntMatrix);
+
+    QVERIFY(firstIntMatrix == thirdIntMatrix);
+
+    /* Case 2: horizontal concatenation of two matrixes */
+
+    firstIntMatrix.resize(3, 2);
+    std::ranges::copy(mPrimaryIntMatrix, firstIntMatrix.zBegin());
+    secondIntMatrix = mSecondaryIntMatrix;
+    thirdIntMatrix.resize(3, 5, 0);
+
+    IntMatrix firstIntMatrixTransposed, secondIntMatrixTransposed;
+
+    firstIntMatrix.transpose(firstIntMatrixTransposed);
+    secondIntMatrix.transpose(secondIntMatrixTransposed);
+
+    matrixesToJoin = {firstIntMatrixTransposed, secondIntMatrixTransposed};
+    joinMatrixesView = matrixesToJoin | std::ranges::views::join;
+
+    std::ranges::copy(joinMatrixesView, thirdIntMatrix.nBegin());
+
+    QVERIFY(-1 == thirdIntMatrix.at(0, 0) &&
+            -15 == thirdIntMatrix.at(2, 4) &&
+            -7 == thirdIntMatrix.at(0, 2) &&
+            -8 == std::accumulate(thirdIntMatrix.constNBegin(), thirdIntMatrix.constNEnd(), 0));
+
+    secondIntMatrix.catByColumn(firstIntMatrix, secondIntMatrix);
+
+    QVERIFY(secondIntMatrix == thirdIntMatrix);
 }
 
 std::optional<int> CPP2xRangesTests::_retrieveEuclidianDistance(const IntPairVector& pointVector)
