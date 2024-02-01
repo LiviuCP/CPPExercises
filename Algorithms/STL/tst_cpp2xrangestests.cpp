@@ -17,6 +17,36 @@ static constexpr auto lexicographicalCompare{[](const IntPair& firstIntPair, con
 
 static constexpr auto reverseProjection{[](const IntPair& intPair) {return IntPair{intPair.second, intPair.first};}};
 
+template<typename DataType>
+class MatrixDiagonalView : public std::ranges::view_interface<MatrixDiagonalView<DataType>>
+{
+public:
+    MatrixDiagonalView() = default;
+    MatrixDiagonalView(Matrix<DataType>& matrix, Matrix<DataType>::size_type diagonalNr)
+    {
+        if (!matrix.isEmpty())
+        {
+            diagonalNr = std::clamp(diagonalNr, 1 - matrix.getNrOfRows(), matrix.getNrOfColumns() - 1);
+            mDiagBegin = matrix.dBegin(diagonalNr);
+            mDiagEnd = matrix.dEnd(diagonalNr);
+        }
+    }
+
+    auto begin() const
+    {
+        return mDiagBegin;
+    }
+
+    auto end() const
+    {
+        return mDiagEnd;
+    }
+
+private:
+    typename Matrix<DataType>::DIterator mDiagBegin;
+    typename Matrix<DataType>::DIterator mDiagEnd;
+};
+
 class CPP2xRangesTests : public QObject
 {
     Q_OBJECT
@@ -32,6 +62,7 @@ private slots:
     void testViews();
     void testKeyValueViews();
     void testJoinView();
+    void testViewInterface();
 
 private:
     std::optional<int> _retrieveEuclidianDistance(const IntPairVector& pointVector);
@@ -55,8 +86,13 @@ CPP2xRangesTests::CPP2xRangesTests()
     , mThirdIntPairVector{{7, 8}, {-2, 2}, {7, -5}, {3, 4}, {-2, 9}}
     , mPrimaryStringIntPairVector{{"Alex", 10}, {"Kevin", 11}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
                                   {"Andrew", 11}, {"Cameron", 10}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}}
-    , mPrimaryIntMatrix{2, 3, {-1, 2, -3, 4, -5, 6}}
-    , mSecondaryIntMatrix{3, 3, {-7, 8, -9, 10, -11, 12, -13, 14, -15}}
+    , mPrimaryIntMatrix{2, 3, {-1, 2, -3,
+                                4, -5, 6
+                       }}
+    , mSecondaryIntMatrix{3, 3, {-7, 8, -9,
+                                 10, -11, 12,
+                                 -13, 14, -15
+                         }}
     , mPrimaryStringIntPairMatrix{2, 5, {{"Anna", 18}, {"Kelly", 12}, {"Annabel", 11}, {"Juan", 10}, {"Jack", 8},
                                          {"Barbara", 10}, {"Barney", 20}, {"Joseph", 11}, {"Johnny", 9}, {"Jeff", 15}
                                  }}
@@ -322,6 +358,45 @@ void CPP2xRangesTests::testJoinView()
     secondIntMatrix.catByColumn(firstIntMatrix, secondIntMatrix);
 
     QVERIFY(secondIntMatrix == thirdIntMatrix);
+}
+
+void CPP2xRangesTests::testViewInterface()
+{
+    IntMatrix firstIntMatrix{mSecondaryIntMatrix};
+    MatrixDiagonalView firstDiagView{firstIntMatrix, 0};
+
+    QVERIFY(-33 == std::accumulate(firstDiagView.begin(), firstDiagView.end(), 0));
+    QVERIFY(3 == std::distance(firstDiagView.begin(), firstDiagView.end()));
+
+    IntMatrix secondIntMatrix;
+    MatrixDiagonalView secondDiagView{secondIntMatrix, 0};
+
+    QVERIFY(0 == std::accumulate(secondDiagView.begin(), secondDiagView.end(), 0));
+    QVERIFY(secondDiagView.begin() == secondDiagView.end());
+
+    IntMatrix thirdIntMatrix{mPrimaryIntMatrix};
+    MatrixDiagonalView thirdDiagView{thirdIntMatrix, 1};
+    auto reversedThirdDiagView{thirdDiagView | std::ranges::views::reverse};
+
+    const IntMatrix c_ThirdIntMatrixRef{2, 3, {6, 2, -3,
+                                               4, 2,  6
+                                       }};
+
+    std::ranges::copy(reversedThirdDiagView, thirdIntMatrix.dBegin(0));
+
+    QVERIFY(c_ThirdIntMatrixRef == thirdIntMatrix);
+
+    IntMatrix fourthIntMatrix{mPrimaryIntMatrix};
+    MatrixDiagonalView fourthDiagView{fourthIntMatrix, -2};
+    MatrixDiagonalView fifthDiagView{fourthIntMatrix, 3};
+
+    const IntMatrix c_FourthIntMatrixRef{2, 3, {-1,  2, 4,
+                                                -3, -5, 6
+                                        }};
+
+    std::ranges::iter_swap(fourthDiagView.begin(), fifthDiagView.begin());
+
+    QVERIFY(c_FourthIntMatrixRef == fourthIntMatrix);
 }
 
 std::optional<int> CPP2xRangesTests::_retrieveEuclidianDistance(const IntPairVector& pointVector)
