@@ -62,6 +62,7 @@ private slots:
     void testViews();
     void testKeyValueViews();
     void testJoinView();
+    void testCountedView();
     void testViewInterface();
 
 private:
@@ -358,6 +359,46 @@ void CPP2xRangesTests::testJoinView()
     secondIntMatrix.catByColumn(firstIntMatrix, secondIntMatrix);
 
     QVERIFY(secondIntMatrix == thirdIntMatrix);
+}
+
+void CPP2xRangesTests::testCountedView()
+{
+    IntMatrix firstIntMatrix{mSecondaryIntMatrix};
+    auto firstCountedView{std::ranges::views::counted(firstIntMatrix.getNIterator(1, 0), 4)};
+
+    const IntMatrix c_FirstIntMatrixRef{3, 3, {-7,   0,  -9,
+                                                0,   0,  12,
+                                                0,  14, -15
+                                       }};
+
+    std::ranges::fill(firstCountedView, 0);
+
+    QVERIFY(c_FirstIntMatrixRef == firstIntMatrix);
+
+    IntMatrix secondIntMatrix{mSecondaryIntMatrix};
+    auto secondCountedView{std::ranges::views::counted(secondIntMatrix.dBegin(0), 3)};
+    auto thirdCountedView{std::ranges::views::counted(secondIntMatrix.mBegin(0), 3)};
+
+    const IntMatrix c_SecondIntMatrixRef {3, 3, {-9,    8,  -7,
+                                                  10, -11,  12,
+                                                 -15,  14, -13
+                                         }};
+
+    std::ranges::swap_ranges(secondCountedView, thirdCountedView);
+
+    QVERIFY(c_SecondIntMatrixRef == secondIntMatrix);
+
+    IntMatrix thirdIntMatrix{mSecondaryIntMatrix};
+    auto fourthCountedView{std::ranges::views::counted(mSecondaryIntMatrix.constReverseDBegin(0), 3)};
+
+    const IntMatrix c_ThirdIntMatrixRef{3, 3, {-7,  -7,   -9,
+                                               -15, -11,  12,
+                                               -11,  14, -15
+                                       }};
+
+    std::ranges::copy(fourthCountedView, thirdIntMatrix.getNIterator(1, 0));
+
+    QVERIFY(c_ThirdIntMatrixRef == thirdIntMatrix);
 }
 
 void CPP2xRangesTests::testViewInterface()
