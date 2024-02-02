@@ -61,6 +61,7 @@ private slots:
     void testReverse();
     void testViews();
     void testKeyValueViews();
+    void testElementsView();
     void testJoinView();
     void testCountedView();
     void testViewInterface();
@@ -309,6 +310,25 @@ void CPP2xRangesTests::testKeyValueViews()
     std::ranges::copy(reverseValuesView, valuesMatrix.nBegin());
 
     QVERIFY(c_ValuesMatrixRef == valuesMatrix);
+}
+
+void CPP2xRangesTests::testElementsView()
+{
+    Matrix<TripleSizeTuple> tripleSizeTupleMatrix{2, 3, {{1, 3, 5}, {2, 9, 0}, {5, 6, 7},
+                                                         {4, 14, 2}, {2, 2, 2}, {10, 9, 8}
+                                                  }};
+
+    auto leftOperandView{tripleSizeTupleMatrix | std::ranges::views::elements<0>};
+    auto rightOperandView{tripleSizeTupleMatrix | std::ranges::views::elements<1>};
+    auto resultView{tripleSizeTupleMatrix | std::ranges::views::elements<2>};
+
+    const Matrix<TripleSizeTuple> c_TripleSizeTupleMatrixRef{2, 3, {{1, 3, 4}, {2, 9, 11}, {5, 6, 11},
+                                                                    {4, 14, 18}, {2, 2, 4}, {10, 9, 19}
+                                                            }};
+
+    std::ranges::transform(leftOperandView, rightOperandView, resultView.begin(), std::plus<size_t>());
+
+    QVERIFY(c_TripleSizeTupleMatrixRef == tripleSizeTupleMatrix);
 }
 
 void CPP2xRangesTests::testJoinView()
