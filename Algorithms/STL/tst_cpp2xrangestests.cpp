@@ -66,7 +66,7 @@ private slots:
     void testCountedView();
     void testViewInterface();
 
-    // some more complex algorithms implemented by using std::ranges::views
+    // some more complex algorithms implemented by using std::views
     void testViewsWithEuclidianDistance();
     void testViewsWithPrimeNumbers();
 
@@ -224,8 +224,8 @@ void CPP2xRangesTests::testViews()
 
 void CPP2xRangesTests::testKeyValueViews()
 {
-    auto keysView{mPrimaryStringIntPairMatrix | std::ranges::views::keys};
-    auto reverseValuesView{mPrimaryStringIntPairMatrix | std::ranges::views::values | std::ranges::views::reverse};
+    auto keysView{mPrimaryStringIntPairMatrix | std::views::keys};
+    auto reverseValuesView{mPrimaryStringIntPairMatrix | std::views::values | std::views::reverse};
 
     StringMatrix keysMatrix{5, 2, ""};
 
@@ -260,9 +260,9 @@ void CPP2xRangesTests::testElementsView()
                                                          {4, 14, 2}, {2, 2, 2}, {10, 9, 8}
                                                   }};
 
-    auto leftOperandView{tripleSizeTupleMatrix | std::ranges::views::elements<0>};
-    auto rightOperandView{tripleSizeTupleMatrix | std::ranges::views::elements<1>};
-    auto resultView{tripleSizeTupleMatrix | std::ranges::views::elements<2>};
+    auto leftOperandView{tripleSizeTupleMatrix | std::views::elements<0>};
+    auto rightOperandView{tripleSizeTupleMatrix | std::views::elements<1>};
+    auto resultView{tripleSizeTupleMatrix | std::views::elements<2>};
 
     const Matrix<TripleSizeTuple> c_TripleSizeTupleMatrixRef{2, 3, {{1, 3, 4}, {2, 9, 11}, {5, 6, 11},
                                                                     {4, 14, 18}, {2, 2, 4}, {10, 9, 19}
@@ -281,7 +281,7 @@ void CPP2xRangesTests::testJoinView()
     IntMatrix secondIntMatrix{mSecondaryIntMatrix};
 
     std::vector<IntMatrix> matrixesToJoin{firstIntMatrix, secondIntMatrix};
-    auto joinMatrixesView{matrixesToJoin | std::ranges::views::join};
+    auto joinMatrixesView{matrixesToJoin | std::views::join};
 
     IntMatrix thirdIntMatrix{5, 3, 0};
 
@@ -309,7 +309,7 @@ void CPP2xRangesTests::testJoinView()
     secondIntMatrix.transpose(secondIntMatrixTransposed);
 
     matrixesToJoin = {firstIntMatrixTransposed, secondIntMatrixTransposed};
-    joinMatrixesView = matrixesToJoin | std::ranges::views::join;
+    joinMatrixesView = matrixesToJoin | std::views::join;
 
     std::ranges::copy(joinMatrixesView, thirdIntMatrix.nBegin());
 
@@ -326,7 +326,7 @@ void CPP2xRangesTests::testJoinView()
 void CPP2xRangesTests::testCountedView()
 {
     IntMatrix firstIntMatrix{mSecondaryIntMatrix};
-    auto firstCountedView{std::ranges::views::counted(firstIntMatrix.getNIterator(1, 0), 4)};
+    auto firstCountedView{std::views::counted(firstIntMatrix.getNIterator(1, 0), 4)};
 
     const IntMatrix c_FirstIntMatrixRef{3, 3, {-7,   0,  -9,
                                                 0,   0,  12,
@@ -338,8 +338,8 @@ void CPP2xRangesTests::testCountedView()
     QVERIFY(c_FirstIntMatrixRef == firstIntMatrix);
 
     IntMatrix secondIntMatrix{mSecondaryIntMatrix};
-    auto secondCountedView{std::ranges::views::counted(secondIntMatrix.dBegin(0), 3)};
-    auto thirdCountedView{std::ranges::views::counted(secondIntMatrix.mBegin(0), 3)};
+    auto secondCountedView{std::views::counted(secondIntMatrix.dBegin(0), 3)};
+    auto thirdCountedView{std::views::counted(secondIntMatrix.mBegin(0), 3)};
 
     const IntMatrix c_SecondIntMatrixRef {3, 3, {-9,    8,  -7,
                                                   10, -11,  12,
@@ -351,7 +351,7 @@ void CPP2xRangesTests::testCountedView()
     QVERIFY(c_SecondIntMatrixRef == secondIntMatrix);
 
     IntMatrix thirdIntMatrix{mSecondaryIntMatrix};
-    auto fourthCountedView{std::ranges::views::counted(mSecondaryIntMatrix.constReverseDBegin(0), 3)};
+    auto fourthCountedView{std::views::counted(mSecondaryIntMatrix.constReverseDBegin(0), 3)};
 
     const IntMatrix c_ThirdIntMatrixRef{3, 3, {-7,  -7,   -9,
                                                -15, -11,  12,
@@ -379,7 +379,7 @@ void CPP2xRangesTests::testViewInterface()
 
     IntMatrix thirdIntMatrix{mPrimaryIntMatrix};
     MatrixDiagonalView thirdDiagView{thirdIntMatrix, 1};
-    auto reversedThirdDiagView{thirdDiagView | std::ranges::views::reverse};
+    auto reversedThirdDiagView{thirdDiagView | std::views::reverse};
 
     const IntMatrix c_ThirdIntMatrixRef{2, 3, {6, 2, -3,
                                                4, 2,  6
