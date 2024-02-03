@@ -258,7 +258,7 @@ void CPP2xRangesTests::testElementsView()
 {
     Matrix<TripleSizeTuple> tripleSizeTupleMatrix{2, 3, {{1, 3, 5}, {2, 9, 0}, {5, 6, 7},
                                                          {4, 14, 2}, {2, 2, 2}, {10, 9, 8}
-                                                  }};
+                                                 }};
 
     auto leftOperandView{tripleSizeTupleMatrix | std::views::elements<0>};
     auto rightOperandView{tripleSizeTupleMatrix | std::views::elements<1>};
@@ -435,9 +435,9 @@ void CPP2xRangesTests::testViewsWithPrimeNumbers()
     QVERIFY(std::ranges::none_of(c_IntVector6, [this](int number){return !_isPrime(number);}));
 
     const IntMatrix c_IntMatrix{3, 4, {1, -3,   2,  4,
-                                          19, 4, -13,  6,
-                                          7, -2,  15, -17
-                                      }};
+                                       19, 4, -13,  6,
+                                       7, -2,  15, -17
+                               }};
 
     QVERIFY(std::ranges::any_of(c_IntMatrix.constMBegin(1), c_IntMatrix.constMEnd(1), [this](int number) {return _isPrime(number) && 0 == number % 2;}));
     QVERIFY(-28 == std::accumulate(c_IntMatrix.constNColumnBegin(2), c_IntMatrix.constNEnd(), 0, [this](int first, int second){return first + (_isPrime(second) ? second : 0);}));
@@ -476,7 +476,8 @@ std::optional<int> CPP2xRangesTests::_retrieveEuclidianDistance(const IntPairVec
         std::ranges::transform(pointVectorLeftView,
                                pointVectorRightView,
                                resultingDistances.begin(),
-                               [](const IntPair& firstPoint, const IntPair& secondPoint) {
+                               [](const IntPair& firstPoint, const IntPair& secondPoint)
+                               {
                                    const auto&[firstPointX, firstPointY]{firstPoint};
                                    const auto&[secondPointX, secondPointY]{secondPoint};
 
