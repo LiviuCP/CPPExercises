@@ -66,6 +66,10 @@ private slots:
     void testCountedView();
     void testViewInterface();
 
+    // some more complex algorithms implemented by using std::ranges::views
+    void testViewsWithEuclidianDistance();
+    void testViewsWithPrimeNumbers();
+
 private:
     std::optional<int> _retrieveEuclidianDistance(const IntPairVector& pointVector);
     IntVector _retrievePrimes(size_t count, std::optional<uint8_t> lastDigit = std::optional<char>{});
@@ -216,68 +220,6 @@ void CPP2xRangesTests::testViews()
     std::ranges::copy(fourCharactersNamesItemsReversed, stringIntPairMatrix.nBegin());
 
     QVERIFY(c_StringIntPairMatrixRef == stringIntPairMatrix);
-
-    QVERIFY(1 == _retrieveEuclidianDistance(mPrimaryIntPairVector));
-    QVERIFY(8 == _retrieveEuclidianDistance(mSecondaryIntPairVector));
-    QVERIFY(29 == _retrieveEuclidianDistance(mThirdIntPairVector));
-    QVERIFY(41 == _retrieveEuclidianDistance({mPrimaryIntPairVector.at(6), mPrimaryIntPairVector.at(9)}));
-    QVERIFY(40 == _retrieveEuclidianDistance({mSecondaryIntPairVector.at(1), mSecondaryIntPairVector.at(3), mSecondaryIntPairVector.at(5)}));
-    QVERIFY(!_retrieveEuclidianDistance({mPrimaryIntPairVector.at(0)}).has_value());
-    QVERIFY(!_retrieveEuclidianDistance({}).has_value());
-
-    IntPairVector intPairVector{mSecondaryIntPairVector};
-    intPairVector.push_back({-4, -3});
-
-    QVERIFY(0 == _retrieveEuclidianDistance(intPairVector));
-
-    const IntVector c_IntVector1{1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 53, 67, 79};
-    const IntVector c_IntVector2{3, 29, 4, 71};
-    const IntVector c_IntVector3{0, 9, 21, 33, 87};
-    const IntVector c_IntVector4{-6, -4, 0, 4, 14};
-    const IntVector c_IntVector5{-5, -9, -3, -2, -1};
-    const IntVector c_IntVector6{-17, -13, -11, -7, 5, 19, 113, 97, 43};
-
-    QVERIFY(std::ranges::all_of(c_IntVector1, [this](int number){return _isPrime(number);}));
-    QVERIFY(std::ranges::any_of(c_IntVector2, [this](int number){return !_isPrime(number);}));
-    QVERIFY(std::ranges::none_of(c_IntVector3, [this](int number){return _isPrime(number);}));
-    QVERIFY(std::ranges::all_of(c_IntVector4, [this](int number){return !_isPrime(number);}));
-    QVERIFY(std::ranges::any_of(c_IntVector5, [this](int number){return _isPrime(number);}));
-    QVERIFY(std::ranges::none_of(c_IntVector6, [this](int number){return !_isPrime(number);}));
-
-    const IntMatrix c_IntMatrix{3, 4, {1, -3,   2,  4,
-                                       19, 4, -13,  6,
-                                       7, -2,  15, -17
-                               }};
-
-    QVERIFY(std::ranges::any_of(c_IntMatrix.constMBegin(1), c_IntMatrix.constMEnd(1), [this](int number) {return _isPrime(number) && 0 == number % 2;}));
-    QVERIFY(-28 == std::accumulate(c_IntMatrix.constNColumnBegin(2), c_IntMatrix.constNEnd(), 0, [this](int first, int second){return first + (_isPrime(second) ? second : 0);}));
-
-    const IntVector c_PrimesVectorRef1{1, 2, 3, 5, 7, 11, 13, 17};
-    QVERIFY(c_PrimesVectorRef1 == _retrievePrimes(8));
-
-    const IntVector c_PrimesVectorRef2{1, 11, 31, 41, 61};
-    QVERIFY(c_PrimesVectorRef2 == _retrievePrimes(5, 1) && c_PrimesVectorRef2 == _retrievePrimes(5, 11));
-
-    const IntVector c_PrimesVectorRef3{3, 13, 23, 43, 53, 73, 83, 103, 113};
-    QVERIFY(c_PrimesVectorRef3 == _retrievePrimes(9, 3) && c_PrimesVectorRef3 == _retrievePrimes(9, 23));
-
-    const IntVector c_PrimesVectorRef4{7, 17, 37, 47, 67, 97};
-    QVERIFY(c_PrimesVectorRef4 == _retrievePrimes(6, 7) && c_PrimesVectorRef4 == _retrievePrimes(6, 67));
-
-    const IntVector c_PrimesVectorRef5{19};
-    QVERIFY(c_PrimesVectorRef5 == _retrievePrimes(1, 9) && c_PrimesVectorRef5 == _retrievePrimes(1, 109));
-
-    const IntVector c_PrimesVectorRef6{2};
-    QVERIFY(c_PrimesVectorRef6 == _retrievePrimes(2, 2) && c_PrimesVectorRef6 == _retrievePrimes(1, 2) && c_PrimesVectorRef6 == _retrievePrimes(3, 32));
-
-    const IntVector c_PrimesVectorRef7{5};
-    QVERIFY(c_PrimesVectorRef7 == _retrievePrimes(2, 5) && c_PrimesVectorRef7 == _retrievePrimes(1, 5) && c_PrimesVectorRef7 == _retrievePrimes(4, 45));
-
-    QVERIFY(_retrievePrimes(1, 0).empty() && _retrievePrimes(1, 4).empty() && _retrievePrimes(1, 6).empty() && _retrievePrimes(1, 8).empty());
-    QVERIFY(_retrievePrimes(1, 10).empty() && _retrievePrimes(1, 24).empty() && _retrievePrimes(1, 36).empty() && _retrievePrimes(1, 48).empty());
-    QVERIFY(_retrievePrimes(0, 2).empty() && _retrievePrimes(0, 5).empty() && _retrievePrimes(0, 7).empty() && _retrievePrimes(0, 8).empty());
-    QVERIFY(_retrievePrimes(0, 12).empty() && _retrievePrimes(0, 25).empty() && _retrievePrimes(0, 47).empty() && _retrievePrimes(0, 78).empty());
-    QVERIFY(_retrievePrimes(0).empty());
 }
 
 void CPP2xRangesTests::testKeyValueViews()
@@ -458,6 +400,69 @@ void CPP2xRangesTests::testViewInterface()
     std::ranges::iter_swap(fourthDiagView.begin(), fifthDiagView.begin());
 
     QVERIFY(c_FourthIntMatrixRef == fourthIntMatrix);
+}
+
+void CPP2xRangesTests::testViewsWithEuclidianDistance()
+{
+    QVERIFY(1 == _retrieveEuclidianDistance(mPrimaryIntPairVector));
+    QVERIFY(8 == _retrieveEuclidianDistance(mSecondaryIntPairVector));
+    QVERIFY(29 == _retrieveEuclidianDistance(mThirdIntPairVector));
+    QVERIFY(41 == _retrieveEuclidianDistance({mPrimaryIntPairVector.at(6), mPrimaryIntPairVector.at(9)}));
+    QVERIFY(40 == _retrieveEuclidianDistance({mSecondaryIntPairVector.at(1), mSecondaryIntPairVector.at(3), mSecondaryIntPairVector.at(5)}));
+    QVERIFY(!_retrieveEuclidianDistance({mPrimaryIntPairVector.at(0)}).has_value());
+    QVERIFY(!_retrieveEuclidianDistance({}).has_value());
+
+    IntPairVector intPairVector{mSecondaryIntPairVector};
+    intPairVector.push_back({-4, -3});
+
+    QVERIFY(0 == _retrieveEuclidianDistance(intPairVector));
+}
+
+void CPP2xRangesTests::testViewsWithPrimeNumbers()
+{
+    const IntVector c_IntVector1{1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 53, 67, 79};
+    const IntVector c_IntVector2{3, 29, 4, 71};
+    const IntVector c_IntVector3{0, 9, 21, 33, 87};
+    const IntVector c_IntVector4{-6, -4, 0, 4, 14};
+    const IntVector c_IntVector5{-5, -9, -3, -2, -1};
+    const IntVector c_IntVector6{-17, -13, -11, -7, 5, 19, 113, 97, 43};
+
+    QVERIFY(std::ranges::all_of(c_IntVector1, [this](int number){return _isPrime(number);}));
+    QVERIFY(std::ranges::any_of(c_IntVector2, [this](int number){return !_isPrime(number);}));
+    QVERIFY(std::ranges::none_of(c_IntVector3, [this](int number){return _isPrime(number);}));
+    QVERIFY(std::ranges::all_of(c_IntVector4, [this](int number){return !_isPrime(number);}));
+    QVERIFY(std::ranges::any_of(c_IntVector5, [this](int number){return _isPrime(number);}));
+    QVERIFY(std::ranges::none_of(c_IntVector6, [this](int number){return !_isPrime(number);}));
+
+    const IntMatrix c_IntMatrix{3, 4, {1, -3,   2,  4,
+                                          19, 4, -13,  6,
+                                          7, -2,  15, -17
+                                      }};
+
+    QVERIFY(std::ranges::any_of(c_IntMatrix.constMBegin(1), c_IntMatrix.constMEnd(1), [this](int number) {return _isPrime(number) && 0 == number % 2;}));
+    QVERIFY(-28 == std::accumulate(c_IntMatrix.constNColumnBegin(2), c_IntMatrix.constNEnd(), 0, [this](int first, int second){return first + (_isPrime(second) ? second : 0);}));
+
+    const IntVector c_PrimesVectorRef1{1, 2, 3, 5, 7, 11, 13, 17};
+    const IntVector c_PrimesVectorRef2{1, 11, 31, 41, 61};
+    const IntVector c_PrimesVectorRef3{3, 13, 23, 43, 53, 73, 83, 103, 113};
+    const IntVector c_PrimesVectorRef4{7, 17, 37, 47, 67, 97};
+    const IntVector c_PrimesVectorRef5{19};
+    const IntVector c_PrimesVectorRef6{2};
+    const IntVector c_PrimesVectorRef7{5};
+
+    QVERIFY(c_PrimesVectorRef1 == _retrievePrimes(8));
+    QVERIFY(c_PrimesVectorRef2 == _retrievePrimes(5, 1) && c_PrimesVectorRef2 == _retrievePrimes(5, 11));
+    QVERIFY(c_PrimesVectorRef3 == _retrievePrimes(9, 3) && c_PrimesVectorRef3 == _retrievePrimes(9, 23));
+    QVERIFY(c_PrimesVectorRef4 == _retrievePrimes(6, 7) && c_PrimesVectorRef4 == _retrievePrimes(6, 67));
+    QVERIFY(c_PrimesVectorRef5 == _retrievePrimes(1, 9) && c_PrimesVectorRef5 == _retrievePrimes(1, 109));
+    QVERIFY(c_PrimesVectorRef6 == _retrievePrimes(2, 2) && c_PrimesVectorRef6 == _retrievePrimes(1, 2) && c_PrimesVectorRef6 == _retrievePrimes(3, 32));
+    QVERIFY(c_PrimesVectorRef7 == _retrievePrimes(2, 5) && c_PrimesVectorRef7 == _retrievePrimes(1, 5) && c_PrimesVectorRef7 == _retrievePrimes(4, 45));
+
+    QVERIFY(_retrievePrimes(1, 0).empty() && _retrievePrimes(1, 4).empty() && _retrievePrimes(1, 6).empty() && _retrievePrimes(1, 8).empty());
+    QVERIFY(_retrievePrimes(1, 10).empty() && _retrievePrimes(1, 24).empty() && _retrievePrimes(1, 36).empty() && _retrievePrimes(1, 48).empty());
+    QVERIFY(_retrievePrimes(0, 2).empty() && _retrievePrimes(0, 5).empty() && _retrievePrimes(0, 7).empty() && _retrievePrimes(0, 8).empty());
+    QVERIFY(_retrievePrimes(0, 12).empty() && _retrievePrimes(0, 25).empty() && _retrievePrimes(0, 47).empty() && _retrievePrimes(0, 78).empty());
+    QVERIFY(_retrievePrimes(0).empty());
 }
 
 std::optional<int> CPP2xRangesTests::_retrieveEuclidianDistance(const IntPairVector& pointVector)
