@@ -18,7 +18,10 @@ public:
 
 private slots:
     void testIpAddressClasses();
+    void testHostName();
+
     void testIpAddressClasses_data();
+    void testHostName_data();
 
 private:
     IpClass _parseIpAddress(const std::string& ipAddress);
@@ -27,6 +30,8 @@ private:
     bool _isClassBIpAddress(const std::string& ipAddress);
     bool _isClassCIpAddress(const std::string& ipAddress);
     bool _isClassDIpAddress(const std::string& ipAddress);
+
+    bool _isValidHostName(const std::string& hostName);
 };
 
 void RegexTests::testIpAddressClasses()
@@ -35,6 +40,14 @@ void RegexTests::testIpAddressClasses()
     QFETCH(IpClass, ipClass);
 
     QVERIFY(ipClass == _parseIpAddress(ipAddress));
+}
+
+void RegexTests::testHostName()
+{
+    QFETCH(std::string, hostName);
+    QFETCH(bool, shouldBeValidHostName);
+
+    QVERIFY(shouldBeValidHostName == _isValidHostName(hostName));
 }
 
 void RegexTests::testIpAddressClasses_data()
@@ -94,6 +107,31 @@ void RegexTests::testIpAddressClasses_data()
     QTest::newRow("50_Invalid") << std::string{"127.44.1.2"} << IpClass::Invalid;
 }
 
+void RegexTests::testHostName_data()
+{
+    QTest::addColumn<std::string>("hostName");
+    QTest::addColumn<bool>("shouldBeValidHostName");
+
+    QTest::newRow("1_Valid") << std::string{"my_host14"} << true;
+    QTest::newRow("2_Valid") << std::string{"my_multicast_a"} << true;
+    QTest::newRow("3_Valid") << std::string{"my_host_2024"} << true;
+    QTest::newRow("4_Valid") << std::string{"my_host_2"} << true;
+    QTest::newRow("5_Valid") << std::string{"My_Beautiful_HostIsHere1"} << true;
+    QTest::newRow("7_Valid") << std::string{"Another_Host"} << true;
+    QTest::newRow("8_Valid") << std::string{"AnotherHost"} << true;
+    QTest::newRow("9_Invalid") << std::string{" "} << false;
+    QTest::newRow("10_Invalid") << std::string{"_my_host41"} << false;
+    QTest::newRow("11_Invalid") << std::string{"my_host41_"} << false;
+    QTest::newRow("12_Invalid") << std::string{"my__host41"} << false;
+    QTest::newRow("13_Invalid") << std::string{"my host41"} << false;
+    QTest::newRow("14_Invalid") << std::string{"my+host41"} << false;
+    QTest::newRow("15_Invalid") << std::string{"my2host41"} << false;
+    QTest::newRow("16_Invalid") << std::string{"my_host41234"} << false;
+    QTest::newRow("17_Invalid") << std::string{"my_host41a"} << false;
+    QTest::newRow("18_Invalid") << std::string{"41my_host"} << false;
+    QTest::newRow("19_Invalid") << std::string{"my_hostabcdefghijklmnop41"} << false;
+}
+
 /* The (host) address should:
    - have the right format
    - belong to a valid class (class A: 1 - 126; class B: 128 - 191; class C: 192 - 223; class D: 224 - 239)
@@ -144,6 +182,23 @@ bool RegexTests::_isClassDIpAddress(const std::string& ipAddress)
     std::regex ipAddressClassDRe{"(22[4-9]|23\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]\\d|\\d)){3}"};
 
     return std::regex_match(ipAddress, ipAddressClassDRe);
+}
+
+/* The host name should contain only letters, digits and underscore (max. 24 characters in total):
+    - digits are optional but should be at the end and should not be more than 4
+    - maximum 2 underscore characters (both optional)
+*/
+bool RegexTests::_isValidHostName(const std::string &hostName)
+{
+    bool isValid{false};
+
+    if (const size_t c_MaxCharsCount{24}; !hostName.empty() && hostName.size() <= c_MaxCharsCount)
+    {
+        std::regex hostNameRe{"([a-zA-Z]+)(_[a-zA-Z]+)*(_?\\d{1,4})?"};
+        isValid = std::regex_match(hostName, hostNameRe);
+    }
+
+    return isValid;
 }
 
 QTEST_APPLESS_MAIN(RegexTests)
