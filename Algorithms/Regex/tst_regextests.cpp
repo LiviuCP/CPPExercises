@@ -116,9 +116,10 @@ void RegexTests::testHostName_data()
     QTest::newRow("2_Valid") << std::string{"my_multicast_a"} << true;
     QTest::newRow("3_Valid") << std::string{"my_host_2024"} << true;
     QTest::newRow("4_Valid") << std::string{"my_host_2"} << true;
-    QTest::newRow("5_Valid") << std::string{"My_Beautiful_HostIsHere1"} << true;
-    QTest::newRow("7_Valid") << std::string{"Another_Host"} << true;
-    QTest::newRow("8_Valid") << std::string{"AnotherHost"} << true;
+    QTest::newRow("5_Valid") << std::string{"My_Wonder_Host_is_here_1"} << true;
+    QTest::newRow("6_Valid") << std::string{"Another_Host"} << true;
+    QTest::newRow("7_Valid") << std::string{"Ahostnameisahostname8765"} << true;
+    QTest::newRow("8_Valid") << std::string{"another_Host"} << true;
     QTest::newRow("9_Invalid") << std::string{" "} << false;
     QTest::newRow("10_Invalid") << std::string{"_my_host41"} << false;
     QTest::newRow("11_Invalid") << std::string{"my_host41_"} << false;
@@ -130,6 +131,17 @@ void RegexTests::testHostName_data()
     QTest::newRow("17_Invalid") << std::string{"my_host41a"} << false;
     QTest::newRow("18_Invalid") << std::string{"41my_host"} << false;
     QTest::newRow("19_Invalid") << std::string{"my_hostabcdefghijklmnop41"} << false;
+    QTest::newRow("20_Invalid") << std::string{"My_Beautiful_HostIsHere1"} << false;
+    QTest::newRow("21_Valid") << std::string{"myhost412"} << true;
+    QTest::newRow("22_Invalid") << std::string{"myHost412"} << false;
+    QTest::newRow("23_Valid") << std::string{"my_Host412"} << true;
+    QTest::newRow("24_Invalid") << std::string{"my_HoSt412"} << false;
+    QTest::newRow("25_Valid") << std::string{"host_2240"} << true;
+    QTest::newRow("26_Invalid") << std::string{"host_22405"} << false;
+    QTest::newRow("27_Valid") << std::string{"h_O_s_T_n_A_m_E_1"} << true;
+    QTest::newRow("28_Invalid") << std::string{"h_O_sT_n_A_m_E_1"} << false;
+    QTest::newRow("29_Invalid") << std::string{""} << false;
+    QTest::newRow("30_Invalid") << std::string{"AhostnameisAhostname8765"} << false;
 }
 
 /* The (host) address should:
@@ -188,13 +200,13 @@ bool RegexTests::_isClassDIpAddress(const std::string& ipAddress)
     - digits are optional but should be at the end and should not be more than 4
     - maximum 2 underscore characters (both optional)
 */
-bool RegexTests::_isValidHostName(const std::string &hostName)
+bool RegexTests::_isValidHostName(const std::string& hostName)
 {
     bool isValid{false};
 
     if (const size_t c_MaxCharsCount{24}; !hostName.empty() && hostName.size() <= c_MaxCharsCount)
     {
-        std::regex hostNameRe{"([a-zA-Z]+)(_[a-zA-Z]+)*(_?\\d{1,4})?"};
+        std::regex hostNameRe{"([a-zA-Z]{1}[a-z]*)(_[a-zA-Z]{1}[a-z]*)*(_?\\d{1,4})?"};
         isValid = std::regex_match(hostName, hostNameRe);
     }
 
