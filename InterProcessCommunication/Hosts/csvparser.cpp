@@ -254,7 +254,7 @@ void CSVParser::_trimQuotesAndWhiteSpaceFromString(std::string& str)
         str.erase(str.begin(), leftTrimIt);
 
         // right trim is a bit trickier as apparently string erase doesn't work well with reverse iterators (so last character should be checked before applying reverse so costs are minimized)
-        if (!isNotSpaceOrQuote(str[str.length() - 1]))
+        if (!str.empty() && !isNotSpaceOrQuote(str[str.length() - 1]))
         {
             std::reverse(str.begin(), str.end());
             auto rightTrimIt{std::find_if(str.begin() + 1, str.end(), isNotSpaceOrQuote)};

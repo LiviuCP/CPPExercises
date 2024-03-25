@@ -1,6 +1,6 @@
 1. Introduction
 
-The project has been tested on Linux and MacOS so far.
+The project has been tested on Linux, MacOS and Windows.
 
 2. Input/Output
 
