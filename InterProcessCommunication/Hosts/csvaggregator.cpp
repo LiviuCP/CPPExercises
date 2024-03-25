@@ -2,7 +2,7 @@
 
 #include "csvaggregator.h"
 
-CSVAggregator::CSVAggregator(const std::string& outputFilePath)
+CSVAggregator::CSVAggregator(const std::filesystem::path& outputFilePath)
     : m_OutputFilePath{outputFilePath}
 {
 }

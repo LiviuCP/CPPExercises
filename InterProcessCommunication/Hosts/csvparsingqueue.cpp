@@ -112,7 +112,7 @@ void CSVParsingQueue::_createParsingThreads()
                     m_CsvFilePathsQueue.pop();
                 }
 
-                _parseCSVFile(csvPath.string());
+                _parseCSVFile(csvPath);
             }
         });
     }
@@ -128,7 +128,7 @@ void CSVParsingQueue::_enqueueParsingTask(const std::filesystem::path& csvFilePa
     m_QueueConditionVariable.notify_one();
 }
 
-void CSVParsingQueue::_parseCSVFile(const std::string& inputCSVPath)
+void CSVParsingQueue::_parseCSVFile(const std::filesystem::path& inputCSVPath)
 {
     if (Utils::isCsvFilePath(inputCSVPath))
     {

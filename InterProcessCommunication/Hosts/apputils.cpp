@@ -37,10 +37,10 @@ std::vector<std::filesystem::path> Utils::retrieveFilePathsBySuffix(const std::f
     {
         if (entry.is_regular_file())
         {
-            std::string filePath{entry.path().string()};
-            std::transform(filePath.cbegin(), filePath.cend(), filePath.begin(), [](unsigned char c){return std::tolower(c);});
+            std::string filePathStr{entry.path().string()};
+            std::transform(filePathStr.cbegin(), filePathStr.cend(), filePathStr.begin(), [](unsigned char c){return std::tolower(c);});
 
-            if (filePath.ends_with(suffix))
+            if (filePathStr.ends_with(suffix))
             {
                 result.push_back(entry.path());
             }
@@ -52,8 +52,8 @@ std::vector<std::filesystem::path> Utils::retrieveFilePathsBySuffix(const std::f
 
 bool Utils::isCsvFilePath(const std::filesystem::path& filePath)
 {
-    const std::string c_FileName{filePath.filename().string()};
-    std::regex csvFileRe{"\\w+\\.[c|C][s|S][v|V]"};
+    const std::filesystem::path c_FileNameExtension{filePath.extension()};
+    std::regex csvExtensionRe{"\\.[c|C][s|S][v|V]"};
 
-    return std::regex_match(c_FileName, csvFileRe);
+    return std::regex_match(c_FileNameExtension.string(), csvExtensionRe);
 }

@@ -27,7 +27,7 @@ public:
 private:
     void _createParsingThreads();
     void _enqueueParsingTask(const std::filesystem::path& csvFilePath);
-    void _parseCSVFile(const std::string& inputCSVPath);
+    void _parseCSVFile(const std::filesystem::path& inputCSVPath);
 
     ICSVAggregator& m_CsvAggregator;
     std::vector<std::thread> m_ThreadPool;

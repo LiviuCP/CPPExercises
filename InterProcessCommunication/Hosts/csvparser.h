@@ -1,10 +1,9 @@
 #pragma once
 
-#include <string>
 #include <string_view>
 #include <vector>
 #include <optional>
-#include <utility>
+#include <filesystem>
 
 #include "datautils.h"
 
@@ -12,7 +11,7 @@ class CSVParser
 {
 public:
     CSVParser() = delete;
-    explicit CSVParser(const std::string& csvInputFilePath);
+    explicit CSVParser(const std::filesystem::path& csvInputFilePath);
 
     void parse();
     const std::vector<Data::HostNameAndInfo>& getOutput() const;
@@ -51,7 +50,7 @@ private:
     static bool _isValidClassCIpAddress(const std::string& ipAddress);
     static bool _isValidClassDIpAddress(const std::string& ipAddress);
 
-    std::string m_CSVFilePath;
+    std::filesystem::path m_CSVFilePath;
     std::vector<std::string> m_Input;
     std::vector<ParsingError> m_ParsingErrors;
     std::vector<Data::HostNameAndInfo> m_Output;

@@ -15,7 +15,7 @@ static constexpr size_t c_IpV4AddressFieldsCount{4};
 static constexpr size_t c_IpFieldMaxCharsCount{3};
 static constexpr char c_Quotes{'\"'};
 
-CSVParser::CSVParser(const std::string& csvInputFilePath)
+CSVParser::CSVParser(const std::filesystem::path& csvInputFilePath)
     : m_CSVFilePath{csvInputFilePath}
     , m_ParsingLimitExceeded{false}
 {
@@ -33,7 +33,7 @@ void CSVParser::parse()
     }
     catch (std::ios_base::failure&)
     {
-        std::cerr << "An error occurred when handling input CSV file: " + m_CSVFilePath + "\n";
+        std::cerr << "An error occurred when handling input CSV file: " << std::filesystem::canonical(m_CSVFilePath).string() << "\n";
         success = false;
     }
 
@@ -185,8 +185,9 @@ void CSVParser::_logParsingErrorsToFile()
             {ErrorCode::SUCCESS, ""}
         };
 
-        std::string errorsFilePath{m_CSVFilePath.substr(0, m_CSVFilePath.size() - 4)};
-        errorsFilePath.append("_error.txt");
+        std::filesystem::path errorsFilePath{m_CSVFilePath.parent_path()};
+        errorsFilePath /= m_CSVFilePath.stem();
+        errorsFilePath += "_error.txt";
 
         bool success{false};
 
@@ -210,7 +211,7 @@ void CSVParser::_logParsingErrorsToFile()
 
         if (!success)
         {
-            std::cerr << "An error occurred when writing to error file: " + errorsFilePath + "\n";
+            std::cerr << "An error occurred when writing to error file: " << std::filesystem::canonical(errorsFilePath).string() << "\n";
         }
     }
 }

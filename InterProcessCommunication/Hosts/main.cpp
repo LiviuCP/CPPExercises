@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
                 Utils::removeErrorFiles(inputDir);
                 const std::filesystem::path c_OutFilePath{Utils::retrieveOutputFilePath(inputDir)};
 
-                CSVAggregator csvAggregator{c_OutFilePath.string()};
+                CSVAggregator csvAggregator{c_OutFilePath};
 
                 std::cout << "\n" << c_CSVFilesCount << " CSV files have been found. Starting work...\n";
 
