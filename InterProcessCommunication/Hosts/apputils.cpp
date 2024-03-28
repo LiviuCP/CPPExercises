@@ -8,27 +8,7 @@
 static const char* c_ErrorFileSuffix{"_error.txt"};
 static const char* c_OutputCSVFileName{"output.csv"};
 
-void Utils::removeErrorFiles(const std::filesystem::directory_entry& inputDir)
-{
-    const std::vector<std::filesystem::path> c_ErrorFilesToDelete{Utils::retrieveFilePathsBySuffix(inputDir, c_ErrorFileSuffix)};
-
-    // cleanup existing error files to ensure the output is consistent in case input csv files have been modified
-    for (const auto& path : c_ErrorFilesToDelete)
-    {
-        std::filesystem::remove(path);
-    }
-}
-
-std::filesystem::path Utils::retrieveOutputFilePath(const std::filesystem::directory_entry& inputDir)
-{
-    std::filesystem::path outFilePath{std::filesystem::canonical(inputDir.path())};
-    outFilePath = outFilePath.parent_path();
-    outFilePath /= c_OutputCSVFileName;
-
-    return outFilePath;
-}
-
-std::vector<std::filesystem::path> Utils::retrieveFilePathsBySuffix(const std::filesystem::directory_entry& dir, const std::string& suffix)
+static std::vector<std::filesystem::path> retrieveFilePathsBySuffix(const std::filesystem::directory_entry& dir, const std::string& suffix)
 {
     assert(dir.is_directory() && !suffix.empty());
     std::vector<std::filesystem::path> result;
@@ -50,10 +30,37 @@ std::vector<std::filesystem::path> Utils::retrieveFilePathsBySuffix(const std::f
     return result;
 }
 
+std::vector<std::filesystem::path> Utils::retrieveInputFilePaths(const std::filesystem::directory_entry& inputDir)
+{
+    const std::vector<std::filesystem::path> c_InputFilePaths{retrieveFilePathsBySuffix(inputDir, ".csv")};
+    return c_InputFilePaths;
+}
+
+std::filesystem::path Utils::computeOutputFilePath(const std::filesystem::directory_entry& inputDir)
+{
+    std::filesystem::path outFilePath{std::filesystem::canonical(inputDir.path())};
+    outFilePath = outFilePath.parent_path();
+    outFilePath /= c_OutputCSVFileName;
+
+    return outFilePath;
+}
+
+std::vector<std::filesystem::path> Utils::retrieveErrorFilePaths(const std::filesystem::__cxx11::directory_entry &inputDir)
+{
+    const std::vector<std::filesystem::path> c_ErrorFilePaths{retrieveFilePathsBySuffix(inputDir, c_ErrorFileSuffix)};
+    return c_ErrorFilePaths;
+}
+
 bool Utils::isCsvFilePath(const std::filesystem::path& filePath)
 {
     const std::filesystem::path c_FileNameExtension{filePath.extension()};
     std::regex csvExtensionRe{"\\.[c|C][s|S][v|V]"};
 
     return std::regex_match(c_FileNameExtension.string(), csvExtensionRe);
+}
+
+bool Utils::errorFilesExist(const std::filesystem::directory_entry& inputDir)
+{
+    const std::vector<std::filesystem::path> c_ErrorFiles{retrieveFilePathsBySuffix(inputDir, c_ErrorFileSuffix)};
+    return !c_ErrorFiles.empty();
 }

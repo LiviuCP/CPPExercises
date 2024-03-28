@@ -6,6 +6,17 @@
 
 static constexpr size_t c_MaxCSVFilesCount{5};
 
+void removeErrorFiles(const std::filesystem::directory_entry& inputDir)
+{
+    const std::vector<std::filesystem::path> c_ErrorFilesToDelete{Utils::retrieveErrorFilePaths(inputDir)};
+
+    // cleanup existing error files to ensure the output is consistent in case input csv files have been modified
+    for (const auto& path : c_ErrorFilesToDelete)
+    {
+        std::filesystem::remove(path);
+    }
+}
+
 int main(int argc, char* argv[])
 {
     if (argc > 1)
@@ -15,29 +26,29 @@ int main(int argc, char* argv[])
         if (inputDir.is_directory())
         {
             std::cout << "Input directory path is: " << std::filesystem::canonical(inputDir.path()).string() << "\n";
-            const std::vector<std::filesystem::path> c_CSVFiles{Utils::retrieveFilePathsBySuffix(inputDir, ".csv")};
+            const std::vector<std::filesystem::path> c_InFilePaths{Utils::retrieveInputFilePaths(inputDir)};
 
-            if (c_CSVFiles.empty())
+            if (c_InFilePaths.empty())
             {
                 std::cerr << "No CSV files found in input directory!\n";
             }
-            else if (const size_t c_CSVFilesCount{c_CSVFiles.size()}; c_CSVFilesCount > c_MaxCSVFilesCount)
+            else if (const size_t c_CSVFilesCount{c_InFilePaths.size()}; c_CSVFilesCount > c_MaxCSVFilesCount)
             {
                 std::cerr << "\nThe actual count of CSV files (" << c_CSVFilesCount << ") exceeds the maximum allowed (" << c_MaxCSVFilesCount << ")!\n";
                 std::cerr << "Please remove part of the files and try again.\n";
             }
             else
             {
-                Utils::removeErrorFiles(inputDir);
-                const std::filesystem::path c_OutFilePath{Utils::retrieveOutputFilePath(inputDir)};
+                removeErrorFiles(inputDir);
 
+                const std::filesystem::path c_OutFilePath{Utils::computeOutputFilePath(inputDir)};
                 CSVAggregator csvAggregator{c_OutFilePath};
 
                 std::cout << "\n" << c_CSVFilesCount << " CSV files have been found. Starting work...\n";
 
                 CSVParsingQueue parsingQueue{csvAggregator, 4};
 
-                const bool c_IsParsingActive{parsingQueue.parseCSVFiles(c_CSVFiles)};
+                const bool c_IsParsingActive{parsingQueue.parseCSVFiles(c_InFilePaths)};
 
                 if (c_IsParsingActive)
                 {
@@ -50,9 +61,7 @@ int main(int argc, char* argv[])
                         std::cout << "\nDone!\n";
                         std::cout << "Please check: " << c_OutFilePath.string() << "\n";
 
-                        const std::vector<std::filesystem::path> c_ErrorFiles{Utils::retrieveFilePathsBySuffix(inputDir, "_error.txt")};
-
-                        if (!c_ErrorFiles.empty())
+                        if (Utils::errorFilesExist(inputDir))
                         {
                             std::cerr << "\nInvalid entries have been detected. Please check the error files from the input directory\n";
                         }
