@@ -45,7 +45,7 @@ std::filesystem::path Utils::computeOutputFilePath(const std::filesystem::direct
     return outFilePath;
 }
 
-std::vector<std::filesystem::path> Utils::retrieveErrorFilePaths(const std::filesystem::__cxx11::directory_entry &inputDir)
+std::vector<std::filesystem::path> Utils::retrieveErrorFilePaths(const std::filesystem::directory_entry &inputDir)
 {
     const std::vector<std::filesystem::path> c_ErrorFilePaths{retrieveFilePathsBySuffix(inputDir, c_ErrorFileSuffix)};
     return c_ErrorFilePaths;
