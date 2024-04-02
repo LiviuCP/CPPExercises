@@ -19,9 +19,11 @@ public:
 private slots:
     void testIpAddressClasses();
     void testHostName();
+    void testEmail();
 
     void testIpAddressClasses_data();
     void testHostName_data();
+    void testEmail_data();
 
 private:
     IpClass _parseIpAddress(const std::string& ipAddress);
@@ -32,6 +34,7 @@ private:
     bool _isClassDIpAddress(const std::string& ipAddress);
 
     bool _isValidHostName(const std::string& hostName);
+    bool _isValidEmail(const std::string& email);
 };
 
 void RegexTests::testIpAddressClasses()
@@ -48,6 +51,14 @@ void RegexTests::testHostName()
     QFETCH(bool, shouldBeValidHostName);
 
     QVERIFY(shouldBeValidHostName == _isValidHostName(hostName));
+}
+
+void RegexTests::testEmail()
+{
+    QFETCH(std::string, email);
+    QFETCH(bool, shouldBeValidEmail);
+
+    QVERIFY(shouldBeValidEmail == _isValidEmail(email));
 }
 
 void RegexTests::testIpAddressClasses_data()
@@ -144,6 +155,119 @@ void RegexTests::testHostName_data()
     QTest::newRow("30_Invalid") << std::string{"AhostnameisAhostname8765"} << false;
 }
 
+void RegexTests::testEmail_data()
+{
+    QTest::addColumn<std::string>("email");
+    QTest::addColumn<bool>("shouldBeValidEmail");
+
+    QTest::newRow("1a_Valid") << std::string{"johnsmith@gmail.com"} << true;
+    QTest::newRow("1b_Valid") << std::string{"john.smith@gmail.com"} << true;
+    QTest::newRow("1c_Valid") << std::string{"john_smith@gmail.com"} << true;
+    QTest::newRow("1d_Valid") << std::string{"john-smith@gmail.com"} << true;
+    QTest::newRow("1e_Valid") << std::string{"john-jack.smith@gmail.com"} << true;
+    QTest::newRow("1f_Valid") << std::string{"john_jack.smith@gmail.com"} << true;
+    QTest::newRow("2a_Valid") << std::string{"JohnSmith@gmail.com"} << true;
+    QTest::newRow("2b_Valid") << std::string{"John.Smith@gmail.com"} << true;
+    QTest::newRow("2c_Valid") << std::string{"John_smIth@gmail.com"} << true;
+    QTest::newRow("2d_Valid") << std::string{"jOhn-Smith@gmail.com"} << true;
+    QTest::newRow("2e_Valid") << std::string{"John-jack.smith@gmail.com"} << true;
+    QTest::newRow("2f_Valid") << std::string{"john_Jack.smith@gmail.com"} << true;
+    QTest::newRow("3a_Valid") << std::string{"johnsmith@gmail.co.uk"} << true;
+    QTest::newRow("3b_Valid") << std::string{"john.smith@gmail.co.uk"} << true;
+    QTest::newRow("3c_Valid") << std::string{"john_smith@gmail.co.uk"} << true;
+    QTest::newRow("3d_Valid") << std::string{"john-smith@gmail.co.uk"} << true;
+    QTest::newRow("3e_Valid") << std::string{"john-jack.smith@gmail.co.uk"} << true;
+    QTest::newRow("3f_Valid") << std::string{"john_jack.smith@gmail.co.uk"} << true;
+    QTest::newRow("4a_Valid") << std::string{"johnsmith1982@gmail.com"} << true;
+    QTest::newRow("4b_Valid") << std::string{"john.smith1982@gmail.com"} << true;
+    QTest::newRow("4c_Valid") << std::string{"john_smith1982@gmail.com"} << true;
+    QTest::newRow("4d_Valid") << std::string{"john-smith1982@gmail.com"} << true;
+    QTest::newRow("4e_Valid") << std::string{"john-jack.smith1982@gmail.com"} << true;
+    QTest::newRow("4f_Valid") << std::string{"john_jack.smith1982@gmail.com"} << true;
+    QTest::newRow("5a_Valid") << std::string{"johnsmith19820101@gmail.com"} << true;
+    QTest::newRow("5b_Valid") << std::string{"john.smith19820101@gmail.com"} << true;
+    QTest::newRow("5c_Valid") << std::string{"john_smith19820101@gmail.com"} << true;
+    QTest::newRow("5d_Valid") << std::string{"john-smith19820101@gmail.com"} << true;
+    QTest::newRow("5e_Valid") << std::string{"john-jack.smith19820101@gmail.com"} << true;
+    QTest::newRow("5f_Valid") << std::string{"john_jack.smith19820101@gmail.com"} << true;
+    QTest::newRow("6a_Valid") << std::string{"j@g.com"} << true;
+    QTest::newRow("6b_Valid") << std::string{"j.s@g.com"} << true;
+    QTest::newRow("6c_Valid") << std::string{"j-j@g.com"} << true;
+    QTest::newRow("6d_Valid") << std::string{"j_j@g.com"} << true;
+    QTest::newRow("6e_Valid") << std::string{"j-j.s@g.com"} << true;
+    QTest::newRow("6f_Valid") << std::string{"j_j.s@g.com"} << true;
+    QTest::newRow("1a_Invalid") << std::string{"john.smith_@gmail.com"} << false;
+    QTest::newRow("1b_Invalid") << std::string{"john.smith-@gmail.com"} << false;
+    QTest::newRow("1c_Invalid") << std::string{"john.jack_smith@gmail.com"} << false;
+    QTest::newRow("1d_Invalid") << std::string{"john.jack-smith@gmail.com"} << false;
+    QTest::newRow("1e_Invalid") << std::string{"john..smith@gmail.com"} << false;
+    QTest::newRow("1f_Invalid") << std::string{"john-.smith@gmail.com"} << false;
+    QTest::newRow("1g_Invalid") << std::string{"john--smith@gmail.com"} << false;
+    QTest::newRow("1h_Invalid") << std::string{"john__smith@gmail.com"} << false;
+    QTest::newRow("1i_Invalid") << std::string{"john_jack_smith@gmail.com"} << false;
+    QTest::newRow("1j_Invalid") << std::string{"john-jack_smith@gmail.com"} << false;
+    QTest::newRow("1k_Invalid") << std::string{"john_jack-smith@gmail.com"} << false;
+    QTest::newRow("1l_Invalid") << std::string{"john-jack-smith@gmail.com"} << false;
+    QTest::newRow("1m_Invalid") << std::string{"johnsmith.@gmail.com"} << false;
+    QTest::newRow("1n_Invalid") << std::string{"john/smith@gmail.com"} << false;
+    QTest::newRow("1o_Invalid") << std::string{"_john.smith@gmail.com"} << false;
+    QTest::newRow("1p_Invalid") << std::string{"jo1hn_smith@gmail.com"} << false;
+    QTest::newRow("1q_Invalid") << std::string{"john+smith@gmail.com"} << false;
+    QTest::newRow("1r_Invalid") << std::string{"john-jack_son.smith@gmail.com"} << false;
+    QTest::newRow("1s_Invalid") << std::string{"john1_jack.smith@gmail.com"} << false;
+    QTest::newRow("1t_Invalid") << std::string{"john_jack1.smith@gmail.com"} << false;
+    QTest::newRow("2a_Invalid") << std::string{"johnsmith123456789@gmail.com"} << false;
+    QTest::newRow("2b_Invalid") << std::string{"john.smith123456789@gmail.com"} << false;
+    QTest::newRow("2c_Invalid") << std::string{"john-jack.smith123456789@gmail.com"} << false;
+    QTest::newRow("2d_Invalid") << std::string{"john_jack.smith123456789@gmail.com"} << false;
+    QTest::newRow("2e_Invalid") << std::string{"john_jack123456789@gmail.com"} << false;
+    QTest::newRow("2f_Invalid") << std::string{"john-jack123456789@gmail.com"} << false;
+    QTest::newRow("3a_Invalid") << std::string{"johnsmith@gmail.comm.uk"} << false;
+    QTest::newRow("3b_Invalid") << std::string{"john.smith@gmail.co.ukmm"} << false;
+    QTest::newRow("3c_Invalid") << std::string{"john_smith@gmail.co.uk.com"} << false;
+    QTest::newRow("3d_Invalid") << std::string{"john-smith@gmail.co.uk."} << false;
+    QTest::newRow("3e_Invalid") << std::string{"john-jack.smith@gmail.co.uk_"} << false;
+    QTest::newRow("3f_Invalid") << std::string{"john_jack.smith@gmail.co..uk"} << false;
+    QTest::newRow("3g_Invalid") << std::string{"johnsmith@gmail.co.uk-"} << false;
+    QTest::newRow("3h_Invalid") << std::string{"john.smith@gmail.co.-uk"} << false;
+    QTest::newRow("3i_Invalid") << std::string{"john_smith@gmail.comm"} << false;
+    QTest::newRow("3j_Invalid") << std::string{"john-smith@gmail.co_uk"} << false;
+    QTest::newRow("3k_Invalid") << std::string{"john-jack.smith@gmail.co.uk1"} << false;
+    QTest::newRow("3l_Invalid") << std::string{"john_jack.smith@gmail..com"} << false;
+    QTest::newRow("3m_Invalid") << std::string{"johnsmith@gmail.12"} << false;
+    QTest::newRow("3n_Invalid") << std::string{"john.smith@gmail.co1.uk"} << false;
+    QTest::newRow("3o_Invalid") << std::string{"john_smith@gmail2.com"} << false;
+    QTest::newRow("3p_Invalid") << std::string{"john-smith@gma_il.com"} << false;
+    QTest::newRow("3q_Invalid") << std::string{"john-jack.smith@1gmail.com"} << false;
+    QTest::newRow("3r_Invalid") << std::string{"john_jack.smith@gmail"} << false;
+    QTest::newRow("3s_Invalid") << std::string{"johnsmith@gmail."} << false;
+    QTest::newRow("3t_Invalid") << std::string{"john.smith@gmail.c"} << false;
+    QTest::newRow("3u_Invalid") << std::string{"john_smith@gmail.co.u"} << false;
+    QTest::newRow("3v_Invalid") << std::string{"john-smith@gmail.c.uk"} << false;
+    QTest::newRow("3x_Invalid") << std::string{"john-jack.smith@gmail.co."} << false;
+    QTest::newRow("3y_Invalid") << std::string{"john_jack.smith@gmail.cou.k"} << false;
+    QTest::newRow("4a_Invalid") << std::string{"JohnSmithgmail.com"} << false;
+    QTest::newRow("4b_Invalid") << std::string{"John.Smith@"} << false;
+    QTest::newRow("4c_Invalid") << std::string{"John_smIth@.com"} << false;
+    QTest::newRow("4d_Invalid") << std::string{"jOhn@Smith@gmail.com"} << false;
+    QTest::newRow("4e_Invalid") << std::string{"John-jack.smith@@gmail.com"} << false;
+    QTest::newRow("4f_Invalid") << std::string{"@gmail.com"} << false;
+    QTest::newRow("4g_Invalid") << std::string{"john.smith"} << false;
+    QTest::newRow("4h_Invalid") << std::string{"john"} << false;
+    QTest::newRow("4i_Invalid") << std::string{"john-jack"} << false;
+    QTest::newRow("4j_Invalid") << std::string{"john_jack"} << false;
+    QTest::newRow("4k_Invalid") << std::string{"john_jack.smith"} << false;
+    QTest::newRow("4l_Invalid") << std::string{"john-jack.smith"} << false;
+    QTest::newRow("5a_Invalid") << std::string{""} << false;
+    QTest::newRow("5b_Invalid") << std::string{" "} << false;
+    QTest::newRow("5c_Invalid") << std::string{"@"} << false;
+    QTest::newRow("5d_Invalid") << std::string{"_"} << false;
+    QTest::newRow("5e_Invalid") << std::string{"-"} << false;
+    QTest::newRow("5f_Invalid") << std::string{"."} << false;
+    QTest::newRow("5g_Invalid") << std::string{"+"} << false;
+    QTest::newRow("5g_Invalid") << std::string{"1"} << false;
+}
+
 /* The (host) address should:
    - have the right format
    - belong to a valid class (class A: 1 - 126; class B: 128 - 191; class C: 192 - 223; class D: 224 - 239)
@@ -211,6 +335,12 @@ bool RegexTests::_isValidHostName(const std::string& hostName)
     }
 
     return isValid;
+}
+
+bool RegexTests::_isValidEmail(const std::string& email)
+{
+    std::regex emailRe{"[a-z]+([_-][a-z]+)?(\\.[a-z]+)?\\d{0,8}@[a-z]+(\\.[a-z]{2,3}){1,2}", std::regex_constants::ECMAScript | std::regex_constants::icase};
+    return std::regex_match(email, emailRe);
 }
 
 QTEST_APPLESS_MAIN(RegexTests)
