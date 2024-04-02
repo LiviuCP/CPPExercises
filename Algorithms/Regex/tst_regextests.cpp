@@ -265,7 +265,7 @@ void RegexTests::testEmail_data()
     QTest::newRow("5e_Invalid") << std::string{"-"} << false;
     QTest::newRow("5f_Invalid") << std::string{"."} << false;
     QTest::newRow("5g_Invalid") << std::string{"+"} << false;
-    QTest::newRow("5g_Invalid") << std::string{"1"} << false;
+    QTest::newRow("5h_Invalid") << std::string{"1"} << false;
 }
 
 /* The (host) address should:
