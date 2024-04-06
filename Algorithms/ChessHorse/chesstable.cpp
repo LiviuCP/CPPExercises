@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include <cassert>
 
 #include "chesstable.h"
@@ -70,7 +71,7 @@ bool ChessTable::isFullyTraversed() const
 void ChessTable::_resetTable()
 {
     m_IsFullyTraversed = false;
-    m_Table.setAllItemsToValue(0);
+    std::fill(m_Table.begin(), m_Table.end(), 0);
 }
 
 // best successor is the one with minimum number of successors (successor = eligible next move position meaning it is both existing within table and not traversed in a previous move)

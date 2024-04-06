@@ -76,8 +76,8 @@ void LexicographicalSorter<T>::_doLexicographicalSort()
         {
             if (!std::lexicographical_compare(sData.constZRowBegin(row), sData.constZRowEnd(row), sData.constZRowBegin(row+1), sData.constZRowEnd(row+1)))
             {
-                sData.swapRows(row, sData, row+1);
-                sOriginalRowNumbers.swapRows(row, sOriginalRowNumbers, row+1);
+                sData.swapRows(row, row+1);
+                sOriginalRowNumbers.swapRows(row, row+1);
                 sortingRequired = true;
             }
         }

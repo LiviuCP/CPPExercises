@@ -12,6 +12,7 @@
 */
 
 #include <iostream>
+#include <algorithm>
 
 #include "matrix.h"
 #include "utils.h"
@@ -55,7 +56,7 @@ int main()
                 const int currentUncolouredCountry{countryIt.getColumnNr()};
                 Matrix<int>::ConstNIterator currentUncolouredCountryIt{countryColours.getConstNIterator(currentUncolouredCountry)};
 
-                uniqueColours.setAllItemsToValue(false);
+                std::fill(uniqueColours.begin(), uniqueColours.end(), false);
 
                 // mark colours that are in use by neighbors that were coloured in previous iterations
                 for (Matrix<int>::ConstNIterator colouredCountryIt{countryColours.constNBegin()}; colouredCountryIt != currentUncolouredCountryIt; ++colouredCountryIt)

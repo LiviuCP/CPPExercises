@@ -6,8 +6,9 @@
 #include <any>
 #include <optional>
 #include <type_traits>
-#include <cassert>
 #include <climits>
+#include <algorithm>
+#include <cassert>
 
 #include "variadictemplates.h"
 
@@ -225,12 +226,12 @@ void CPP17ConceptsTests::testVariableDeclarationInIf()
     // scenario 3: else branching (here comes the real power: the scope of "value" covers both "if" AND "else", yet the variable is not visible outside the if-else construct)
     if (int value{std::accumulate(matrix.constDBegin(0), matrix.constDEnd(0), 0) / (matrix.constDEnd(0) - matrix.constDBegin(0))}; value > matrix.at(1, 1))
     {
-        matrix.setAllItemsToValue(0);
+        std::fill(matrix.begin(), matrix.end(), 0);
         std::fill(matrix.dBegin(0), matrix.dEnd(0), value);
     }
     else
     {
-        matrix.setAllItemsToValue(-value);
+        std::fill(matrix.begin(), matrix.end(), -value);
     }
 
     QVERIFY(c_ThirdMatrixRef == matrix);
@@ -256,16 +257,16 @@ void CPP17ConceptsTests::testVariableDeclarationInSwitch()
                                                                                                             : SizeOrder::EXTRA_LARGE})
     {
     case SizeOrder::SMALL:
-        matrix.setAllItemsToValue(c_ElementsCount);
+        std::fill(matrix.begin(), matrix.end(), c_ElementsCount);
         break;
     case SizeOrder::MEDIUM:
-        matrix.setAllItemsToValue(c_ElementsCount / 3);
+        std::fill(matrix.begin(), matrix.end(), c_ElementsCount / 3);
         break;
     case SizeOrder::LARGE:
-        matrix.setAllItemsToValue(c_ElementsCount / 5);
+        std::fill(matrix.begin(), matrix.end(), c_ElementsCount / 5);
         break;
     case SizeOrder::EXTRA_LARGE:
-        matrix.setAllItemsToValue(c_ElementsCount / 8);
+        std::fill(matrix.begin(), matrix.end(), c_ElementsCount / 8);
         break;
     default:
         assert(false);
