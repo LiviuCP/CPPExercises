@@ -13,3 +13,4 @@ endif()
 
 add_subdirectory(Semaphore)
 add_subdirectory(Hosts)
+add_subdirectory(CharCounter)
