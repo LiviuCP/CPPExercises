@@ -7,6 +7,7 @@ static constexpr size_t c_CharCountThreshold{16 * 1024};
 
 Parser::Parser(char* pFilePath, IAggregator* pIAggregator)
     : m_pFile{nullptr}
+    , m_pFilePath{pFilePath}
     , m_pIAggregator{pIAggregator}
     , m_TotalFoundCharsCount{0}
     , m_TotalParsedCharsCount{0}
@@ -14,9 +15,9 @@ Parser::Parser(char* pFilePath, IAggregator* pIAggregator)
 {
     std::fill(m_CharOccurrences.begin(), m_CharOccurrences.end(), 0);
 
-    if (pFilePath)
+    if (m_pFilePath)
     {
-        m_pFile = fopen(pFilePath, "r");
+        m_pFile = fopen(m_pFilePath, "r");
     }
 }
 
@@ -71,4 +72,9 @@ size_t Parser::getTotalParsedCharsCount()
 bool Parser::maxCharsExceeeded() const
 {
     return m_MaxCharsCountExceeded;
+}
+
+char* Parser::getFilePath() const
+{
+    return m_pFilePath;
 }

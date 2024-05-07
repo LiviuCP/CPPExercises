@@ -5,6 +5,7 @@
 
 #include "parser.h"
 #include "parserfactory.h"
+#include "parsingqueue.h"
 #include "concreteaggregators.h"
 
 static const std::map<std::string, ParserFactory::ParserType> c_ParsingOptionsMap
@@ -17,7 +18,7 @@ static const std::map<std::string, ParserFactory::ParserType> c_ParsingOptionsMa
 };
 
 static constexpr size_t c_MinRequiredArgs{3};
-static constexpr size_t c_MaxFilesToParseCount{4};
+static constexpr size_t c_MinPoolingThreshold{4};
 
 bool checkArguments(int argc, char* argv[])
 {
@@ -47,7 +48,6 @@ void parse(Parser& parser)
 }
 
 int main(int argc, char* argv[]) {
-    std::vector<std::thread> threads;
     std::vector<Parser*> parsers;
 
     size_t filesToParse{0};
@@ -55,16 +55,10 @@ int main(int argc, char* argv[]) {
 
     if (c_AreArgumentsOk)
     {
-        // TODO: implement thread pool in order to be able to parse more files
         filesToParse = argc - 2;
-        if (filesToParse > c_MaxFilesToParseCount)
-        {
-            filesToParse = c_MaxFilesToParseCount;
-        }
     }
 
     parsers.reserve(filesToParse);
-    threads.reserve(filesToParse);
 
     Aggregator aggregator;
 
@@ -75,26 +69,46 @@ int main(int argc, char* argv[]) {
         if (pParser)
         {
             parsers.push_back(pParser);
-            threads.emplace_back(parse, std::ref(*parsers[fileIndex]));
         }
     }
 
-    for (auto& currentThread : threads)
+    if (const size_t c_ParsersCount{parsers.size()}; c_ParsersCount >= c_MinPoolingThreshold)
     {
-        currentThread.join();
+        ParsingQueue parsingQueue{c_MinPoolingThreshold};
+        const bool c_IsParsingActive{parsingQueue.addParsingTasks(parsers)};
+
+        if (c_IsParsingActive)
+        {
+            parsingQueue.finishParsingAndStop();
+        }
+    }
+    else
+    {
+        std::vector<std::thread> threads;
+        threads.reserve(c_ParsersCount);
+
+        for (auto pParser : parsers)
+        {
+            threads.emplace_back(parse, std::ref(*pParser));
+        }
+
+        for (auto& currentThread : threads)
+        {
+            currentThread.join();
+        }
     }
 
     int totalNrOfMatchingDigits{0};
     int totalNrOfParsedDigits{0};
 
-    for (size_t fileIndex{0}; fileIndex < filesToParse; ++fileIndex)
+    for (auto pParser : parsers)
     {
-        totalNrOfMatchingDigits += parsers[fileIndex]->getTotalFoundCharsCount();
-        totalNrOfParsedDigits += parsers[fileIndex]->getTotalParsedCharsCount();
+        totalNrOfMatchingDigits += pParser->getTotalFoundCharsCount();
+        totalNrOfParsedDigits += pParser->getTotalParsedCharsCount();
 
-        if (parsers[fileIndex]->maxCharsExceeeded())
+        if (pParser->maxCharsExceeeded())
         {
-            std::clog << "File " << argv[fileIndex + 2] << ": the number of matching characters exceeds the maximum allowed count!\n The extra chars have been ignored.\n";
+            std::clog << "File " << pParser->getFilePath() << ": the number of characters to parse exceeds the maximum allowed count!\nThe extra chars have been ignored.\n\n";
         }
     }
 
