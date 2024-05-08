@@ -6,7 +6,8 @@
 #include "parser.h"
 #include "parserfactory.h"
 #include "parsingqueue.h"
-#include "concreteaggregators.h"
+#include "iaggregator.h"
+#include "aggregatorfactory.h"
 
 static const std::map<std::string, ParserFactory::ParserType> c_ParsingOptionsMap
 {
@@ -17,7 +18,15 @@ static const std::map<std::string, ParserFactory::ParserType> c_ParsingOptionsMa
     {"-ad", ParserFactory::ParserType::ALPHA_AND_DIGITS},
 };
 
-static constexpr size_t c_MinRequiredArgs{3};
+static const std::map<std::string, AggregatorFactory::AggregatorType> c_AggregatingOptionsMap
+{
+    {"-t", AggregatorFactory::AggregatorType::TOTAL_COUNT},
+    {"-m", AggregatorFactory::AggregatorType::MIN_COUNT},
+    {"-a", AggregatorFactory::AggregatorType::AVERAGE_COUNT},
+    {"-M", AggregatorFactory::AggregatorType::MAX_COUNT}
+};
+
+static constexpr size_t c_MinRequiredArgs{4};
 static constexpr size_t c_MinPoolingThreshold{4};
 
 bool checkArguments(int argc, char* argv[])
@@ -32,7 +41,11 @@ bool checkArguments(int argc, char* argv[])
     }
     else if (c_ParsingOptionsMap.find(argv[1]) == c_ParsingOptionsMap.cend())
     {
-        std::cerr << "Invalid parsing option\n";
+        std::cerr << "Invalid parsing option!\n";
+    }
+    else if (c_AggregatingOptionsMap.find(argv[2]) == c_AggregatingOptionsMap.cend())
+    {
+        std::cerr << "Invalid aggregation option!\n";
     }
     else
     {
@@ -51,24 +64,27 @@ int main(int argc, char* argv[]) {
     std::vector<Parser*> parsers;
 
     size_t filesToParse{0};
+    IAggregator* pIAggregator{nullptr};
     const bool c_AreArgumentsOk{checkArguments(argc, argv)};
 
     if (c_AreArgumentsOk)
     {
         filesToParse = argc - 2;
+        pIAggregator = AggregatorFactory::createAggregator(c_AggregatingOptionsMap.at(argv[2]));
     }
 
     parsers.reserve(filesToParse);
 
-    Aggregator aggregator;
-
-    for (size_t fileIndex{0}; fileIndex < filesToParse; ++fileIndex)
+    if (pIAggregator)
     {
-        Parser* const pParser{ParserFactory::createParser(c_ParsingOptionsMap.at(argv[1]), argv[fileIndex + 2], &aggregator)};
-
-        if (pParser)
+        for (size_t fileIndex{0}; fileIndex < filesToParse; ++fileIndex)
         {
-            parsers.push_back(pParser);
+            Parser* const pParser{ParserFactory::createParser(c_ParsingOptionsMap.at(argv[1]), argv[fileIndex + 3], pIAggregator)};
+
+            if (pParser)
+            {
+                parsers.push_back(pParser);
+            }
         }
     }
 
@@ -129,7 +145,7 @@ int main(int argc, char* argv[]) {
             std::cout << "\nFound chars distribution: \n";
         }
 
-        const CharOccurrencesArray& consolidatedCharOccurrences{aggregator.getCharOccurrences()};
+        const CharOccurrencesArray& consolidatedCharOccurrences{pIAggregator->getCharOccurrences()};
 
         for (char ch{0}; ch < consolidatedCharOccurrences.size(); ++ch)
         {
