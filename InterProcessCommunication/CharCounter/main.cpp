@@ -1,4 +1,4 @@
-#include <set>
+#include <map>
 #include <vector>
 #include <iostream>
 
@@ -6,8 +6,20 @@
 
 static constexpr size_t c_MinRequiredArgs{4};
 
-static const std::set<std::string> c_ParsingOptions{"-d", "-l", "-u", "-lu", "-ad"};
-static const std::set<std::string> c_AggregatingOptions{"-t", "-m", "-a", "-M"};
+static const std::map<std::string, std::string> c_ParsingOptionsLabels{
+    {"-d", "digits"},
+    {"-l", "lower case"},
+    {"-u", "upper case"},
+    {"-lu", "lower and upper case"},
+    {"-ad", "alphanumeric and digits"}
+};
+
+static const std::map<std::string, std::string> c_AggregatingOptionsLabels{
+    {"-t", "total occurrences"},
+    {"-m", "minimum occurrences"},
+    {"-a", "average occurrences"},
+    {"-M", "maximum occurrences"}
+};
 
 bool checkArguments(int argc, char* argv[])
 {
@@ -15,15 +27,16 @@ bool checkArguments(int argc, char* argv[])
 
     if (static_cast<size_t>(argc) < c_MinRequiredArgs)
     {
-        std::cerr << "Insufficient parameters provided. There should be at least 2:\n"
+        std::cerr << "Insufficient parameters provided. There should be at least 3:\n"
                      "- parsing option\n"
+                     "- aggregating option\n"
                      "- one file path\n";
     }
-    else if (c_ParsingOptions.find(argv[1]) == c_ParsingOptions.cend())
+    else if (c_ParsingOptionsLabels.find(argv[1]) == c_ParsingOptionsLabels.cend())
     {
         std::cerr << "Invalid parsing option!\n";
     }
-    else if (c_AggregatingOptions.find(argv[2]) == c_AggregatingOptions.cend())
+    else if (c_AggregatingOptionsLabels.find(argv[2]) == c_AggregatingOptionsLabels.cend())
     {
         std::cerr << "Invalid aggregation option!\n";
     }
@@ -59,8 +72,8 @@ int main(int argc, char* argv[]) {
 
         if (c_TotalParsedDigitsCount > 0)
         {
-            std::cout << "Matching characters: " << c_TotalMatchingDigitsCount << "\n";
             std::cout << "Parsed characters: " << c_TotalParsedDigitsCount << "\n";
+            std::cout << "Matching characters (" << c_ParsingOptionsLabels.at(argv[1]) << "): " << c_TotalMatchingDigitsCount << "\n";
         }
         else
         {
@@ -69,7 +82,7 @@ int main(int argc, char* argv[]) {
 
         if (c_TotalMatchingDigitsCount > 0)
         {
-            std::cout << "\nFound chars distribution: \n";
+            std::cout << "\nFound chars distribution (" << c_AggregatingOptionsLabels.at(argv[2]) << "):\n";
         }
 
         const CharOccurrencesArray& consolidatedCharOccurrences{parsingEngine.getCharOccurrences()};
