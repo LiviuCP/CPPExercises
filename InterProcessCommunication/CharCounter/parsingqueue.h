@@ -7,7 +7,7 @@
 #include <queue>
 #include <cstdlib>
 
-#include "parser.h"
+class Parser;
 
 class ParsingQueue
 {

@@ -1,7 +1,7 @@
 #ifndef AGGREGATORFACTORY_H
 #define AGGREGATORFACTORY_H
 
-class IAggregator;
+#include "iaggregator.h"
 
 class AggregatorFactory
 {

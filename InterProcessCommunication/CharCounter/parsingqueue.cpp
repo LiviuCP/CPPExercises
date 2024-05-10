@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cassert>
 
+#include "parser.h"
 #include "parsingqueue.h"
 
 ParsingQueue::ParsingQueue(size_t threadsCount)
