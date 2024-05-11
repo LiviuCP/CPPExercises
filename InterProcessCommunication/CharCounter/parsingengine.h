@@ -1,9 +1,6 @@
 #ifndef PARSINGENGINE_H
 #define PARSINGENGINE_H
 
-#include <vector>
-#include <string>
-
 #include "utilities.h"
 
 class Parser;
@@ -12,7 +9,7 @@ class IAggregator;
 class ParsingEngine
 {
 public:
-    ParsingEngine(const std::string& parsingOption, const std::vector<char *>& filePaths, const std::string& aggregationOption);
+    ParsingEngine(const std::string& parsingOption, const FilePathsArray& filePaths, const std::string& aggregationOption);
     ~ParsingEngine();
 
     void run();
@@ -23,7 +20,7 @@ public:
 
 private:
     void _buildAggregator(const std::string& aggregationOption);
-    void _buildParsers(const std::string& parsingOption, const std::vector<char*>& filePaths);
+    void _buildParsers(const std::string& parsingOption, const FilePathsArray& filePaths);
     void _computeStatistics();
 
     std::vector<Parser*> m_Parsers;

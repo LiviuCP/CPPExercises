@@ -1,6 +1,8 @@
 #ifndef PARSERFACTORY_H
 #define PARSERFACTORY_H
 
+#include <string>
+
 class Parser;
 class IAggregator;
 
@@ -17,7 +19,7 @@ public:
     };
 
     ParserFactory() = delete;
-    static Parser* createParser(ParserType parserType, char* filePath, IAggregator* pIAggregator);
+    static Parser* createParser(ParserType parserType, const std::string& filePath, IAggregator* pIAggregator);
 };
 
 #endif

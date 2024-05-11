@@ -10,7 +10,7 @@
 
 static constexpr size_t c_MinPoolingThreshold{4};
 
-ParsingEngine::ParsingEngine(const std::string& parsingOption, const std::vector<char*>& filePaths, const std::string& aggregationOption)
+ParsingEngine::ParsingEngine(const std::string& parsingOption, const FilePathsArray& filePaths, const std::string& aggregationOption)
     : m_pIAggregator{nullptr}
     , m_TotalParsedDigitsCount{0}
     , m_TotalMatchingDigitsCount{0}
@@ -102,7 +102,7 @@ void ParsingEngine::_buildAggregator(const std::string& aggregationOption)
     }
 }
 
-void ParsingEngine::_buildParsers(const std::string& parsingOption, const std::vector<char*>& filePaths)
+void ParsingEngine::_buildParsers(const std::string& parsingOption, const FilePathsArray& filePaths)
 {
     if (m_pIAggregator)
     {
@@ -121,7 +121,7 @@ void ParsingEngine::_buildParsers(const std::string& parsingOption, const std::v
             m_Parsers.clear();
             m_Parsers.reserve(filePaths.size());
 
-            for (auto path : filePaths)
+            for (const auto& path : filePaths)
             {
                 Parser* const pParser{ParserFactory::createParser(parserTypeIt->second, path, m_pIAggregator)};
 

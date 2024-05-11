@@ -1,7 +1,7 @@
 #include "concreteparsers.h"
 #include "parserfactory.h"
 
-Parser* ParserFactory::createParser(ParserType parserType, char* filePath, IAggregator* pIAggregator)
+Parser* ParserFactory::createParser(ParserType parserType, const std::string& filePath, IAggregator* pIAggregator)
 {
     Parser* pParser{nullptr};
 

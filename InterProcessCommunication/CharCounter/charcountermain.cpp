@@ -1,10 +1,9 @@
 #include <map>
-#include <vector>
 #include <iostream>
 
 #include "parsingengine.h"
 
-static constexpr size_t c_MinRequiredArgs{4};
+static constexpr size_t c_MinRequiredDataParamsCount{3};
 
 static const std::map<std::string, std::string> c_ParsingOptionsLabels{
     {"-d", "digits"},
@@ -25,7 +24,9 @@ bool checkArguments(int argc, char* argv[])
 {
     bool result{false};
 
-    if (static_cast<size_t>(argc) < c_MinRequiredArgs)
+    const size_t c_DataParamsCount{static_cast<size_t>(argc - 1)}; // application executable taken out from arguments count
+
+    if (c_DataParamsCount < c_MinRequiredDataParamsCount)
     {
         std::cerr << "Insufficient parameters provided. There should be at least 3:\n"
                      "- parsing option\n"
@@ -51,20 +52,23 @@ bool checkArguments(int argc, char* argv[])
 int main(int argc, char* argv[]) {
     std::vector<Parser*> parsers;
 
-    size_t filesToParse{0};
     const bool c_AreArgumentsOk{checkArguments(argc, argv)};
 
     if (c_AreArgumentsOk)
     {
-        filesToParse = argc - 3;
+        const size_t c_NonFilePathArgumentsCount{3};
+        const size_t c_FilePathsCount{static_cast<size_t>(argc) - c_NonFilePathArgumentsCount}; // take out the application executable path, parsing and aggregation options
 
-        std::vector<char*> filePaths;
-        for (size_t fileIndex{0}; fileIndex < filesToParse; ++fileIndex)
+        FilePathsArray filePaths;
+        for (size_t fileIndex{0}; fileIndex < c_FilePathsCount; ++fileIndex)
         {
-            filePaths.push_back(argv[fileIndex + 3]);
+            filePaths.push_back(argv[fileIndex + c_NonFilePathArgumentsCount]);
         }
 
-        ParsingEngine parsingEngine{argv[1], filePaths, argv[2]};
+        const std::string c_ParsingOption{argv[1]};
+        const std::string c_AggregatingOption{argv[2]};
+
+        ParsingEngine parsingEngine{c_ParsingOption, filePaths, c_AggregatingOption};
         parsingEngine.run();
 
         const size_t c_TotalParsedDigitsCount{parsingEngine.getTotalParsedDigitsCount()};
@@ -73,7 +77,7 @@ int main(int argc, char* argv[]) {
         if (c_TotalParsedDigitsCount > 0)
         {
             std::cout << "Parsed characters: " << c_TotalParsedDigitsCount << "\n";
-            std::cout << "Matching characters (" << c_ParsingOptionsLabels.at(argv[1]) << "): " << c_TotalMatchingDigitsCount << "\n";
+            std::cout << "Matching characters (" << c_ParsingOptionsLabels.at(c_ParsingOption) << "): " << c_TotalMatchingDigitsCount << "\n";
         }
         else
         {
@@ -82,7 +86,7 @@ int main(int argc, char* argv[]) {
 
         if (c_TotalMatchingDigitsCount > 0)
         {
-            std::cout << "\nFound chars distribution (" << c_AggregatingOptionsLabels.at(argv[2]) << "):\n";
+            std::cout << "\nFound chars distribution (" << c_AggregatingOptionsLabels.at(c_AggregatingOption) << "):\n";
         }
 
         const CharOccurrencesArray& consolidatedCharOccurrences{parsingEngine.getCharOccurrences()};

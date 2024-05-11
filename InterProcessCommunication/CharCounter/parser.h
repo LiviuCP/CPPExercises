@@ -10,21 +10,21 @@ class IAggregator;
 class Parser
 {
 public:
-    Parser(char* pFilePath, IAggregator* pIAggregator);
+    Parser(const std::string& filePath, IAggregator* pIAggregator);
     virtual ~Parser();
 
     void parse();
     size_t getTotalFoundCharsCount();
     size_t getTotalParsedCharsCount();
     bool maxCharsExceeeded() const;
-    char* getFilePath() const;
+    const std::string& getFilePath() const;
 
 protected:
     virtual bool isValidChar(char c) = 0;
 
 private:
     FILE * m_pFile;
-    char* m_pFilePath;
+    std::string m_FilePath;
     IAggregator* m_pIAggregator;
     CharOccurrencesArray m_CharOccurrences; // only the non-negative chars are taken into consideration
     size_t m_TotalFoundCharsCount;

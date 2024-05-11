@@ -6,7 +6,7 @@
 class DigitsParser : virtual public Parser
 {
 public:
-    DigitsParser(char* pFilePath, IAggregator* pIAggregator);
+    DigitsParser(const std::string& filePath, IAggregator* pIAggregator);
 
 protected:
     bool isValidChar(char c) override;
@@ -15,7 +15,7 @@ protected:
 class LowerCaseParser : virtual public Parser
 {
 public:
-    LowerCaseParser(char* pFilePath, IAggregator* pIAggregator);
+    LowerCaseParser(const std::string& filePath, IAggregator* pIAggregator);
 
 protected:
     bool isValidChar(char c) override;
@@ -24,7 +24,7 @@ protected:
 class UpperCaseParser : virtual public Parser
 {
 public:
-    UpperCaseParser(char* pFilePath, IAggregator* pIAggregator);
+    UpperCaseParser(const std::string& filePath, IAggregator* pIAggregator);
 
 protected:
     bool isValidChar(char c) override;
@@ -33,7 +33,7 @@ protected:
 class LowerUpperCaseParser : virtual public LowerCaseParser, virtual public UpperCaseParser
 {
 public:
-    LowerUpperCaseParser(char* pFilePath, IAggregator* pIAggregator);
+    LowerUpperCaseParser(const std::string& filePath, IAggregator* pIAggregator);
 
 protected:
     bool isValidChar(char c) override;
@@ -42,7 +42,7 @@ protected:
 class AlphaAndDigitsParser final : public LowerUpperCaseParser, public DigitsParser
 {
 public:
-    AlphaAndDigitsParser(char* pFilePath, IAggregator* pIAggregator);
+    AlphaAndDigitsParser(const std::string& filePath, IAggregator* pIAggregator);
 
 protected:
     bool isValidChar(char c) override;

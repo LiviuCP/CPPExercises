@@ -1,7 +1,7 @@
 #include "concreteparsers.h"
 
-DigitsParser::DigitsParser(char* pFilePath, IAggregator* pIAggregator)
-    : Parser{pFilePath, pIAggregator}
+DigitsParser::DigitsParser(const std::string& filePath, IAggregator* pIAggregator)
+    : Parser{filePath, pIAggregator}
 {
 }
 
@@ -10,8 +10,8 @@ bool DigitsParser::isValidChar(char c)
     return c >= 48 && c <= 57;
 }
 
-LowerCaseParser::LowerCaseParser(char* pFilePath, IAggregator* pIAggregator)
-    : Parser{pFilePath, pIAggregator}
+LowerCaseParser::LowerCaseParser(const std::string& filePath, IAggregator* pIAggregator)
+    : Parser{filePath, pIAggregator}
 {
 }
 
@@ -20,8 +20,8 @@ bool LowerCaseParser::isValidChar(char c)
     return c >= 97 && c <= 122;
 }
 
-UpperCaseParser::UpperCaseParser(char* pFilePath, IAggregator* pIAggregator)
-    : Parser{pFilePath, pIAggregator}
+UpperCaseParser::UpperCaseParser(const std::string& filePath, IAggregator* pIAggregator)
+    : Parser{filePath, pIAggregator}
 {
 }
 
@@ -30,10 +30,10 @@ bool UpperCaseParser::isValidChar(char c)
     return c >= 65 && c <= 90;
 }
 
-LowerUpperCaseParser::LowerUpperCaseParser(char* pFilePath, IAggregator* pIAggregator)
-    : LowerCaseParser{pFilePath, pIAggregator}
-    , UpperCaseParser{pFilePath, pIAggregator}
-    , Parser{pFilePath, pIAggregator}
+LowerUpperCaseParser::LowerUpperCaseParser(const std::string& filePath, IAggregator* pIAggregator)
+    : LowerCaseParser{filePath, pIAggregator}
+    , UpperCaseParser{filePath, pIAggregator}
+    , Parser{filePath, pIAggregator}
 {
 }
 
@@ -42,12 +42,12 @@ bool LowerUpperCaseParser::isValidChar(char c)
     return LowerCaseParser::isValidChar(c) || UpperCaseParser::isValidChar(c);
 }
 
-AlphaAndDigitsParser::AlphaAndDigitsParser(char* pFilePath, IAggregator* pIAggregator)
-    : LowerUpperCaseParser{pFilePath, pIAggregator}
-    , LowerCaseParser{pFilePath, pIAggregator}
-    , UpperCaseParser{pFilePath, pIAggregator}
-    , DigitsParser{pFilePath, pIAggregator}
-    , Parser{pFilePath, pIAggregator}
+AlphaAndDigitsParser::AlphaAndDigitsParser(const std::string& filePath, IAggregator* pIAggregator)
+    : LowerUpperCaseParser{filePath, pIAggregator}
+    , LowerCaseParser{filePath, pIAggregator}
+    , UpperCaseParser{filePath, pIAggregator}
+    , DigitsParser{filePath, pIAggregator}
+    , Parser{filePath, pIAggregator}
 {
 }
 
