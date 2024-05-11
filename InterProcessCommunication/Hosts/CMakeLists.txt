@@ -5,7 +5,7 @@ project(Hosts LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(Hosts main.cpp csvparsingqueue.cpp csvparser.cpp csvaggregator.cpp apputils.cpp)
+add_executable(Hosts hostsmain.cpp csvparsingqueue.cpp csvparser.cpp csvaggregator.cpp apputils.cpp)
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
