@@ -87,8 +87,10 @@ void RedBlackTree::printTree() const
 
     for (std::vector<Node*>::const_iterator it{nodesArray.cbegin()}; it != nodesArray.cend(); ++it)
     {
+        assert(dynamic_cast<RedBlackNode*>(*it));
+
         std::cout << "Node: " << (*it)->getKey();
-        std::cout << " / Colour: " << (static_cast<RedBlackNode*>(*it)->isBlack() ? "B" : "R");
+        std::cout << " / Colour: " << (dynamic_cast<RedBlackNode*>(*it)->isBlack() ? "B" : "R");
         std::cout << " / Is child: " << ((*it)->isLeftChild() ? "L" : (*it)->isRightChild() ? "R" : "N");
 
         _printNodeRelatives(*it);
@@ -108,17 +110,17 @@ void RedBlackTree::printTree() const
 */
 RedBlackTree::Node* RedBlackTree::_doAddOrUpdateNode(int key, const std::string& value)
 {
-    RedBlackNode* addedNode{static_cast<RedBlackNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
+    RedBlackNode* addedNode{dynamic_cast<RedBlackNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
 
     if (addedNode != nullptr)
     {
         RedBlackNode* currentNode{addedNode};
-        RedBlackNode* parent{static_cast<RedBlackNode*>(currentNode->getParent())};
+        RedBlackNode* parent{dynamic_cast<RedBlackNode*>(currentNode->getParent())};
 
         while(parent != nullptr && !parent->isBlack())
         {
-            RedBlackNode* const uncle{static_cast<RedBlackNode*>(currentNode->getUncle())};
-            RedBlackNode* const grandparent{static_cast<RedBlackNode*>(currentNode->getGrandparent())};
+            RedBlackNode* const uncle{dynamic_cast<RedBlackNode*>(currentNode->getUncle())};
+            RedBlackNode* const grandparent{dynamic_cast<RedBlackNode*>(currentNode->getGrandparent())};
 
             assert(grandparent != nullptr && "Null grandparent for current node"); // there should always be a grandparent (parent is red)
 
@@ -163,7 +165,7 @@ RedBlackTree::Node* RedBlackTree::_doAddOrUpdateNode(int key, const std::string&
                 uncle->setBlack(true);
                 grandparent->setBlack(false);
                 currentNode = grandparent;
-                parent = static_cast<RedBlackNode*>(currentNode->getParent());
+                parent = dynamic_cast<RedBlackNode*>(currentNode->getParent());
 
                 if (parent == nullptr)
                 {
@@ -172,8 +174,10 @@ RedBlackTree::Node* RedBlackTree::_doAddOrUpdateNode(int key, const std::string&
             }
         }
 
+        assert(dynamic_cast<RedBlackNode*>(m_Root));
+
         // ensure the root is black node (cornercase: only one node added to empty red-black tree)
-        if (!static_cast<RedBlackNode*>(m_Root)->isBlack())
+        if (!dynamic_cast<RedBlackNode*>(m_Root)->isBlack())
         {
             currentNode->setBlack(true);
         }
@@ -195,11 +199,13 @@ RedBlackTree::Node* RedBlackTree::_removeSingleChildedOrLeafNode(Node* const nod
     assert(nodeToRemove != nullptr && "Attempt to remove a null node from red-black tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
 
-    RedBlackNode* parent{static_cast<RedBlackNode*>(nodeToRemove->getParent())};
-    RedBlackNode* sibling{static_cast<RedBlackNode*>(nodeToRemove->getSibling())};
-    RedBlackNode* const replacingNode{static_cast<RedBlackNode*>(BinarySearchTree::_removeSingleChildedOrLeafNode(nodeToRemove))};
+    RedBlackNode* parent{dynamic_cast<RedBlackNode*>(nodeToRemove->getParent())};
+    RedBlackNode* sibling{dynamic_cast<RedBlackNode*>(nodeToRemove->getSibling())};
+    RedBlackNode* const replacingNode{dynamic_cast<RedBlackNode*>(BinarySearchTree::_removeSingleChildedOrLeafNode(nodeToRemove))};
 
-    if (!static_cast<RedBlackNode*>(nodeToRemove)->isBlack()) // no action required if removed node is a red leaf
+    assert(dynamic_cast<RedBlackNode*>(nodeToRemove));
+
+    if (!dynamic_cast<RedBlackNode*>(nodeToRemove)->isBlack()) // no action required if removed node is a red leaf
     {
     }
     else if (replacingNode != nullptr) // case 1: removed black node with red child
@@ -223,8 +229,8 @@ RedBlackTree::Node* RedBlackTree::_removeSingleChildedOrLeafNode(Node* const nod
                 assert((sibling != nullptr && sibling->getParent() != nullptr) && "Invalid sibling of non-root black node found"); // required for avoiding rule 4 violation
 
                 // keep reference to sibling children before doing any rotations
-                RedBlackNode* const siblingLeftChild{static_cast<RedBlackNode*>(sibling->getLeftChild())};
-                RedBlackNode* const siblingRightChild{static_cast<RedBlackNode*>(sibling->getRightChild())};
+                RedBlackNode* const siblingLeftChild{dynamic_cast<RedBlackNode*>(sibling->getLeftChild())};
+                RedBlackNode* const siblingRightChild{dynamic_cast<RedBlackNode*>(sibling->getRightChild())};
 
                 if (sibling->isBlack())
                 {
@@ -239,8 +245,8 @@ RedBlackTree::Node* RedBlackTree::_removeSingleChildedOrLeafNode(Node* const nod
                         if (parent->isBlack())
                         {
                             doubleBlackNode = parent; // set parent double black and recur
-                            parent = static_cast<RedBlackNode*>(doubleBlackNode->getParent());
-                            sibling = static_cast<RedBlackNode*>(doubleBlackNode->getSibling());
+                            parent = dynamic_cast<RedBlackNode*>(doubleBlackNode->getParent());
+                            sibling = dynamic_cast<RedBlackNode*>(doubleBlackNode->getSibling());
                             doubleBlackNodeChanged = true;
                         }
                         else
@@ -319,9 +325,11 @@ std::string RedBlackTree::_getNodeAsString(const BinarySearchTree::Node* const n
 
     if (node != nullptr)
     {
+        assert(dynamic_cast<const RedBlackNode*>(node));
+
         result = BinarySearchTree::_getNodeAsString(node, isValueRequired);
 
-        if (static_cast<const RedBlackNode*>(node)->isBlack())
+        if (dynamic_cast<const RedBlackNode*>(node)->isBlack())
         {
             result += ":BK";
         }
