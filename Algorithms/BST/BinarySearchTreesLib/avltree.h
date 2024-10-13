@@ -38,12 +38,12 @@ private:
     // design decision: any assignment operator to work only between trees of same type
     using BinarySearchTree::operator=;
 
-    virtual AVLNode* _doAddOrUpdateNode(int key, const std::string& value) override;
+    virtual Node* _doAddOrUpdateNode(int key, const std::string& value) override;
 
     // Node* instead of AVLNode* is required as argument for signature purposes (but return type can be covariant)
-    virtual AVLNode* _removeSingleChildedOrLeafNode(Node* const nodeToRemove) override;
+    virtual Node* _removeSingleChildedOrLeafNode(Node* const nodeToRemove) override;
 
-    virtual AVLNode* _createNewNode(int key, const std::string& value) override;
+    virtual Node* _createNewNode(int key, const std::string& value) override;
 
     // update all ancestors of a specific node up to the root
     void _updateAncestorHeights(const AVLNode* const node);

@@ -75,7 +75,7 @@ AVLTree& AVLTree::operator=(AVLTree&& sourceTree)
    - do a bottom-up search of the first unbalanced ancestor
    - balance the tree formed by this ancestor and the child and grandchild located in the search path
 */
-AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
+AVLTree::Node* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
 {
     AVLNode* addedNode{static_cast<AVLNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
 
@@ -118,7 +118,7 @@ AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
      - update parent height and ancestor heights
      - recursively balance resulting unbalanced nodes (sub-trees) starting with parent and going bottom-up until reaching root
 */
-AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
+AVLTree::Node* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node for AVL tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
@@ -156,7 +156,7 @@ AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemo
     return nullptr; // no replacing node required for AVL nodes (return value only for signature purposes)
 }
 
-AVLTree::AVLNode* AVLTree::_createNewNode(int key, const std::string &value)
+AVLTree::Node* AVLTree::_createNewNode(int key, const std::string &value)
 {
     AVLNode* const newNode{new AVLNode{key, value}};
     return newNode;

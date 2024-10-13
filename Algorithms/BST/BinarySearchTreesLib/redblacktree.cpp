@@ -19,7 +19,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
     {
         for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
         {
-            RedBlackNode* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
+            RedBlackNode* addedNode{dynamic_cast<RedBlackNode*>(RedBlackTree::_doAddOrUpdateNode(*it, defaultValue))};
 
             if (BinarySearchTree::sLoggingEnabled && addedNode == nullptr)
             {
@@ -106,7 +106,7 @@ void RedBlackTree::printTree() const
   - add the node as per BST standard (inherited) procedure
   - apply required transformation to resulting tree structure (rotations, recoloring) for ensuring the four rules (see redblacktree.h) are obeyed
 */
-RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateNode(int key, const std::string& value)
+RedBlackTree::Node* RedBlackTree::_doAddOrUpdateNode(int key, const std::string& value)
 {
     RedBlackNode* addedNode{static_cast<RedBlackNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
 
@@ -190,7 +190,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_doAddOrUpdateNode(int key, const std:
    - the second step is performed only if a black node has been removed. Removing a red node (which can only be leaf) does not affect the rules.
    - the second step contains two cases: child of removed node is red (simple case - red child becomes black) and a black leaf node has been removed (complex case - more sub-cases/scenarios)
 */
-RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
+RedBlackTree::Node* RedBlackTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node from red-black tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
@@ -307,7 +307,7 @@ RedBlackTree::RedBlackNode* RedBlackTree::_removeSingleChildedOrLeafNode(Node* c
     return nullptr; // no replacing node required for red-black nodes (return value only for signature purposes)
 }
 
-RedBlackTree::RedBlackNode* RedBlackTree::_createNewNode(int key, const std::string& value)
+RedBlackTree::Node* RedBlackTree::_createNewNode(int key, const std::string& value)
 {
     RedBlackNode* const newNode{new RedBlackNode{key, value}};
     return newNode;
