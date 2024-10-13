@@ -30,6 +30,9 @@ add_test(NAME AVLTreesTests COMMAND AVLTreesTests)
 add_executable(MixedTreeTypesTests tst_mixedtreetypestests.cpp testutils.cpp)
 add_test(NAME MixedTreeTypesTests COMMAND MixedTreeTypesTests)
 
+add_executable(AltSimpleBSTTests tst_altsimplebsttests.cpp testutils.cpp)
+add_test(NAME AltSimpleBSTTests COMMAND AltSimpleBSTTests)
+
 target_link_libraries(SimpleBSTTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(SimpleBSTTests PRIVATE BinarySearchTreesLib)
 
@@ -41,3 +44,6 @@ target_link_libraries(AVLTreesTests PRIVATE BinarySearchTreesLib)
 
 target_link_libraries(MixedTreeTypesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(MixedTreeTypesTests PRIVATE BinarySearchTreesLib)
+
+target_link_libraries(AltSimpleBSTTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(AltSimpleBSTTests PRIVATE BinarySearchTreesLib)

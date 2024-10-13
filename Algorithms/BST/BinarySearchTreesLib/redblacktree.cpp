@@ -1,6 +1,4 @@
 #include <iostream>
-#include <utility>
-
 #include <cassert>
 
 #include "redblacktree.h"

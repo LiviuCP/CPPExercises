@@ -30,7 +30,7 @@ public:
     /* it is possible to merge different types of trees but the resulting tree should be of the type of the calling object while the source tree should have all elements removed
        (currently the derived classes use the base version but it is possible to create own implementations if required)
     */
-    virtual void mergeTree(BinarySearchTree& sourceTree);
+    bool mergeTree(BinarySearchTree& sourceTree);
 
     /* This function has been left unvirtualized as the clear() operation should occur the same way for all base and derived search tree objects */
     void clear();
@@ -48,7 +48,7 @@ public:
     int getSize() const;
 
     virtual void printTree() const;
-    virtual std::string getTreeAsString(bool areNodeValuesRequired) const;
+    virtual std::string getTreeAsString(bool areNodeValuesRequired = false) const;
 
     static void enableLogging(bool enable);
 

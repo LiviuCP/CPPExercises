@@ -1,6 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include <numeric>
 
 #include <cassert>
 
@@ -89,15 +88,18 @@ bool BinarySearchTree::removeNode(int key)
     return removed;
 }
 
-void BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
+bool BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
 {
-    assert(m_NullValue == sourceTree.m_NullValue && "Null values of trees don't match");
+    bool merged{false};
 
-    if (this != &sourceTree)
+    if (m_NullValue == sourceTree.m_NullValue && this != &sourceTree)
     {
         _copyTreeNodes(sourceTree);
         sourceTree._doClearTreeContent();
+        merged = true;
     }
+
+    return merged;
 }
 
 void BinarySearchTree::clear()

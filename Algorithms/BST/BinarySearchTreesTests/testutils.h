@@ -3,11 +3,9 @@
 
 #include <string>
 
-class BinarySearchTree;
-
 namespace TestUtils
 {
-    bool areExpectedTreeValuesMet(const BinarySearchTree* searchTree, const std::string& treeString, int treeSize, bool areNodeValuesConsidered = false);
+    bool areExpectedTreeValuesMet(const std::string& treeString, int treeSize, const std::string& expectedTreeString, int expectedTreeSize);
 
     static const std::string scDefaultValue{"DF"};
     static const std::string scDefaultNullValue{""};
