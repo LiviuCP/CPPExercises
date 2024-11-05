@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-class AlternativeBinarySearchTree final
+class AlternativeBinarySearchTree
 {
 public:
     AlternativeBinarySearchTree(const std::string& nullValue = "");
@@ -13,8 +13,8 @@ public:
     AlternativeBinarySearchTree(const AlternativeBinarySearchTree& sourceTree);
     AlternativeBinarySearchTree(AlternativeBinarySearchTree&& sourceTree);
 
-    bool addOrUpdateNode(int key, const std::string& value); // in actual implementation(s) true is returned if new node is added (number of nodes increases)
-    bool removeNode(int key); // in actual implementation(s) true is returned if the node with the given key exists within tree structure (and thus is removed)
+    virtual bool addOrUpdateNode(int key, const std::string& value); // in actual implementation(s) true is returned if new node is added (number of nodes increases)
+    virtual bool removeNode(int key); // in actual implementation(s) true is returned if the node with the given key exists within tree structure (and thus is removed)
 
     bool mergeTree(AlternativeBinarySearchTree& sourceTree);
     void clear();
@@ -28,19 +28,20 @@ public:
     std::string getNullValue() const;
     int getSize() const;
 
-    void printTree() const;
-    std::string getTreeAsString(bool areNodeValuesRequired = false) const;
+    virtual void printTree() const;
+    virtual std::string getTreeAsString(bool areNodeValuesRequired = false) const;
 
     static void enableLogging(bool enable);
 
 protected:
-    class Node final
+    class Node
     {
     public:
         using spNode = std::shared_ptr<Node>;
         using wpNode = std::weak_ptr<Node>;
 
         Node(int key, std::string value);
+        virtual ~Node() = default;
 
         int getKey() const;
 
@@ -50,10 +51,11 @@ protected:
         bool isLeftChild() const;
         bool isRightChild() const;
 
-        void setLeftChild(spNode leftChild);
+        // plain setup refers to setting without any other checks/updates and no matter the provided value (required for rotations)
+        void setLeftChild(spNode leftChild, bool plainSetupRequired = false);
         spNode getLeftChild() const;
 
-        void setRightChild(spNode rightChild);
+        void setRightChild(spNode rightChild, bool plainSetupRequired = false); // plain setup required for rotations
         spNode getRightChild() const;
 
         void copyInOrderSuccessorKeyAndValue();
@@ -62,7 +64,7 @@ protected:
         /* Should always be used after the current node is set as left/right child of the parent
            Due to weak pointer constraints it is no longer possible to have the parent set by the setLeftChild()/setRightChild() methods
         */
-        void setParent(spNode parent);
+        void setParent(spNode parent, bool plainSetupRequired = false); // plain setup required for rotations
 
         spNode getParent() const;
         spNode getSibling() const;
@@ -86,16 +88,19 @@ protected:
     void _copyTreeNodes(const AlternativeBinarySearchTree& sourceTree);
     void _moveTreeNodes(AlternativeBinarySearchTree& sourceTree);
 
-    spNode _doAddOrUpdateNode(int key, const std::string& value);
-    void _removeSingleChildedOrLeafNode(spNode nodeToRemove);
+    virtual spNode _doAddOrUpdateNode(int key, const std::string& value);
+    virtual spNode _removeSingleChildedOrLeafNode(spNode nodeToRemove);
 
-    spNode _createNewNode(int key, const std::string& value);
+    virtual spNode _createNewNode(int key, const std::string& value);
 
     spNode _findNode(int key) const;
     void _convertTreeToArray(std::vector<spNode>& nodes) const;
 
+    void _rotateNodeLeft(spNode node);
+    void _rotateNodeRight(spNode node);
+
     void _printNodeRelatives(const spNode node) const;
-    std::string _getNodeAsString(const spNode node, bool isValueRequired) const;
+    virtual std::string _getNodeAsString(const spNode node, bool isValueRequired) const;
 
     spNode m_Root;
     std::string m_NullValue; // value that each key that is NOT contained within tree corresponds to

@@ -97,7 +97,7 @@ AlternativeBinarySearchTree& AlternativeBinarySearchTree::operator=(const Altern
 {
     if (this != &sourceTree)
     {
-        if (m_Root != nullptr)
+        if (m_Root)
         {
             clear();
         }
@@ -336,8 +336,10 @@ AlternativeBinarySearchTree::spNode AlternativeBinarySearchTree::_doAddOrUpdateN
     return addedNode;
 }
 
-void AlternativeBinarySearchTree::_removeSingleChildedOrLeafNode(AlternativeBinarySearchTree::spNode nodeToRemove)
+AlternativeBinarySearchTree::spNode AlternativeBinarySearchTree::_removeSingleChildedOrLeafNode(spNode nodeToRemove)
 {
+    spNode replacingNode{nullptr};
+
     if (nodeToRemove)
     {
         spNode const leftChild{nodeToRemove->getLeftChild()};
@@ -346,7 +348,7 @@ void AlternativeBinarySearchTree::_removeSingleChildedOrLeafNode(AlternativeBina
         if (!leftChild || !rightChild)
         {
             // determine replacing node (null if leaf node is removed)
-            spNode const replacingNode{leftChild ? leftChild : rightChild ? rightChild : nullptr};
+            replacingNode = leftChild ? leftChild : rightChild ? rightChild : nullptr;
 
             // parent of removed node to be stored in advance in order to make re-parenting of the replacing node possible (it gets decoupled from the node to remove when setting new child)
             spNode const nodeToRemoveParent{nodeToRemove->getParent()};
@@ -394,6 +396,8 @@ void AlternativeBinarySearchTree::_removeSingleChildedOrLeafNode(AlternativeBina
             assert(false && "Attempt to use the remove function on a node with two children");
         }
     }
+
+    return replacingNode;
 }
 
 AlternativeBinarySearchTree::spNode AlternativeBinarySearchTree::_createNewNode(int key, const std::string& value)
@@ -428,7 +432,7 @@ AlternativeBinarySearchTree::spNode AlternativeBinarySearchTree::_findNode(int k
     return foundNode;
 }
 
-void AlternativeBinarySearchTree::_convertTreeToArray(std::vector<AlternativeBinarySearchTree::spNode>& nodes) const
+void AlternativeBinarySearchTree::_convertTreeToArray(std::vector<spNode>& nodes) const
 {
     nodes.clear();
 
@@ -460,7 +464,109 @@ void AlternativeBinarySearchTree::_convertTreeToArray(std::vector<AlternativeBin
     }
 }
 
-void AlternativeBinarySearchTree::_printNodeRelatives(const AlternativeBinarySearchTree::spNode node) const
+// a right child node is required for left rotation
+void AlternativeBinarySearchTree::_rotateNodeLeft(spNode node)
+{
+    if (node)
+    {
+        spNode const rightChild{node->getRightChild()};
+
+        if (rightChild)
+        {
+            spNode const rightLeftChild{rightChild->getLeftChild()};
+            spNode const parent{node->getParent()};
+
+            // current node becomes left child of its actual right child
+            rightChild->setLeftChild(node, true);
+            node->setParent(rightChild, true);
+
+            // left child of actual right child becomes right child of current node
+            if (rightLeftChild)
+            {
+                rightLeftChild->setParent(node, true);
+            }
+
+            node->setRightChild(rightLeftChild, true);
+
+            // parent of current node (if any) becomes parent of actual right child (the new child remains same type of child for parent as before)
+            if (parent)
+            {
+                if (parent->getLeftChild() == node)
+                {
+                    parent->setLeftChild(rightChild, true);
+                    rightChild->setParent(parent, true);
+                }
+                else
+                {
+                    parent->setRightChild(rightChild, true);
+                    rightChild->setParent(parent, true);
+                }
+            }
+            else
+            {
+                rightChild->setParent(nullptr);
+            }
+
+            if (m_Root == node)
+            {
+                m_Root = rightChild;
+            }
+        }
+    }
+}
+
+// a left child node is required for right rotation
+void AlternativeBinarySearchTree::_rotateNodeRight(spNode node)
+{
+    if (node)
+    {
+        spNode const leftChild{node->getLeftChild()};
+
+        if (leftChild)
+        {
+            spNode const leftRightChild{leftChild->getRightChild()};
+            spNode const parent{node->getParent()};
+
+            // current node becomes right child of its actual left child
+            leftChild->setRightChild(node, true);
+            node->setParent(leftChild, true);
+
+            // right child of actual left child becomes left child of current node
+            if (leftRightChild)
+            {
+                leftRightChild->setParent(node, true);
+            }
+
+            node->setLeftChild(leftRightChild, true);
+
+            // parent of current node (if any) becomes parent of actual left child (the new child remains same type of child for parent as before)
+            if (parent)
+            {
+                if (parent->getLeftChild() == node)
+                {
+                    parent->setLeftChild(leftChild, true);
+                    leftChild->setParent(parent, true);
+                }
+                else
+                {
+                    parent->setRightChild(leftChild, true);
+                    leftChild->setParent(parent, true);
+                }
+            }
+            else
+            {
+                leftChild->setParent(nullptr);
+            }
+
+            if (m_Root == node)
+            {
+                m_Root = leftChild;
+            }
+        }
+    }
+}
+
+void AlternativeBinarySearchTree::_printNodeRelatives(const spNode node) const
 {
     if (node)
     {
@@ -603,9 +709,13 @@ bool AlternativeBinarySearchTree::Node::isRightChild() const
 
 /* It is the responsibility of the tree object to ensure that the correct node is added as left child and that the tree rules are followed
    (e.g. don't add root as left child of a sub-node prior to decoupling it from its children */
-void AlternativeBinarySearchTree::Node::setLeftChild(AlternativeBinarySearchTree::spNode leftChild)
+void AlternativeBinarySearchTree::Node::setLeftChild(spNode leftChild, bool plainSetupRequired)
 {
-    if (m_LeftChild != leftChild)
+    if (plainSetupRequired)
+    {
+        m_LeftChild = leftChild;
+    }
+    else if (m_LeftChild != leftChild)
     {
         // ensure old left child gets decoupled from parent
         if (m_LeftChild)
@@ -642,9 +752,13 @@ AlternativeBinarySearchTree::spNode AlternativeBinarySearchTree::Node::getLeftCh
 
 /* It is the responsibility of the tree object to ensure that the correct node is added as right child and that the tree rules are followed
    (e.g. don't add root as right child of a sub-node prior to decoupling it from its children */
-void AlternativeBinarySearchTree::Node::setRightChild(spNode rightChild)
+void AlternativeBinarySearchTree::Node::setRightChild(spNode rightChild, bool plainSetupRequired)
 {
-    if (m_RightChild != rightChild)
+    if (plainSetupRequired)
+    {
+        m_RightChild = rightChild;
+    }
+    else if (m_RightChild != rightChild)
     {
         // ensure old right child gets decoupled from parent
         if (m_RightChild)
@@ -708,9 +822,13 @@ AlternativeBinarySearchTree::spNode AlternativeBinarySearchTree::Node::getInOrde
     return inOrderSuccessor;
 }
 
-void AlternativeBinarySearchTree::Node::setParent(spNode parent)
+void AlternativeBinarySearchTree::Node::setParent(spNode parent, bool plainSetupRequired)
 {
-    if (parent)
+    if (plainSetupRequired || !parent)
+    {
+        m_Parent = parent;
+    }
+    else
     {
         if (parent->m_LeftChild.get() == this || parent->m_RightChild.get() == this)
         {
@@ -721,10 +839,6 @@ void AlternativeBinarySearchTree::Node::setParent(spNode parent)
             m_Parent.reset();
             assert(false && "Invalid parent, current node is none of its children!");
         }
-    }
-    else
-    {
-        m_Parent = parent;
     }
 }
 

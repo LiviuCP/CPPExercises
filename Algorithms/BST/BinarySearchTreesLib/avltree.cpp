@@ -75,9 +75,9 @@ AVLTree& AVLTree::operator=(AVLTree&& sourceTree)
    - do a bottom-up search of the first unbalanced ancestor
    - balance the tree formed by this ancestor and the child and grandchild located in the search path
 */
-AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
+AVLTree::Node* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
 {
-    AVLNode* addedNode{static_cast<AVLNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
+    AVLNode* addedNode{dynamic_cast<AVLNode*>(BinarySearchTree::_doAddOrUpdateNode(key, value))};
 
     if (addedNode != nullptr)
     {
@@ -85,8 +85,8 @@ AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
         _updateAncestorHeights(addedNode);
 
         AVLNode* child{addedNode};
-        AVLNode* parent{static_cast<AVLNode*>(addedNode->getParent())};
-        AVLNode* grandparent{static_cast<AVLNode*>(addedNode->getGrandparent())};
+        AVLNode* parent{dynamic_cast<AVLNode*>(addedNode->getParent())};
+        AVLNode* grandparent{dynamic_cast<AVLNode*>(addedNode->getGrandparent())};
 
         // find the first unbalanced ancestor (start with grandparent of added child as the child is leaf and the parent also cannot be unbalanced after the node has been added)
         while (grandparent != nullptr)
@@ -99,7 +99,7 @@ AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
             {
                 child = parent;
                 parent = grandparent;
-                grandparent = static_cast<AVLNode*>(grandparent->getParent());
+                grandparent = dynamic_cast<AVLNode*>(grandparent->getParent());
             }
         }
 
@@ -118,12 +118,12 @@ AVLTree::AVLNode* AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
      - update parent height and ancestor heights
      - recursively balance resulting unbalanced nodes (sub-trees) starting with parent and going bottom-up until reaching root
 */
-AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
+AVLTree::Node* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemove)
 {
     assert(nodeToRemove != nullptr && "Attempt to remove a null node for AVL tree");
     assert((nodeToRemove->getLeftChild() == nullptr || nodeToRemove->getRightChild() == nullptr) && "Node to be removed has more than one child");
 
-    AVLNode* parent{static_cast<AVLNode*>(nodeToRemove->getParent())};
+    AVLNode* parent{dynamic_cast<AVLNode*>(nodeToRemove->getParent())};
 
     /* reason for using (void): the replacing node is not relevant as the removed node parent will be the first node to be checked whether being unbalanced
        (no matter if removed node is leaf or has one child */
@@ -148,7 +148,7 @@ AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemo
             }
             else
             {
-                currentNode = static_cast<AVLNode*>(currentNode->getParent());
+                currentNode = dynamic_cast<AVLNode*>(currentNode->getParent());
             }
         }
     }
@@ -156,7 +156,7 @@ AVLTree::AVLNode* AVLTree::_removeSingleChildedOrLeafNode(Node* const nodeToRemo
     return nullptr; // no replacing node required for AVL nodes (return value only for signature purposes)
 }
 
-AVLTree::AVLNode* AVLTree::_createNewNode(int key, const std::string &value)
+AVLTree::Node* AVLTree::_createNewNode(int key, const std::string &value)
 {
     AVLNode* const newNode{new AVLNode{key, value}};
     return newNode;
@@ -166,12 +166,12 @@ void AVLTree::_updateAncestorHeights(const AVLTree::AVLNode* const node)
 {
     assert(node != nullptr && "Attempt to update ancestors of a null node");
 
-    AVLNode* nodeToUpdate{static_cast<AVLNode*>(node->getParent())};
+    AVLNode* nodeToUpdate{dynamic_cast<AVLNode*>(node->getParent())};
 
     while (nodeToUpdate != nullptr)
     {
         nodeToUpdate->updateHeight();
-        nodeToUpdate = static_cast<AVLNode*>(nodeToUpdate->getParent());
+        nodeToUpdate = dynamic_cast<AVLNode*>(nodeToUpdate->getParent());
     }
 }
 
@@ -229,16 +229,16 @@ AVLTree::AVLNode::AVLNode(int key, std::string value)
 
 void AVLTree::AVLNode::updateHeight()
 {
-    const short c_LeftSubtreeHeight{m_LeftChild != nullptr ? static_cast<AVLNode*>(m_LeftChild)->m_Height : short{0}};
-    const short c_RightSubtreeHeight{m_RightChild != nullptr ? static_cast<AVLNode*>(m_RightChild)->m_Height : short{0}};
+    const short c_LeftSubtreeHeight{dynamic_cast<AVLNode*>(m_LeftChild) != nullptr ? dynamic_cast<AVLNode*>(m_LeftChild)->m_Height : short{0}};
+    const short c_RightSubtreeHeight{dynamic_cast<AVLNode*>(m_RightChild) != nullptr ? dynamic_cast<AVLNode*>(m_RightChild)->m_Height : short{0}};
 
     m_Height = 1 + std::max(c_LeftSubtreeHeight, c_RightSubtreeHeight);
 }
 
 bool AVLTree::AVLNode::isBalanced() const
 {
-    const short c_LeftSubtreeHeight{m_LeftChild != nullptr ? static_cast<AVLNode*>(m_LeftChild)->m_Height : short{0}};
-    const short c_RightSubtreeHeight{m_RightChild != nullptr ? static_cast<AVLNode*>(m_RightChild)->m_Height : short{0}};
+    const short c_LeftSubtreeHeight{dynamic_cast<AVLNode*>(m_LeftChild) != nullptr ? dynamic_cast<AVLNode*>(m_LeftChild)->m_Height : short{0}};
+    const short c_RightSubtreeHeight{dynamic_cast<AVLNode*>(m_RightChild) != nullptr ? dynamic_cast<AVLNode*>(m_RightChild)->m_Height : short{0}};
 
     const bool c_IsBalanced{std::abs(c_LeftSubtreeHeight - c_RightSubtreeHeight) <= 1};
 
@@ -248,8 +248,8 @@ bool AVLTree::AVLNode::isBalanced() const
 AVLTree::AVLNode* AVLTree::AVLNode::getGreaterHeightChild() const
 {
     AVLNode* result{nullptr};
-    AVLNode* const leftChild{static_cast<AVLNode*>(m_LeftChild)};
-    AVLNode* const rightChild{static_cast<AVLNode*>(m_RightChild)};
+    AVLNode* const leftChild{dynamic_cast<AVLNode*>(m_LeftChild)};
+    AVLNode* const rightChild{dynamic_cast<AVLNode*>(m_RightChild)};
 
     if (leftChild == nullptr || (rightChild != nullptr && leftChild->m_Height < rightChild->m_Height))
     {

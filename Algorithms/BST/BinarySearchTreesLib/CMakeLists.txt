@@ -12,6 +12,8 @@ add_library(${PROJECT_NAME} ${LIB_TYPE}
     redblacktree.cpp
     avltree.cpp
     alternativebinarysearchtree.cpp
+    alternativeredblacktree.cpp
+    alternativeavltree.cpp
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE BINARYSEARCHTREESLIB_LIBRARY)
