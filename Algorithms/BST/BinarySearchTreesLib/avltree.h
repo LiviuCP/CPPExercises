@@ -23,32 +23,32 @@ private:
     class AVLNode : public Node
     {
     public:
-        AVLNode() = delete;
+        using spAVLNode = std::shared_ptr<AVLNode>;
+
         AVLNode(int key, std::string value);
 
         void updateHeight();
 
         bool isBalanced() const;
-        AVLNode* getGreaterHeightChild() const;
+        spAVLNode getGreaterHeightChild() const;
 
     private:
         short m_Height;
     };
 
+    using spAVLNode = AVLNode::spAVLNode;
+
     // design decision: any assignment operator to work only between trees of same type
     using BinarySearchTree::operator=;
 
-    virtual Node* _doAddOrUpdateNode(int key, const std::string& value) override;
-
-    // Node* instead of AVLNode* is required as argument for signature purposes (but return type can be covariant)
-    virtual Node* _removeSingleChildedOrLeafNode(Node* const nodeToRemove) override;
-
-    virtual Node* _createNewNode(int key, const std::string& value) override;
+    spNode _doAddOrUpdateNode(int key, const std::string& value) override;
+    spNode _removeSingleChildedOrLeafNode(spNode const nodeToRemove) override;
+    spNode _createNewNode(int key, const std::string& value) override;
 
     // update all ancestors of a specific node up to the root
-    void _updateAncestorHeights(const AVLNode* const node);
+    void _updateAncestorHeights(AVLNode::spAVLNode const node);
 
-    AVLNode* _balanceSubtree(AVLNode* const grandparent, AVLNode* const parent, AVLNode* const child);
+    spAVLNode _balanceSubtree(spAVLNode const grandparent, spAVLNode const parent, spAVLNode const child);
 };
 
 #endif // AVLTREE_H

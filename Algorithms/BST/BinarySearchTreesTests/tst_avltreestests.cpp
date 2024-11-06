@@ -13,7 +13,6 @@ class AVLTreesTests : public QObject
 
 public:
     AVLTreesTests();
-    ~AVLTreesTests();
 
 private slots:
     void init();
@@ -38,11 +37,6 @@ AVLTreesTests::AVLTreesTests()
     , mpAuxSearchTree{nullptr}
 {
     BinarySearchTree::enableLogging(false);
-}
-
-AVLTreesTests::~AVLTreesTests()
-{
-    // not implemented as cleanup() does all the job
 }
 
 void AVLTreesTests::init()

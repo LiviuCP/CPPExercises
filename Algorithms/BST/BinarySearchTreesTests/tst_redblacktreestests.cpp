@@ -13,7 +13,6 @@ class RedBlackTreesTests : public QObject
 
 public:
     RedBlackTreesTests();
-    ~RedBlackTreesTests();
 
 private slots:
     void init();
@@ -39,11 +38,6 @@ RedBlackTreesTests::RedBlackTreesTests()
     , mpAuxSearchTree{nullptr}
 {
     BinarySearchTree::enableLogging(false);
-}
-
-RedBlackTreesTests::~RedBlackTreesTests()
-{
-    // not implemented as cleanup() does all the job
 }
 
 void RedBlackTreesTests::init()
@@ -86,6 +80,7 @@ void RedBlackTreesTests::testAddNodes()
             areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT:BK/-5:-1:BK/8:-1:BK/-2:-5R:RD/2:8L:RD", 5));
 
     newNodeAdded = mpSearchTree->addOrUpdateNode(7, scDefaultValue);
+    qDebug("lpopa: tree is: %s", mpSearchTree->getTreeAsString().c_str());
     QVERIFY(newNodeAdded &&
             areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT:BK/-5:-1:BK/7:-1:BK/-2:-5R:RD/2:7:RD/8:7:RD", 6));
 

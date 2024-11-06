@@ -17,7 +17,7 @@ BinarySearchTree::BinarySearchTree(const std::string& nullValue)
 BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
     : BinarySearchTree{nullValue}
 {
-    if (inputKeys.size() != 0 && defaultValue != nullValue)
+    if (defaultValue != nullValue)
     {
         _createTreeStructure(inputKeys, defaultValue, nullValue);
     }
@@ -40,23 +40,14 @@ BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
     sourceTree.m_Size = 0;
 }
 
-BinarySearchTree::~BinarySearchTree()
-{
-    _doClearTreeContent();
-}
-
 bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
 {
     bool newNodeAdded{false};
 
     if (value != m_NullValue)
     {
-        const Node* const addedNode{_doAddOrUpdateNode(key, value)};
-
-        if (addedNode != nullptr)
-        {
-            newNodeAdded = true;
-        }
+        spNode const addedNode{_doAddOrUpdateNode(key, value)};
+        newNodeAdded = addedNode != nullptr;
     }
 
     return newNodeAdded;
@@ -65,23 +56,18 @@ bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
 bool BinarySearchTree::removeNode(int key)
 {
     bool removed{false};
-    Node* nodeToRemove{_findNode(key)};
+    spNode nodeToRemove{_findNode(key)};
 
-    if (nodeToRemove != nullptr)
+    if (nodeToRemove)
     {
         // for two-children node to be removed: the in-order successor content will be copied to the node; then the successor will be recursively removed
-        if (nodeToRemove->getLeftChild() != nullptr && nodeToRemove->getRightChild() != nullptr)
+        if (nodeToRemove->getLeftChild() && nodeToRemove->getRightChild())
         {
             nodeToRemove->copyInOrderSuccessorKeyAndValue();
             nodeToRemove = nodeToRemove->getInOrderSuccessor();
         }
 
-        // when using the standard BST remove method, replacing node can be NULL (removed node is leaf) or the child of the removed node (removed node has a single child)
-        const Node* const replacingNode{_removeSingleChildedOrLeafNode(nodeToRemove)};
-        (void)replacingNode; // replacing node is not used here, is used instead by derived classes (AVL, RB trees) when calling the BinarySearchTree::_removeSingleChildedOrLeafNode() method
-
-        delete nodeToRemove;
-        nodeToRemove = nullptr;
+        _removeSingleChildedOrLeafNode(nodeToRemove);
         removed = true;
     }
 
@@ -94,8 +80,7 @@ bool BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
 
     if (m_NullValue == sourceTree.m_NullValue && this != &sourceTree)
     {
-        _copyTreeNodes(sourceTree);
-        sourceTree._doClearTreeContent();
+        _moveTreeNodes(sourceTree);
         merged = true;
     }
 
@@ -104,16 +89,17 @@ bool BinarySearchTree::mergeTree(BinarySearchTree& sourceTree)
 
 void BinarySearchTree::clear()
 {
-    _doClearTreeContent();
+    m_Root.reset();
+    m_Size = 0;
 }
 
 BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree)
 {
     if (this != &sourceTree)
     {
-        if (m_Root != nullptr)
+        if (m_Root)
         {
-            _doClearTreeContent();
+            clear();
         }
 
         m_NullValue = sourceTree.m_NullValue;
@@ -127,18 +113,13 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
 {
     if (this != &sourceTree)
     {
-        if (m_Root != nullptr)
+        if (m_Root)
         {
-            _doClearTreeContent();
+            clear();
         }
 
-        /* It is required to do a copy assignment and then erase the source tree content.
-           The reason is that it is possible to apply this operator to trees of different types by dereferencing BinarySearchTree pointers to derived tree objects.
-           In this case using the move assignment operator by simply copying the m_Root pointer value of the source object into the destination pointer and setting the m_Root source pointer to null would cause an error.
-        */
         m_NullValue = sourceTree.m_NullValue;
-        _copyTreeNodes(sourceTree);
-        sourceTree._doClearTreeContent();
+        _moveTreeNodes(sourceTree);
     }
 
     return *this;
@@ -146,28 +127,29 @@ BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
 
 bool BinarySearchTree::operator==(const BinarySearchTree& tree) const
 {
-    const bool c_AreEqualTrees{_isEqualTo(tree)};
-    return c_AreEqualTrees;
-}
+    bool areEqualTrees{true};
 
-bool BinarySearchTree::operator!=(const BinarySearchTree& tree) const
-{
-    const bool c_AreNotEqualTrees{!_isEqualTo(tree)};
-    return c_AreNotEqualTrees;
+    if (this != &tree)
+    {
+        std::vector<spNode> nodes;
+        std::vector<spNode> treeNodes;
+
+        _convertTreeToArray(nodes);
+        tree._convertTreeToArray(treeNodes);
+
+        areEqualTrees = std::equal(nodes.cbegin(), nodes.cend(), treeNodes.cbegin(), treeNodes.cend(),
+                                   [](const spNode& node, const spNode& treeNode) {return *node == *treeNode;});
+    }
+
+    return areEqualTrees;
 }
 
 std::string BinarySearchTree::getNodeValue(int key) const
 {
-    std::string result{m_NullValue};
+    spNode const foundNode{_findNode(key)};
+    const std::string c_Result{foundNode ? foundNode->getValue() : m_NullValue};
 
-    const Node* const foundNode{_findNode(key)};
-
-    if (foundNode != nullptr)
-    {
-        result = foundNode->getValue();
-    }
-
-    return result;
+    return c_Result;
 }
 
 std::string BinarySearchTree::getNullValue() const
@@ -182,15 +164,15 @@ int BinarySearchTree::getSize() const
 
 void BinarySearchTree::printTree() const
 {
-    std::vector<Node*> nodesArray;
+    std::vector<spNode> nodesArray;
     _convertTreeToArray(nodesArray);
 
-    for (std::vector<Node*>::const_iterator it{nodesArray.cbegin()}; it != nodesArray.cend(); ++it)
+    for (const auto& node: nodesArray)
     {
-        std::cout << "Node: " << (*it)->getKey();
-        std::cout << " / Is child: " << ((*it)->isLeftChild() ? "L" : (*it)->isRightChild() ? "R" : "N");
+        std::cout << "Node: " << node->getKey();
+        std::cout << " / Is child: " << (node->isLeftChild() ? "L" : node->isRightChild() ? "R" : "N");
 
-        _printNodeRelatives(*it);
+        _printNodeRelatives(node);
 
         std::cout << std::endl;
     }
@@ -205,12 +187,12 @@ std::string BinarySearchTree::getTreeAsString(bool areNodeValuesRequired) const
 {
     std::string result;
 
-    std::vector<Node*> nodesArray;
+    std::vector<spNode> nodesArray;
     _convertTreeToArray(nodesArray);
 
-    for (std::vector<Node*>::const_iterator it{nodesArray.cbegin()}; it != nodesArray.cend(); ++it)
+    for (const auto& node : nodesArray)
     {
-        result += _getNodeAsString(*it, areNodeValuesRequired);
+        result += _getNodeAsString(node, areNodeValuesRequired);
         result += "/";
     }
 
@@ -233,48 +215,74 @@ void BinarySearchTree::enableLogging(bool enable)
 
 void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
 {
-    assert(inputKeys.size() != 0 && "No keys provided for creating tree structure");
-    assert(defaultValue != nullValue && "Null value set as default value for tree keys");
-
-    for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
+    if (defaultValue != nullValue)
     {
-        Node* addedNode{_doAddOrUpdateNode(*it, defaultValue)};
-
-        if (sLoggingEnabled && addedNode == nullptr)
+        for (const auto& key : inputKeys)
         {
-            std::clog << "Warning: duplicate key found: " << *it << std::endl;
+            spNode const addedNode{_doAddOrUpdateNode(key, defaultValue)};
+
+            if (sLoggingEnabled && !addedNode)
+            {
+                std::clog << "Warning: duplicate key found: " << key << std::endl;
+            }
         }
+    }
+    else
+    {
+        assert(false && "Null value set as default value for tree keys");
     }
 }
 
 void BinarySearchTree::_copyTreeNodes(const BinarySearchTree& sourceTree)
 {
-    std::vector<Node*> sourceTreeArray;
-    sourceTree._convertTreeToArray(sourceTreeArray);
-
-    for (std::vector<Node*>::const_iterator it{sourceTreeArray.cbegin()}; it != sourceTreeArray.cend(); ++it)
+    if (m_NullValue == sourceTree.m_NullValue)
     {
-        const Node* const addedNode{_doAddOrUpdateNode((*it)->getKey(), (*it)->getValue())};
+        std::vector<spNode> sourceTreeArray;
+        sourceTree._convertTreeToArray(sourceTreeArray);
 
-        if (sLoggingEnabled && addedNode == nullptr)
+        for (const auto& node : sourceTreeArray)
         {
-            std::clog << "Warning: node " << (*it)->getKey() << " already present. Value overridden" << std::endl;
+            spNode const addedNode{_doAddOrUpdateNode(node->getKey(), node->getValue())};
+
+            if (sLoggingEnabled && !addedNode)
+            {
+                std::clog << "Warning: node " << node->getKey() << " already present. Value overridden" << std::endl;
+            }
         }
-    }
-}
-
-BinarySearchTree::Node* BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value)
-{
-    Node* addedNode{nullptr};
-
-    if (m_Root == nullptr)
-    {
-        m_Root = _createNewNode(key, value);
-        addedNode = m_Root;
     }
     else
     {
-        Node* currentNode{m_Root};
+        assert(false && "Null values of trees don't match");
+    }
+}
+
+void BinarySearchTree::_moveTreeNodes(BinarySearchTree& sourceTree)
+{
+    if (m_NullValue == sourceTree.m_NullValue)
+    {
+        if (this != &sourceTree)
+        {
+            _copyTreeNodes(sourceTree);
+            sourceTree.clear();
+        }
+        else
+        {
+            assert(false && "The tree cannot move nodes within itself!");
+        }
+    }
+    else
+    {
+        assert(false && "Null values of trees don't match");
+    }
+}
+
+BinarySearchTree::spNode BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value)
+{
+    spNode addedNode{nullptr};
+
+    if (m_Root)
+    {
+        spNode currentNode{m_Root};
         bool entryPointFound{false};
 
         while (!entryPointFound)
@@ -283,33 +291,29 @@ BinarySearchTree::Node* BinarySearchTree::_doAddOrUpdateNode(int key, const std:
 
             if (key < c_CurrentNodeKey)
             {
-                Node* const leftChild{currentNode->getLeftChild()};
-
-                if (leftChild == nullptr)
-                {
-                    addedNode = _createNewNode(key, value);
-                    currentNode->setLeftChild(addedNode);
-                    entryPointFound = true;
-                }
-                else
+                if (spNode const leftChild{currentNode->getLeftChild()}; leftChild)
                 {
                     currentNode = leftChild;
+                    continue;
                 }
+
+                addedNode = _createNewNode(key, value);
+                currentNode->setLeftChild(addedNode);
+                addedNode->setParent(currentNode);
+                entryPointFound = true;
             }
             else if (key > c_CurrentNodeKey)
             {
-                Node* const rightChild{currentNode->getRightChild()};
-
-                if (rightChild == nullptr)
-                {
-                    addedNode = _createNewNode(key, value);
-                    currentNode->setRightChild(addedNode);
-                    entryPointFound = true;
-                }
-                else
+                if (spNode const rightChild{currentNode->getRightChild()}; rightChild)
                 {
                     currentNode = rightChild;
+                    continue;
                 }
+
+                addedNode = _createNewNode(key, value);
+                currentNode->setRightChild(addedNode);
+                addedNode->setParent(currentNode);
+                entryPointFound = true;
             }
             else
             {
@@ -318,8 +322,13 @@ BinarySearchTree::Node* BinarySearchTree::_doAddOrUpdateNode(int key, const std:
             }
         }
     }
+    else
+    {
+        m_Root = _createNewNode(key, value);
+        addedNode = m_Root;
+    }
 
-    if (addedNode != nullptr)
+    if (addedNode)
     {
         ++m_Size;
     }
@@ -327,90 +336,81 @@ BinarySearchTree::Node* BinarySearchTree::_doAddOrUpdateNode(int key, const std:
     return addedNode;
 }
 
-BinarySearchTree::Node* BinarySearchTree::_removeSingleChildedOrLeafNode(BinarySearchTree::Node* const nodeToRemove)
+BinarySearchTree::spNode BinarySearchTree::_removeSingleChildedOrLeafNode(spNode nodeToRemove)
 {
-    Node* replacingNode{nullptr};
+    spNode replacingNode{nullptr};
 
-    if (nodeToRemove != nullptr)
+    if (nodeToRemove)
     {
-        Node* const leftChild{nodeToRemove->getLeftChild()};
-        Node* const rightChild{nodeToRemove->getRightChild()};
+        spNode const leftChild{nodeToRemove->getLeftChild()};
+        spNode const rightChild{nodeToRemove->getRightChild()};
 
-        assert((leftChild == nullptr || rightChild == nullptr) && "Attempt to use the remove function on a node with two children");
+        if (!leftChild || !rightChild)
+        {
+            // determine replacing node (null if leaf node is removed)
+            replacingNode = leftChild ? leftChild : rightChild ? rightChild : nullptr;
 
-        // determine replacing node
-        if (leftChild != nullptr && rightChild == nullptr)
-        {
-            replacingNode = leftChild;
-        }
-        else if (leftChild == nullptr && rightChild != nullptr)
-        {
-            replacingNode = rightChild;
-        }
-        else // do nothing, leaf node (defensive programming)
-        {
-        }
+            // parent of removed node to be stored in advance in order to make re-parenting of the replacing node possible (it gets decoupled from the node to remove when setting new child)
+            spNode const nodeToRemoveParent{nodeToRemove->getParent()};
 
-        // remove and replace
-        if (nodeToRemove->isLeftChild())
-        {
-            nodeToRemove->getParent()->setLeftChild(replacingNode);
-        }
-        else if (nodeToRemove->isRightChild())
-        {
-            nodeToRemove->getParent()->setRightChild(replacingNode);
+            // remove and replace
+            if (nodeToRemove->isLeftChild())
+            {
+                nodeToRemoveParent->setLeftChild(replacingNode);
+
+                if (replacingNode)
+                {
+                    replacingNode->setParent(nodeToRemoveParent);
+                }
+            }
+            else if (nodeToRemove->isRightChild())
+            {
+                nodeToRemoveParent->setRightChild(replacingNode);
+
+                if (replacingNode)
+                {
+                    replacingNode->setParent(nodeToRemoveParent);
+                }
+            }
+            else
+            {
+                m_Root = replacingNode;
+
+                if (replacingNode)
+                {
+                    if (replacingNode->isLeftChild())
+                    {
+                        nodeToRemove->setLeftChild(nullptr);
+                    }
+                    else
+                    {
+                        nodeToRemove->setRightChild(nullptr);
+                    }
+                }
+            }
+
+            --m_Size;
         }
         else
         {
-            m_Root = replacingNode;
-
-            if (replacingNode != nullptr)
-            {
-                if (replacingNode->isLeftChild())
-                {
-                    nodeToRemove->setLeftChild(nullptr);
-                }
-                else
-                {
-                    nodeToRemove->setRightChild(nullptr);
-                }
-            }
+            assert(false && "Attempt to use the remove function on a node with two children");
         }
-
-        --m_Size;
     }
 
     return replacingNode;
 }
 
-BinarySearchTree::Node* BinarySearchTree::_createNewNode(int key, const std::string& value)
+BinarySearchTree::spNode BinarySearchTree::_createNewNode(int key, const std::string& value)
 {
-    Node* const newNode{new Node{key, value}};
-    return newNode;
+    return std::make_shared<Node>(key, value);
 }
 
-void BinarySearchTree::_doClearTreeContent()
+BinarySearchTree::spNode BinarySearchTree::_findNode(int key) const
 {
-    std::vector<Node*> nodesArray;
-    _convertTreeToArray(nodesArray);
+    spNode foundNode{nullptr};
+    spNode currentNode{m_Root};
 
-    // no need to unlink the nodes from each other as all tree nodes are being deleted
-    for (std::vector<Node*>::iterator it{nodesArray.begin()}; it != nodesArray.end(); ++it)
-    {
-        delete(*it);
-        *it = nullptr;
-    }
-
-    m_Root = nullptr;
-    m_Size = 0;
-}
-
-BinarySearchTree::Node* BinarySearchTree::_findNode(int key) const
-{
-    Node* foundNode{nullptr};
-    Node* currentNode{m_Root};
-
-    while (currentNode != nullptr)
+    while (currentNode)
     {
         const int c_CurrentNodeKey{currentNode->getKey()};
 
@@ -432,46 +432,80 @@ BinarySearchTree::Node* BinarySearchTree::_findNode(int key) const
     return foundNode;
 }
 
-void BinarySearchTree::_convertTreeToArray(std::vector<BinarySearchTree::Node*>& nodes) const
+void BinarySearchTree::_convertTreeToArray(std::vector<spNode>& nodes) const
 {
-    if (m_Root != nullptr)
+    nodes.clear();
+
+    if (m_Root)
     {
-        nodes.clear();
-        std::vector<Node*> parentsToCheck{m_Root};
+        nodes.push_back(m_Root);
+        std::vector<spNode> parentsToCheck{m_Root};
 
         while (parentsToCheck.size() != 0)
         {
-            nodes.insert(nodes.end(), parentsToCheck.begin(), parentsToCheck.end());
-            std::vector<Node*> currentParentsToCheck{std::move(parentsToCheck)};
+            std::vector<spNode> childrenToCheck;
 
-            for (std::vector<Node*>::const_iterator it{currentParentsToCheck.cbegin()}; it != currentParentsToCheck.cend(); ++it)
+            for (const auto& parent : parentsToCheck)
             {
-                Node* const leftChild{(*it)->getLeftChild()};
-                if (leftChild != nullptr)
+                if (spNode const leftChild{parent->getLeftChild()}; leftChild)
                 {
-                    parentsToCheck.push_back(leftChild);
+                    childrenToCheck.push_back(leftChild);
                 }
 
-                Node* const rightChild{(*it)->getRightChild()};
-                if (rightChild != nullptr)
+                if (spNode const rightChild{parent->getRightChild()}; rightChild)
                 {
-                    parentsToCheck.push_back(rightChild);
+                    childrenToCheck.push_back(rightChild);
                 }
             }
+
+            nodes.insert(nodes.end(), childrenToCheck.begin(), childrenToCheck.end());
+            parentsToCheck = std::move(childrenToCheck);
         }
     }
 }
 
 // a right child node is required for left rotation
-void BinarySearchTree::_rotateNodeLeft(BinarySearchTree::Node* node)
+void BinarySearchTree::_rotateNodeLeft(spNode node)
 {
-    if (node != nullptr)
+    if (node)
     {
-        Node* const rightChild{node->getRightChild()};
+        spNode const rightChild{node->getRightChild()};
 
-        if (rightChild != nullptr)
+        if (rightChild)
         {
-            node->rotateLeft();
+            spNode const rightLeftChild{rightChild->getLeftChild()};
+            spNode const parent{node->getParent()};
+
+            // current node becomes left child of its actual right child
+            rightChild->setLeftChild(node, true);
+            node->setParent(rightChild, true);
+
+            // left child of actual right child becomes right child of current node
+            if (rightLeftChild)
+            {
+                rightLeftChild->setParent(node, true);
+            }
+
+            node->setRightChild(rightLeftChild, true);
+
+            // parent of current node (if any) becomes parent of actual right child (the new child remains same type of child for parent as before)
+            if (parent)
+            {
+                if (parent->getLeftChild() == node)
+                {
+                    parent->setLeftChild(rightChild, true);
+                    rightChild->setParent(parent, true);
+                }
+                else
+                {
+                    parent->setRightChild(rightChild, true);
+                    rightChild->setParent(parent, true);
+                }
+            }
+            else
+            {
+                rightChild->setParent(nullptr);
+            }
 
             if (m_Root == node)
             {
@@ -482,15 +516,47 @@ void BinarySearchTree::_rotateNodeLeft(BinarySearchTree::Node* node)
 }
 
 // a left child node is required for right rotation
-void BinarySearchTree::_rotateNodeRight(BinarySearchTree::Node* node)
+void BinarySearchTree::_rotateNodeRight(spNode node)
 {
-    if (node != nullptr)
+    if (node)
     {
-        Node* const leftChild{node->getLeftChild()};
+        spNode const leftChild{node->getLeftChild()};
 
-        if (leftChild != nullptr)
+        if (leftChild)
         {
-            node->rotateRight();
+            spNode const leftRightChild{leftChild->getRightChild()};
+            spNode const parent{node->getParent()};
+
+            // current node becomes right child of its actual left child
+            leftChild->setRightChild(node, true);
+            node->setParent(leftChild, true);
+
+            // right child of actual left child becomes left child of current node
+            if (leftRightChild)
+            {
+                leftRightChild->setParent(node, true);
+            }
+
+            node->setLeftChild(leftRightChild, true);
+
+            // parent of current node (if any) becomes parent of actual left child (the new child remains same type of child for parent as before)
+            if (parent)
+            {
+                if (parent->getLeftChild() == node)
+                {
+                    parent->setLeftChild(leftChild, true);
+                    leftChild->setParent(parent, true);
+                }
+                else
+                {
+                    parent->setRightChild(leftChild, true);
+                    leftChild->setParent(parent, true);
+                }
+            }
+            else
+            {
+                leftChild->setParent(nullptr);
+            }
 
             if (m_Root == node)
             {
@@ -500,38 +566,45 @@ void BinarySearchTree::_rotateNodeRight(BinarySearchTree::Node* node)
     }
 }
 
-void BinarySearchTree::_printNodeRelatives(const BinarySearchTree::Node* const node) const
+void BinarySearchTree::_printNodeRelatives(const spNode node) const
 {
-    auto printNodeRelativeInfo = [](const Node* node, const std::string& relativeName)
+    if (node)
     {
-        std::cout << " / " << relativeName << ": ";
-
-        if (node != nullptr)
+        auto printNodeRelativeInfo = [](const spNode node, const std::string& relativeName)
         {
-            std::cout << node->getKey();
-        }
-        else
-        {
-            std::cout << "N";
-        }
-    };
+            std::cout << " / " << relativeName << ": ";
 
-    printNodeRelativeInfo(node->getLeftChild(), "Left child");
-    printNodeRelativeInfo(node->getRightChild(), "Right child");
-    printNodeRelativeInfo(node->getParent(), "Parent");
-    printNodeRelativeInfo(node->getSibling(), "Sibling");
-    printNodeRelativeInfo(node->getUncle(), "Uncle");
-    printNodeRelativeInfo(node->getGrandparent(), "Grandparent");
+            if (node)
+            {
+                std::cout << node->getKey();
+            }
+            else
+            {
+                std::cout << "N";
+            }
+        };
+
+        printNodeRelativeInfo(node->getLeftChild(), "Left child");
+        printNodeRelativeInfo(node->getRightChild(), "Right child");
+        printNodeRelativeInfo(node->getParent(), "Parent");
+        printNodeRelativeInfo(node->getSibling(), "Sibling");
+        printNodeRelativeInfo(node->getUncle(), "Uncle");
+        printNodeRelativeInfo(node->getGrandparent(), "Grandparent");
+    }
+    else
+    {
+        assert(false);
+    }
 }
 
-std::string BinarySearchTree::_getNodeAsString(const Node* const node, bool isValueRequired) const
+std::string BinarySearchTree::_getNodeAsString(const spNode node, bool isValueRequired) const
 {
     std::string result{"NULL"};
 
-    if (node != nullptr)
+    if (node)
     {
         std::ostringstream nodeData;
-        const Node* const parent{node->getParent()};
+        spNode const parent{node->getParent()};
 
         nodeData << node->getKey() << ":";
 
@@ -540,24 +613,13 @@ std::string BinarySearchTree::_getNodeAsString(const Node* const node, bool isVa
             nodeData << node->getValue() << ":";
         }
 
-        if (parent != nullptr)
+        if (parent)
         {
             nodeData << parent->getKey();
 
-            if (node->getSibling() == nullptr)
+            if (!node->getSibling())
             {
-                const bool c_IsNodeLeftChild{node->isLeftChild()};
-
-                assert(c_IsNodeLeftChild || node->isRightChild()); // defensive programming, node should not be root
-
-                if (c_IsNodeLeftChild)
-                {
-                    nodeData << "L";
-                }
-                else
-                {
-                    nodeData << "R";
-                }
+                nodeData << (node->isLeftChild() ? "L" : "R");
             }
         }
         else
@@ -571,45 +633,13 @@ std::string BinarySearchTree::_getNodeAsString(const Node* const node, bool isVa
     return result;
 }
 
-bool BinarySearchTree::_isEqualTo(const BinarySearchTree& tree) const
-{
-    bool areEqualTrees{true};
-
-    if (this != &tree)
-    {
-        std::vector<Node*> nodes;
-        std::vector<Node*> treeNodes;
-
-        _convertTreeToArray(nodes);
-        tree._convertTreeToArray(treeNodes);
-
-        if (nodes.size() != treeNodes.size())
-        {
-            areEqualTrees = false;
-        }
-        else
-        {
-            for (size_t index{0}; index < nodes.size(); ++index)
-            {
-                if (*(nodes[index]) != *(treeNodes[index]))
-                {
-                    areEqualTrees = false;
-                    break;
-                }
-            }
-        }
-    }
-
-    return areEqualTrees;
-}
-
 BinarySearchTree::InOrderForwardIterator BinarySearchTree::begin()
 {
-    Node* startingNode{m_Root};
+    spNode startingNode{m_Root};
 
     if (startingNode)
     {
-        Node* currentLeftChild{startingNode->getLeftChild()};
+        spNode currentLeftChild{startingNode->getLeftChild()};
 
         while (currentLeftChild)
         {
@@ -628,7 +658,7 @@ BinarySearchTree::InOrderForwardIterator BinarySearchTree::end()
 
 BinarySearchTree::InOrderForwardIterator BinarySearchTree::find(int key)
 {
-    Node* const currentNode{_findNode(key)};
+    spNode const currentNode{_findNode(key)};
     return InOrderForwardIterator{currentNode, m_NullValue};
 }
 
@@ -638,16 +668,12 @@ BinarySearchTree::InOrderForwardIterator BinarySearchTree::root()
 }
 
 BinarySearchTree::Node::Node(int key, std::string value)
-    : m_Parent{nullptr}
-    , m_LeftChild{nullptr}
+    : m_LeftChild{nullptr}
     , m_RightChild{nullptr}
     , m_Key{key}
     , m_Value{value}
 {
-}
-
-BinarySearchTree::Node::~Node()
-{
+    m_Parent.reset();
 }
 
 int BinarySearchTree::Node::getKey() const
@@ -657,10 +683,7 @@ int BinarySearchTree::Node::getKey() const
 
 void BinarySearchTree::Node::setValue(const std::string& value)
 {
-    if (m_Value != value)
-    {
-        m_Value = value;
-    }
+    m_Value = value;
 }
 
 std::string BinarySearchTree::Node::getValue() const
@@ -670,114 +693,126 @@ std::string BinarySearchTree::Node::getValue() const
 
 bool BinarySearchTree::Node::isLeftChild() const
 {
-    const bool c_IsNodeLeftChild{m_Parent != nullptr && m_Parent->m_LeftChild == this};
+    spNode const parent{m_Parent.lock()};
+    const bool c_IsNodeLeftChild{parent && parent->m_LeftChild.get() == this};
+
     return c_IsNodeLeftChild;
 }
 
 bool BinarySearchTree::Node::isRightChild() const
 {
-    const bool c_IsNodeRightChild{m_Parent != nullptr && m_Parent->m_RightChild == this};
+    spNode const parent{m_Parent.lock()};
+    const bool c_IsNodeRightChild{parent && parent->m_RightChild.get() == this};
+
     return c_IsNodeRightChild;
 }
 
 /* It is the responsibility of the tree object to ensure that the correct node is added as left child and that the tree rules are followed
    (e.g. don't add root as left child of a sub-node prior to decoupling it from its children */
-void BinarySearchTree::Node::setLeftChild(BinarySearchTree::Node* const leftChild)
+void BinarySearchTree::Node::setLeftChild(spNode leftChild, bool plainSetupRequired)
 {
-    if (m_LeftChild != leftChild)
+    if (plainSetupRequired)
+    {
+        m_LeftChild = leftChild;
+    }
+    else if (m_LeftChild != leftChild)
     {
         // ensure old left child gets decoupled from parent
-        if (m_LeftChild != nullptr)
+        if (m_LeftChild)
         {
-            m_LeftChild->m_Parent = nullptr;
+            m_LeftChild->m_Parent.reset();
         }
 
         // ensure added left child gets decoupled from parent (if any) and coupled to actual parent
-        if (leftChild != nullptr)
+        if (leftChild)
         {
-            if (leftChild->m_Parent != nullptr)
+            spNode const parent{leftChild->m_Parent.lock()};
+
+            if (parent)
             {
-                if (leftChild->m_Parent->m_LeftChild == leftChild)
+                if (parent->m_LeftChild == leftChild)
                 {
-                    leftChild->m_Parent->m_LeftChild = nullptr;
+                    parent->m_LeftChild = nullptr;
                 }
                 else
                 {
-                    leftChild->m_Parent->m_RightChild = nullptr;
+                    parent->m_RightChild = nullptr;
                 }
             }
-
-            leftChild->m_Parent = this;
         }
 
         m_LeftChild = leftChild;
     }
 }
 
-BinarySearchTree::Node* BinarySearchTree::Node::getLeftChild() const
+BinarySearchTree::spNode BinarySearchTree::Node::getLeftChild() const
 {
     return m_LeftChild;
 }
 
 /* It is the responsibility of the tree object to ensure that the correct node is added as right child and that the tree rules are followed
    (e.g. don't add root as right child of a sub-node prior to decoupling it from its children */
-void BinarySearchTree::Node::setRightChild(BinarySearchTree::Node* const rightChild)
+void BinarySearchTree::Node::setRightChild(spNode rightChild, bool plainSetupRequired)
 {
-    if (m_RightChild != rightChild)
+    if (plainSetupRequired)
+    {
+        m_RightChild = rightChild;
+    }
+    else if (m_RightChild != rightChild)
     {
         // ensure old right child gets decoupled from parent
-        if (m_RightChild != nullptr)
+        if (m_RightChild)
         {
-            m_RightChild->m_Parent = nullptr;
+            m_RightChild->m_Parent.reset();
         }
 
         // ensure added right child gets decoupled from old parent (if any) and coupled to actual parent
-        if (rightChild != nullptr)
+        if (rightChild)
         {
-            if (rightChild->m_Parent != nullptr)
+            spNode const parent{rightChild->m_Parent.lock()};
+
+            if (parent)
             {
-                if (rightChild->m_Parent->m_LeftChild == rightChild)
+                if (parent->m_LeftChild == rightChild)
                 {
-                    rightChild->m_Parent->m_LeftChild = nullptr;
+                    parent->m_LeftChild = nullptr;
                 }
                 else
                 {
-                    rightChild->m_Parent->m_RightChild = nullptr;
+                    parent->m_RightChild = nullptr;
                 }
             }
-
-            rightChild->m_Parent = this;
         }
 
         m_RightChild = rightChild;
     }
 }
 
-BinarySearchTree::Node* BinarySearchTree::Node::getRightChild() const
+BinarySearchTree::spNode BinarySearchTree::Node::getRightChild() const
 {
     return m_RightChild;
 }
 
 void BinarySearchTree::Node::copyInOrderSuccessorKeyAndValue()
 {
-    const Node* const successor{getInOrderSuccessor()};
+    spNode const successor{getInOrderSuccessor()};
 
-    if (successor != nullptr)
+    if (successor)
     {
         m_Key = successor->m_Key;
         m_Value = successor->m_Value;
     }
 }
 
-BinarySearchTree::Node* BinarySearchTree::Node::getInOrderSuccessor() const
+BinarySearchTree::spNode BinarySearchTree::Node::getInOrderSuccessor() const
 {
-    Node* inOrderSuccessor{m_RightChild};
+    spNode inOrderSuccessor{m_RightChild};
 
-    if (m_RightChild != nullptr)
+    if (m_RightChild)
     {
-        Node* successorChild{inOrderSuccessor->m_LeftChild};
+        spNode successorChild{inOrderSuccessor->m_LeftChild};
 
-        while (successorChild != nullptr)
+        while (successorChild)
         {
             inOrderSuccessor = successorChild;
             successorChild = inOrderSuccessor->m_LeftChild;
@@ -787,200 +822,104 @@ BinarySearchTree::Node* BinarySearchTree::Node::getInOrderSuccessor() const
     return inOrderSuccessor;
 }
 
-void BinarySearchTree::Node::rotateLeft()
+void BinarySearchTree::Node::setParent(spNode parent, bool plainSetupRequired)
 {
-    assert(m_RightChild != nullptr && "Attempt to left rotate node without right child");
-
-    Node* const rightChild{m_RightChild};
-    Node* const rightLeftChild{m_RightChild->m_LeftChild};
-    Node* const parent{m_Parent};
-
-    // current node becomes left child of its actual right child
-    m_RightChild->m_LeftChild = this;
-    m_Parent = rightChild;
-
-    // left child of actual right child becomes right child of current node
-    if (rightLeftChild != nullptr)
+    if (plainSetupRequired || !parent)
     {
-        rightLeftChild->m_Parent = this;
-    }
-
-    m_RightChild = rightLeftChild;
-
-    // parent of current node (if any) becomes parent of actual right child (the new child remains same type of child for parent as before)
-    if (parent != nullptr)
-    {
-        if (parent->m_LeftChild == this)
-        {
-            parent->m_LeftChild = rightChild;
-            rightChild->m_Parent = parent;
-        }
-        else
-        {
-            parent->m_RightChild = rightChild;
-            rightChild->m_Parent = parent;
-        }
+        m_Parent = parent;
     }
     else
     {
-        rightChild->m_Parent = nullptr;
-    }
-}
-
-void BinarySearchTree::Node::rotateRight()
-{
-    assert(m_LeftChild != nullptr && "Attempt to right rotate node without left child");
-
-    Node* const leftChild{m_LeftChild};
-    Node* const leftRightChild{m_LeftChild->m_RightChild};
-    Node* const parent{m_Parent};
-
-    // current node becomes right child of its actual left child
-    m_LeftChild->m_RightChild = this;
-    m_Parent = leftChild;
-
-    // right child of actual left child becomes left child of current node
-    if (leftRightChild != nullptr)
-    {
-        leftRightChild->m_Parent = this;
-    }
-
-    m_LeftChild = leftRightChild;
-
-    // parent of current node (if any) becomes parent of actual left child (the new child remains same type of child for parent as before)
-    if (parent != nullptr)
-    {
-        if (parent->m_LeftChild == this)
+        if (parent->m_LeftChild.get() == this || parent->m_RightChild.get() == this)
         {
-            parent->m_LeftChild = leftChild;
-            leftChild->m_Parent = parent;
+            m_Parent = parent;
         }
         else
         {
-            parent->m_RightChild = leftChild;
-            leftChild->m_Parent = parent;
+            m_Parent.reset();
+            assert(false && "Invalid parent, current node is none of its children!");
         }
-    }
-    else
-    {
-        leftChild->m_Parent = nullptr;
     }
 }
 
-BinarySearchTree::Node* BinarySearchTree::Node::getParent() const
+BinarySearchTree::spNode BinarySearchTree::Node::getParent() const
 {
-    return m_Parent;
+    return m_Parent.lock();
 }
 
-BinarySearchTree::Node* BinarySearchTree::Node::getSibling() const
+BinarySearchTree::spNode BinarySearchTree::Node::getSibling() const
 {
-    Node* result{nullptr};
+    spNode result{nullptr};
 
-    if (m_Parent != nullptr)
+    if (spNode const parent{m_Parent.lock()}; parent)
     {
-        if (m_Parent->m_LeftChild == this)
-        {
-            result = m_Parent->m_RightChild;
-        }
-        else
-        {
-            result = m_Parent->m_LeftChild;
-        }
+        result = parent->m_LeftChild.get() != this ? parent->m_LeftChild : parent->m_RightChild;
     }
 
     return result;
 }
 
-BinarySearchTree::Node* BinarySearchTree::Node::getUncle() const
+BinarySearchTree::spNode BinarySearchTree::Node::getUncle() const
 {
-    Node* result{nullptr};
+    spNode result{nullptr};
 
-    const Node* const grandParent{getGrandparent()};
-
-    if (grandParent)
+    if (spNode const grandParent{getGrandparent()}; grandParent)
     {
-        if (grandParent->m_LeftChild == m_Parent)
-        {
-            result = grandParent->m_RightChild;
-        }
-        else
-        {
-            result = grandParent->m_LeftChild;
-        }
+        result = grandParent->m_LeftChild.get() != m_Parent.lock().get() ? grandParent->m_LeftChild: grandParent->m_RightChild;
     }
 
     return result;
 }
 
-BinarySearchTree::Node* BinarySearchTree::Node::getGrandparent() const
+BinarySearchTree::spNode BinarySearchTree::Node::getGrandparent() const
 {
-    Node* result{nullptr};
+    spNode result{nullptr};
 
-    if (m_Parent != nullptr)
+    if (spNode const parent{m_Parent.lock()}; parent)
     {
-        result = m_Parent->getParent();
+        result = parent->getParent();
     }
 
     return result;
 }
 
-bool BinarySearchTree::Node::operator!=(const BinarySearchTree::Node& node) const
+/* Two nodes are equal if all below conditions are fulfilled:
+- they have the same key and value
+- they are both in the same ordering position: root, left child or right child
+- if they are both parented: the parent has the same key (not necessarily the same value)
+*/
+bool BinarySearchTree::Node::operator==(const BinarySearchTree::Node& node) const
 {
-    bool areNotEqualNodes{false};
+    bool areEqualNodes{false};
 
-    if (m_Parent != nullptr)
+    if (m_Key == node.m_Key && m_Value == node.m_Value)
     {
-        assert(node.m_Parent != nullptr); // defensive programming, a non-root node should only be compared with another non-root node
+        spNode const parent{m_Parent.lock()};
+        spNode const nodeParent{node.m_Parent.lock()};
 
-        if (m_Parent->m_Key != node.m_Parent->m_Key)
-        {
-            areNotEqualNodes = true;
-        }
-        else
-        {
-            assert(m_Parent->m_Value == node.m_Parent->m_Value); // defensive programming, it is presumed that the parent nodes have already been compared and have equal keys and values
-
-            const bool c_IsCurrentNodeLeftChild{isLeftChild()};
-            const bool c_IsOtherNodeLeftChild{node.isLeftChild()};
-
-            assert((c_IsCurrentNodeLeftChild || isRightChild()) && (c_IsOtherNodeLeftChild || node.isRightChild())); // defensive programming, neither node should be root
-
-            if ((c_IsCurrentNodeLeftChild && !c_IsOtherNodeLeftChild) || (!c_IsCurrentNodeLeftChild && c_IsOtherNodeLeftChild) || (m_Key != node.m_Key || m_Value != node.m_Value))
-            {
-                areNotEqualNodes = true;
-            }
-        }
-    }
-    else
-    {
-        assert(node.m_Parent == nullptr); // defensive programming, the root node should only be compared with another root
-
-        if (m_Key != node.m_Key || m_Value != node.m_Value)
-        {
-            areNotEqualNodes = true;
-        }
+        areEqualNodes = (!parent && !nodeParent) || (parent && nodeParent && (parent->m_Key == nodeParent->m_Key) && (isLeftChild() == node.isLeftChild()));
     }
 
-    return areNotEqualNodes;
+    return areEqualNodes;
 }
 
 BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator()
-    : m_Node{nullptr}
 {
+    m_Node.reset();
 }
 
-BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator(Node* node, const std::string& nullValue)
-    : m_Node{node}
-    , m_NullValue{nullValue}
+BinarySearchTree::InOrderForwardIterator::InOrderForwardIterator(spNode node, const std::string& nullValue)
+    : m_NullValue{nullValue}
 {
+    m_Node = node;
 }
 
 void BinarySearchTree::InOrderForwardIterator::next()
 {
-    if (m_Node)
+    if (spNode const node{m_Node.lock()}; node)
     {
-        Node* nextNode{nullptr};
-        Node* currentChild{m_Node->getRightChild()};
+        spNode nextNode{nullptr};
+        spNode currentChild{node->getRightChild()};
 
         // first check downwards by moving to the right child and then checking on the left side until no more left child is found
         while (currentChild)
@@ -992,8 +931,8 @@ void BinarySearchTree::InOrderForwardIterator::next()
         // if no suitable child was found check upwards until a suitable parent (to which current node is right child) is found
         if (!nextNode)
         {
-            Node* currentNode{m_Node};
-            Node* currentParent{m_Node->getParent()};
+            spNode currentNode{node};
+            spNode currentParent{node->getParent()};
 
             // if no suitable parent is found then the end of the tree has been reached
             while(currentParent)
@@ -1003,11 +942,9 @@ void BinarySearchTree::InOrderForwardIterator::next()
                     nextNode = currentParent;
                     break;
                 }
-                else
-                {
-                    currentNode = currentParent;
-                    currentParent = currentNode->getParent();
-                }
+
+                currentNode = currentParent;
+                currentParent = currentNode->getParent();
             }
         }
 
@@ -1019,9 +956,9 @@ int BinarySearchTree::InOrderForwardIterator::getKey() const
 {
     int result{std::numeric_limits<int>::max()};
 
-    if (m_Node)
+    if (spNode const node{m_Node.lock()}; node)
     {
-        result = m_Node->getKey();
+        result = node->getKey();
     }
 
     return result;
@@ -1029,9 +966,9 @@ int BinarySearchTree::InOrderForwardIterator::getKey() const
 
 void BinarySearchTree::InOrderForwardIterator::setValue(const std::string& value)
 {
-    if (m_Node)
+    if (spNode const node{m_Node.lock()}; node)
     {
-        m_Node->setValue(value);
+        node->setValue(value);
     }
 }
 
@@ -1039,9 +976,9 @@ std::string BinarySearchTree::InOrderForwardIterator::getValue() const
 {
     std::string result{m_NullValue};
 
-    if (m_Node)
+    if (spNode const node{m_Node.lock()}; node)
     {
-        result = m_Node->getValue();
+        result = node->getValue();
     }
 
     return result;
@@ -1057,5 +994,5 @@ BinarySearchTree::InOrderForwardIterator& BinarySearchTree::InOrderForwardIterat
 
 bool BinarySearchTree::InOrderForwardIterator::operator==(const InOrderForwardIterator& other) const
 {
-    return m_Node == other.m_Node && m_NullValue == other.m_NullValue;
+    return m_Node.lock() == other.m_Node.lock() && m_NullValue == other.m_NullValue;
 }

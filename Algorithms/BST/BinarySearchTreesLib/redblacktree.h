@@ -34,13 +34,14 @@ public:
     RedBlackTree& operator=(const RedBlackTree& sourceTree);
     RedBlackTree& operator=(RedBlackTree&& sourceTree);
 
-    virtual void printTree() const override;
+    void printTree() const override;
 
 private:
     class RedBlackNode : public Node
     {
     public:
-        RedBlackNode() = delete;
+        using spRBNode = std::shared_ptr<RedBlackNode>;
+
         RedBlackNode(int key, std::string value);
 
         void setBlack(bool isBlackRequired);
@@ -50,17 +51,16 @@ private:
         bool m_IsBlack;
     };
 
+    using spRBNode = RedBlackNode::spRBNode;
+
     // design decision: any assignment operator to work only between trees of same type
     using BinarySearchTree::operator=;
 
-    virtual Node* _doAddOrUpdateNode(int key, const std::string& value) override;
+    spNode _doAddOrUpdateNode(int key, const std::string& value) override;
+    spNode _removeSingleChildedOrLeafNode(spNode const nodeToRemove) override;
+    spNode _createNewNode(int key, const std::string& value) override;
 
-    // Node* instead of RedBlackNode* is required as argument for signature purposes (but return type can be covariant)
-    virtual Node* _removeSingleChildedOrLeafNode(Node* const nodeToRemove) override;
-
-    virtual Node* _createNewNode(int key, const std::string& value) override;
-
-    virtual std::string _getNodeAsString(const Node* const node, bool isValueRequired) const override;
+    std::string _getNodeAsString(const spNode node, bool isValueRequired) const override;
 };
 
 #endif // REDBLACKTREE_H
