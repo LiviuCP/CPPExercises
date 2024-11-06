@@ -477,29 +477,29 @@ void BinarySearchTree::_rotateNodeLeft(spNode node)
             spNode const parent{node->getParent()};
 
             // current node becomes left child of its actual right child
-            rightChild->setLeftChild(node, true);
-            node->setParent(rightChild, true);
+            rightChild->setLeftChild(node);
+            node->setParent(rightChild);
 
             // left child of actual right child becomes right child of current node
+            node->setRightChild(rightLeftChild);
+
             if (rightLeftChild)
             {
-                rightLeftChild->setParent(node, true);
+                rightLeftChild->setParent(node);
             }
-
-            node->setRightChild(rightLeftChild, true);
 
             // parent of current node (if any) becomes parent of actual right child (the new child remains same type of child for parent as before)
             if (parent)
             {
                 if (parent->getLeftChild() == node)
                 {
-                    parent->setLeftChild(rightChild, true);
-                    rightChild->setParent(parent, true);
+                    parent->setLeftChild(rightChild);
+                    rightChild->setParent(parent);
                 }
                 else
                 {
-                    parent->setRightChild(rightChild, true);
-                    rightChild->setParent(parent, true);
+                    parent->setRightChild(rightChild);
+                    rightChild->setParent(parent);
                 }
             }
             else
@@ -528,29 +528,29 @@ void BinarySearchTree::_rotateNodeRight(spNode node)
             spNode const parent{node->getParent()};
 
             // current node becomes right child of its actual left child
-            leftChild->setRightChild(node, true);
-            node->setParent(leftChild, true);
+            leftChild->setRightChild(node);
+            node->setParent(leftChild);
 
             // right child of actual left child becomes left child of current node
+            node->setLeftChild(leftRightChild);
+
             if (leftRightChild)
             {
-                leftRightChild->setParent(node, true);
+                leftRightChild->setParent(node);
             }
-
-            node->setLeftChild(leftRightChild, true);
 
             // parent of current node (if any) becomes parent of actual left child (the new child remains same type of child for parent as before)
             if (parent)
             {
                 if (parent->getLeftChild() == node)
                 {
-                    parent->setLeftChild(leftChild, true);
-                    leftChild->setParent(parent, true);
+                    parent->setLeftChild(leftChild);
+                    leftChild->setParent(parent);
                 }
                 else
                 {
-                    parent->setRightChild(leftChild, true);
-                    leftChild->setParent(parent, true);
+                    parent->setRightChild(leftChild);
+                    leftChild->setParent(parent);
                 }
             }
             else
@@ -709,40 +709,9 @@ bool BinarySearchTree::Node::isRightChild() const
 
 /* It is the responsibility of the tree object to ensure that the correct node is added as left child and that the tree rules are followed
    (e.g. don't add root as left child of a sub-node prior to decoupling it from its children */
-void BinarySearchTree::Node::setLeftChild(spNode leftChild, bool plainSetupRequired)
+void BinarySearchTree::Node::setLeftChild(spNode leftChild)
 {
-    if (plainSetupRequired)
-    {
-        m_LeftChild = leftChild;
-    }
-    else if (m_LeftChild != leftChild)
-    {
-        // ensure old left child gets decoupled from parent
-        if (m_LeftChild)
-        {
-            m_LeftChild->m_Parent.reset();
-        }
-
-        // ensure added left child gets decoupled from parent (if any) and coupled to actual parent
-        if (leftChild)
-        {
-            spNode const parent{leftChild->m_Parent.lock()};
-
-            if (parent)
-            {
-                if (parent->m_LeftChild == leftChild)
-                {
-                    parent->m_LeftChild = nullptr;
-                }
-                else
-                {
-                    parent->m_RightChild = nullptr;
-                }
-            }
-        }
-
-        m_LeftChild = leftChild;
-    }
+    m_LeftChild = leftChild;
 }
 
 BinarySearchTree::spNode BinarySearchTree::Node::getLeftChild() const
@@ -752,40 +721,9 @@ BinarySearchTree::spNode BinarySearchTree::Node::getLeftChild() const
 
 /* It is the responsibility of the tree object to ensure that the correct node is added as right child and that the tree rules are followed
    (e.g. don't add root as right child of a sub-node prior to decoupling it from its children */
-void BinarySearchTree::Node::setRightChild(spNode rightChild, bool plainSetupRequired)
+void BinarySearchTree::Node::setRightChild(spNode rightChild)
 {
-    if (plainSetupRequired)
-    {
-        m_RightChild = rightChild;
-    }
-    else if (m_RightChild != rightChild)
-    {
-        // ensure old right child gets decoupled from parent
-        if (m_RightChild)
-        {
-            m_RightChild->m_Parent.reset();
-        }
-
-        // ensure added right child gets decoupled from old parent (if any) and coupled to actual parent
-        if (rightChild)
-        {
-            spNode const parent{rightChild->m_Parent.lock()};
-
-            if (parent)
-            {
-                if (parent->m_LeftChild == rightChild)
-                {
-                    parent->m_LeftChild = nullptr;
-                }
-                else
-                {
-                    parent->m_RightChild = nullptr;
-                }
-            }
-        }
-
-        m_RightChild = rightChild;
-    }
+    m_RightChild = rightChild;
 }
 
 BinarySearchTree::spNode BinarySearchTree::Node::getRightChild() const
@@ -822,24 +760,9 @@ BinarySearchTree::spNode BinarySearchTree::Node::getInOrderSuccessor() const
     return inOrderSuccessor;
 }
 
-void BinarySearchTree::Node::setParent(spNode parent, bool plainSetupRequired)
+void BinarySearchTree::Node::setParent(spNode parent)
 {
-    if (plainSetupRequired || !parent)
-    {
-        m_Parent = parent;
-    }
-    else
-    {
-        if (parent->m_LeftChild.get() == this || parent->m_RightChild.get() == this)
-        {
-            m_Parent = parent;
-        }
-        else
-        {
-            m_Parent.reset();
-            assert(false && "Invalid parent, current node is none of its children!");
-        }
-    }
+    m_Parent = parent;
 }
 
 BinarySearchTree::spNode BinarySearchTree::Node::getParent() const

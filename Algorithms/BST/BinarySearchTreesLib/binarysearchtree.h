@@ -51,11 +51,10 @@ protected:
         bool isLeftChild() const;
         bool isRightChild() const;
 
-        // plain setup refers to setting without any other checks/updates and no matter the provided value (required for rotations)
-        void setLeftChild(spNode leftChild, bool plainSetupRequired = false);
+        void setLeftChild(spNode leftChild);
         spNode getLeftChild() const;
 
-        void setRightChild(spNode rightChild, bool plainSetupRequired = false); // plain setup required for rotations
+        void setRightChild(spNode rightChild);
         spNode getRightChild() const;
 
         void copyInOrderSuccessorKeyAndValue();
@@ -64,7 +63,7 @@ protected:
         /* Should always be used after the current node is set as left/right child of the parent
            Due to weak pointer constraints it is no longer possible to have the parent set by the setLeftChild()/setRightChild() methods
         */
-        void setParent(spNode parent, bool plainSetupRequired = false); // plain setup required for rotations
+        void setParent(spNode parent);
 
         spNode getParent() const;
         spNode getSibling() const;
