@@ -566,7 +566,7 @@ void BinarySearchTree::_rotateNodeRight(spNode node)
     }
 }
 
-void BinarySearchTree::_printNodeRelatives(const spNode node) const
+void BinarySearchTree::_printNodeRelatives(spNode node) const
 {
     if (node)
     {
@@ -597,7 +597,7 @@ void BinarySearchTree::_printNodeRelatives(const spNode node) const
     }
 }
 
-std::string BinarySearchTree::_getNodeAsString(const spNode node, bool isValueRequired) const
+std::string BinarySearchTree::_getNodeAsString(spNode node, bool isValueRequired) const
 {
     std::string result{"NULL"};
 

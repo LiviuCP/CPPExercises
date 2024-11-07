@@ -214,7 +214,7 @@ RedBlackTree::spNode RedBlackTree::_doAddOrUpdateNode(int key, const std::string
    - the second step is performed only if a black node has been removed. Removing a red node (which can only be leaf) does not affect the rules.
    - the second step contains two cases: child of removed node is red (simple case - red child becomes black) and a black leaf node has been removed (complex case - more sub-cases/scenarios)
 */
-RedBlackTree::spNode RedBlackTree::_removeSingleChildedOrLeafNode(spNode const nodeToRemove)
+RedBlackTree::spNode RedBlackTree::_removeSingleChildedOrLeafNode(spNode nodeToRemove)
 {
     spRBNode const rbNodeToRemove{dynamic_pointer_cast<RedBlackNode>(nodeToRemove)};
 
@@ -355,7 +355,7 @@ RedBlackTree::spNode RedBlackTree::_createNewNode(int key, const std::string& va
     return std::make_shared<RedBlackNode>(key, value);
 }
 
-std::string RedBlackTree::_getNodeAsString(spNode const node, bool isValueRequired) const
+std::string RedBlackTree::_getNodeAsString(spNode node, bool isValueRequired) const
 {
     std::string result{"NULL"};
 

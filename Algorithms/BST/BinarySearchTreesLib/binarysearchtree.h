@@ -98,8 +98,8 @@ protected:
     void _rotateNodeLeft(spNode node);
     void _rotateNodeRight(spNode node);
 
-    void _printNodeRelatives(const spNode node) const;
-    virtual std::string _getNodeAsString(const spNode node, bool isValueRequired) const;
+    void _printNodeRelatives(spNode node) const;
+    virtual std::string _getNodeAsString(spNode node, bool isValueRequired) const;
 
     spNode m_Root;
     std::string m_NullValue; // value that each key that is NOT contained within tree corresponds to

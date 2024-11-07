@@ -42,13 +42,13 @@ private:
     using BinarySearchTree::operator=;
 
     spNode _doAddOrUpdateNode(int key, const std::string& value) override;
-    spNode _removeSingleChildedOrLeafNode(spNode const nodeToRemove) override;
+    spNode _removeSingleChildedOrLeafNode(spNode nodeToRemove) override;
     spNode _createNewNode(int key, const std::string& value) override;
 
     // update all ancestors of a specific node up to the root
-    void _updateAncestorHeights(AVLNode::spAVLNode const node);
+    void _updateAncestorHeights(spAVLNode node);
 
-    spAVLNode _balanceSubtree(spAVLNode const grandparent, spAVLNode const parent, spAVLNode const child);
+    spAVLNode _balanceSubtree(spAVLNode grandparent, spAVLNode parent, spAVLNode child);
 };
 
 #endif // AVLTREE_H

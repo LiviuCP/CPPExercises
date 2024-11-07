@@ -57,10 +57,10 @@ private:
     using BinarySearchTree::operator=;
 
     spNode _doAddOrUpdateNode(int key, const std::string& value) override;
-    spNode _removeSingleChildedOrLeafNode(spNode const nodeToRemove) override;
+    spNode _removeSingleChildedOrLeafNode(spNode nodeToRemove) override;
     spNode _createNewNode(int key, const std::string& value) override;
 
-    std::string _getNodeAsString(const spNode node, bool isValueRequired) const override;
+    std::string _getNodeAsString(spNode node, bool isValueRequired) const override;
 };
 
 #endif // REDBLACKTREE_H

@@ -118,7 +118,7 @@ AVLTree::spNode AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
      - update parent height and ancestor heights
      - recursively balance resulting unbalanced nodes (sub-trees) starting with parent and going bottom-up until reaching root
 */
-AVLTree::spNode AVLTree::_removeSingleChildedOrLeafNode(spNode const nodeToRemove)
+AVLTree::spNode AVLTree::_removeSingleChildedOrLeafNode(spNode nodeToRemove)
 {
     if (nodeToRemove)
     {
@@ -183,7 +183,7 @@ AVLTree::spNode AVLTree::_createNewNode(int key, const std::string& value)
     return std::make_shared<AVLNode>(key, value);
 }
 
-void AVLTree::_updateAncestorHeights(spAVLNode const node)
+void AVLTree::_updateAncestorHeights(spAVLNode node)
 {
     if (node)
     {
@@ -201,7 +201,7 @@ void AVLTree::_updateAncestorHeights(spAVLNode const node)
     }
 }
 
-AVLTree::spAVLNode AVLTree::_balanceSubtree(spAVLNode const grandparent, spAVLNode const parent, spAVLNode const child)
+AVLTree::spAVLNode AVLTree::_balanceSubtree(spAVLNode grandparent, spAVLNode parent, spAVLNode child)
 {
     spAVLNode resultingSubtreeRoot{nullptr};
 
