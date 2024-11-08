@@ -21,9 +21,14 @@ AVLTree::AVLTree(const std::vector<int>& inputKeys, const std::string& defaultVa
 }
 
 AVLTree::AVLTree(const AVLTree& sourceTree)
-    : BinarySearchTree{sourceTree.m_NullValue} // the "empty tree" base constructor is called for the above mentioned reasons
+    : AVLTree{sourceTree.m_NullValue}
 {
-    _copyTreeNodes(sourceTree);
+    // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
+    AVLTree temp;
+    temp = sourceTree;
+
+    // move temporary object to current object
+    *this = std::move(temp);
 }
 
 AVLTree::AVLTree(AVLTree&& sourceTree)

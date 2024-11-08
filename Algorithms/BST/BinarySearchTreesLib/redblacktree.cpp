@@ -30,9 +30,14 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
 }
 
 RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
-    : BinarySearchTree{sourceTree.m_NullValue} // the "empty tree" base constructor is called for the above mentioned reasons
+    : RedBlackTree{sourceTree.m_NullValue}
 {
-    _copyTreeNodes(sourceTree);
+    // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
+    RedBlackTree temp;
+    temp = sourceTree;
+
+    // move temporary object to current object
+    *this = std::move(temp);
 }
 
 RedBlackTree::RedBlackTree(RedBlackTree&& sourceTree)

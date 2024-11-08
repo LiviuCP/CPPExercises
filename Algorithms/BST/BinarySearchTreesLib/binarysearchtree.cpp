@@ -24,11 +24,14 @@ BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std:
 }
 
 BinarySearchTree::BinarySearchTree(const BinarySearchTree& sourceTree)
-    : m_Root{nullptr}
-    , m_NullValue{sourceTree.m_NullValue}
-    , m_Size{0}
+    : BinarySearchTree{sourceTree.m_NullValue}
 {
-    _copyTreeNodes(sourceTree);
+    // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
+    BinarySearchTree temp;
+    temp = sourceTree;
+
+    // move temporary object to current object
+    *this = std::move(temp);
 }
 
 BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
