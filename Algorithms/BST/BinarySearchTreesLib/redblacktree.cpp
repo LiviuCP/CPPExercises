@@ -8,24 +8,26 @@ RedBlackTree::RedBlackTree(const std::string& nullValue)
 {
 }
 
-/* This RB constructor does not call the "same arguments" base BST class constructor in init list
-   The reason is that the base constructor creates Node objects (instead of RedBlackNode) and uses the simple BST logic for connecting them with each other
-   Consequently the "empty tree" base constructor is called instead
-*/
 RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
-    : BinarySearchTree{nullValue}
+    : RedBlackTree{nullValue}
 {
-    if (inputKeys.size() != 0 && defaultValue != nullValue)
+    if (!inputKeys.empty() && defaultValue != nullValue)
     {
-        for (std::vector<int>::const_iterator it{inputKeys.cbegin()}; it != inputKeys.cend(); ++it)
+        // temporary object is required in order to avoid directly calling _doAddOrUpdateNode() which is virtual
+        RedBlackTree temp{nullValue};
+
+        for (const auto& inputKey : inputKeys)
         {
-            spRBNode const addedNode{dynamic_pointer_cast<RedBlackNode>(RedBlackTree::_doAddOrUpdateNode(*it, defaultValue))};
+            spRBNode const addedNode{dynamic_pointer_cast<RedBlackNode>(temp._doAddOrUpdateNode(inputKey, defaultValue))};
 
             if (BinarySearchTree::sLoggingEnabled && addedNode)
             {
-                std::clog << "Warning: duplicate red-black tree key found: " << *it << std::endl;
+                std::clog << "Warning: duplicate red-black tree key found: " << inputKey << std::endl;
             }
         }
+
+        // move temporary object to current object
+        *this = std::move(temp);
     }
 }
 
@@ -33,7 +35,7 @@ RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
     : RedBlackTree{sourceTree.m_NullValue}
 {
     // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
-    RedBlackTree temp;
+    RedBlackTree temp{sourceTree.m_NullValue};
     temp = sourceTree;
 
     // move temporary object to current object

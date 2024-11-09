@@ -17,9 +17,14 @@ BinarySearchTree::BinarySearchTree(const std::string& nullValue)
 BinarySearchTree::BinarySearchTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
     : BinarySearchTree{nullValue}
 {
-    if (defaultValue != nullValue)
+    if (!inputKeys.empty() && defaultValue != nullValue)
     {
-        _createTreeStructure(inputKeys, defaultValue, nullValue);
+        // temporary object is required in order to avoid directly calling _createTreeStructure() which contains calls to virtual methods
+        BinarySearchTree temp{nullValue};
+        temp._createTreeStructure(inputKeys, defaultValue, nullValue);
+
+        // move temporary object to current object
+        *this = std::move(temp);
     }
 }
 
@@ -27,7 +32,7 @@ BinarySearchTree::BinarySearchTree(const BinarySearchTree& sourceTree)
     : BinarySearchTree{sourceTree.m_NullValue}
 {
     // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
-    BinarySearchTree temp;
+    BinarySearchTree temp{sourceTree.m_NullValue};
     temp = sourceTree;
 
     // move temporary object to current object

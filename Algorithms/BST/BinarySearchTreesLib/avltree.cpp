@@ -7,16 +7,17 @@ AVLTree::AVLTree(const std::string& nullValue)
 {
 }
 
-/* This AVL constructor does not call the "same arguments" base BST class constructor in init list
-   The reason is that the base constructor creates Node objects (instead of AVLNode) and uses the simple BST logic for connecting them with each other
-   Consequently the "empty tree" base constructor is called instead
-*/
 AVLTree::AVLTree(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
-    : BinarySearchTree{nullValue}
+    : AVLTree{nullValue}
 {
-    if (inputKeys.size() != 0 && defaultValue != nullValue)
+    if (!inputKeys.empty() && defaultValue != nullValue)
     {
-        _createTreeStructure(inputKeys, defaultValue, nullValue);
+        // temporary object is required in order to avoid directly calling _createTreeStructure() which contains calls to virtual methods
+        AVLTree temp{nullValue};
+        temp._createTreeStructure(inputKeys, defaultValue, nullValue);
+
+        // move temporary object to current object
+        *this = std::move(temp);
     }
 }
 
@@ -24,7 +25,7 @@ AVLTree::AVLTree(const AVLTree& sourceTree)
     : AVLTree{sourceTree.m_NullValue}
 {
     // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
-    AVLTree temp;
+    AVLTree temp{sourceTree.m_NullValue};
     temp = sourceTree;
 
     // move temporary object to current object
