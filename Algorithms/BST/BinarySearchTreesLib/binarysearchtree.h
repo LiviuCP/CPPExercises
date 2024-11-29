@@ -32,6 +32,7 @@ public:
     virtual std::string getTreeAsString(bool areNodeValuesRequired = false) const;
 
     static void enableLogging(bool enable);
+    static bool isLoggingEnabled();
 
 protected:
     class Node
@@ -86,6 +87,8 @@ protected:
     void _createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue);
     void _copyTreeNodes(const BinarySearchTree& sourceTree);
     void _moveTreeNodes(BinarySearchTree& sourceTree);
+    void _moveAssignTree(BinarySearchTree& sourceTree);
+    void _setNullValue(const std::string& nullValue);
 
     virtual spNode _doAddOrUpdateNode(int key, const std::string& value);
     virtual spNode _removeSingleChildedOrLeafNode(spNode nodeToRemove);
@@ -100,7 +103,9 @@ protected:
 
     void _printNodeRelatives(spNode node) const;
     virtual std::string _getNodeAsString(spNode node, bool isValueRequired) const;
+    spNode _getRoot() const; // used by derived classes only
 
+private:
     spNode m_Root;
     std::string m_NullValue; // value that each key that is NOT contained within tree corresponds to
     int m_Size; // used for easy retrieval of the number of nodes (to avoid tree traversal)

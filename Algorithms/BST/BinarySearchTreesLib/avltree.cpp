@@ -22,10 +22,10 @@ AVLTree::AVLTree(const std::vector<int>& inputKeys, const std::string& defaultVa
 }
 
 AVLTree::AVLTree(const AVLTree& sourceTree)
-    : AVLTree{sourceTree.m_NullValue}
+    : AVLTree{sourceTree.getNullValue()}
 {
     // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
-    AVLTree temp{sourceTree.m_NullValue};
+    AVLTree temp{sourceTree.getNullValue()};
     temp = sourceTree;
 
     // move temporary object to current object
@@ -34,24 +34,16 @@ AVLTree::AVLTree(const AVLTree& sourceTree)
 
 AVLTree::AVLTree(AVLTree&& sourceTree)
 {
-    m_Root = sourceTree.m_Root;
-    m_NullValue = sourceTree.m_NullValue;
-    m_Size = sourceTree.m_Size;
-
-    sourceTree.m_Root = nullptr;
-    sourceTree.m_Size = 0;
+    _moveAssignTree(sourceTree);
 }
 
 AVLTree& AVLTree::operator=(const AVLTree& sourceTree)
 {
     if (this != &sourceTree)
     {
-        if (m_Root)
-        {
-            clear();
-        }
+        clear();
 
-        m_NullValue = sourceTree.m_NullValue;
+        _setNullValue(sourceTree.getNullValue());
         _copyTreeNodes(sourceTree);
     }
 
@@ -62,16 +54,8 @@ AVLTree& AVLTree::operator=(AVLTree&& sourceTree)
 {
     if (this != &sourceTree)
     {
-        if (m_Root)
-        {
-            clear();
-        }
-
-        m_Root = sourceTree.m_Root;
-        m_Size = sourceTree.m_Size;
-        sourceTree.m_Root = nullptr;
-        sourceTree.m_Size = 0;
-        m_NullValue = sourceTree.m_NullValue;
+        clear();
+        _moveAssignTree(sourceTree);
     }
 
     return *this;

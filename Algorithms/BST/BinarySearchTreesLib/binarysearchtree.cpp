@@ -40,12 +40,8 @@ BinarySearchTree::BinarySearchTree(const BinarySearchTree& sourceTree)
 }
 
 BinarySearchTree::BinarySearchTree(BinarySearchTree&& sourceTree)
-    : m_Root{sourceTree.m_Root}
-    , m_NullValue{sourceTree.m_NullValue}
-    , m_Size{sourceTree.m_Size}
 {
-    sourceTree.m_Root = nullptr;
-    sourceTree.m_Size = 0;
+    _moveAssignTree(sourceTree);
 }
 
 bool BinarySearchTree::addOrUpdateNode(int key, const std::string& value)
@@ -105,10 +101,7 @@ BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree
 {
     if (this != &sourceTree)
     {
-        if (m_Root)
-        {
-            clear();
-        }
+        clear();
 
         m_NullValue = sourceTree.m_NullValue;
         _copyTreeNodes(sourceTree);
@@ -117,14 +110,15 @@ BinarySearchTree& BinarySearchTree::operator=(const BinarySearchTree& sourceTree
     return *this;
 }
 
+/* Cannot use _moveAssignTree() here because the nodes should be moved one by one in base BSTs.
+   This is because a base BST pointer might point to a derived BST class and hence the source/destination root node pointers might have different node types behind.
+   This would corrupt the data in case of a move operation -> see MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes() for more details
+*/
 BinarySearchTree& BinarySearchTree::operator=(BinarySearchTree&& sourceTree)
 {
     if (this != &sourceTree)
     {
-        if (m_Root)
-        {
-            clear();
-        }
+        clear();
 
         m_NullValue = sourceTree.m_NullValue;
         _moveTreeNodes(sourceTree);
@@ -221,6 +215,11 @@ void BinarySearchTree::enableLogging(bool enable)
     }
 }
 
+bool BinarySearchTree::isLoggingEnabled()
+{
+    return sLoggingEnabled;
+}
+
 void BinarySearchTree::_createTreeStructure(const std::vector<int>& inputKeys, const std::string& defaultValue, const std::string& nullValue)
 {
     if (defaultValue != nullValue)
@@ -282,6 +281,21 @@ void BinarySearchTree::_moveTreeNodes(BinarySearchTree& sourceTree)
     {
         assert(false && "Null values of trees don't match");
     }
+}
+
+void BinarySearchTree::_moveAssignTree(BinarySearchTree& sourceTree)
+{
+    m_Root = sourceTree.m_Root;
+    m_NullValue = sourceTree.m_NullValue;
+    m_Size = sourceTree.m_Size;
+
+    sourceTree.m_Root = nullptr;
+    sourceTree.m_Size = 0;
+}
+
+void BinarySearchTree::_setNullValue(const std::string& nullValue)
+{
+    m_NullValue = nullValue;
 }
 
 BinarySearchTree::spNode BinarySearchTree::_doAddOrUpdateNode(int key, const std::string& value)
@@ -639,6 +653,11 @@ std::string BinarySearchTree::_getNodeAsString(spNode node, bool isValueRequired
     }
 
     return result;
+}
+
+BinarySearchTree::spNode BinarySearchTree::_getRoot() const
+{
+    return m_Root;
 }
 
 BinarySearchTree::InOrderForwardIterator BinarySearchTree::begin()

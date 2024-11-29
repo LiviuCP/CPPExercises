@@ -20,7 +20,7 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
         {
             spRBNode const addedNode{dynamic_pointer_cast<RedBlackNode>(temp._doAddOrUpdateNode(inputKey, defaultValue))};
 
-            if (BinarySearchTree::sLoggingEnabled && addedNode)
+            if (isLoggingEnabled() && addedNode)
             {
                 std::clog << "Warning: duplicate red-black tree key found: " << inputKey << std::endl;
             }
@@ -32,10 +32,10 @@ RedBlackTree::RedBlackTree(const std::vector<int>& inputKeys, const std::string&
 }
 
 RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
-    : RedBlackTree{sourceTree.m_NullValue}
+    : RedBlackTree{sourceTree.getNullValue()}
 {
     // temporary object is required in order to avoid directly calling _copyTreeNodes() which contains calls to virtual methods
-    RedBlackTree temp{sourceTree.m_NullValue};
+    RedBlackTree temp{sourceTree.getNullValue()};
     temp = sourceTree;
 
     // move temporary object to current object
@@ -44,24 +44,16 @@ RedBlackTree::RedBlackTree(const RedBlackTree& sourceTree)
 
 RedBlackTree::RedBlackTree(RedBlackTree&& sourceTree)
 {
-    m_Root = sourceTree.m_Root;
-    m_NullValue = sourceTree.m_NullValue;
-    m_Size = sourceTree.m_Size;
-
-    sourceTree.m_Root = nullptr;
-    sourceTree.m_Size = 0;
+    _moveAssignTree(sourceTree);
 }
 
 RedBlackTree& RedBlackTree::operator=(const RedBlackTree& sourceTree)
 {
     if (this != &sourceTree)
     {
-        if (m_Root)
-        {
-            clear();
-        }
+        clear();
 
-        m_NullValue = sourceTree.m_NullValue;
+        _setNullValue(sourceTree.getNullValue());
         _copyTreeNodes(sourceTree);
     }
 
@@ -72,16 +64,8 @@ RedBlackTree& RedBlackTree::operator=(RedBlackTree&& sourceTree)
 {
     if (this != &sourceTree)
     {
-        if (m_Root)
-        {
-            clear();
-        }
-
-        m_Root = sourceTree.m_Root;
-        m_Size = sourceTree.m_Size;
-        sourceTree.m_Root = nullptr;
-        sourceTree.m_Size = 0;
-        m_NullValue = sourceTree.m_NullValue;
+        clear();
+        _moveAssignTree(sourceTree);
     }
 
     return *this;
@@ -112,7 +96,7 @@ void RedBlackTree::printTree() const
         }
     }
 
-    if (BinarySearchTree::sLoggingEnabled && nodesArray.size() == 0)
+    if (isLoggingEnabled() && nodesArray.size() == 0)
     {
         std::clog << "Warning: red-black tree has no nodes" << std::endl;
     }
@@ -194,7 +178,7 @@ RedBlackTree::spNode RedBlackTree::_doAddOrUpdateNode(int key, const std::string
             }
         }
 
-        spRBNode const rootNode{dynamic_pointer_cast<RedBlackNode>(m_Root)};
+        spRBNode const rootNode{dynamic_pointer_cast<RedBlackNode>(_getRoot())};
 
         if (rootNode)
         {
@@ -248,7 +232,7 @@ RedBlackTree::spNode RedBlackTree::_removeSingleChildedOrLeafNode(spNode nodeToR
 
             while (!isTreeValid)
             {
-                if (doubleBlackNode == m_Root)
+                if (doubleBlackNode == _getRoot())
                 {
                     isTreeValid = true; // for double-black root: "convert" double black to black and finish
                 }
