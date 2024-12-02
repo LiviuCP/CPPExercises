@@ -71,7 +71,9 @@ bool BinarySearchTree::removeNode(int key)
             nodeToRemove = nodeToRemove->getInOrderSuccessor();
         }
 
-        _removeSingleChildedOrLeafNode(nodeToRemove);
+        // no need for replacing node here, it's only required by (some of the) derived classes
+        (void)_removeSingleChildedOrLeafNode(nodeToRemove);
+
         removed = true;
     }
 
@@ -304,14 +306,9 @@ BinarySearchTree::spNode BinarySearchTree::_doAddOrUpdateNode(int key, const std
 
     if (m_Root)
     {
-        spNode currentNode{m_Root};
-        bool entryPointFound{false};
-
-        while (!entryPointFound)
+        for(spNode currentNode{m_Root};;)
         {
-            const int c_CurrentNodeKey{currentNode->getKey()};
-
-            if (key < c_CurrentNodeKey)
+            if (const int c_CurrentNodeKey{currentNode->getKey()}; key < c_CurrentNodeKey)
             {
                 if (spNode const leftChild{currentNode->getLeftChild()}; leftChild)
                 {
@@ -321,8 +318,6 @@ BinarySearchTree::spNode BinarySearchTree::_doAddOrUpdateNode(int key, const std
 
                 addedNode = _createNewNode(key, value);
                 currentNode->setLeftChild(addedNode);
-                addedNode->setParent(currentNode);
-                entryPointFound = true;
             }
             else if (key > c_CurrentNodeKey)
             {
@@ -334,14 +329,18 @@ BinarySearchTree::spNode BinarySearchTree::_doAddOrUpdateNode(int key, const std
 
                 addedNode = _createNewNode(key, value);
                 currentNode->setRightChild(addedNode);
-                addedNode->setParent(currentNode);
-                entryPointFound = true;
             }
             else
             {
                 currentNode->setValue(value);
-                entryPointFound = true;
             }
+
+            if (addedNode)
+            {
+                addedNode->setParent(currentNode);
+            }
+
+            break;
         }
     }
     else
@@ -361,61 +360,61 @@ BinarySearchTree::spNode BinarySearchTree::_doAddOrUpdateNode(int key, const std
 BinarySearchTree::spNode BinarySearchTree::_removeSingleChildedOrLeafNode(spNode nodeToRemove)
 {
     spNode replacingNode{nullptr};
+    spNode nodeToRemoveParent{nullptr};
+    bool rootNodeRemoved{false};
 
     if (nodeToRemove)
     {
         spNode const leftChild{nodeToRemove->getLeftChild()};
         spNode const rightChild{nodeToRemove->getRightChild()};
 
-        if (!leftChild || !rightChild)
+        assert(!leftChild || !rightChild && "Attempt to use the remove function on a node with two children");
+
+        // determine replacing node (null if leaf node is removed)
+        replacingNode = leftChild ? leftChild : rightChild ? rightChild : nullptr;
+
+        // parent of removed node to be stored in advance in order to make re-parenting of the replacing node possible
+        // (it gets decoupled from the node to remove when setting new child)
+        nodeToRemoveParent = nodeToRemove->getParent();
+
+        if (nodeToRemove->isLeftChild())
         {
-            // determine replacing node (null if leaf node is removed)
-            replacingNode = leftChild ? leftChild : rightChild ? rightChild : nullptr;
-
-            // parent of removed node to be stored in advance in order to make re-parenting of the replacing node possible (it gets decoupled from the node to remove when setting new child)
-            spNode const nodeToRemoveParent{nodeToRemove->getParent()};
-
-            // remove and replace
-            if (nodeToRemove->isLeftChild())
-            {
-                nodeToRemoveParent->setLeftChild(replacingNode);
-
-                if (replacingNode)
-                {
-                    replacingNode->setParent(nodeToRemoveParent);
-                }
-            }
-            else if (nodeToRemove->isRightChild())
-            {
-                nodeToRemoveParent->setRightChild(replacingNode);
-
-                if (replacingNode)
-                {
-                    replacingNode->setParent(nodeToRemoveParent);
-                }
-            }
-            else
-            {
-                m_Root = replacingNode;
-
-                if (replacingNode)
-                {
-                    if (replacingNode->isLeftChild())
-                    {
-                        nodeToRemove->setLeftChild(nullptr);
-                    }
-                    else
-                    {
-                        nodeToRemove->setRightChild(nullptr);
-                    }
-                }
-            }
-
-            --m_Size;
+            nodeToRemoveParent->setLeftChild(replacingNode);
+        }
+        else if (nodeToRemove->isRightChild())
+        {
+            nodeToRemoveParent->setRightChild(replacingNode);
         }
         else
         {
-            assert(false && "Attempt to use the remove function on a node with two children");
+            m_Root = replacingNode;
+            rootNodeRemoved = true;
+        }
+
+        nodeToRemove->setParent(nullptr); // decouple removed node from parent
+        --m_Size;
+    }
+    else
+    {
+        assert(false && "Attempt to remove a null node!");
+    }
+
+    if (replacingNode)
+    {
+        if (rootNodeRemoved)
+        {
+            if (replacingNode->isLeftChild())
+            {
+                nodeToRemove->setLeftChild(nullptr);
+            }
+            else
+            {
+                nodeToRemove->setRightChild(nullptr);
+            }
+        }
+        else
+        {
+            replacingNode->setParent(nodeToRemoveParent);
         }
     }
 

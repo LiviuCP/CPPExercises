@@ -85,12 +85,10 @@ AVLTree::spNode AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
             {
                 break;
             }
-            else
-            {
-                child = parent;
-                parent = grandparent;
-                grandparent = dynamic_pointer_cast<AVLNode>(grandparent->getParent());
-            }
+
+            child = parent;
+            parent = grandparent;
+            grandparent = dynamic_pointer_cast<AVLNode>(grandparent->getParent());
         }
 
         if (grandparent)
@@ -110,59 +108,53 @@ AVLTree::spNode AVLTree::_doAddOrUpdateNode(int key, const std::string& value)
 */
 AVLTree::spNode AVLTree::_removeSingleChildedOrLeafNode(spNode nodeToRemove)
 {
+    spAVLNode parent{nullptr};
+
     if (nodeToRemove)
     {
         assert((!nodeToRemove->getLeftChild() || !nodeToRemove->getRightChild()) && "Node to be removed has more than one child");
-
-        spAVLNode const parent{dynamic_pointer_cast<AVLNode>(nodeToRemove->getParent())};
+        parent = dynamic_pointer_cast<AVLNode>(nodeToRemove->getParent()); // store parent in advance (BinarySearchTree::_removeSingleChildedOrLeafNode() decouples from parent)
 
         /* reason for using (void): the replacing node is not relevant as the removed node parent will be the first node to be checked whether being unbalanced
            (no matter if removed node is leaf or has one child */
         (void)BinarySearchTree::_removeSingleChildedOrLeafNode(nodeToRemove);
-
-        if (parent)
-        {
-            parent->updateHeight();
-            _updateAncestorHeights(parent);
-
-            spAVLNode currentNode{parent};
-
-            while (currentNode)
-            {
-                if (!currentNode->isBalanced())
-                {
-                    spAVLNode const currentNodeChild{currentNode->getGreaterHeightChild()};
-
-                    if (currentNodeChild)
-                    {
-                        spAVLNode const currentNodeGrandchild{currentNodeChild->getGreaterHeightChild()};
-
-                        if (currentNodeGrandchild)
-                        {
-                            currentNode = _balanceSubtree(currentNode, currentNodeChild, currentNodeGrandchild);
-                        }
-                        else
-                        {
-                            currentNode = nullptr;
-                            assert(false && "Null larger height grandchild found for unbalanced node"); // defensive programming, normally this issue should not occur
-                        }
-                    }
-                    else
-                    {
-                        currentNode = nullptr;
-                        assert(false && "Null larger height child found for unbalanced node"); // defensive programming, normally this issue should not occur
-                    }
-                }
-                else
-                {
-                    currentNode = dynamic_pointer_cast<AVLNode>(currentNode->getParent());
-                }
-            }
-        }
     }
     else
     {
-        assert(false && "Attempt to remove a null node for AVL tree");
+        assert(false && "Attempt to remove a null node!");
+    }
+
+    if (parent)
+    {
+        parent->updateHeight();
+        _updateAncestorHeights(parent);
+    }
+
+    for (spAVLNode currentNode{parent}; currentNode != nullptr;)
+    {
+        if (currentNode->isBalanced())
+        {
+            currentNode = dynamic_pointer_cast<AVLNode>(currentNode->getParent());
+            continue;
+        }
+
+        spAVLNode const currentNodeChild{currentNode->getGreaterHeightChild()};
+
+        if (!currentNodeChild)
+        {
+            assert(false && "Null larger height child found for unbalanced node"); // defensive programming, normally this issue should not occur
+            break;
+        }
+
+        spAVLNode const currentNodeGrandchild{currentNodeChild->getGreaterHeightChild()};
+
+        if (!currentNodeGrandchild)
+        {
+            assert(false && "Null larger height grandchild found for unbalanced node"); // defensive programming, normally this issue should not occur
+            break;
+        }
+
+        currentNode = _balanceSubtree(currentNode, currentNodeChild, currentNodeGrandchild);
     }
 
     return nullptr; // no replacing node required for AVL nodes (return value only for signature purposes)
