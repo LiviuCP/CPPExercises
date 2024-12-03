@@ -26,7 +26,7 @@ public:
 
     std::string getNodeValue(int key) const;
     std::string getNullValue() const;
-    int getSize() const;
+    size_t getSize() const;
 
     virtual void printTree() const;
     virtual std::string getTreeAsString(bool areNodeValuesRequired = false) const;
@@ -108,7 +108,7 @@ protected:
 private:
     spNode m_Root;
     std::string m_NullValue; // value that each key that is NOT contained within tree corresponds to
-    int m_Size; // used for easy retrieval of the number of nodes (to avoid tree traversal)
+    size_t m_Size; // used for easy retrieval of the number of nodes (to avoid tree traversal)
 
     static bool sLoggingEnabled;
 

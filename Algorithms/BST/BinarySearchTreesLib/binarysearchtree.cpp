@@ -161,7 +161,7 @@ std::string BinarySearchTree::getNullValue() const
     return m_NullValue;
 }
 
-int BinarySearchTree::getSize() const
+size_t BinarySearchTree::getSize() const
 {
     return m_Size;
 }
@@ -392,7 +392,15 @@ BinarySearchTree::spNode BinarySearchTree::_removeSingleChildedOrLeafNode(spNode
         }
 
         nodeToRemove->setParent(nullptr); // decouple removed node from parent
-        --m_Size;
+
+        if (m_Size > 0)
+        {
+            --m_Size;
+        }
+        else
+        {
+            assert(false && "Size of the tree is not allowed to be 0!");
+        }
     }
     else
     {
