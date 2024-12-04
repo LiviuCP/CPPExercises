@@ -831,8 +831,8 @@ void SimpleBSTTests::testInOrderForwardIterators()
     QVERIFY(mpSearchTree->find(-5) == mpSearchTree->root());
     QVERIFY(mpSearchTree->find(12) == mpSearchTree->end());
 
-    std::vector<std::pair<int, std::string>> traversedElements;
-    const std::vector<std::pair<int, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
+    std::vector<std::pair<std::optional<int>, std::string>> traversedElements;
+    const std::vector<std::pair<std::optional<int>, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
                                                                           {0, "fq"}, {2, "q1"}, {7, "a"}, {8, "z"}, {14, "abab"}, {16, "cCc"}, {17, "b"}, {19, "_ca"}};
 
     for (BSTIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
@@ -857,7 +857,7 @@ void SimpleBSTTests::testInOrderForwardIterators()
     it.next();
 
     QVERIFY(it == mpSearchTree->end());
-    QVERIFY(std::numeric_limits<int>::max() == it.getKey() && it.getValue().empty());
+    QVERIFY(!it.getKey().has_value() && it.getValue().empty());
 
     QVERIFY(mpSearchTree->find(2) != mpSearchTree->end());
     (void)mpSearchTree->removeNode(2);
@@ -867,10 +867,10 @@ void SimpleBSTTests::testInOrderForwardIterators()
     QVERIFY(mpAuxSearchTree->begin() == mpAuxSearchTree->end() && mpAuxSearchTree->root() == mpAuxSearchTree->end() && mpAuxSearchTree->find(14) == mpAuxSearchTree->end());
 
     BSTIterator itAux;
-    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
+    QVERIFY(!itAux.getKey().has_value() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
 
     itAux = mpAuxSearchTree->end();
-    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue() == "NullVal");
+    QVERIFY(!itAux.getKey().has_value() && itAux.getValue() == "NullVal");
 
     // the last part of this test is only relevant for "simple" BSTs (for RB and AVL a balancing is being performed)
     
@@ -880,8 +880,8 @@ void SimpleBSTTests::testInOrderForwardIterators()
     mpAuxSearchTree = std::make_unique<BinarySearchTree>(std::vector<int>{12, 9, 5, 3, 0, -2, -4, -8}, scDefaultValue);
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "12:ROOT/9:12L/5:9L/3:5L/0:3L/-2:0L/-4:-2L/-8:-4L", 8));
 
-    std::vector<int> traversedKeys;
-    const std::vector<int> c_TraversedKeysRef{-8, -4, -2, 0, 3, 5, 9, 12};
+    std::vector<std::optional<int>> traversedKeys;
+    const std::vector<std::optional<int>> c_TraversedKeysRef{-8, -4, -2, 0, 3, 5, 9, 12};
 
     for (BSTIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
     {

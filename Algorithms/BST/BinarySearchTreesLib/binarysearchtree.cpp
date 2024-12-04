@@ -909,9 +909,9 @@ void BinarySearchTree::InOrderForwardIterator::next()
     }
 }
 
-int BinarySearchTree::InOrderForwardIterator::getKey() const
+std::optional<int> BinarySearchTree::InOrderForwardIterator::getKey() const
 {
-    int result{std::numeric_limits<int>::max()};
+    std::optional<int> result;
 
     if (spNode const node{m_Node.lock()}; node)
     {

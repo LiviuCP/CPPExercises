@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <optional>
 
 class BinarySearchTree
 {
@@ -121,7 +122,7 @@ public:
         InOrderForwardIterator();
 
         void next();
-        int getKey() const;
+        std::optional<int> getKey() const;
 
         void setValue(const std::string& value);
         std::string getValue() const;

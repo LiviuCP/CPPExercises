@@ -1028,8 +1028,8 @@ void AVLTreesTests::testInOrderForwardIterators()
     QVERIFY(mpSearchTree->find(-1) == mpSearchTree->root());
     QVERIFY(mpSearchTree->find(12) == mpSearchTree->end());
 
-    std::vector<std::pair<int, std::string>> traversedElements;
-    const std::vector<std::pair<int, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
+    std::vector<std::pair<std::optional<int>, std::string>> traversedElements;
+    const std::vector<std::pair<std::optional<int>, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
                                                                           {0, "fq"}, {2, "q1"}, {7, "a"}, {8, "z"}, {14, "abab"}, {16, "cCc"}, {17, "b"}, {19, "_ca"}};
 
     for (AVLIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
@@ -1054,7 +1054,7 @@ void AVLTreesTests::testInOrderForwardIterators()
     it.next();
 
     QVERIFY(it == mpSearchTree->end());
-    QVERIFY(std::numeric_limits<int>::max() == it.getKey() && it.getValue().empty());
+    QVERIFY(!it.getKey().has_value() && it.getValue().empty());
 
     QVERIFY(mpSearchTree->find(2) != mpSearchTree->end());
     (void)mpSearchTree->removeNode(2);
@@ -1064,10 +1064,10 @@ void AVLTreesTests::testInOrderForwardIterators()
     QVERIFY(mpAuxSearchTree->begin() == mpAuxSearchTree->end() && mpAuxSearchTree->root() == mpAuxSearchTree->end() && mpAuxSearchTree->find(14) == mpAuxSearchTree->end());
 
     AVLIterator itAux;
-    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
+    QVERIFY(!itAux.getKey().has_value() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
 
     itAux = mpAuxSearchTree->end();
-    QVERIFY(itAux.getKey() == std::numeric_limits<int>::max() && itAux.getValue() == "NullVal");
+    QVERIFY(!itAux.getKey().has_value() && itAux.getValue() == "NullVal");
 }
 
 QTEST_APPLESS_MAIN(AVLTreesTests)
