@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_subdirectory(BST)
 add_subdirectory(ChessHorse)
 add_subdirectory(HuffmanEncoding)
 add_subdirectory(KruskalPrim)
