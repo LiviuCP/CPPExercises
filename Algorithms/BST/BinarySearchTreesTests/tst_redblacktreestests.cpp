@@ -5,8 +5,9 @@
 #include "redblacktree.h"
 
 using namespace TestUtils;
-using RBTIterator = RedBlackTree::InOrderForwardIterator;
-using upRedBlackTree = std::unique_ptr<RedBlackTree>;
+using IntStrRedBlackTree = RedBlackTree<int, std::string>;
+using IntStrRBTIterator = IntStrRedBlackTree::InOrderForwardIterator;
+using upIntStrRedBlackTree = std::unique_ptr<IntStrRedBlackTree>;
 
 class RedBlackTreesTests : public QObject
 {
@@ -28,15 +29,15 @@ private slots:
     void testPrintTree(); // only required for improving code coverage
 
 private:
-    upRedBlackTree mpSearchTree;
-    upRedBlackTree mpAuxSearchTree;
+    upIntStrRedBlackTree mpSearchTree;
+    upIntStrRedBlackTree mpAuxSearchTree;
 };
 
 RedBlackTreesTests::RedBlackTreesTests()
     : mpSearchTree{nullptr}
     , mpAuxSearchTree{nullptr}
 {
-    BinarySearchTree::enableLogging(false);
+    IntStrRedBlackTree::enableLogging(false);
 }
 
 void RedBlackTreesTests::init()
@@ -49,14 +50,14 @@ void RedBlackTreesTests::cleanup()
     mpSearchTree.reset();
     mpAuxSearchTree.reset();
 
-    BinarySearchTree::enableLogging(false);
+    IntStrRedBlackTree::enableLogging(false);
 }
 
 void RedBlackTreesTests::testAddNodes()
 {
     bool newNodeAdded{false};
 
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), scEmptyTreeString, 0));
 
@@ -126,7 +127,7 @@ void RedBlackTreesTests::testAddNodes()
             areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT:BK/-5:-1:BK/7:-1:BK/-16:-5:RD/-2:-5:BK/2:7:BK/14:7:RD/-23:-16:BK/-12:-16:BK/0:2L:RD/8:14:BK/17:14:BK/-15:-12:RD/-9:-12:RD/16:17:RD/19:17:RD", 16));
 
     // adding nodes to custom null value tree (compare with default null value tree)
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
 
@@ -149,15 +150,15 @@ void RedBlackTreesTests::testAddNodes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-1:ROOT:BK/-5:-1:BK/14:-1:BK/-16:-5:RD/-2:-5:BK/7:14:RD/17:14:RD/-23:-16:BK/-12:-16:BK/2:7:BK/8:7:BK/16:17:BK/19:17:BK/-15:-12:RD/-9:-12:RD/0:2L:RD/25:19R:RD", 17));
 
     // some additional (corner) cases
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-12:ROOT:BK/-16:-12:BK/-1:-12:RD/-23:-16:BK/-15:-16:BK/-5:-1:BK/8:-1:BK/-9:-5:BK/-2:-5:BK/2:8:RD/16:8:RD/0:2:BK/7:2:BK/14:16:BK/17:16:BK/19:17R:RD", 16));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "14:ROOT:BK/0:14:RD/17:14:BK/-9:0:BK/7:0:BK/16:17:BK/19:17:BK/-15:-9:RD/-2:-9:RD/2:7:BK/8:7:BK/-16:-15:BK/-12:-15:BK/-5:-2:BK/-1:-2:BK/-23:-16L:RD", 16));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-12:ROOT:BK/-16:-12:BK/14:-12:RD/-23:-16:BK/-15:-16:BK/-1:14:BK/17:14:BK/-5:-1:RD/7:-1:RD/16:17:BK/19:17:BK/-9:-5:BK/-2:-5:BK/2:7:BK/8:7:BK/0:2L:RD", 16));
 
@@ -167,33 +168,33 @@ void RedBlackTreesTests::testAddNodes()
 
     // additional tests for constructors along with the == and != operators
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree); // in this particular case due to RB tree construction rules the trees become equal when third element is being added (unlike the basic BST)
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-3, -5, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-3, 2, -5, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-3, -5, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-3, 2, -5, 4, 0, 1}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{}, scDefaultValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 }
@@ -202,8 +203,8 @@ void RedBlackTreesTests::testRemoveNodes()
 {
     bool nodeDeleted{false};
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(*mpSearchTree);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(*mpSearchTree);
 
     nodeDeleted = mpSearchTree->removeNode(-16);
     QVERIFY(nodeDeleted &&
@@ -323,7 +324,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(8); // root and left child, erase root
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-5:ROOT:BK", 1));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
 
     (void)mpSearchTree->removeNode(-5);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT:BK/-16:-1:BK/7:-1:BK/-23:-16:BK/-12:-16:RD/2:7:BK/14:7:RD/-15:-12:BK/-2:-12:BK/0:2L:RD/8:14:BK/17:14:BK/-9:-2L:RD/16:17:RD/19:17:RD", 15));
@@ -364,7 +365,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->removeNode(-16);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-12:ROOT:BK/-15:-12:BK/19:-12:BK", 3));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
 
     (void)mpSearchTree->removeNode(-23);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT:BK/-12:-1:BK/8:-1:BK/-16:-12:BK/-5:-12:RD/2:8:RD/16:8:RD/-15:-16R:RD/-9:-5:BK/-2:-5:BK/0:2:BK/7:2:BK/14:16:BK/17:16:BK/19:17R:RD", 15));
@@ -411,7 +412,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->removeNode(17); // root and right child, erase root
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "19:ROOT:BK", 1));
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue, scCustomNullValue);
 
     (void)mpAuxSearchTree->removeNode(19);
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "0:ROOT:BK/-9:0:BK/14:0:BK/-15:-9:RD/-2:-9:RD/7:14:RD/17:14:BK/-16:-15:BK/-12:-15:BK/-5:-2:BK/-1:-2:BK/2:7:BK/8:7:BK/16:17L:RD/-23:-16L:RD", 15));
@@ -452,7 +453,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(-12);
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-16:ROOT:BK/-23:-16:BK/-15:-16:BK", 3));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
 
     (void)mpSearchTree->removeNode(14);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-12:ROOT:BK/-16:-12:BK/-1:-12:RD/-23:-16:BK/-15:-16:BK/-5:-1:BK/16:-1:BK/-9:-5:BK/-2:-5:BK/7:16:RD/17:16:BK/2:7:BK/8:7:BK/19:17R:RD/0:2L:RD", 15));
@@ -493,7 +494,7 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpSearchTree->removeNode(19);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT:BK/-23:-1:BK/0:-1:BK", 3));
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-3, -5, 2}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-3, -5, 2}, scDefaultValue);
 
     (void)mpAuxSearchTree->removeNode(-5); // root and two red children, erase left child
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-3:ROOT:BK/2:-3R:RD", 2));
@@ -501,25 +502,25 @@ void RedBlackTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(2); // root and right child, erase right child
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-3:ROOT:BK", 1));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-3, -5, 2}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-3, -5, 2}, scDefaultValue, scCustomNullValue);
 
     (void)mpSearchTree->removeNode(2); // root and two red children, erase right child
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-3:ROOT:BK/-5:-3L:RD", 2));
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-3, -5, 2}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-3, -5, 2}, scDefaultValue);
 
     (void)mpAuxSearchTree->removeNode(-3); // root and two red children, erase root
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "2:ROOT:BK/-5:2L:RD", 2));
 
     // deleting null node from custom null value tree
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue);
 
     nodeDeleted = mpSearchTree->removeNode(-5);
     QVERIFY(!nodeDeleted &&
             areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "2:ROOT:BK/-1:2:BK/3:2:BK/-2:-1L:RD/4:3R:RD", 5));
 
     // deleting same node from custom and default null value trees of equal structure, keys and values
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue);
 
     nodeDeleted = mpSearchTree->removeNode(3);
     QVERIFY(nodeDeleted &&
@@ -534,7 +535,7 @@ void RedBlackTreesTests::testRemoveNodes()
 
 void RedBlackTreesTests::testUpdateNodeValue()
 {
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(-5) &&
             scDefaultNullValue == mpSearchTree->getNodeValue(0) &&
@@ -624,7 +625,7 @@ void RedBlackTreesTests::testUpdateNodeValue()
             scDefaultNullValue == mpSearchTree->getNodeValue(16));
 
     // test with same value for all nodes
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:DF:ROOT:BK/-5:DF:-1:BK/7:DF:-1:BK/-16:DF:-5:RD/-2:DF:-5:BK/2:DF:7:BK/14:DF:7:RD/-23:DF:-16:BK/-9:DF:-16:BK/0:DF:2L:RD/8:DF:14:BK/16:DF:14:BK/-12:DF:-9L:RD/17:DF:16R:RD", 14));
     QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
@@ -635,7 +636,7 @@ void RedBlackTreesTests::testUpdateNodeValue()
 
     // test updating custom null value tree node values
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
     (void)mpSearchTree->addOrUpdateNode(8, "b2");
@@ -695,7 +696,7 @@ void RedBlackTreesTests::testUpdateNodeValue()
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "0:g7:ROOT:BK/-5:a1:0:RD/7:f6:0:BK/-7:i9:-5:BK/-2::-5:BK/8:b2:7R:RD/-9:h8:-7L:RD/-1::-2R:RD", 8));
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(*mpSearchTree);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(*mpSearchTree);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
     QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
@@ -706,8 +707,8 @@ void RedBlackTreesTests::testUpdateNodeValue()
 
     // test value update and copy assignment between default and custom null value trees
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
 
     newNodeAdded = mpSearchTree->addOrUpdateNode(7, scDefaultNullValue);
     QVERIFY(!newNodeAdded &&
@@ -727,7 +728,7 @@ void RedBlackTreesTests::testUpdateNodeValue()
 
 void RedBlackTreesTests::testMoveSemantics()
 {
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
     (void)mpSearchTree->addOrUpdateNode(8, "b2");
@@ -735,7 +736,7 @@ void RedBlackTreesTests::testMoveSemantics()
     (void)mpSearchTree->addOrUpdateNode(2, "d4");
     (void)mpSearchTree->addOrUpdateNode(-2, "e5");
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::move(*mpSearchTree));
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::move(*mpSearchTree));
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:c3:ROOT:BK/-5:a1:-1:BK/8:b2:-1:BK/-2:e5:-5R:RD/2:d4:8L:RD", 5));
@@ -768,12 +769,12 @@ void RedBlackTreesTests::testMoveSemantics()
 
     // test move constructor for trees with custom null value
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scCustomNullValue);
 
     (void)mpSearchTree->addOrUpdateNode(5, scDefaultNullValue);
     (void)mpSearchTree->addOrUpdateNode(4, "newval");
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::move(*mpSearchTree));
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::move(*mpSearchTree));
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "4:newval:ROOT:BK/-1:DF:4:BK/5::4:BK/-2:DF:-1:RD/0:DF:-1:RD", 5));
@@ -782,8 +783,8 @@ void RedBlackTreesTests::testMoveSemantics()
 
     // test move and copy for trees with different null values
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
 
     (void)mpSearchTree->addOrUpdateNode(7, scDefaultNullValue);
     (void)mpAuxSearchTree->addOrUpdateNode(4, scCustomNullValue);
@@ -798,7 +799,7 @@ void RedBlackTreesTests::testMoveSemantics()
 
 void RedBlackTreesTests::testMergeTrees()
 {
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1_1");
     (void)mpSearchTree->addOrUpdateNode(2, "d4");
@@ -809,7 +810,7 @@ void RedBlackTreesTests::testMergeTrees()
     (void)mpSearchTree->addOrUpdateNode(16, "i9_1");
     (void)mpSearchTree->addOrUpdateNode(0, "g7_1");
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>();
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     (void)mpAuxSearchTree->addOrUpdateNode(8, "b2");
     (void)mpAuxSearchTree->addOrUpdateNode(-1, "c3");
@@ -821,8 +822,8 @@ void RedBlackTreesTests::testMergeTrees()
     (void)mpAuxSearchTree->addOrUpdateNode(14, "j10");
     (void)mpAuxSearchTree->addOrUpdateNode(-16, "m13");
 
-    const RedBlackTree searchTreeCopy{*mpSearchTree};
-    const RedBlackTree searchTreeAuxCopy{*mpAuxSearchTree};
+    const IntStrRedBlackTree searchTreeCopy{*mpSearchTree};
+    const IntStrRedBlackTree searchTreeAuxCopy{*mpAuxSearchTree};
 
     QVERIFY(searchTreeCopy == *mpSearchTree &&      // just a(n additional) check that the copy constructor and == operator work correctly
             searchTreeAuxCopy == *mpAuxSearchTree);
@@ -834,7 +835,7 @@ void RedBlackTreesTests::testMergeTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT:BK/-12:n14:2:BK/16:i9_2:2:BK/-23:k11:-12:BK/-1:c3:-12:RD/8:b2:16:BK/17:l12:16:BK/-16:m13:-23R:RD/-5:a1_2:-1:BK/0:g7_2:-1:BK/7:f6:8:RD/14:j10:8:RD/-9:h8:-5:RD/-2:e5:-5:RD", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    const RedBlackTree mainTreeAfterFirstMerge{*mpSearchTree};
+    const IntStrRedBlackTree mainTreeAfterFirstMerge{*mpSearchTree};
 
     // merge empty tree into unempty tree
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
@@ -888,7 +889,7 @@ void RedBlackTreesTests::testMergeTrees()
 
     // merge trees with (same) custom null value
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
     (void)mpSearchTree->addOrUpdateNode(8, "b2");
@@ -903,7 +904,7 @@ void RedBlackTreesTests::testMergeTrees()
     (void)mpSearchTree->removeNode(-8);
     (void)mpSearchTree->removeNode(2);
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
     (void)mpAuxSearchTree->addOrUpdateNode(-9, scDefaultNullValue);
 
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
@@ -916,8 +917,8 @@ void RedBlackTreesTests::testMergeTrees()
 
     // (attempt to) merge trees with different null values (custom vs. default)
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scDefaultNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scDefaultNullValue);
     mpSearchTree->addOrUpdateNode(9, "abc");
     mpAuxSearchTree->addOrUpdateNode(7, "xyz");
 
@@ -959,8 +960,8 @@ void RedBlackTreesTests::testMergeTrees()
 
     // (attempt to) merge trees with different null values (custom vs. custom)
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scCustomNullValue + "1");
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scCustomNullValue + "1");
     mpSearchTree->addOrUpdateNode(9, "abc");
     mpAuxSearchTree->addOrUpdateNode(7, "xyz");
 
@@ -1003,7 +1004,7 @@ void RedBlackTreesTests::testMergeTrees()
 
 void RedBlackTreesTests::testInOrderForwardIterators()
 {
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     (void)mpSearchTree->addOrUpdateNode(-5, "b");
     (void)mpSearchTree->addOrUpdateNode(8, "z");
@@ -1027,7 +1028,7 @@ void RedBlackTreesTests::testInOrderForwardIterators()
                                      "-23:-c:-16:BK/-12:dev:-16:BK/0:fq:2L:RD/8:z:14:BK/17:b:14:BK/-15:DF:-12:RD/-9:DF:-12:RD/16:cCc:17:RD/19:_ca:17:RD",
                                      16));
 
-    RBTIterator it{mpSearchTree->begin()};
+    IntStrRBTIterator it{mpSearchTree->begin()};
     QVERIFY(it.getKey() == -23 && it.getValue() == "-c");
 
     it = mpSearchTree->root();
@@ -1044,7 +1045,7 @@ void RedBlackTreesTests::testInOrderForwardIterators()
     const std::vector<std::pair<std::optional<int>, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
                                                                           {0, "fq"}, {2, "q1"}, {7, "a"}, {8, "z"}, {14, "abab"}, {16, "cCc"}, {17, "b"}, {19, "_ca"}};
 
-    for (RBTIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
+    for (IntStrRBTIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
     {
         traversedElements.push_back({it.getKey(), it.getValue()});
     }
@@ -1072,10 +1073,10 @@ void RedBlackTreesTests::testInOrderForwardIterators()
     (void)mpSearchTree->removeNode(2);
     QVERIFY(mpSearchTree->find(2) == mpSearchTree->end());
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>("NullVal");
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>("NullVal");
     QVERIFY(mpAuxSearchTree->begin() == mpAuxSearchTree->end() && mpAuxSearchTree->root() == mpAuxSearchTree->end() && mpAuxSearchTree->find(14) == mpAuxSearchTree->end());
 
-    RBTIterator itAux;
+    IntStrRBTIterator itAux;
     QVERIFY(!itAux.getKey().has_value() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
 
     itAux = mpAuxSearchTree->end();
@@ -1085,7 +1086,7 @@ void RedBlackTreesTests::testInOrderForwardIterators()
 void RedBlackTreesTests::testPrintTree()
 {
     qInfo("Creating new tree");
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue);
 
     QVERIFY(16 == mpSearchTree->getSize());
 

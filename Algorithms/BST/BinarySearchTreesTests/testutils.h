@@ -5,7 +5,7 @@
 
 namespace TestUtils
 {
-    bool areExpectedTreeValuesMet(const std::string& treeString, int treeSize, const std::string& expectedTreeString, int expectedTreeSize);
+    bool areExpectedTreeValuesMet(const std::string& treeString, size_t treeSize, const std::string& expectedTreeString, size_t expectedTreeSize);
 
     static const std::string scDefaultValue{"DF"};
     static const std::string scDefaultNullValue{""};

@@ -6,7 +6,10 @@
 #include "avltree.h"
 
 using namespace TestUtils;
-using upBinarySearchTree = std::unique_ptr<BinarySearchTree>;
+using IntStrBinarySearchTree = BinarySearchTree<int, std::string>;
+using IntStrRedBlackTree = RedBlackTree<int, std::string>;
+using IntStrAVLTree = AVLTree<int, std::string>;
+using upIntStrBinarySearchTree = std::unique_ptr<IntStrBinarySearchTree>;
 
 class MixedTreeTypesTests : public QObject
 {
@@ -32,15 +35,15 @@ private:
     void _buildPrimaryTestSearchTreeInDifferentOrder(); // same content, different node adding order to the tree created by _buildPrimaryTestSearchTree() method (referenced by mpAuxSearchTree)
     void _buildSecondaryTestSearchTreeInDifferentOrder(); // same content, different node adding order to the tree created by _buildSecondaryTestSearchTree() method (referenced by mpSearchTree)
     
-    upBinarySearchTree mpSearchTree;
-    upBinarySearchTree mpAuxSearchTree;
+    upIntStrBinarySearchTree mpSearchTree;
+    upIntStrBinarySearchTree mpAuxSearchTree;
 };
 
 MixedTreeTypesTests::MixedTreeTypesTests()
     : mpSearchTree{nullptr}
     , mpAuxSearchTree{nullptr}
 {
-    BinarySearchTree::enableLogging(false);
+    IntStrBinarySearchTree::enableLogging(false);
 }
 
 void MixedTreeTypesTests::init()
@@ -53,43 +56,43 @@ void MixedTreeTypesTests::cleanup()
     mpSearchTree.reset();
     mpAuxSearchTree.reset();
 
-    BinarySearchTree::enableLogging(false);
+    IntStrBinarySearchTree::enableLogging(false);
 }
 
 void MixedTreeTypesTests::testMergeDifferentSearchTrees()
 {
     /* create all trees to be used in the merge operations */
-    mpSearchTree = std::make_unique<BinarySearchTree>();
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>();
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
     
-    const BinarySearchTree simpleTreeCopy{*mpSearchTree};
-    const BinarySearchTree simpleTreeAuxCopy{*mpAuxSearchTree};
+    const IntStrBinarySearchTree simpleTreeCopy{*mpSearchTree};
+    const IntStrBinarySearchTree simpleTreeAuxCopy{*mpAuxSearchTree};
 
-    mpSearchTree = std::make_unique<RedBlackTree>();
-    mpAuxSearchTree = std::make_unique<RedBlackTree>();
-
-    _buildPrimaryTestSearchTree();
-    _buildSecondaryTestSearchTree();
-
-    const RedBlackTree redBlackTreeCopy{*dynamic_cast<RedBlackTree*>(mpSearchTree.get())};
-    const RedBlackTree redBlackTreeAuxCopy{*dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get())};
-
-    mpSearchTree = std::make_unique<AVLTree>();
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
 
-    const AVLTree avlTreeCopy{*dynamic_cast<AVLTree*>(mpSearchTree.get())};
-    const AVLTree avlTreeAuxCopy{*dynamic_cast<AVLTree*>(mpAuxSearchTree.get())};
+    const IntStrRedBlackTree redBlackTreeCopy{*dynamic_cast<IntStrRedBlackTree*>(mpSearchTree.get())};
+    const IntStrRedBlackTree redBlackTreeAuxCopy{*dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get())};
+
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
+
+    _buildPrimaryTestSearchTree();
+    _buildSecondaryTestSearchTree();
+
+    const IntStrAVLTree avlTreeCopy{*dynamic_cast<IntStrAVLTree*>(mpSearchTree.get())};
+    const IntStrAVLTree avlTreeAuxCopy{*dynamic_cast<IntStrAVLTree*>(mpAuxSearchTree.get())};
 
     /* merge RED-BLACK tree into SIMPLE tree */
     
-    mpSearchTree = std::make_unique<BinarySearchTree>(simpleTreeCopy);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(redBlackTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeAuxCopy);
 
     bool merged{mpSearchTree->mergeTree(*mpAuxSearchTree)};
 
@@ -97,8 +100,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-5:a1_2:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23R/0:g7_2:2/7:f6:2/-16:m13:-12/-9:h8:-12/-1:c3:0L/17:l12:7R/-2:e5:-1L/16:i9_2:17L/8:b2:16L/14:j10:8R", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(redBlackTreeCopy);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(simpleTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeAuxCopy);
 
     merged = mpAuxSearchTree->mergeTree(*mpSearchTree);
 
@@ -108,8 +111,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
 
     /* merge AVL tree into SIMPLE tree */
     
-    mpSearchTree = std::make_unique<BinarySearchTree>(simpleTreeCopy);
-    mpAuxSearchTree = std::make_unique<AVLTree>(avlTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(avlTreeAuxCopy);
 
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
 
@@ -117,8 +120,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-5:a1_2:ROOT/-23:k11:-5/2:d4:-5/-12:n14:-23R/0:g7_2:2/7:f6:2/-16:m13:-12/-9:h8:-12/-1:c3:0L/17:l12:7R/-2:e5:-1L/16:i9_2:17L/8:b2:16L/14:j10:8R", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<AVLTree>(avlTreeCopy);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(simpleTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(avlTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeAuxCopy);
 
     merged = mpAuxSearchTree->mergeTree(*mpSearchTree);
 
@@ -128,8 +131,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
 
     /* merge AVL tree into RED-BLACK tree */
 
-    mpSearchTree = std::make_unique<RedBlackTree>(redBlackTreeCopy);
-    mpAuxSearchTree = std::make_unique<AVLTree>(avlTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(avlTreeAuxCopy);
 
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
 
@@ -137,8 +140,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT:BK/-12:n14:2:BK/16:i9_2:2:BK/-23:k11:-12:BK/-1:c3:-12:RD/8:b2:16:BK/17:l12:16:BK/-16:m13:-23R:RD/-5:a1_2:-1:BK/0:g7_2:-1:BK/7:f6:8:RD/14:j10:8:RD/-9:h8:-5:RD/-2:e5:-5:RD", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<AVLTree>(avlTreeCopy);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(redBlackTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(avlTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeAuxCopy);
 
     merged = mpAuxSearchTree->mergeTree(*mpSearchTree);
 
@@ -148,8 +151,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
 
     /* merge SIMPLE tree into RED-BLACK tree */
 
-    mpSearchTree = std::make_unique<RedBlackTree>(redBlackTreeCopy);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(simpleTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeAuxCopy);
 
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
 
@@ -157,8 +160,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT:BK/-12:n14:2:BK/16:i9_2:2:BK/-23:k11:-12:BK/-1:c3:-12:RD/8:b2:16:BK/17:l12:16:BK/-16:m13:-23R:RD/-5:a1_2:-1:BK/0:g7_2:-1:BK/7:f6:8:RD/14:j10:8:RD/-9:h8:-5:RD/-2:e5:-5:RD", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<BinarySearchTree>(simpleTreeCopy);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(redBlackTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeAuxCopy);
 
     merged = mpAuxSearchTree->mergeTree(*mpSearchTree);
 
@@ -168,8 +171,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
 
     /* merge SIMPLE tree into AVL tree */
 
-    mpSearchTree = std::make_unique<AVLTree>(avlTreeCopy);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(simpleTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(avlTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeAuxCopy);
 
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
 
@@ -177,8 +180,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT/-5:a1_2:2/16:i9_2:2/-12:n14:-5/-1:c3:-5/8:b2:16/17:l12:16/-23:k11:-12/-9:h8:-12/-2:e5:-1/0:g7_2:-1/7:f6:8/14:j10:8/-16:m13:-23R", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<BinarySearchTree>(simpleTreeCopy);
-    mpAuxSearchTree = std::make_unique<AVLTree>(avlTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(simpleTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(avlTreeAuxCopy);
 
     merged = mpAuxSearchTree->mergeTree(*mpSearchTree);
 
@@ -188,8 +191,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
 
     /* merge RED-BLACK tree into AVL tree */
 
-    mpSearchTree = std::make_unique<AVLTree>(avlTreeCopy);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(redBlackTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(avlTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeAuxCopy);
 
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
 
@@ -197,8 +200,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT/-5:a1_2:2/16:i9_2:2/-12:n14:-5/-1:c3:-5/8:b2:16/17:l12:16/-23:k11:-12/-9:h8:-12/-2:e5:-1/0:g7_2:-1/7:f6:8/14:j10:8/-16:m13:-23R", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(redBlackTreeCopy);
-    mpAuxSearchTree = std::make_unique<AVLTree>(avlTreeAuxCopy);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(redBlackTreeCopy);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(avlTreeAuxCopy);
 
     merged = mpAuxSearchTree->mergeTree(*mpSearchTree);
 
@@ -210,8 +213,8 @@ void MixedTreeTypesTests::testMergeDifferentSearchTrees()
 void MixedTreeTypesTests::testFailToMergeWhenNullValuesAreDifferent()
 {
     /* (attempt to) merge RED-BLACK tree into SIMPLE tree */
-    mpSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
@@ -226,8 +229,8 @@ void MixedTreeTypesTests::testFailToMergeWhenNullValuesAreDifferent()
 
     /* (attempt to) merge AVL tree into SIMPLE tree */
     
-    mpSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
@@ -242,8 +245,8 @@ void MixedTreeTypesTests::testFailToMergeWhenNullValuesAreDifferent()
 
     /* (attempt to) merge AVL tree into RED-BLACK tree */
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
@@ -258,8 +261,8 @@ void MixedTreeTypesTests::testFailToMergeWhenNullValuesAreDifferent()
 
     /* (attempt to) merge SIMPLE tree into RED-BLACK tree */
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
@@ -274,8 +277,8 @@ void MixedTreeTypesTests::testFailToMergeWhenNullValuesAreDifferent()
 
     /* (attempt to) merge SIMPLE tree into AVL tree */
 
-    mpSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
@@ -290,8 +293,8 @@ void MixedTreeTypesTests::testFailToMergeWhenNullValuesAreDifferent()
 
     /* (attempt to) merge RED-BLACK tree into AVL tree */
 
-    mpSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     _buildPrimaryTestSearchTree();
     _buildSecondaryTestSearchTree();
@@ -308,10 +311,10 @@ void MixedTreeTypesTests::testFailToMergeWhenNullValuesAreDifferent()
 void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 {
     // Simple BST vs. Red-Black tree
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
     _buildPrimaryTestSearchTree();
     
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
     _buildPrimaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT:BK/-12:n14:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:RD/17:l12:16:RD/0:g7_1:-5R:RD", 8));
@@ -323,19 +326,19 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
     (void)mpAuxSearchTree->addOrUpdateNode(-12, "n14_1");
-    QVERIFY(*dynamic_cast<RedBlackTree*>(mpSearchTree.get()) == *mpAuxSearchTree);
+    QVERIFY(*dynamic_cast<IntStrRedBlackTree*>(mpSearchTree.get()) == *mpAuxSearchTree);
 
     (void)mpSearchTree->addOrUpdateNode(1, "abcd");
     (void)mpAuxSearchTree->addOrUpdateNode(1, "abcd");
-    QVERIFY(*dynamic_cast<RedBlackTree*>(mpSearchTree.get()) != *mpAuxSearchTree);
+    QVERIFY(*dynamic_cast<IntStrRedBlackTree*>(mpSearchTree.get()) != *mpAuxSearchTree);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT:BK/-12:n14_1:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/0:g7_1:-12:BK/7:f6:16:RD/17:l12:16:RD/-5:a1_1:0:RD/1:abcd:0:RD", 9));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R/1:abcd:0R", 9));
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
     
-    mpSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>();
     _buildSecondaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9));
@@ -347,81 +350,81 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
     (void)mpAuxSearchTree->removeNode(14);
-    QVERIFY(*mpSearchTree == *dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()));
+    QVERIFY(*mpSearchTree == *dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()));
 
     (void)mpSearchTree->removeNode(-2);
     (void)mpAuxSearchTree->removeNode(-2);
-    QVERIFY(*mpSearchTree != *dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()));
+    QVERIFY(*mpSearchTree != *dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()));
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5L/0:g7_2:8/16:i9_2:8/-16:m13:-9L", 7));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:c3:ROOT:BK/-9:h8:-1:RD/8:b2:-1:RD/-16:m13:-9:BK/-5:a1_2:-9:BK/0:g7_2:8:BK/16:i9_2:8:BK", 7));
 
     // Red-Black tree vs. AVL tree
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::move(*dynamic_cast<RedBlackTree*>(mpSearchTree.get())));
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::move(*dynamic_cast<IntStrRedBlackTree*>(mpSearchTree.get())));
 
-    mpSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
     _buildPrimaryTestSearchTree();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "2:d4:ROOT:BK/-12:n14:2:RD/16:i9_1:2:BK/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:RD/17:l12:16:RD/0:g7_1:-5R:RD", 8));
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
-    QVERIFY(*mpSearchTree == *dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()));
+    QVERIFY(*mpSearchTree == *dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()));
 
     (void)mpSearchTree->addOrUpdateNode(-12, "n14_1");
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
-    QVERIFY(*mpSearchTree != *dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()));
+    QVERIFY(*mpSearchTree != *dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()));
 
     (void)mpAuxSearchTree->addOrUpdateNode(-12, "n14_1");
-    QVERIFY(*dynamic_cast<AVLTree*>(mpSearchTree.get()) == *dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()));
-    QVERIFY(*dynamic_cast<AVLTree*>(mpSearchTree.get()) == *mpAuxSearchTree);
+    QVERIFY(*dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()) == *dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()));
+    QVERIFY(*dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()) == *mpAuxSearchTree);
 
     (void)mpAuxSearchTree->addOrUpdateNode(25, "abcd");
-    QVERIFY(*dynamic_cast<AVLTree*>(mpSearchTree.get()) != *dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()));
-    QVERIFY(*dynamic_cast<AVLTree*>(mpSearchTree.get()) != *mpAuxSearchTree);
+    QVERIFY(*dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()) != *dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()));
+    QVERIFY(*dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()) != *mpAuxSearchTree);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "2:d4:ROOT:BK/-12:n14_1:2:RD/16:i9_1:2:RD/-23:k11:-12:BK/-5:a1_1:-12:BK/7:f6:16:BK/17:l12:16:BK/0:g7_1:-5R:RD/25:abcd:17R:RD", 9));
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
-    mpSearchTree = std::make_unique<AVLTree>(*dynamic_cast<AVLTree*>(mpAuxSearchTree.get()));
+    mpSearchTree = std::make_unique<IntStrAVLTree>(*dynamic_cast<IntStrAVLTree*>(mpAuxSearchTree.get()));
 
-    mpAuxSearchTree = std::make_unique<RedBlackTree>();
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>();
     _buildSecondaryTestSearchTree();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:c3:ROOT:BK/-5:a1_2:-1:RD/8:b2:-1:RD/-9:h8:-5:BK/-2:e5:-5:BK/0:g7_2:8:BK/16:i9_2:8:BK/-16:m13:-9L:RD/14:j10:16L:RD", 9));
 
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
-    QVERIFY(*mpAuxSearchTree == *dynamic_cast<AVLTree*>(mpSearchTree.get()));
+    QVERIFY(*mpAuxSearchTree == *dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()));
 
     (void)mpSearchTree->removeNode(-2);
     QVERIFY(*mpAuxSearchTree != *mpSearchTree);
-    QVERIFY(*mpAuxSearchTree != *dynamic_cast<AVLTree*>(mpSearchTree.get()));
+    QVERIFY(*mpAuxSearchTree != *dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()));
 
     (void)mpAuxSearchTree->removeNode(-2);
-    QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()) == *dynamic_cast<AVLTree*>(mpSearchTree.get()));
-    QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()) == *mpSearchTree);
+    QVERIFY(*dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()) == *dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()));
+    QVERIFY(*dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()) == *mpSearchTree);
 
     (void)mpSearchTree->removeNode(14);
-    QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()) != *dynamic_cast<AVLTree*>(mpSearchTree.get()));
-    QVERIFY(*dynamic_cast<RedBlackTree*>(mpAuxSearchTree.get()) != *mpSearchTree);
+    QVERIFY(*dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()) != *dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()));
+    QVERIFY(*dynamic_cast<IntStrRedBlackTree*>(mpAuxSearchTree.get()) != *mpSearchTree);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-1:c3:ROOT/-9:h8:-1/8:b2:-1/-16:m13:-9/-5:a1_2:-9/0:g7_2:8/16:i9_2:8", 7));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:c3:ROOT:BK/-9:h8:-1:RD/8:b2:-1:RD/-16:m13:-9:BK/-5:a1_2:-9:BK/0:g7_2:8:BK/16:i9_2:8:BK/14:j10:16L:RD", 8));
 
     // AVL tree vs. Simple BST
 
-    mpSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
     _buildPrimaryTestSearchTree();
     
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>();
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>();
     _buildPrimaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT/-12:n14:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R", 8));
@@ -433,19 +436,19 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     QVERIFY(*mpAuxSearchTree != *mpSearchTree);
 
     (void)mpAuxSearchTree->addOrUpdateNode(-12, "n14_1");
-    QVERIFY(*mpAuxSearchTree == *dynamic_cast<AVLTree*>(mpSearchTree.get()));
+    QVERIFY(*mpAuxSearchTree == *dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()));
 
     (void)mpSearchTree->addOrUpdateNode(1, "abcd");
     (void)mpAuxSearchTree->addOrUpdateNode(1, "abcd");
-    QVERIFY(*mpAuxSearchTree != *dynamic_cast<AVLTree*>(mpSearchTree.get()));
+    QVERIFY(*mpAuxSearchTree != *dynamic_cast<IntStrAVLTree*>(mpSearchTree.get()));
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/0:g7_1:-12/7:f6:16/17:l12:16/-5:a1_1:0/1:abcd:0", 9));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "2:d4:ROOT/-12:n14_1:2/16:i9_1:2/-23:k11:-12/-5:a1_1:-12/7:f6:16/17:l12:16/0:g7_1:-5R/1:abcd:0R", 9));
 
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
     _buildSecondaryTestSearchTree();
     
-    mpSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
     _buildSecondaryTestSearchTreeInDifferentOrder();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9));
@@ -457,56 +460,56 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
     QVERIFY(*mpAuxSearchTree != *mpSearchTree);
 
     (void)mpAuxSearchTree->removeNode(14);
-    QVERIFY(*dynamic_cast<AVLTree*>(mpAuxSearchTree.get()) == *mpSearchTree);
+    QVERIFY(*dynamic_cast<IntStrAVLTree*>(mpAuxSearchTree.get()) == *mpSearchTree);
 
     (void)mpSearchTree->removeNode(-2);
     (void)mpAuxSearchTree->removeNode(-2);
-    QVERIFY(*dynamic_cast<AVLTree*>(mpAuxSearchTree.get()) != *mpSearchTree);
+    QVERIFY(*dynamic_cast<IntStrAVLTree*>(mpAuxSearchTree.get()) != *mpSearchTree);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5L/0:g7_2:8/16:i9_2:8/-16:m13:-9L", 7));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:c3:ROOT/-9:h8:-1/8:b2:-1/-16:m13:-9/-5:a1_2:-9/0:g7_2:8/16:i9_2:8", 7));
 
     // additional tests
     
-    mpSearchTree = std::make_unique<BinarySearchTree>(std::vector<int>{2, -1, 3}, scDefaultValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{1, -1, 3}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(std::vector<int>{2, -1, 3}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{1, -1, 3}, scDefaultValue);
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{2, -1, 3, 4}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{2, -1, 3, -5}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{2, -1, 3, 4}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{2, -1, 3, -5}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{2, -1, 3, -2}, scDefaultValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{2, -1, 3, 8}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{2, -1, 3, -2}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{2, -1, 3, 8}, scDefaultValue);
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{2, -1, 3, 4}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{2, -1, 3, 4}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{2, -1, 3, -4}, scDefaultValue);
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(std::vector<int>{2, -1, 3, -5}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{2, -1, 3, -4}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(std::vector<int>{2, -1, 3, -5}, scDefaultValue);
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<BinarySearchTree>(std::vector<int>{2, -1, 3}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{2, -1, 3}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(std::vector<int>{2, -1, 3}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{2, -1, 3}, scDefaultValue, scCustomNullValue);
     mpSearchTree->addOrUpdateNode(2, "abcd");
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<BinarySearchTree>(std::vector<int>{2, -1, 3, -4}, scDefaultValue);
-    mpAuxSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{2, -1, 3, -4}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>(std::vector<int>{2, -1, 3, -4}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{2, -1, 3, -4}, scDefaultValue);
     mpAuxSearchTree->addOrUpdateNode(-4, "abcd");
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{2, -1, 3, 5}, scDefaultValue, scCustomNullValue);
     mpAuxSearchTree->addOrUpdateNode(5, "abcd");
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
@@ -515,10 +518,10 @@ void MixedTreeTypesTests::testDifferentTreeTypesEquivalence()
 void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
 {
     // AVL tree assigned to Red-Black tree (and vice-versa)
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
     _buildSecondaryTestSearchTree();
 
     *mpSearchTree = *mpAuxSearchTree;
@@ -531,12 +534,12 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
        (no need to take the values into consideration so default values are being used for simplicity)
     */
     QVERIFY("-1:ROOT:BK/-5:-1:RD/8:-1:RD/-9:-5:BK/-2:-5:BK/0:8:BK/16:8:BK/-16:-9L:RD/14:16L:RD" ==
-            RedBlackTree(std::vector<int>{-1, -5, 8, -9, -2, 0, 16, -16, 14}, scDefaultValue).getTreeAsString(false));
+            IntStrRedBlackTree(std::vector<int>{-1, -5, 8, -9, -2, 0, 16, -16, 14}, scDefaultValue).getTreeAsString(false));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
     _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = *mpSearchTree;
@@ -546,14 +549,14 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
 
     QVERIFY("2:ROOT/-12:2/16:2/-23:-12/-5:-12/7:16/17:16/0:-5R" ==
-            AVLTree(std::vector<int>{2, -12, 16, -23, -5, 7, 17, 0}, scDefaultValue, scCustomNullValue).getTreeAsString(false));
+            IntStrAVLTree(std::vector<int>{2, -12, 16, -23, -5, 7, 17, 0}, scDefaultValue, scCustomNullValue).getTreeAsString(false));
 
     // Simple BST assigned to Red-Black tree (and vice-versa)
 
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
     _buildPrimaryTestSearchTree();
     
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpSearchTree = *mpAuxSearchTree;
@@ -563,12 +566,12 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "8:b2:ROOT/-1:c3:8/16:i9_2:8/-2:e5:-1/0:g7_2:-1/14:j10:16L/-5:a1_2:-2L/-9:h8:-5L/-16:m13:-9L", 9));
 
     QVERIFY("-1:ROOT:BK/-5:-1:RD/8:-1:RD/-9:-5:BK/-2:-5:BK/0:8:BK/16:8:BK/-16:-9L:RD/14:16L:RD" ==
-            RedBlackTree(std::vector<int>{8, -1, 16, -2, 0, 14, -5, -9, -16}, scDefaultValue, scCustomNullValue).getTreeAsString(false));
+            IntStrRedBlackTree(std::vector<int>{8, -1, 16, -2, 0, 14, -5, -9, -16}, scDefaultValue, scCustomNullValue).getTreeAsString(false));
 
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
     _buildPrimaryTestSearchTree();
     
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = *mpSearchTree;
@@ -578,14 +581,14 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
 
     QVERIFY("2:ROOT/-12:2/16:2/-23:-12/-5:-12/7:16/17:16/0:-5R" ==
-            BinarySearchTree(std::vector<int>{2, -12, 16, -23, -5, 7, 17, 0}, scDefaultValue).getTreeAsString(false));
+            IntStrBinarySearchTree(std::vector<int>{2, -12, 16, -23, -5, 7, 17, 0}, scDefaultValue).getTreeAsString(false));
 
     // AVL tree assigned to Simple BST (and vice-versa)
     
-    mpSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>();
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpSearchTree = *mpAuxSearchTree;
@@ -595,12 +598,12 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:c3:ROOT/-5:a1_2:-1/8:b2:-1/-9:h8:-5/-2:e5:-5/0:g7_2:8/16:i9_2:8/-16:m13:-9L/14:j10:16L", 9));
 
     QVERIFY("-1:ROOT/-5:-1/8:-1/-9:-5/-2:-5/0:8/16:8/-16:-9L/14:16L" ==
-            BinarySearchTree(std::vector<int>{-1, -5, 8, -9, -2, 0, 16, -16, 14}, scDefaultValue, scCustomNullValue).getTreeAsString(false));
+            IntStrBinarySearchTree(std::vector<int>{-1, -5, 8, -9, -2, 0, 16, -16, 14}, scDefaultValue, scCustomNullValue).getTreeAsString(false));
 
-    mpSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>();
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = *mpSearchTree;
@@ -610,7 +613,7 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
     QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
 
     QVERIFY("-5:ROOT/-23:-5/2:-5/-12:-23R/0:2/16:2/7:16/17:16" ==
-            AVLTree(std::vector<int>{-5, -23, 2, -12, 0, 7, 17, 16}, scDefaultValue).getTreeAsString(false));
+            IntStrAVLTree(std::vector<int>{-5, -23, 2, -12, 0, 7, 17, 16}, scDefaultValue).getTreeAsString(false));
 }
 
 /* Same test base used as for the copy assignment test
@@ -620,10 +623,10 @@ void MixedTreeTypesTests::testCopyAssignmentOfMixedTreeTypes()
 void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
 {
     // AVL tree assigned to Red-Black tree (and vice-versa)
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
     _buildSecondaryTestSearchTree();
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
@@ -633,10 +636,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
 
-    mpSearchTree = std::make_unique<RedBlackTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(scCustomNullValue);
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
     _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = std::move(*mpSearchTree);
@@ -648,10 +651,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
 
     // Simple BST assigned to Red-Black tree (and vice-versa)
 
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
     _buildPrimaryTestSearchTree();
     
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
@@ -661,10 +664,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
 
-    mpSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>();
     _buildPrimaryTestSearchTree();
     
-    mpAuxSearchTree = std::make_unique<BinarySearchTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrBinarySearchTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = std::move(*mpSearchTree);
@@ -676,10 +679,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
 
     // AVL tree assigned to Simple BST (and vice-versa)
     
-    mpSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>();
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpSearchTree = std::move(*mpAuxSearchTree);
@@ -689,10 +692,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
 
-    mpSearchTree = std::make_unique<BinarySearchTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>();
     _buildPrimaryTestSearchTree();
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
     _buildSecondaryTestSearchTree();
 
     *mpAuxSearchTree = std::move(*mpSearchTree);
@@ -705,10 +708,10 @@ void MixedTreeTypesTests::testMoveAssignmentOfMixedTreeTypes()
 
 void MixedTreeTypesTests::testPassThroughAllLogMessages()
 {
-    BinarySearchTree::enableLogging(true);
+    IntStrBinarySearchTree::enableLogging(true);
     
-    mpSearchTree = std::make_unique<BinarySearchTree>();
-    mpAuxSearchTree = std::make_unique<RedBlackTree>();
+    mpSearchTree = std::make_unique<IntStrBinarySearchTree>();
+    mpAuxSearchTree = std::make_unique<IntStrRedBlackTree>();
 
     mpSearchTree->printTree();
     mpAuxSearchTree->printTree();
@@ -716,8 +719,8 @@ void MixedTreeTypesTests::testPassThroughAllLogMessages()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<RedBlackTree>(std::vector<int>{2, 3, 2, -4}, scDefaultValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{2, 5, 2, 2}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrRedBlackTree>(std::vector<int>{2, 3, 2, -4}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{2, 5, 2, 2}, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "2:ROOT:BK/-4:2:RD/3:2:RD", 3));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "2:ROOT/5:2R", 2));

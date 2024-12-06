@@ -5,8 +5,9 @@
 #include "avltree.h"
 
 using namespace TestUtils;
-using AVLIterator = AVLTree::InOrderForwardIterator;
-using upAVLTree = std::unique_ptr<AVLTree>;
+using IntStrAVLTree = AVLTree<int, std::string>;
+using IntStrAVLIterator = IntStrAVLTree::InOrderForwardIterator;
+using upIntStrAVLTree = std::unique_ptr<IntStrAVLTree>;
 
 class AVLTreesTests : public QObject
 {
@@ -27,15 +28,15 @@ private slots:
     void testInOrderForwardIterators();
 
 private:
-    upAVLTree mpSearchTree;
-    upAVLTree mpAuxSearchTree;
+    upIntStrAVLTree mpSearchTree;
+    upIntStrAVLTree mpAuxSearchTree;
 };
 
 AVLTreesTests::AVLTreesTests()
     : mpSearchTree{nullptr}
     , mpAuxSearchTree{nullptr}
 {
-    BinarySearchTree::enableLogging(false);
+    IntStrAVLTree::enableLogging(false);
 }
 
 void AVLTreesTests::init()
@@ -48,14 +49,14 @@ void AVLTreesTests::cleanup()
     mpSearchTree.reset();
     mpAuxSearchTree.reset();
 
-    BinarySearchTree::enableLogging(false);
+    IntStrAVLTree::enableLogging(false);
 }
 
 void AVLTreesTests::testAddNodes()
 {
     bool newNodeAdded{false};
 
-    mpSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), scEmptyTreeString, 0));
 
@@ -124,7 +125,7 @@ void AVLTreesTests::testAddNodes()
             areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT/-9:-1/7:-1/-16:-9/-5:-9/2:7/14:7/-23:-16/-12:-16/-2:-5R/0:2L/8:14/17:14/-15:-12L/16:17/19:17", 16));
 
     // adding nodes to custom null value tree (compare with default null value tree)
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpAuxSearchTree == *mpSearchTree);
 
@@ -147,15 +148,15 @@ void AVLTreesTests::testAddNodes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-1:ROOT/-9:-1/7:-1/-16:-9/-5:-9/2:7/17:7/-23:-16/-12:-16/-2:-5R/0:2L/14:17/19:17/-15:-12L/8:14/16:14/25:19R", 17));
 
     // some additional (corner) cases
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT/-12:-1/8:-1/-16:-12/-5:-12/2:8/16:8/-23:-16/-15:-16/-9:-5/-2:-5/0:2/7:2/14:16/17:16/19:17R", 16));
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "0:ROOT/-9:0/14:0/-15:-9/-2:-9/7:14/17:14/-16:-15/-12:-15/-5:-2/-1:-2/2:7/8:7/16:17/19:17/-23:-16L", 16));
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-9:ROOT/-15:-9/2:-9/-16:-15/-12:-15/-2:2/14:2/-23:-16L/-5:-2/-1:-2/7:14/17:14/0:-1R/8:7R/16:17/19:17", 16));
 
@@ -165,33 +166,33 @@ void AVLTreesTests::testAddNodes()
 
     // additional tests for constructors along with the == and != operators
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 2, -3, 2, 4, 0, 1}, scDefaultValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, -3, 2, 4, 0, 1}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree); // in this particular case due to AVL tree construction rules the trees become equal when third element is being added (unlike the basic BST)
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 2, -3, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 2, -3, 4, 1, 0}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree != *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-3, -5, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-3, 2, -5, 4, 0, 1}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-3, -5, 2, 4, 0, 1}, scDefaultValue, scDefaultNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-3, 2, -5, 4, 0, 1}, scDefaultValue, scCustomNullValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{}, scDefaultValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), scEmptyTreeString, 0));
 
-    mpSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
 }
@@ -200,8 +201,8 @@ void AVLTreesTests::testRemoveNodes()
 {
     bool nodeDeleted{false};
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(*mpSearchTree);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(*mpSearchTree);
 
     nodeDeleted = mpSearchTree->removeNode(-16);
     QVERIFY(nodeDeleted &&
@@ -321,7 +322,7 @@ void AVLTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(8); // root and left child, erase root
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-5:ROOT", 1));
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12, 19, -15}, scDefaultValue, scCustomNullValue);
 
     (void)mpSearchTree->removeNode(-5);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT/-12:-1/7:-1/-16:-12/-9:-12/2:7/14:7/-23:-16/-15:-16/-2:-9R/0:2L/8:14/17:14/16:17/19:17", 15));
@@ -362,7 +363,7 @@ void AVLTreesTests::testRemoveNodes()
     (void)mpSearchTree->removeNode(-16);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-12:ROOT/-15:-12/19:-12", 3));
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-23, -16, -15, -12, -9, -5, -2, -1, 0, 2, 7, 8, 14, 16, 17, 19}, scDefaultValue);
 
     (void)mpSearchTree->removeNode(-23);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT/-12:-1/8:-1/-16:-12/-5:-12/2:8/16:8/-15:-16R/-9:-5/-2:-5/0:2/7:2/14:16/17:16/19:17R", 15));
@@ -409,7 +410,7 @@ void AVLTreesTests::testRemoveNodes()
     (void)mpSearchTree->removeNode(17); // root and right child, erase root
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "19:ROOT", 1));
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{19, 17, 16, 14, 8, 7, 2, 0, -1, -2, -5, -9, -12, -15, -16, -23}, scDefaultValue, scCustomNullValue);
 
     (void)mpAuxSearchTree->removeNode(19);
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "0:ROOT/-9:0/14:0/-15:-9/-2:-9/7:14/17:14/-16:-15/-12:-15/-5:-2/-1:-2/2:7/8:7/16:17L/-23:-16L", 15));
@@ -450,7 +451,7 @@ void AVLTreesTests::testRemoveNodes()
     (void)mpAuxSearchTree->removeNode(-12);
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-16:ROOT/-23:-16/-15:-16", 3));
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-23, 19, -16, 17, -15, 16, -12, 14, -9, 8, -5, 7, -2, 2, -1, 0}, scDefaultValue, scCustomNullValue);
 
     (void)mpSearchTree->removeNode(14);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-9:ROOT/-15:-9/2:-9/-16:-15/-12:-15/-2:2/16:2/-23:-16L/-5:-2/-1:-2/7:16/17:16/0:-1R/8:7R/19:17R", 15));
@@ -491,7 +492,7 @@ void AVLTreesTests::testRemoveNodes()
     (void)mpSearchTree->removeNode(19);
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "-1:ROOT/-23:-1/0:-1", 3));
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-3, -5, 2}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-3, -5, 2}, scDefaultValue);
 
     (void)mpAuxSearchTree->removeNode(-5);
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-3:ROOT/2:-3R", 2));
@@ -500,14 +501,14 @@ void AVLTreesTests::testRemoveNodes()
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(), mpAuxSearchTree->getSize(), "-3:ROOT", 1));
 
     // deleting null node from custom null value tree
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue, scCustomNullValue);
 
     nodeDeleted = mpSearchTree->removeNode(-5);
     QVERIFY(!nodeDeleted &&
             areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(), mpSearchTree->getSize(), "2:ROOT/-1:2/3:2/-2:-1L/4:3R", 5));
 
     // deleting same node from custom and default null value trees of equal structure, keys and values
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-1, 3, 2, 4, -2}, scDefaultValue);
 
     nodeDeleted = mpSearchTree->removeNode(3);
     QVERIFY(nodeDeleted &&
@@ -522,7 +523,7 @@ void AVLTreesTests::testRemoveNodes()
 
 void AVLTreesTests::testUpdateNodeValue()
 {
-    mpSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
 
     QVERIFY(scDefaultNullValue == mpSearchTree->getNodeValue(-5) &&
             scDefaultNullValue == mpSearchTree->getNodeValue(0) &&
@@ -612,7 +613,7 @@ void AVLTreesTests::testUpdateNodeValue()
             scDefaultNullValue == mpSearchTree->getNodeValue(16));
 
     // test with same value for all nodes
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-5, 8, -1, 2, -2, 7, 0, -9, 16, 14, -23, 17, -16, -12}, scDefaultValue);
 
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:DF:ROOT/-9:DF:-1/7:DF:-1/-16:DF:-9/-5:DF:-9/2:DF:7/14:DF:7/-23:DF:-16/-12:DF:-16/-2:DF:-5R/0:DF:2L/8:DF:14/16:DF:14/17:DF:16R", 14));
     QVERIFY(scDefaultNullValue == mpAuxSearchTree->getNullValue());
@@ -623,7 +624,7 @@ void AVLTreesTests::testUpdateNodeValue()
 
     // test updating custom null value tree node values
 
-    mpSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
     (void)mpSearchTree->addOrUpdateNode(8, "b2");
@@ -683,7 +684,7 @@ void AVLTreesTests::testUpdateNodeValue()
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "0:g7:ROOT/-5:a1:0/7:f6:0/-7:i9:-5/-2::-5/8:b2:7R/-9:h8:-7L/-1::-2R", 8));
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(*mpSearchTree);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(*mpSearchTree);
 
     QVERIFY(*mpSearchTree == *mpAuxSearchTree);
     QVERIFY(scCustomNullValue == mpAuxSearchTree->getNullValue());
@@ -694,8 +695,8 @@ void AVLTreesTests::testUpdateNodeValue()
 
     // test value update and copy assignment between default and custom null value trees
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
 
     newNodeAdded = mpSearchTree->addOrUpdateNode(7, scDefaultNullValue);
     QVERIFY(!newNodeAdded &&
@@ -715,7 +716,7 @@ void AVLTreesTests::testUpdateNodeValue()
 
 void AVLTreesTests::testMoveSemantics()
 {
-    mpSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
     (void)mpSearchTree->addOrUpdateNode(8, "b2");
@@ -723,7 +724,7 @@ void AVLTreesTests::testMoveSemantics()
     (void)mpSearchTree->addOrUpdateNode(2, "d4");
     (void)mpSearchTree->addOrUpdateNode(-2, "e5");
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::move(*mpSearchTree));
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::move(*mpSearchTree));
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "-1:c3:ROOT/-5:a1:-1/8:b2:-1/-2:e5:-5R/2:d4:8L", 5));
@@ -756,12 +757,12 @@ void AVLTreesTests::testMoveSemantics()
 
     // test move constructor for trees with custom null value
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue, scCustomNullValue);
 
     (void)mpSearchTree->addOrUpdateNode(5, scDefaultNullValue);
     (void)mpSearchTree->addOrUpdateNode(4, "newval");
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::move(*mpSearchTree));
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::move(*mpSearchTree));
 
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), scEmptyTreeString, 0));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), "4:newval:ROOT/-1:DF:4/5::4/-2:DF:-1/0:DF:-1", 5));
@@ -770,8 +771,8 @@ void AVLTreesTests::testMoveSemantics()
 
     // test move and copy for trees with different null values
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{-2, 5, 4, 0, -1}, scDefaultValue);
 
     (void)mpSearchTree->addOrUpdateNode(7, scDefaultNullValue);
     (void)mpAuxSearchTree->addOrUpdateNode(4, scCustomNullValue);
@@ -786,7 +787,7 @@ void AVLTreesTests::testMoveSemantics()
 
 void AVLTreesTests::testMergeTrees()
 {
-    mpSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1_1");
     (void)mpSearchTree->addOrUpdateNode(2, "d4");
@@ -797,7 +798,7 @@ void AVLTreesTests::testMergeTrees()
     (void)mpSearchTree->addOrUpdateNode(16, "i9_1");
     (void)mpSearchTree->addOrUpdateNode(0, "g7_1");
 
-    mpAuxSearchTree = std::make_unique<AVLTree>();
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>();
 
     (void)mpAuxSearchTree->addOrUpdateNode(8, "b2");
     (void)mpAuxSearchTree->addOrUpdateNode(-1, "c3");
@@ -809,8 +810,8 @@ void AVLTreesTests::testMergeTrees()
     (void)mpAuxSearchTree->addOrUpdateNode(14, "j10");
     (void)mpAuxSearchTree->addOrUpdateNode(-16, "m13");
 
-    const AVLTree searchTreeCopy{*mpSearchTree};
-    const AVLTree searchTreeAuxCopy{*mpAuxSearchTree};
+    const IntStrAVLTree searchTreeCopy{*mpSearchTree};
+    const IntStrAVLTree searchTreeAuxCopy{*mpAuxSearchTree};
 
     QVERIFY(searchTreeCopy == *mpSearchTree &&      // just a(n additional) check that the copy constructor and == operator work correctly
             searchTreeAuxCopy == *mpAuxSearchTree);
@@ -822,7 +823,7 @@ void AVLTreesTests::testMergeTrees()
     QVERIFY(areExpectedTreeValuesMet(mpSearchTree->getTreeAsString(true), mpSearchTree->getSize(), "2:d4:ROOT/-5:a1_2:2/16:i9_2:2/-12:n14:-5/-1:c3:-5/8:b2:16/17:l12:16/-23:k11:-12/-9:h8:-12/-2:e5:-1/0:g7_2:-1/7:f6:8/14:j10:8/-16:m13:-23R", 14));
     QVERIFY(areExpectedTreeValuesMet(mpAuxSearchTree->getTreeAsString(true), mpAuxSearchTree->getSize(), scEmptyTreeString, 0));
 
-    const AVLTree mainTreeAfterFirstMerge{*mpSearchTree};
+    const IntStrAVLTree mainTreeAfterFirstMerge{*mpSearchTree};
 
     // merge empty tree into unempty tree
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
@@ -876,7 +877,7 @@ void AVLTreesTests::testMergeTrees()
 
     // merge trees with (same) custom null value
 
-    mpSearchTree = std::make_unique<AVLTree>(scCustomNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(scCustomNullValue);
 
     (void)mpSearchTree->addOrUpdateNode(-5, "a1");
     (void)mpSearchTree->addOrUpdateNode(8, "b2");
@@ -891,7 +892,7 @@ void AVLTreesTests::testMergeTrees()
     (void)mpSearchTree->removeNode(-8);
     (void)mpSearchTree->removeNode(2);
 
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12}, scDefaultValue, scCustomNullValue);
     (void)mpAuxSearchTree->addOrUpdateNode(-9, scDefaultNullValue);
 
     merged = mpSearchTree->mergeTree(*mpAuxSearchTree);
@@ -904,8 +905,8 @@ void AVLTreesTests::testMergeTrees()
 
     // (attempt to) merge trees with different null values (custom vs. default)
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scDefaultNullValue);
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scDefaultNullValue);
     mpSearchTree->addOrUpdateNode(9, "abc");
     mpAuxSearchTree->addOrUpdateNode(7, "xyz");
 
@@ -947,8 +948,8 @@ void AVLTreesTests::testMergeTrees()
 
     // (attempt to) merge trees with different null values (custom vs. custom)
 
-    mpSearchTree = std::make_unique<AVLTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
-    mpAuxSearchTree = std::make_unique<AVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scCustomNullValue + "1");
+    mpSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{5, 10, -2, 9, 4, 2, 7, -8}, scDefaultValue, scCustomNullValue);
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>(std::vector<int>{16, -9, 14, 7, -23, 17, -16, -12, 1}, scDefaultValue, scCustomNullValue + "1");
     mpSearchTree->addOrUpdateNode(9, "abc");
     mpAuxSearchTree->addOrUpdateNode(7, "xyz");
 
@@ -991,7 +992,7 @@ void AVLTreesTests::testMergeTrees()
 
 void AVLTreesTests::testInOrderForwardIterators()
 {
-    mpSearchTree = std::make_unique<AVLTree>();
+    mpSearchTree = std::make_unique<IntStrAVLTree>();
 
     (void)mpSearchTree->addOrUpdateNode(-5, "b");
     (void)mpSearchTree->addOrUpdateNode(8, "z");
@@ -1015,7 +1016,7 @@ void AVLTreesTests::testInOrderForwardIterators()
                                      "-2:55:-5R/0:fq:2L/8:z:14/17:b:14/-15:DF:-12L/16:cCc:17/19:_ca:17",
                                      16));
 
-    AVLIterator it{mpSearchTree->begin()};
+    IntStrAVLIterator it{mpSearchTree->begin()};
     QVERIFY(it.getKey() == -23 && it.getValue() == "-c");
 
     it = mpSearchTree->root();
@@ -1032,7 +1033,7 @@ void AVLTreesTests::testInOrderForwardIterators()
     const std::vector<std::pair<std::optional<int>, std::string>> c_TraversedElementsRef{{-23, "-c"}, {-16, "qa"}, {-15, "DF"}, {-12, "dev"}, {-9, "DF"}, {-5, "b"}, {-2, "55"}, {-1, "_ca"},
                                                                           {0, "fq"}, {2, "q1"}, {7, "a"}, {8, "z"}, {14, "abab"}, {16, "cCc"}, {17, "b"}, {19, "_ca"}};
 
-    for (AVLIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
+    for (IntStrAVLIterator it{mpSearchTree->begin()}; it != mpSearchTree->end(); it.next())
     {
         traversedElements.push_back({it.getKey(), it.getValue()});
     }
@@ -1060,10 +1061,10 @@ void AVLTreesTests::testInOrderForwardIterators()
     (void)mpSearchTree->removeNode(2);
     QVERIFY(mpSearchTree->find(2) == mpSearchTree->end());
 
-    mpAuxSearchTree = std::make_unique<AVLTree>("NullVal");
+    mpAuxSearchTree = std::make_unique<IntStrAVLTree>("NullVal");
     QVERIFY(mpAuxSearchTree->begin() == mpAuxSearchTree->end() && mpAuxSearchTree->root() == mpAuxSearchTree->end() && mpAuxSearchTree->find(14) == mpAuxSearchTree->end());
 
-    AVLIterator itAux;
+    IntStrAVLIterator itAux;
     QVERIFY(!itAux.getKey().has_value() && itAux.getValue().empty() && itAux == mpSearchTree->end() && itAux != mpAuxSearchTree->end());
 
     itAux = mpAuxSearchTree->end();
