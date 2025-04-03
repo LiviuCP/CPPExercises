@@ -52,7 +52,7 @@ void PartitioningTests::testPartition()
     IntMatrix matrix{mPrimaryIntMatrix};
 
     IntMatrix::ConstZIterator partitioningIt{std::partition(matrix.zBegin(), matrix.zEnd(), [](int element) {return element > 0;})};
-    const std::pair<IntMatrix::size_type, IntMatrix::size_type> c_RequiredCoordinates{1, 4};
+    const std::pair<matrix_size_t, matrix_size_t> c_RequiredCoordinates{1, 4};
 
     bool isValidPartitioning{c_RequiredCoordinates.first == partitioningIt.getRowNr() && c_RequiredCoordinates.second == partitioningIt.getColumnNr()};
 
@@ -90,7 +90,7 @@ void PartitioningTests::testPartition()
 void PartitioningTests::testPartitionCopy()
 {
     StringIntPairMatrix sourceMatrix{mSecondaryStringIntPairMatrix};
-    const StringIntPairMatrix::size_type c_DestinationElementsCount{sourceMatrix.getNrOfColumns()};
+    const matrix_size_t c_DestinationElementsCount{sourceMatrix.getNrOfColumns()};
 
     StringIntPairMatrix firstDestinationMatrix{c_DestinationElementsCount, 1, {"Zorba", 100}};
     StringIntPairMatrix secondDestinationMatrix{1, c_DestinationElementsCount, {"Zorba's brother", 101}};
@@ -115,7 +115,7 @@ void PartitioningTests::testStablePartition()
                                            -5, -5, 2, -1, -4
                                      }};
 
-    for (IntMatrix::size_type diagonalNr{1 - firstMatrix.getNrOfRows()}; diagonalNr < firstMatrix.getNrOfColumns(); ++diagonalNr)
+    for (matrix_diff_t diagonalNr{1 - static_cast<matrix_diff_t>(firstMatrix.getNrOfRows())}; diagonalNr < static_cast<matrix_diff_t>(firstMatrix.getNrOfColumns()); ++diagonalNr)
     {
         std::stable_partition(firstMatrix.dBegin(diagonalNr), firstMatrix.dEnd(diagonalNr), [](int element) {return element > 0;});
     }

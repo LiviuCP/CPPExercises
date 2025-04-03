@@ -36,7 +36,7 @@ private:
     using AdjacencyMatrix = Matrix<HammingDistance>;
 
     // indexes of a pair of data words (as contained in the data set but converted to adjacency matrix index types)
-    using WordsPair = std::pair<AdjacencyMatrix::size_type, AdjacencyMatrix::size_type>;
+    using WordsPair = std::pair<matrix_size_t, matrix_size_t>;
 
     static HammingDistance _getHammingDistance(const DataWord& firstWord, const DataWord& secondWord);
 
@@ -45,7 +45,7 @@ private:
     void _buildAdjacencyMatrix();
     bool _retrieveMinimumDistancePair(bool inversionAllowed, WordsPair& minDistancePair) const;
 
-    AdjacencyMatrix::size_type _initGreedyMinSimplified(bool inversionAllowed, std::vector<bool>& wordAlreadyAddedStatuses);
+    std::optional<matrix_size_t> _initGreedyMinSimplified(bool inversionAllowed, std::vector<bool>& wordAlreadyAddedStatuses);
 
     DataSet mDataSet;
     AdjacencyMatrix mAdjacencyMatrix;

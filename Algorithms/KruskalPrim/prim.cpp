@@ -1,4 +1,5 @@
 #include "prim.h"
+#include "datautils.h"
 
 PrimEngine::PrimEngine()
     : BaseEngine{"Prim"}
@@ -11,7 +12,7 @@ bool PrimEngine::buildTrees(const GraphMatrix& graphMatrix)
 
     _reset();
 
-    const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
+    const matrix_size_t c_RowsCount{graphMatrix.getNrOfRows()};
 
     if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
@@ -27,11 +28,11 @@ bool PrimEngine::buildTrees(const GraphMatrix& graphMatrix)
 
 void PrimEngine::_buildGraph(const GraphMatrix& graphMatrix)
 {
-    const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
+    const matrix_size_t c_RowsCount{graphMatrix.getNrOfRows()};
 
     if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
-        mNodesCount = static_cast<size_t>(c_RowsCount);
+        mNodesCount = c_RowsCount;
         mGraphMatrix = graphMatrix;
     }
     else
@@ -44,7 +45,7 @@ void PrimEngine::_buildTreeFromGraph(bool isMinTree)
 {
     NodeInfoMap nodeInfoMap;
 
-    if (mNodesCount > 0u)
+    if (mNodesCount > 0)
     {
         const Cost c_InitialNodeCost{isMinTree ? scMaxCost : scMinCost};
 
@@ -53,8 +54,8 @@ void PrimEngine::_buildTreeFromGraph(bool isMinTree)
 
         nodeInfoMap.resize(mNodesCount, c_InitialNodeCost);
 
-        Node currentNode{0u};
-        size_t addedNodesCount{1u};
+        Node currentNode{0};
+        size_t addedNodesCount{1};
         nodeInfoMap.at(currentNode).mIsAddedToTree = true;
 
         while (addedNodesCount < mNodesCount)
@@ -66,7 +67,7 @@ void PrimEngine::_buildTreeFromGraph(bool isMinTree)
             Cost nextNodeCost{c_InitialNodeCost};
 
             // the next node to be added is chosen from the pool of nodes that haven't been added to tree yet (NOT necesarily neighbors of current node)
-            for (Node node{0u}; node < nodeInfoMap.size(); ++node)
+            for (Node node{0}; node < nodeInfoMap.size(); ++node)
             {
                 if (!nodeInfoMap.at(node).mIsAddedToTree && isNewCostBetter(nodeInfoMap.at(node).mNodeCost, nextNodeCost))
                 {
@@ -92,13 +93,13 @@ void PrimEngine::_doBuildTree(const NodeInfoMap& nodeInfoMap, bool isMinTree)
 {
     Tree& tree{isMinTree ? mMinTree : mMaxTree};
 
-    assert(0u == tree.size());
+    assert(tree.empty());
 
     const size_t c_NodesCount{nodeInfoMap.size()};
 
-    if (c_NodesCount > 1u)
+    if (c_NodesCount > 1)
     {
-        for (Node node{1u}; node < c_NodesCount; ++node)
+        for (Node node{1}; node < c_NodesCount; ++node)
         {
             const Node currentPrecedingNode{nodeInfoMap.at(node).mPrecedingNode};
 
@@ -117,12 +118,12 @@ void PrimEngine::_updateNeighborCosts(Node node, NodeInfoMap& nodeInfoMap, bool 
     {
         if (*it > 0)
         {
-            Node neighbor{static_cast<Node>(it.getColumnNr())};
+            const Node c_Neighbor{*it.getColumnNr()};
 
-            if (isNewCostBetter(mGraphMatrix.at(node, neighbor), nodeInfoMap.at(neighbor).mNodeCost) && !nodeInfoMap.at(neighbor).mIsAddedToTree)
+            if (isNewCostBetter(mGraphMatrix.at(node, c_Neighbor), nodeInfoMap.at(c_Neighbor).mNodeCost) && !nodeInfoMap.at(c_Neighbor).mIsAddedToTree)
             {
-                nodeInfoMap.at(neighbor).mNodeCost = mGraphMatrix.at(node, neighbor);
-                nodeInfoMap.at(neighbor).mPrecedingNode = node;
+                nodeInfoMap.at(c_Neighbor).mNodeCost = mGraphMatrix.at(node, c_Neighbor);
+                nodeInfoMap.at(c_Neighbor).mPrecedingNode = node;
             }
         }
     }

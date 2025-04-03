@@ -48,7 +48,7 @@ private:
     {
     public:
         MatrixWrapper() {}
-        MatrixWrapper(int nrOfRows, int nrOfColumns, const DataType& value) : mMatrix{nrOfRows, nrOfColumns, value} {}
+        MatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, const DataType& value) : mMatrix{nrOfRows, nrOfColumns, value} {}
 
         size_t size() const {return mMatrix.getNrOfRows() * mMatrix.getNrOfColumns();}
 
@@ -331,7 +331,7 @@ void CPP20ConceptsTests::testStdSpan()
     {
         IntMatrix matrix{3, 4, {-1, 2, 3, -4, -5, 6, 7, -8, 9, -10, 11, 12}};
 
-        IntMatrix::size_type elementsCount{0};
+        matrix_size_t elementsCount{0};
 
         // to note: the matrix should NOT be passed to std::span because due to its internal structure its elements are usually not contiguous (std::span supports contiguous containers only)
         int* pArray = (int*)matrix.getBaseArray(elementsCount); // however by converting it to a plain unidimensional array it can be "spanned"

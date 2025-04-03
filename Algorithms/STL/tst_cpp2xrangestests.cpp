@@ -22,11 +22,11 @@ class MatrixDiagonalView : public std::ranges::view_interface<MatrixDiagonalView
 {
 public:
     MatrixDiagonalView() = default;
-    MatrixDiagonalView(Matrix<DataType>& matrix, Matrix<DataType>::size_type diagonalNr)
+    MatrixDiagonalView(Matrix<DataType>& matrix, matrix_diff_t diagonalNr)
     {
         if (!matrix.isEmpty())
         {
-            diagonalNr = std::clamp(diagonalNr, 1 - matrix.getNrOfRows(), matrix.getNrOfColumns() - 1);
+            diagonalNr = std::clamp(diagonalNr, 1 - static_cast<matrix_diff_t>(matrix.getNrOfRows()), static_cast<matrix_diff_t>(matrix.getNrOfColumns()) - 1);
             mDiagBegin = matrix.dBegin(diagonalNr);
             mDiagEnd = matrix.dEnd(diagonalNr);
         }

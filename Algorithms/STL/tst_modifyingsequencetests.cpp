@@ -605,7 +605,7 @@ void ModifyingSequenceTests::testReverse()
                         0, -3, 4, -1, -2
                  }};
 
-    for(IntMatrix::size_type diagonalNr{1 - matrix.getNrOfRows()}; diagonalNr <= 0; ++diagonalNr)
+    for(matrix_diff_t diagonalNr{1 - static_cast<matrix_diff_t>(matrix.getNrOfRows())}; diagonalNr <= 0; ++diagonalNr)
     {
         std::reverse(matrix.dBegin(diagonalNr), matrix.dEnd(diagonalNr));
     }

@@ -27,11 +27,12 @@
 template<typename DataType>
 using ValueSizePair = std::pair<DataType, size_t>;
 
-template<typename DataType>
-using MatrixSizeType = typename Matrix<DataType>::size_type;
+using matrix_size_t = Matrix<int>::size_type; // actually type independent
+using matrix_diff_t = Matrix<int>::diff_type; // actually type independent
 
+// std::nullopt corresponds to the "negative" value (previously noted -1)
 template<typename DataType>
-using MatrixPoint = std::pair<MatrixSizeType<DataType>, MatrixSizeType<DataType>>;
+using MatrixPoint = std::pair<std::optional<matrix_size_t>, std::optional<matrix_size_t>>;
 
 using IntMatrix = Matrix<int>;
 using IntPair = std::pair<int, int>;

@@ -1,4 +1,5 @@
 #include "kruskal.h"
+#include "datautils.h"
 
 KruskalEngine::KruskalEngine()
     : BaseEngine{"Kruskal"}
@@ -11,7 +12,7 @@ bool KruskalEngine::buildTrees(const GraphMatrix& graphMatrix)
 
     _reset();
 
-    const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
+    const matrix_size_t c_RowsCount{graphMatrix.getNrOfRows()};
 
     if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
@@ -27,19 +28,20 @@ bool KruskalEngine::buildTrees(const GraphMatrix& graphMatrix)
 
 void KruskalEngine::_buildGraph(const GraphMatrix& graphMatrix)
 {
-    const GraphMatrix::size_type c_RowsCount{graphMatrix.getNrOfRows()};
+    const matrix_size_t c_RowsCount{graphMatrix.getNrOfRows()};
 
     if (c_RowsCount > 0 && c_RowsCount == graphMatrix.getNrOfColumns())
     {
-        mNodesCount = static_cast<size_t>(c_RowsCount);
+        mNodesCount = c_RowsCount;
 
-        for (GraphMatrix::size_type row{0}; row < c_RowsCount - 1; ++row)
+        for (matrix_size_t row{0}; row < c_RowsCount - 1; ++row)
         {
-            for (Matrix<int>::ConstZIterator it{graphMatrix.getConstZIterator(row, row + 1)}; it != graphMatrix.constZRowEnd(row); ++it)
+            for (Matrix<Cost>::ConstZIterator it{graphMatrix.getConstZIterator(row, row + 1)}; it != graphMatrix.constZRowEnd(row); ++it)
             {
                 if (*it != 0)
                 {
-                    mEdgeCostsMap.insert(std::pair<Cost, Edge>{*it, Edge{it.getRowNr(), it.getColumnNr()}});
+                    // no need to check validity of getRowNr() / getColumnNr() output, the matrix is not empty and it is a forward iterator
+                    mEdgeCostsMap.insert(std::pair<Cost, Edge>{*it, Edge{*it.getRowNr(), *it.getColumnNr()}});
                 }
             }
         }
@@ -54,13 +56,13 @@ void KruskalEngine::_buildGraph(const GraphMatrix& graphMatrix)
 */
 void KruskalEngine::_buildMinTreeFromGraph()
 {
-    if (mNodesCount > 0u)
+    if (mNodesCount > 0)
     {
         _buildEmptyComponents();
 
         size_t requiredEdgesCount{mNodesCount - 1};
 
-        for (EdgeCostsMap::const_iterator it{mEdgeCostsMap.cbegin()}; it != mEdgeCostsMap.cend() && requiredEdgesCount > 0u; ++it)
+        for (EdgeCostsMap::const_iterator it{mEdgeCostsMap.cbegin()}; it != mEdgeCostsMap.cend() && requiredEdgesCount > 0; ++it)
         {
             bool edgeAdded{_addEdgeToTree(it->second)};
 
@@ -79,13 +81,15 @@ void KruskalEngine::_buildMinTreeFromGraph()
 
 void KruskalEngine::_buildMaxTreeFromGraph()
 {
-    if (mNodesCount > 0u)
+    assert(mNodesCount > 0);
+
+    if (mNodesCount > 0)
     {
         _buildEmptyComponents();
 
         size_t requiredEdgesCount{mNodesCount - 1};
 
-        for (EdgeCostsMap::const_reverse_iterator it{mEdgeCostsMap.crbegin()}; it != mEdgeCostsMap.crend() && requiredEdgesCount > 0u; ++it)
+        for (EdgeCostsMap::const_reverse_iterator it{mEdgeCostsMap.crbegin()}; it != mEdgeCostsMap.crend() && requiredEdgesCount > 0; ++it)
         {
             bool edgeAdded{_addEdgeToTree(it->second)};
 
@@ -96,10 +100,6 @@ void KruskalEngine::_buildMaxTreeFromGraph()
             }
         }
     }
-    else
-    {
-        assert(false);
-    }
 }
 
 /* Empty components (one per node) are created. However initially no node "belongs" to its component but instead is considered standalone ("orphan")
@@ -107,9 +107,11 @@ void KruskalEngine::_buildMaxTreeFromGraph()
 */
 void KruskalEngine::_buildEmptyComponents()
 {
-    if (mNodesCount > 0u)
+    assert(mNodesCount > 0);
+
+    if (mNodesCount > 0)
     {
-        if (mComponents.size() > 0u || mComponentNumbers.size() > 0u)
+        if (!mComponents.empty() || !mComponentNumbers.empty())
         {
             mComponents.clear();
             mComponentNumbers.clear();
@@ -118,14 +120,10 @@ void KruskalEngine::_buildEmptyComponents()
         mComponents.resize(mNodesCount);
         mComponentNumbers.resize(mNodesCount);
 
-        for (Node currentNodeNumber{0u}; currentNodeNumber < mNodesCount; ++currentNodeNumber)
+        for (Node currentNodeNumber{0}; currentNodeNumber < mNodesCount; ++currentNodeNumber)
         {
             mComponentNumbers.at(currentNodeNumber) = scNullComponent;
         }
-    }
-    else
-    {
-        assert(false);
     }
 }
 

@@ -1,25 +1,24 @@
 #include <cassert>
 
-#include "lexicographicalsorter.h"
 #include "boxutils.h"
 
-void retrieveFittingBoxes(const Matrix<int>& boxes, Matrix<int>& fittingBoxIndexes)
+void retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes, Matrix<matrix_size_t>& fittingBoxIndexes)
 {
     // total number of boxes belonging to series
-    const int c_NrOfBoxes{boxes.getNrOfRows()};
+    const auto c_NrOfBoxes{boxes.getNrOfRows()};
 
     // row index of the box containing largest number of boxes that fit into each other (and into it) - initially the first box in the lexicographically sorted series
-    int maxFittingIndex{0};
+    matrix_size_t maxFittingIndex{0};
 
     // fitting boxes count for each box (including the box)
-    Matrix<int> fittingBoxesCounts{c_NrOfBoxes, 1, 1};
+    Matrix<matrix_size_t> fittingBoxesCounts{c_NrOfBoxes, 1, 1};
 
     // index (in lexicographically sorted series) of first preceding box that fits into current box; by default -1 (no preceding fitting box)
-    Matrix<int> prevFittingBoxIndexes{c_NrOfBoxes, 1, -1};
+    Matrix<std::optional<matrix_size_t>> prevFittingBoxIndexes{c_NrOfBoxes, 1, std::nullopt};
 
-    for (int boxIndex{1}; boxIndex < c_NrOfBoxes; ++boxIndex)
+    for (matrix_size_t boxIndex{1}; boxIndex < c_NrOfBoxes; ++boxIndex)
     {
-        for (int prevBoxIndex{0}; prevBoxIndex < boxIndex; ++prevBoxIndex)
+        for (matrix_size_t prevBoxIndex{0}; prevBoxIndex < boxIndex; ++prevBoxIndex)
         {
             if (boxFitsIntoBox(prevBoxIndex, boxIndex, boxes) &&
                     ((fittingBoxesCounts[prevBoxIndex] + 1) > fittingBoxesCounts[boxIndex]))
@@ -35,19 +34,19 @@ void retrieveFittingBoxes(const Matrix<int>& boxes, Matrix<int>& fittingBoxIndex
         }
     }
 
-    Matrix<int> recoveredIndexes{1, 1, maxFittingIndex};
-    int currentIndexToCheck{prevFittingBoxIndexes[maxFittingIndex]};
+    Matrix<matrix_size_t> recoveredIndexes{1, 1, maxFittingIndex};
+    auto currentIndexToCheck{prevFittingBoxIndexes[maxFittingIndex]};
 
-    while(currentIndexToCheck != -1)
+    while(currentIndexToCheck.has_value())
     {
-        recoveredIndexes.insertColumn(0, currentIndexToCheck);
-        currentIndexToCheck = prevFittingBoxIndexes[currentIndexToCheck];
+        recoveredIndexes.insertColumn(0, *currentIndexToCheck);
+        currentIndexToCheck = prevFittingBoxIndexes[*currentIndexToCheck];
     }
 
     fittingBoxIndexes = std::move(recoveredIndexes);
 }
 
-bool boxFitsIntoBox(int fittingBoxNumber, int includingBoxNumber, Matrix<int> boxes)
+bool boxFitsIntoBox(matrix_size_t fittingBoxNumber, matrix_size_t includingBoxNumber, Matrix<matrix_size_t> boxes)
 {
     assert(boxes.getNrOfColumns() > 1 && "Invalid dimensions for boxes");
     assert((fittingBoxNumber >= 0 && fittingBoxNumber < boxes.getNrOfRows()) && "Invalid box number (fitting box)");
@@ -55,7 +54,7 @@ bool boxFitsIntoBox(int fittingBoxNumber, int includingBoxNumber, Matrix<int> bo
 
     bool fitsIntoBox{true};
 
-    for (int column{0}; column < boxes.getNrOfColumns(); ++column)
+    for (matrix_size_t column{0}; column < boxes.getNrOfColumns(); ++column)
     {
         if (boxes.at(fittingBoxNumber, column) >= boxes.at(includingBoxNumber, column))
         {

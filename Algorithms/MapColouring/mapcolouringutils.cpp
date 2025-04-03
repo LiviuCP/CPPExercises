@@ -7,7 +7,7 @@ bool MapColouringUtils::isValidNeighbourhoodMatrix(Matrix<bool> neighbours)
 {
     bool isValid{false};
 
-    const int c_NrOfCountries{neighbours.getNrOfRows()};
+    const auto c_NrOfCountries{neighbours.getNrOfRows()};
 
     if (c_NrOfCountries > 0 && c_NrOfCountries == neighbours.getNrOfColumns())
     {
@@ -23,21 +23,26 @@ bool MapColouringUtils::isValidNeighbourhoodMatrix(Matrix<bool> neighbours)
     return isValid;
 }
 
-int MapColouringUtils::getFirstAvailableColour(const Matrix<bool>& availableColours)
+std::optional<matrix_size_t> MapColouringUtils::getFirstAvailableColour(const Matrix<bool>& availableColours)
 {
-    assert(availableColours.getNrOfRows() == 1 && "Invalid colour availability matrix");
-
     // lowest index colour that is not used by a country
-    int firstAvailableColour{-1};
+    std::optional<matrix_size_t> firstAvailableColour;
 
-    // choose colour with lowest index that is not in use by a neighbor
-    for (Matrix<bool>::ConstZIterator colourIt{availableColours.constZBegin()}; colourIt != availableColours.constZEnd(); ++colourIt)
+    if (availableColours.getNrOfRows() == 1)
     {
-        if (false == *colourIt)
+        // choose colour with lowest index that is not in use by a neighbor
+        for (Matrix<bool>::ConstZIterator colourIt{availableColours.constZBegin()}; colourIt != availableColours.constZEnd(); ++colourIt)
         {
-            firstAvailableColour = colourIt.getColumnNr();
-            break;
+            if (false == *colourIt)
+            {
+                firstAvailableColour = *colourIt.getColumnNr();
+                break;
+            }
         }
+    }
+    else
+    {
+        assert(false && "Invalid colour availability matrix");
     }
 
     return firstAvailableColour;

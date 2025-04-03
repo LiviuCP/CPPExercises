@@ -42,7 +42,7 @@ bool HuffmanEncoder::_buildOccurrenceMap(const EncodingInput& encodingInput)
     CharOccurrenceMap huffmanOccurrenceMap;
     const ssize_t c_CharOccurrencePairSize{2};
 
-    if (encodingInput.getNrOfRows() >= scMinRequiredCharsCount && c_CharOccurrencePairSize == encodingInput.getNrOfColumns())
+    if (!encodingInput.isEmpty() && encodingInput.getNrOfRows() >= scMinRequiredCharsCount && c_CharOccurrencePairSize == encodingInput.getNrOfColumns())
     {
         CharSet foundCharacters;
 
@@ -61,7 +61,9 @@ bool HuffmanEncoder::_buildOccurrenceMap(const EncodingInput& encodingInput)
                 if (foundCharacters.find(character) == foundCharacters.cend())
                 {
                     std::stringstream stream;
-                    stream << encodingInput.at(it.getRowNr(), it.getColumnNr() + 1);
+
+                    // no need to check validity of getRowNr() / getColumnNr() output, the matrix is not empty and it is a forward iterator
+                    stream << encodingInput.at(*it.getRowNr(), *it.getColumnNr() + 1);
                     stream >> occurrence;
 
                     if (!stream.fail() && occurrence > 0)

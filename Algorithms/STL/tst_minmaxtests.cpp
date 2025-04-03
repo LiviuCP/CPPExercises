@@ -111,8 +111,8 @@ void MinMaxTests::testMinMaxElement()
 {
     QVERIFY(mSecondaryIntMatrix.getConstReverseZIterator(2, 0) == std::min_element(mSecondaryIntMatrix.constReverseZRowBegin(2), mSecondaryIntMatrix.getConstReverseZIterator(1, 2)));
     QVERIFY(mSecondaryIntMatrix.getConstReverseZIterator(2, 3) == std::max_element(mSecondaryIntMatrix.getConstReverseZIterator(2, 3), mSecondaryIntMatrix.getConstReverseZIterator(1, 2)));
-    QVERIFY(mThirdIntMatrix.getConstDIterator(1, 1, true) == std::min_element(mThirdIntMatrix.constDBegin(1), mThirdIntMatrix.constDEnd(1)));
-    QVERIFY(mThirdIntMatrix.getConstMIterator(0, 2, true) == std::max_element(mThirdIntMatrix.constMBegin(0), mThirdIntMatrix.constMEnd(0)));
+    QVERIFY(mThirdIntMatrix.getConstDIterator({1, 1}) == std::min_element(mThirdIntMatrix.constDBegin(1), mThirdIntMatrix.constDEnd(1)));
+    QVERIFY(mThirdIntMatrix.getConstMIterator({0, 2}) == std::max_element(mThirdIntMatrix.constMBegin(0), mThirdIntMatrix.constMEnd(0)));
 
     ConstIntZIteratorPair itPair1{std::minmax_element(mThirdIntMatrix.getConstZIterator(2, 1), mThirdIntMatrix.constZRowEnd(2))};
     ConstIntZIteratorPair itPairRef1{mThirdIntMatrix.getConstZIterator(2, 1), mThirdIntMatrix.getConstZIterator(2, 4)};

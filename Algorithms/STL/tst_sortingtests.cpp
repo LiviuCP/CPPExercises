@@ -148,8 +148,8 @@ void SortingTests::testNthElement()
     IntMatrix matrix{mPrimaryIntMatrix};
     std::nth_element(matrix.nBegin(), matrix.getNIterator(1, 2), matrix.nEnd());
 
-    const IntMatrix::size_type nthElementRowNr{1};
-    const IntMatrix::size_type nthElementColumnNr{2};
+    const matrix_size_t nthElementRowNr{1};
+    const matrix_size_t nthElementColumnNr{2};
     IntMatrix::ConstNIterator nthElementIt{matrix.getConstNIterator(nthElementRowNr, nthElementColumnNr)};
     const int expectedNthElementValue{2};
 

@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "matrix.h"
-#include "utils.h"
 
 using EncodingInput = Matrix<std::string>;
 using EncodingOutput = std::map<char, std::string>;

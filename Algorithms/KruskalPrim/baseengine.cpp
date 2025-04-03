@@ -1,7 +1,7 @@
 #include "baseengine.h"
 
 BaseEngine::BaseEngine(const std::string engineName)
-    : mNodesCount{0u}
+    : mNodesCount{0}
     , mName{engineName}
 {
 }
@@ -23,7 +23,7 @@ std::string BaseEngine::getName() const
 
 void BaseEngine::_reset()
 {
-    mNodesCount = 0u;
+    mNodesCount = 0;
     mMinTree.clear();
     mMaxTree.clear();
 }

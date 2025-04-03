@@ -1,6 +1,7 @@
 #include <sstream>
 
 #include "datatypes.h"
+#include "datautils.h"
 
 Thermometer::Thermometer(double temp, bool isDigital)
     : mTemperature{temp}
@@ -98,11 +99,11 @@ void display(const ColorBoard& data, std::ofstream& out, size_t indentation)
 {
     if (out.is_open())
     {
-        for (ColorBoard::size_type rowNr{0}; rowNr < data.getNrOfRows(); ++rowNr)
+        for (matrix_size_t rowNr{0}; rowNr < data.getNrOfRows(); ++rowNr)
         {
             out << std::string(indentation, ' ') << "[";
 
-            for (ColorBoard::size_type columnNr{0}; columnNr < data.getNrOfColumns(); ++columnNr)
+            for (matrix_size_t columnNr{0}; columnNr < data.getNrOfColumns(); ++columnNr)
             {
                 out << " ("<< c_ColorMapping.at(data.at(rowNr, columnNr)) << ") ";
             }

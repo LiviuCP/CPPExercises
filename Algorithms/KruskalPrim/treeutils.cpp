@@ -3,6 +3,7 @@
 #include "baseengine.h"
 #include "utils.h"
 #include "matrixutils.h"
+#include "datautils.h"
 
 static void writeTreeToFile(std::ofstream& out, const GraphMatrix& graphMatrix, const Tree& tree)
 {
@@ -10,11 +11,11 @@ static void writeTreeToFile(std::ofstream& out, const GraphMatrix& graphMatrix, 
     {
         Cost totalCost{0};
 
-        if (tree.size() > 0u)
+        if (!tree.empty())
         {
             for (const auto& edge : tree)
             {
-                const Cost currentEdgeCost{graphMatrix.at(static_cast<GraphMatrix::size_type>(edge.first), static_cast<GraphMatrix::size_type>(edge.second))};
+                const Cost currentEdgeCost{graphMatrix.at(edge.first, edge.second)};
                 totalCost += currentEdgeCost;
 
                 out << "(" << (edge.first + 1) << "," << (edge.second + 1) << ") - cost: " << currentEdgeCost << "\n";
@@ -47,9 +48,7 @@ int treeAppMain(const std::string& inputFile, const std::string& outputFile, Bas
         GraphMatrix graphMatrix;
         in >> graphMatrix;
 
-        const size_t c_NodesCount{static_cast<size_t>(graphMatrix.getNrOfRows())};
-
-        if (c_NodesCount > 0u)
+        if (!graphMatrix.isEmpty())
         {
             bool success{treeEngine.buildTrees(graphMatrix)};
 
@@ -64,7 +63,8 @@ int treeAppMain(const std::string& inputFile, const std::string& outputFile, Bas
 
                 writeTreeToFile(out, graphMatrix, treeEngine.getMaxTree());
 
-                const size_t c_RequiredEdgesCount{c_NodesCount - 1};
+                const matrix_size_t c_NodesCount{graphMatrix.getNrOfRows()};
+                const matrix_size_t c_RequiredEdgesCount{c_NodesCount - 1};
 
                 // no need to check the count of the maximum tree (if any nodes are loose then both trees will be incomplete)
                 if (c_RequiredEdgesCount == treeEngine.getMinTree().size())

@@ -4,7 +4,7 @@
 
 #include "chesstable.h"
 
-ChessTable::ChessTable(int nrOfRows, int nrOfColumns)
+ChessTable::ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
     : m_Table{}
     , m_IsFullyTraversed{false}
 {
@@ -12,7 +12,7 @@ ChessTable::ChessTable(int nrOfRows, int nrOfColumns)
     m_Table.resizeWithValue(nrOfRows, nrOfColumns, 0);
 }
 
-void ChessTable::setSize(int nrOfRows, int nrOfColumns)
+void ChessTable::setSize(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
 {
     if (nrOfRows > 0 && nrOfColumns > 0)
     {
@@ -21,7 +21,7 @@ void ChessTable::setSize(int nrOfRows, int nrOfColumns)
     }
 }
 
-void ChessTable::traverse(int startingRow, int startingColumn)
+void ChessTable::traverse(matrix_size_t startingRow, matrix_size_t startingColumn)
 {
     if (_isValidTablePosition(startingRow, startingColumn))
     {
@@ -29,10 +29,10 @@ void ChessTable::traverse(int startingRow, int startingColumn)
         _resetTable();
 
         // each traversed position contains the number of the current move; first move belongs to the starting position
-        int moveNumber{1};
+        matrix_size_t moveNumber{1};
         m_Table.at(startingRow, startingColumn) = moveNumber;
 
-        Point currentPos{startingRow, startingColumn};
+        Point currentPos{static_cast<matrix_diff_t>(startingRow), static_cast<matrix_diff_t>(startingColumn)};
         Point successor{currentPos}; // stores the best successor (initially initialized with the current position so it is not left uninitialized - could be any other initial value)
         bool hasSuccessor{_getBestSuccessor(currentPos, successor)};
 
@@ -52,7 +52,7 @@ void ChessTable::traverse(int startingRow, int startingColumn)
 
 void ChessTable::printTable() const
 {
-    for (int row{0}; row < m_Table.getNrOfRows(); ++row)
+    for (matrix_size_t row{0}; row < m_Table.getNrOfRows(); ++row)
     {
         for (Matrix<int>::ConstZIterator it{m_Table.constZRowBegin(row)}; it != m_Table.constZRowEnd(row); ++it)
         {
@@ -84,15 +84,15 @@ bool ChessTable::_getBestSuccessor(const ChessTable::Point& currentPosition, Che
     if (successors.size() > 0)
     {
         hasSuccessors = true;
-        int minNrOfSuccessors{8}; // assume each successor has maximum number of successors (8 possible) and update each time a possible next moving position with less successors is identified
+        matrix_size_t minNrOfSuccessors{8}; // assume each successor has maximum number of successors (8 possible) and update each time a possible next moving position with less successors is identified
 
         for (const auto& successor : successors)
         {
-            int nrOfSuccessors{static_cast<int>(_getSuccessors(successor).size())};
+            const auto c_NrOfSuccessors{_getSuccessors(successor).size()};
 
-            if (nrOfSuccessors < minNrOfSuccessors)
+            if (c_NrOfSuccessors < minNrOfSuccessors)
             {
-                minNrOfSuccessors = nrOfSuccessors;
+                minNrOfSuccessors = c_NrOfSuccessors;
                 bestSuccessor = successor;
             }
         }
@@ -127,13 +127,13 @@ bool ChessTable::_isValidMovePosition(ChessTable::Point position) const
     return isValid;
 }
 
-bool ChessTable::_isValidTablePosition(int x, int y) const
+bool ChessTable::_isValidTablePosition(matrix_diff_t x, matrix_diff_t y) const
 {
-    bool isValid{x >= 0 && x < m_Table.getNrOfRows() && y >= 0 && y < m_Table.getNrOfColumns()};
-    return isValid;
+    const bool c_IsValid{x >= 0 && static_cast<matrix_size_t>(x) < m_Table.getNrOfRows() && y >= 0 && static_cast<matrix_size_t>(y) < m_Table.getNrOfColumns()};
+    return c_IsValid;
 }
 
-ChessTable::Point::Point(int x, int y)
+ChessTable::Point::Point(matrix_diff_t x, matrix_diff_t y)
     : m_X{x}, m_Y{y}
 {
 }

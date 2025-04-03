@@ -12,12 +12,12 @@ DataOrderingEngine::DataOrderingEngine(const DataSet& dataSet)
 void DataOrderingEngine::performGreedyMinSimplified()
 {
     std::vector<bool> wordAlreadyAddedStatuses;
-    AdjacencyMatrix::size_type currentWordIndex{_initGreedyMinSimplified(false, wordAlreadyAddedStatuses)};
+    std::optional<matrix_size_t> currentWordIndex{_initGreedyMinSimplified(false, wordAlreadyAddedStatuses)};
 
     // continue with the remaining words, add them at one end of the ordered set (first the distance between second added word and another one is considered and so on...)
     size_t addedWordsCount{static_cast<size_t>(std::count_if(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), [](bool value){return value;}))};
 
-    auto findMinDistanceSuccessor = [&wordAlreadyAddedStatuses, &currentWordIndex](AdjacencyMatrix::size_type columnNr, HammingDistance currentHammingDistance, HammingDistance& currentMinHammingDistance)
+    auto findMinDistanceSuccessor = [&wordAlreadyAddedStatuses, &currentWordIndex](matrix_size_t columnNr, HammingDistance currentHammingDistance, HammingDistance& currentMinHammingDistance)
     {
         if (!wordAlreadyAddedStatuses.at(columnNr) && currentHammingDistance < currentMinHammingDistance)
         {
@@ -28,23 +28,40 @@ void DataOrderingEngine::performGreedyMinSimplified()
 
     while (addedWordsCount < mDataSet.size())
     {
-        HammingDistance currentMinHammingDistance{static_cast<HammingDistance>(mDataSet.at(0).size()) + 1}; // start with maximum distance (add 1 to ensure one of the remaining words is added to ordered set)
+        // start with maximum distance (add 1 to ensure one of the remaining words is added to ordered set)
+        HammingDistance currentMinHammingDistance{static_cast<HammingDistance>(mDataSet.at(0).size()) + 1};
 
-        AdjacencyMatrix::ConstZIterator currentWordIt{mAdjacencyMatrix.getConstZIterator(currentWordIndex, currentWordIndex)};
-
-        for (AdjacencyMatrix::ConstZIterator it{mAdjacencyMatrix.constZRowBegin(currentWordIt.getRowNr())}; it != currentWordIt; ++it)
+        if (!currentWordIndex.has_value())
         {
-            findMinDistanceSuccessor(it.getColumnNr(), *it, currentMinHammingDistance);
+            assert(false);
+            break;
         }
 
-        for (AdjacencyMatrix::ConstZIterator it{++currentWordIt}; it != mAdjacencyMatrix.constZRowEnd(currentWordIt.getRowNr()); ++it)
+        AdjacencyMatrix::ConstZIterator currentWordIt{mAdjacencyMatrix.getConstZIterator(*currentWordIndex, *currentWordIndex)};
+
+        const std::optional<matrix_size_t> c_CurrentWordItRowNr{currentWordIt.getRowNr()};
+
+        if (!c_CurrentWordItRowNr.has_value())
         {
-            findMinDistanceSuccessor(it.getColumnNr(), *it, currentMinHammingDistance);
+            assert(false);
+            break;
         }
 
-        mOrderingIndexes.at(addedWordsCount) = currentWordIndex;
+        // no need to check optional validity for it.getColumnNr() before getting its value (*) because the matrix is presumed non-empty (see above check) and the iterator is not reverse
+
+        for (AdjacencyMatrix::ConstZIterator it{mAdjacencyMatrix.constZRowBegin(*c_CurrentWordItRowNr)}; it != currentWordIt; ++it)
+        {
+            findMinDistanceSuccessor(*it.getColumnNr(), *it, currentMinHammingDistance);
+        }
+
+        for (AdjacencyMatrix::ConstZIterator it{++currentWordIt}; it != mAdjacencyMatrix.constZRowEnd(*c_CurrentWordItRowNr); ++it)
+        {
+            findMinDistanceSuccessor(*it.getColumnNr(), *it, currentMinHammingDistance);
+        }
+
+        mOrderingIndexes.at(addedWordsCount) = *currentWordIndex;
         mInversionFlags.at(addedWordsCount) = false;
-        wordAlreadyAddedStatuses.at(currentWordIndex) = true;
+        wordAlreadyAddedStatuses.at(*currentWordIndex) = true;
 
         ++addedWordsCount;
     }
@@ -53,14 +70,14 @@ void DataOrderingEngine::performGreedyMinSimplified()
 void DataOrderingEngine::performGreedyMinSimplifiedWithInversion()
 {
     std::vector<bool> wordAlreadyAddedStatuses;
-    AdjacencyMatrix::size_type currentWordIndex{_initGreedyMinSimplified(true, wordAlreadyAddedStatuses)};
+    std::optional<matrix_size_t> currentWordIndex{_initGreedyMinSimplified(true, wordAlreadyAddedStatuses)};
 
     const HammingDistance c_MaxHammingDistance{static_cast<HammingDistance>(mDataSet.at(0).size())};
 
     // continue with the remaining words, add them at one end of the ordered set (first the distance between second added word and another one is considered and so on...)
     size_t addedWordsCount{static_cast<size_t>(std::count_if(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), [](bool value){return value;}))};
 
-    auto findMinDistanceSuccessor = [c_MaxHammingDistance, &wordAlreadyAddedStatuses, &currentWordIndex](AdjacencyMatrix::size_type columnNr, HammingDistance currentHammingDistance, HammingDistance& currentMinHammingDistance, bool& isInvertedSuccessor)
+    auto findMinDistanceSuccessor = [c_MaxHammingDistance, &wordAlreadyAddedStatuses, &currentWordIndex](matrix_size_t columnNr, HammingDistance currentHammingDistance, HammingDistance& currentMinHammingDistance, bool& isInvertedSuccessor)
     {
         if (!wordAlreadyAddedStatuses.at(columnNr))
         {
@@ -71,11 +88,11 @@ void DataOrderingEngine::performGreedyMinSimplifiedWithInversion()
                 isInvertedSuccessor = false;
             }
 
-            const HammingDistance invertedHammingDistance{c_MaxHammingDistance - currentHammingDistance};
+            const HammingDistance c_InvertedHammingDistance{c_MaxHammingDistance - currentHammingDistance};
 
-            if (invertedHammingDistance < currentMinHammingDistance)
+            if (c_InvertedHammingDistance < currentMinHammingDistance)
             {
-                currentMinHammingDistance = invertedHammingDistance;
+                currentMinHammingDistance = c_InvertedHammingDistance;
                 currentWordIndex = columnNr;
                 isInvertedSuccessor = true;
             }
@@ -87,21 +104,37 @@ void DataOrderingEngine::performGreedyMinSimplifiedWithInversion()
         HammingDistance currentMinHammingDistance{c_MaxHammingDistance + 1}; // start with maximum distance (add 1 to ensure one of the remaining words is added to ordered set)
         bool isInvertedSuccessor{false};
 
-        AdjacencyMatrix::ConstZIterator currentWordIt{mAdjacencyMatrix.getConstZIterator(currentWordIndex, currentWordIndex)};
-
-        for (AdjacencyMatrix::ConstZIterator it{mAdjacencyMatrix.constZRowBegin(currentWordIt.getRowNr())}; it != currentWordIt; ++it)
+        if (!currentWordIndex.has_value())
         {
-            findMinDistanceSuccessor(it.getColumnNr(), *it, currentMinHammingDistance, isInvertedSuccessor);
+            assert(false);
+            break;
         }
 
-        for (AdjacencyMatrix::ConstZIterator it{++currentWordIt}; it != mAdjacencyMatrix.constZRowEnd(currentWordIt.getRowNr()); ++it)
+        AdjacencyMatrix::ConstZIterator currentWordIt{mAdjacencyMatrix.getConstZIterator(*currentWordIndex, *currentWordIndex)};
+
+        const std::optional<matrix_size_t> c_CurrentWordItRowNr{currentWordIt.getRowNr()};
+
+        if (!c_CurrentWordItRowNr.has_value())
         {
-            findMinDistanceSuccessor(it.getColumnNr(), *it, currentMinHammingDistance, isInvertedSuccessor);
+            assert(false);
+            break;
         }
 
-        mOrderingIndexes.at(addedWordsCount) = currentWordIndex;
+        // no need to check optional validity for it.getColumnNr() before getting its value (*) because the matrix is presumed non-empty (see above check) and the iterator is not reverse
+
+        for (AdjacencyMatrix::ConstZIterator it{mAdjacencyMatrix.constZRowBegin(*c_CurrentWordItRowNr)}; it != currentWordIt; ++it)
+        {
+            findMinDistanceSuccessor(*it.getColumnNr(), *it, currentMinHammingDistance, isInvertedSuccessor);
+        }
+
+        for (AdjacencyMatrix::ConstZIterator it{++currentWordIt}; it != mAdjacencyMatrix.constZRowEnd(*c_CurrentWordItRowNr); ++it)
+        {
+            findMinDistanceSuccessor(*it.getColumnNr(), *it, currentMinHammingDistance, isInvertedSuccessor);
+        }
+
+        mOrderingIndexes.at(addedWordsCount) = *currentWordIndex;
         mInversionFlags.at(addedWordsCount) = isInvertedSuccessor ? !mInversionFlags.at(addedWordsCount - 1) : mInversionFlags.at(addedWordsCount - 1);
-        wordAlreadyAddedStatuses.at(currentWordIndex) = true;
+        wordAlreadyAddedStatuses.at(*currentWordIndex) = true;
 
         ++addedWordsCount;
     }
@@ -133,21 +166,21 @@ HammingDistance DataOrderingEngine::getTotalTransitionsCount() const
 {
     HammingDistance transitionsCount{0};
 
-    const size_t cDataSetSize{mDataSet.size()};
+    const size_t c_DataSetSize{mDataSet.size()};
 
-    if (cDataSetSize > 1)
+    if (c_DataSetSize > 1)
     {
         const HammingDistance cWordSize{static_cast<HammingDistance>(mDataSet.at(0).size())};
 
-        for (size_t currentWordIndex{0}; currentWordIndex < cDataSetSize - 1; ++currentWordIndex)
+        for (size_t currentWordIndex{0}; currentWordIndex < c_DataSetSize - 1; ++currentWordIndex)
         {
-            const AdjacencyMatrix::size_type cFirstWordIndex{static_cast<AdjacencyMatrix::size_type>(mOrderingIndexes.at(currentWordIndex))};
-            const AdjacencyMatrix::size_type cSecondWordIndex{static_cast<AdjacencyMatrix::size_type>(mOrderingIndexes.at(currentWordIndex + 1))};
-            const bool cAreInInvertedRelation{mInversionFlags.at(currentWordIndex) != mInversionFlags.at(currentWordIndex + 1)};
+            const matrix_size_t c_FirstWordIndex{static_cast<matrix_size_t>(mOrderingIndexes.at(currentWordIndex))};
+            const matrix_size_t c_SecondWordIndex{static_cast<matrix_size_t>(mOrderingIndexes.at(currentWordIndex + 1))};
+            const bool c_AreInInvertedRelation{mInversionFlags.at(currentWordIndex) != mInversionFlags.at(currentWordIndex + 1)};
 
-            HammingDistance hammingDistance{mAdjacencyMatrix.at(cFirstWordIndex, cSecondWordIndex)};
+            HammingDistance hammingDistance{mAdjacencyMatrix.at(c_FirstWordIndex, c_SecondWordIndex)};
 
-            if (cAreInInvertedRelation)
+            if (c_AreInInvertedRelation)
             {
                 hammingDistance = cWordSize - hammingDistance;
             }
@@ -191,18 +224,18 @@ void DataOrderingEngine::_reset()
 
 void DataOrderingEngine::_init()
 {
-    const size_t cWordsCount{mDataSet.size()};
+    const size_t c_WordsCount{mDataSet.size()};
 
-    if (cWordsCount > 0)
+    if (c_WordsCount > 0)
     {
         _buildAdjacencyMatrix();
 
         if (mAdjacencyMatrix.getNrOfRows() > 0)
         {
-            mOrderingIndexes.reserve(cWordsCount);
-            mInversionFlags.reserve(cWordsCount);
+            mOrderingIndexes.reserve(c_WordsCount);
+            mInversionFlags.reserve(c_WordsCount);
 
-            for (size_t currentWordIndex{0}; currentWordIndex < cWordsCount; ++currentWordIndex)
+            for (size_t currentWordIndex{0}; currentWordIndex < c_WordsCount; ++currentWordIndex)
             {
                 mOrderingIndexes.push_back(currentWordIndex);
                 mInversionFlags.push_back(false);
@@ -217,25 +250,25 @@ void DataOrderingEngine::_init()
 
 void DataOrderingEngine::_buildAdjacencyMatrix()
 {
-    const AdjacencyMatrix::size_type cWordsCount{static_cast<AdjacencyMatrix::size_type>(mDataSet.size())};
+    const matrix_size_t c_WordsCount{static_cast<matrix_size_t>(mDataSet.size())};
 
-    if (cWordsCount > 0)
+    if (c_WordsCount > 0)
     {
-        mAdjacencyMatrix.resize(cWordsCount, cWordsCount);
+        mAdjacencyMatrix.resize(c_WordsCount, c_WordsCount);
 
         for (size_t firstWordPos{0}; firstWordPos < mDataSet.size(); ++firstWordPos)
         {
             for (size_t secondWordPos{firstWordPos + 1}; secondWordPos < mDataSet.size(); ++secondWordPos)
             {
-                AdjacencyMatrix::size_type rowNumber{static_cast<AdjacencyMatrix::size_type>(firstWordPos)};
-                AdjacencyMatrix::size_type columnNumber{static_cast<AdjacencyMatrix::size_type>(secondWordPos)};
+                const matrix_size_t c_RowNumber{static_cast<matrix_size_t>(firstWordPos)};
+                const matrix_size_t c_ColumnNumber{static_cast<matrix_size_t>(secondWordPos)};
 
-                const HammingDistance cHammingDistance{_getHammingDistance(mDataSet.at(firstWordPos), mDataSet.at(secondWordPos))};
+                const HammingDistance c_HammingDistance{_getHammingDistance(mDataSet.at(firstWordPos), mDataSet.at(secondWordPos))};
 
-                if (cHammingDistance >= 0)
+                if (c_HammingDistance >= 0)
                 {
-                    mAdjacencyMatrix.at(rowNumber, columnNumber) = cHammingDistance;
-                    mAdjacencyMatrix.at(columnNumber, rowNumber) = cHammingDistance;
+                    mAdjacencyMatrix.at(c_RowNumber, c_ColumnNumber) = c_HammingDistance;
+                    mAdjacencyMatrix.at(c_ColumnNumber, c_RowNumber) = c_HammingDistance;
                 }
                 else
                 {
@@ -263,10 +296,10 @@ bool DataOrderingEngine::_retrieveMinimumDistancePair(bool inversionAllowed, Dat
 
     if (mAdjacencyMatrix.getNrOfRows() > 1)
     {
-        AdjacencyMatrix::size_type currentFirstWordIndex{0};
-        AdjacencyMatrix::size_type currentSecondWordIndex{1};
+        matrix_size_t currentFirstWordIndex{0};
+        matrix_size_t currentSecondWordIndex{1};
 
-        const AdjacencyMatrix::size_type c_PositiveDiagonalsCount{mAdjacencyMatrix.getNrOfColumns() - 1};
+        const matrix_size_t c_PositiveDiagonalsCount{mAdjacencyMatrix.getNrOfColumns() - 1};
 
         HammingDistance currentDistance{mAdjacencyMatrix.at(currentFirstWordIndex, currentSecondWordIndex)};
 
@@ -281,15 +314,19 @@ bool DataOrderingEngine::_retrieveMinimumDistancePair(bool inversionAllowed, Dat
                 areInverted = true;
             }
 
-            for (AdjacencyMatrix::size_type currentDiagNr{1}; currentDiagNr < c_PositiveDiagonalsCount; ++currentDiagNr)
+            for (matrix_size_t currentDiagNr{1}; currentDiagNr < c_PositiveDiagonalsCount; ++currentDiagNr)
             {
                 for (AdjacencyMatrix::ConstDIterator it{mAdjacencyMatrix.constDBegin(currentDiagNr)}; it != mAdjacencyMatrix.constDEnd(currentDiagNr); ++it)
                 {
+                    // no need to check the validity of getRowNr() and getColumnNr() as the matrix is not empty and the iterators are not reverse
+                    const matrix_size_t c_RowNr{*it.getRowNr()};
+                    const matrix_size_t c_ColumnNr{*it.getColumnNr()};
+
                     if (*it < currentDistance)
                     {
                         currentDistance = *it;
-                        currentFirstWordIndex = it.getRowNr();
-                        currentSecondWordIndex = it.getColumnNr();
+                        currentFirstWordIndex = c_RowNr;
+                        currentSecondWordIndex = c_ColumnNr;
                         areInverted = false;
                     }
 
@@ -298,8 +335,8 @@ bool DataOrderingEngine::_retrieveMinimumDistancePair(bool inversionAllowed, Dat
                     if (c_CurrentPairInvertedDistance < currentDistance)
                     {
                         currentDistance = c_CurrentPairInvertedDistance;
-                        currentFirstWordIndex = it.getRowNr();
-                        currentSecondWordIndex = it.getColumnNr();
+                        currentFirstWordIndex = c_RowNr;
+                        currentSecondWordIndex = c_ColumnNr;
                         areInverted = true;
                     }
                 }
@@ -307,15 +344,17 @@ bool DataOrderingEngine::_retrieveMinimumDistancePair(bool inversionAllowed, Dat
         }
         else
         {
-            for (AdjacencyMatrix::size_type currentDiagNr{1}; currentDiagNr < c_PositiveDiagonalsCount; ++currentDiagNr)
+            for (matrix_size_t currentDiagNr{1}; currentDiagNr < c_PositiveDiagonalsCount; ++currentDiagNr)
             {
                 for (AdjacencyMatrix::ConstDIterator it{mAdjacencyMatrix.constDBegin(currentDiagNr)}; it != mAdjacencyMatrix.constDEnd(currentDiagNr); ++it)
                 {
                     if (*it < currentDistance)
                     {
                         currentDistance = *it;
-                        currentFirstWordIndex = it.getRowNr();
-                        currentSecondWordIndex = it.getColumnNr();
+
+                        // no need to check the validity of getRowNr() and getColumnNr() as the matrix is not empty and the iterators are not reverse
+                        currentFirstWordIndex = *it.getRowNr();
+                        currentSecondWordIndex = *it.getColumnNr();
                     }
                 }
             }
@@ -327,9 +366,9 @@ bool DataOrderingEngine::_retrieveMinimumDistancePair(bool inversionAllowed, Dat
     return areInverted;
 }
 
-DataOrderingEngine::AdjacencyMatrix::size_type DataOrderingEngine::_initGreedyMinSimplified(bool inversionAllowed, std::vector<bool>& wordAlreadyAddedStatuses)
+std::optional<matrix_size_t> DataOrderingEngine::_initGreedyMinSimplified(bool inversionAllowed, std::vector<bool>& wordAlreadyAddedStatuses)
 {
-    AdjacencyMatrix::size_type currentWordIndex{-1};
+    std::optional<matrix_size_t> currentWordIndex;
 
     const size_t c_DataSetSize{mDataSet.size()};
 

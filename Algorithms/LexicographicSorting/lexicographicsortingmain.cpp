@@ -11,12 +11,12 @@ using namespace std;
 static const string c_InFile{Utilities::c_InputOutputDir + "lexicographicinput.txt"};
 static const string c_OutFile{Utilities::c_InputOutputDir + "lexicographicoutput.txt"};
 
-void logLexicographicalSortOutput(ofstream& outStream, const Matrix<double>& sortedMatrix, const Matrix<int>& originalRowNumbersMatrix);
+void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix, const Matrix<matrix_size_t>& originalRowNumbersMatrix);
 
 int main()
 {
-    Matrix<double> matrix;
-    Matrix<int> originalRowNumbers;
+    Matrix<int> matrix;
+    Matrix<matrix_size_t> originalRowNumbers;
     std::ifstream in{c_InFile};
 
     Utilities::clearScreen();
@@ -28,7 +28,7 @@ int main()
 
         if (!matrix.isEmpty())
         {
-            (void)LexicographicalSorter<double>::sort(matrix, originalRowNumbers, true);
+            (void)LexicographicalSorter<int>::sort(matrix, originalRowNumbers, true);
             cout << "The matrix has been successfully read and lexicographically sorted" << endl;
 
             std::ofstream out{c_OutFile};
@@ -56,7 +56,7 @@ int main()
     return 0;
 }
 
-void logLexicographicalSortOutput(ofstream& outStream, const Matrix<double>& sortedMatrix, const Matrix<int>& originalRowNumbersMatrix)
+void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix, const Matrix<matrix_size_t>& originalRowNumbersMatrix)
 {
     assert(originalRowNumbersMatrix.getNrOfColumns() == 1 && originalRowNumbersMatrix.getNrOfRows() == sortedMatrix.getNrOfRows());
 
@@ -64,7 +64,7 @@ void logLexicographicalSortOutput(ofstream& outStream, const Matrix<double>& sor
     outStream << sortedMatrix << endl;
     outStream << "Number of each row before lexicographic sorting: " << endl << endl;
 
-    for(Matrix<int>::ConstNIterator it{originalRowNumbersMatrix.constNBegin()}; it != originalRowNumbersMatrix.constNEnd(); ++it)
+    for (Matrix<matrix_size_t>::ConstNIterator it{originalRowNumbersMatrix.constNBegin()}; it != originalRowNumbersMatrix.constNEnd(); ++it)
     {
         outStream << *it << endl;
     }

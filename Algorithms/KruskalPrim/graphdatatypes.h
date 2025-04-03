@@ -8,7 +8,7 @@
 
 using Node = size_t;
 using Edge = std::pair<Node, Node>;
-using Cost = int;
+using Cost = size_t;
 using GraphMatrix = Matrix<Cost>;
 using Tree = std::list<Edge>;
 

@@ -53,8 +53,8 @@ private:
 
     template<typename DataType> auto _getSum(const Matrix<DataType>& matrix) const;
     template<typename DataType> DataTypes _getType(DataType myType) const;
-    template<typename DataType> std::optional<typename Matrix<DataType>::size_type> _getLowestDiagonalNr(const Matrix<DataType> matrix);
-    template<typename DataType> std::optional<typename Matrix<DataType>::size_type> _getHighestDiagonalNr(const Matrix<DataType> matrix);
+    template<typename DataType> std::optional<matrix_diff_t> _getLowestDiagonalNr(const Matrix<DataType> matrix);
+    template<typename DataType> std::optional<matrix_diff_t> _getHighestDiagonalNr(const Matrix<DataType> matrix);
 
     class RawContainer
     {
@@ -74,7 +74,7 @@ private:
     {
     public:
         IntMatrixWrapper() {}
-        IntMatrixWrapper(int nrOfRows, int nrOfColumns, int value) : mIntMatrix{nrOfRows, nrOfColumns, value} {}
+        IntMatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, int value) : mIntMatrix{nrOfRows, nrOfColumns, value} {}
 
         // it is possible to also use signed size with std::size
         ssize_t size() const {return mIntMatrix.getNrOfRows() * mIntMatrix.getNrOfColumns();}
@@ -87,7 +87,7 @@ private:
     {
     public:
         StringMatrixWrapper() {}
-        StringMatrixWrapper(int nrOfRows, int nrOfColumns, std::string value) : mStringMatrix{nrOfRows, nrOfColumns, value} {}
+        StringMatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, std::string value) : mStringMatrix{nrOfRows, nrOfColumns, value} {}
 
         // a pair can also be used with std::size
         SizePair size() const {return {static_cast<size_t>(mStringMatrix.getNrOfRows()), static_cast<size_t>(mStringMatrix.getNrOfColumns())};}
@@ -174,14 +174,14 @@ template<typename DataType> CPP17ConceptsTests::DataTypes CPP17ConceptsTests::_g
     }
 }
 
-template<typename DataType> std::optional<typename Matrix<DataType>::size_type> CPP17ConceptsTests::_getLowestDiagonalNr(const Matrix<DataType> matrix)
+template<typename DataType> std::optional<matrix_diff_t> CPP17ConceptsTests::_getLowestDiagonalNr(const Matrix<DataType> matrix)
 {
-    return !matrix.isEmpty() ? std::optional<typename Matrix<DataType>::size_type>{1 - matrix.getNrOfRows()} : std::nullopt;
+    return !matrix.isEmpty() ? std::optional<matrix_diff_t>{1 - static_cast<matrix_diff_t>(matrix.getNrOfRows())} : std::nullopt;
 }
 
-template<typename DataType> std::optional<typename Matrix<DataType>::size_type> CPP17ConceptsTests::_getHighestDiagonalNr(const Matrix<DataType> matrix)
+template<typename DataType> std::optional<matrix_diff_t> CPP17ConceptsTests::_getHighestDiagonalNr(const Matrix<DataType> matrix)
 {
-    return !matrix.isEmpty() ? std::optional<typename Matrix<DataType>::size_type>{matrix.getNrOfColumns() - 1} : std::nullopt;
+    return !matrix.isEmpty() ? std::optional<matrix_diff_t>{static_cast<matrix_diff_t>(matrix.getNrOfColumns()) - 1} : std::nullopt;
 }
 
 void CPP17ConceptsTests::testVariableDeclarationInIf()
@@ -250,7 +250,7 @@ void CPP17ConceptsTests::testVariableDeclarationInSwitch()
     IntMatrix matrix{9, 8, -7};
     const IntMatrix c_MatrixRef{9, 8, 24};
 
-    switch (const IntMatrix::size_type c_ElementsCount{matrix.getNrOfRows() * matrix.getNrOfColumns()};
+    switch (const matrix_size_t c_ElementsCount{matrix.getNrOfRows() * matrix.getNrOfColumns()};
             const SizeOrder c_SizeOrder{c_ElementsCount < 50 ? SizeOrder::SMALL
                                                              : c_ElementsCount < 90 ? SizeOrder::MEDIUM
                                                                                     : c_ElementsCount < 140 ? SizeOrder::LARGE
@@ -537,7 +537,7 @@ void CPP17ConceptsTests::testStdSize()
 void CPP17ConceptsTests::testStdOptional()
 {
     IntMatrix intMatrix;
-    std::optional<IntMatrix::size_type> intMatrixLowestDiagonalNr{_getLowestDiagonalNr(intMatrix)};
+    std::optional<matrix_diff_t> intMatrixLowestDiagonalNr{_getLowestDiagonalNr(intMatrix)};
 
     QVERIFY(!intMatrixLowestDiagonalNr.has_value());
 
@@ -552,8 +552,8 @@ void CPP17ConceptsTests::testStdOptional()
     QVERIFY(INT_MIN == intMatrixLowestDiagonalNr.value_or(INT_MIN));
 
     StringMatrix stringMatrix{1, 1, "abcd"};
-    std::optional<StringMatrix::size_type> stringMatrixLowestDiagonalNr{_getLowestDiagonalNr(stringMatrix)};
-    std::optional<StringMatrix::size_type> stringMatrixHighestDiagonalNr{_getHighestDiagonalNr(stringMatrix)};
+    std::optional<matrix_diff_t> stringMatrixLowestDiagonalNr{_getLowestDiagonalNr(stringMatrix)};
+    std::optional<matrix_diff_t> stringMatrixHighestDiagonalNr{_getHighestDiagonalNr(stringMatrix)};
 
     QVERIFY(stringMatrixLowestDiagonalNr.has_value() && stringMatrixLowestDiagonalNr == stringMatrixHighestDiagonalNr && 0 == stringMatrixHighestDiagonalNr.value());
 
@@ -577,7 +577,7 @@ void CPP17ConceptsTests::testStdOptional()
     stringMatrixHighestDiagonalNr.reset();
 
     QVERIFY(!stringMatrixLowestDiagonalNr.has_value() && !stringMatrixHighestDiagonalNr.has_value() && stringMatrixLowestDiagonalNr == stringMatrixHighestDiagonalNr);
-    QVERIFY_THROWS_EXCEPTION(std::bad_optional_access, {const StringMatrix::size_type c_DiagNumber{stringMatrixLowestDiagonalNr.value()}; (void)c_DiagNumber;});
+    QVERIFY_THROWS_EXCEPTION(std::bad_optional_access, {const matrix_diff_t c_DiagNumber{stringMatrixLowestDiagonalNr.value()}; (void)c_DiagNumber;});
 }
 
 void CPP17ConceptsTests::testStdStringView()

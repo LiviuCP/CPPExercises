@@ -2,20 +2,21 @@
    It is also possible that no solution exists.
 */
 #include <iostream>
+#include <string>
 
 #include "chesstable.h"
 #include "utils.h"
 
 using namespace std;
 
-void retrieveInput(int& input, std::string inputRequestMessage);
+void retrieveInput(std::optional<matrix_size_t>& input, const string& inputRequestMessage);
 
 int main()
 {
-    int tableLength{-1};
-    int tableWidth{-1};
-    int startPositionX{-1};
-    int startPositionY{-1};
+    std::optional<matrix_size_t> tableLength;
+    std::optional<matrix_size_t> tableWidth;
+    std::optional<matrix_size_t> startPositionX;
+    std::optional<matrix_size_t> startPositionY;
 
     Utilities::clearScreen();
 
@@ -28,14 +29,16 @@ int main()
     retrieveInput(startPositionY, "Vertical = ");
     cout << endl;
 
-    if (tableLength <= 0 || tableWidth <= 0 || startPositionX < 1 || startPositionX > tableLength || startPositionY < 1 || startPositionY > tableWidth)
+    assert(tableLength.has_value() && tableWidth.has_value() && startPositionX.has_value() && startPositionY.has_value());
+
+    if (tableLength == 0 || tableWidth == 0 || startPositionX < 1 || startPositionX > tableLength || startPositionY < 1 || startPositionY > tableWidth)
     {
         cerr << "Invalid table dimensions and/or start position of the horse" << endl;
     }
     else
     {
-        ChessTable chessTable{tableLength, tableWidth};
-        chessTable.traverse(startPositionX-1, startPositionY-1);
+        ChessTable chessTable{*tableLength, *tableWidth};
+        chessTable.traverse(*startPositionX - 1, *startPositionY - 1);
 
         if (chessTable.isFullyTraversed())
         {
@@ -53,14 +56,18 @@ int main()
     return 0;
 }
 
-void retrieveInput(int& input, std::string inputRequestMessage)
+void retrieveInput(std::optional<matrix_size_t>& input, const string& inputRequestMessage)
 {
+    matrix_size_t buffer;
+
     cout << inputRequestMessage;
-    cin >> input;
+    cin >> buffer;
 
     if (cin.fail())
     {
         cerr << "Bad input. Aborted" << endl;
         exit(-1);
     }
+
+    input = buffer;
 }

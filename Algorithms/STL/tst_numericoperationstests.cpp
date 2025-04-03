@@ -76,12 +76,12 @@ void NumericOperationsTests::testAccumulate()
                                        -6,  1,  9,  10, 16
                                 }};
 
-    const IntMatrix::size_type c_LastRowNrAfterInsert{matrix.getNrOfRows()};
+    const matrix_size_t c_LastRowNrAfterInsert{matrix.getNrOfRows()};
     matrix.insertRow(c_LastRowNrAfterInsert);
 
     for(IntMatrix::ZIterator it{matrix.zRowBegin(c_LastRowNrAfterInsert)}; it != matrix.zEnd(); ++it)
     {
-        *it = std::accumulate(matrix.constNColumnBegin(it.getColumnNr()), matrix.getConstNIterator(c_LastRowNrAfterInsert, it.getColumnNr()), 0);
+        *it = std::accumulate(matrix.constNColumnBegin(*it.getColumnNr()), matrix.getConstNIterator(c_LastRowNrAfterInsert, *it.getColumnNr()), 0);
     }
 
     QVERIFY(c_MatrixRef == matrix);
@@ -108,7 +108,7 @@ void NumericOperationsTests::testInnerProduct()
 
     for(IntMatrix::ZIterator it{matrix.zBegin()}; it != matrix.zEnd(); ++it)
     {
-        *it = std::inner_product(mPrimaryIntMatrix.constZRowBegin(it.getRowNr()), mPrimaryIntMatrix.constZRowEnd(it.getRowNr()), mThirdIntMatrix.constNColumnBegin(it.getColumnNr()), 0);
+        *it = std::inner_product(mPrimaryIntMatrix.constZRowBegin(*it.getRowNr()), mPrimaryIntMatrix.constZRowEnd(*it.getRowNr()), mThirdIntMatrix.constNColumnBegin(*it.getColumnNr()), 0);
     }
 
     QVERIFY(c_MatrixRef == matrix);
@@ -221,13 +221,13 @@ void NumericOperationsTests::testReduce()
                                        -6,  1,  9,  10, 16
                                 }};
 
-    const IntMatrix::size_type c_LastRowNrAfterInsert{matrix.getNrOfRows()};
+    const matrix_size_t c_LastRowNrAfterInsert{matrix.getNrOfRows()};
     matrix.insertRow(c_LastRowNrAfterInsert);
 
     // Same example as the first one provided for std::accumulate; both algorithms can be used with same results here (for std::reduce the init value is not provided - it's implicitly 0)
     for(IntMatrix::ZIterator it{matrix.zRowBegin(c_LastRowNrAfterInsert)}; it != matrix.zEnd(); ++it)
     {
-        *it = std::reduce(matrix.constNColumnBegin(it.getColumnNr()), matrix.getConstNIterator(c_LastRowNrAfterInsert, it.getColumnNr()));
+        *it = std::reduce(matrix.constNColumnBegin(*it.getColumnNr()), matrix.getConstNIterator(c_LastRowNrAfterInsert, *it.getColumnNr()));
     }
 
     QVERIFY(c_MatrixRef == matrix);

@@ -159,26 +159,26 @@ void writeScenarioOutputToFile(ofstream& out, const DataOrderingEngine& engine)
 
 void writeConvertedDataSetToFile(ofstream& out, const DataOrderingEngine& engine)
 {
-    const DataSet& dataSet{engine.getDataSet()};
-    const OrderingIndexes& orderingIndexes{engine.getOrderingIndexes()};
-    const InversionFlags& inversionFlags{engine.getInversionFlags()};
+    const DataSet& c_DataSet{engine.getDataSet()};
+    const OrderingIndexes& c_OrderingIndexes{engine.getOrderingIndexes()};
+    const InversionFlags& c_InversionFlags{engine.getInversionFlags()};
 
-    const size_t dataSetSize{dataSet.size()};
+    const size_t c_DataSetSize{c_DataSet.size()};
 
-    if (dataSetSize == orderingIndexes.size() && dataSetSize == inversionFlags.size())
+    if (c_DataSetSize == c_OrderingIndexes.size() && c_DataSetSize == c_InversionFlags.size())
     {
         DataSet convertedDataSet;
-        convertedDataSet.reserve(dataSetSize);
+        convertedDataSet.reserve(c_DataSetSize);
 
-        for (size_t currentWordIndex{0}; currentWordIndex < dataSet.size(); ++currentWordIndex)
+        for (size_t currentWordIndex{0}; currentWordIndex < c_DataSet.size(); ++currentWordIndex)
         {
-            if (inversionFlags.at(currentWordIndex))
+            if (c_InversionFlags.at(currentWordIndex))
             {
-                convertedDataSet.push_back(Utilities::invertDataWord(dataSet.at(orderingIndexes.at(currentWordIndex))));
+                convertedDataSet.push_back(Utilities::invertDataWord(c_DataSet.at(c_OrderingIndexes.at(currentWordIndex))));
             }
             else
             {
-                convertedDataSet.push_back(dataSet.at(orderingIndexes.at(currentWordIndex)));
+                convertedDataSet.push_back(c_DataSet.at(c_OrderingIndexes.at(currentWordIndex)));
             }
         }
 
@@ -196,17 +196,17 @@ void writeConvertedDataSetToFile(ofstream& out, const DataOrderingEngine& engine
 
 void writeOrderingIndexesToFile(ofstream& out, const OrderingIndexes& indexes)
 {
-    const size_t indexesSize{indexes.size()};
+    const size_t c_IndexesSize{indexes.size()};
 
-    if (indexesSize > 0)
+    if (c_IndexesSize > 0)
     {
-        for (size_t currentIndex{0}; currentIndex < indexesSize - 1; ++currentIndex)
+        for (size_t currentIndex{0}; currentIndex < c_IndexesSize - 1; ++currentIndex)
         {
             out << indexes.at(currentIndex);
             out << ", ";
         }
 
-        out << indexes.at(indexesSize - 1);
+        out << indexes.at(c_IndexesSize - 1);
     }
 }
 

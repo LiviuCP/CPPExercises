@@ -18,7 +18,7 @@ using namespace std;
 static const string c_InFile{Utilities::c_InputOutputDir + "boxesinput.txt"};
 static const string c_OutFile{Utilities::c_InputOutputDir + "boxesoutput.txt"};
 
-void logFittingBoxesToFile(ofstream& outStream, const Matrix<int>& fittingBoxIndexes, const Matrix<int>& originalIndexes);
+void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fittingBoxIndexes, const Matrix<matrix_size_t>& originalIndexes);
 
 int main()
 {
@@ -29,9 +29,9 @@ int main()
 
     if(in.is_open() && out.is_open())
     {
-        Matrix<int> sortedBoxData;
-        Matrix<int> originalIndexes; // box indexes before lexicographic sort
-        Matrix<int> fittingBoxes; // original indexes of the boxes that belong to maximum fitting series
+        Matrix<matrix_size_t> sortedBoxData;
+        Matrix<matrix_size_t> originalIndexes; // box indexes before lexicographic sort
+        Matrix<matrix_size_t> fittingBoxes; // original indexes of the boxes that belong to maximum fitting series
 
         cout << "Reading all existing box series from input file: " << c_InFile << endl << endl;
 
@@ -43,7 +43,7 @@ int main()
 
             if(sortedBoxData.getNrOfRows() > 0)
             {
-                LexicographicalSorter<int>::sort(sortedBoxData, originalIndexes, true);
+                LexicographicalSorter<matrix_size_t>::sort(sortedBoxData, originalIndexes, true);
                 retrieveFittingBoxes(sortedBoxData, fittingBoxes);
 
                 cout << "Writing maximum fitting range of boxes to output file: " << c_OutFile << endl;
@@ -64,17 +64,17 @@ int main()
 }
 
 // logs the input file row number of each found box by taking the lexicographical ordering into consideration
-void logFittingBoxesToFile(ofstream& outStream, const Matrix<int>& fittingBoxIndexes, const Matrix<int>& originalIndexes)
+void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fittingBoxIndexes, const Matrix<matrix_size_t>& originalIndexes)
 {
-    const int nrOfFittingBoxes{fittingBoxIndexes.constZEnd() - fittingBoxIndexes.constZBegin()};
+    const matrix_diff_t c_NrOfFittingBoxes{std::distance(fittingBoxIndexes.constZBegin(), fittingBoxIndexes.constZEnd())};
 
     outStream << "In-order box numbers (boxes sorted increasingly by size): ";
 
-    for (Matrix<int>::ConstZIterator it{fittingBoxIndexes.constZBegin()}; it != fittingBoxIndexes.constZEnd(); ++it)
+    for (Matrix<matrix_size_t>::ConstZIterator it{fittingBoxIndexes.constZBegin()}; it != fittingBoxIndexes.constZEnd(); ++it)
     {
-        int boxNumber{originalIndexes[*it] + 1}; // provide a "human readable" number to the box so it can easily be identifed in the input file
+        const matrix_size_t boxNumber{originalIndexes[*it] + 1}; // provide a "human readable" number to the box so it can easily be identifed in the input file
         outStream << boxNumber << " ";
     }
 
-    outStream << endl << nrOfFittingBoxes << " fitting boxes found" << endl << endl;
+    outStream << endl << c_NrOfFittingBoxes << " fitting boxes found" << endl << endl;
 }
