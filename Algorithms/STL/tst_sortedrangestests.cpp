@@ -68,14 +68,14 @@ SortedRangesTests::SortedRangesTests()
                              -2,  1,  9, -8, 4,
                               0,  7, -4,  6, 8
                       }}
-    , mSeventhIntMatrix{4, 5, -50}
+    , mSeventhIntMatrix{-50, 4, 5}
     , mPrimaryStringIntPairMatrix{2, 5, {{"Mark", 7}, {"Alex", 8}, {"Alistair", 8}, {"Cameron", 9}, {"Andrew", 10},
                                          {"Kevin", 11}, {"John", 11}, {"Reggie", 12}, {"George", 14}, {"Patrick", 15}
                                   }} // sorted increasingly by child age
     , mSecondaryStringIntPairMatrix{2, 5, {{"Christian", 13}, {"Patrick", 15}, {"Cameron", 9}, {"Andrew", 10}, {"Reggie", 12},
                                            {"George", 14}, {"Gordon", 7}, {"John", 11}, {"Alex", 8}, {"Mark", 7}
                                   }} // sorted decreasingly by number of characters of the child name
-    , mThirdStringIntPairMatrix{4, 5, {"RESERVED", 0}}
+    , mThirdStringIntPairMatrix{{"RESERVED", 0}, 4, 5}
     , mFourthStringIntPairMatrix{2, 5, {{"Alex", 8}, {"Chris", 9}, {"Erwin", 5}, {"Edgar", 7}, {"Reggie", 12},
                                         {"Camilla", 14}, {"Cameron", 11}, {"Patrick", 15}, {"Reginald", 10}, {"Alexander", 9}
                                  }} // sorted increasingly by number of characters

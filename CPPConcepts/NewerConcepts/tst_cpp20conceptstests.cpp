@@ -48,7 +48,7 @@ private:
     {
     public:
         MatrixWrapper() {}
-        MatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, const DataType& value) : mMatrix{nrOfRows, nrOfColumns, value} {}
+        MatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, const DataType& value) : mMatrix{value, nrOfRows, nrOfColumns} {}
 
         size_t size() const {return mMatrix.getNrOfRows() * mMatrix.getNrOfColumns();}
 
@@ -397,8 +397,8 @@ void CPP20ConceptsTests::testConcept()
 
     const IntMatrix c_IntMatrix{2, 3, {4, 5, -2, 9, 8, -3}};
     const Matrix<size_t> c_SizeMatrix{3, 2, {4, 8, 9, 12, 14, 5}};
-    const Matrix c_DecimalMatrix{2, 2, {1.2, 2.5, 5.003, -3.0}};
-    const Matrix c_BooleanMatrix{3, 3, {false, true, false, false, true, true, false, true, false}};
+    const Matrix<double> c_DecimalMatrix{2, 2, {1.2, 2.5, 5.003, -3.0}};
+    const Matrix<bool> c_BooleanMatrix{3, 3, {false, true, false, false, true, true, false, true, false}};
     const StringMatrix c_StringMatrix{4, 2, {"abc", "d", "efgh", "", "i", "jkl", "mno", "p"}};
     const Matrix<IntVector> c_IntVectorMatrix{2, 2, {{2, 3, 5}, {1, -2, 4, 10, 2}, {}, {0}}};
     const Matrix<StringWrapper> c_StringWrapperMatrix{2, 4, {{"p"}, {"mno"}, {"jkl"}, {"i"}, {""}, {"efgh"}, {"d"}, {"abc"}}};

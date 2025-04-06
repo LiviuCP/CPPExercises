@@ -74,7 +74,7 @@ private:
     {
     public:
         IntMatrixWrapper() {}
-        IntMatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, int value) : mIntMatrix{nrOfRows, nrOfColumns, value} {}
+        IntMatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, int value) : mIntMatrix{value, nrOfRows, nrOfColumns} {}
 
         // it is possible to also use signed size with std::size
         ssize_t size() const {return mIntMatrix.getNrOfRows() * mIntMatrix.getNrOfColumns();}
@@ -87,7 +87,7 @@ private:
     {
     public:
         StringMatrixWrapper() {}
-        StringMatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, std::string value) : mStringMatrix{nrOfRows, nrOfColumns, value} {}
+        StringMatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, std::string value) : mStringMatrix{value, nrOfRows, nrOfColumns} {}
 
         // a pair can also be used with std::size
         SizePair size() const {return {static_cast<size_t>(mStringMatrix.getNrOfRows()), static_cast<size_t>(mStringMatrix.getNrOfColumns())};}
@@ -201,7 +201,7 @@ void CPP17ConceptsTests::testVariableDeclarationInIf()
                                               16, 4, 6
                                       }};
 
-    const IntMatrix c_ThirdMatrixRef{3, 3, -7};
+    const IntMatrix c_ThirdMatrixRef{-7, 3, 3};
 
     // scenario 1: one variable
     if (int value{std::accumulate(matrix.constNColumnBegin(0), matrix.constNColumnEnd(0), 0)};
@@ -247,8 +247,8 @@ void CPP17ConceptsTests::testVariableDeclarationInSwitch()
         EXTRA_LARGE
     };
 
-    IntMatrix matrix{9, 8, -7};
-    const IntMatrix c_MatrixRef{9, 8, 24};
+    IntMatrix matrix{-7, 9, 8};
+    const IntMatrix c_MatrixRef{24, 9, 8};
 
     switch (const matrix_size_t c_ElementsCount{matrix.getNrOfRows() * matrix.getNrOfColumns()};
             const SizeOrder c_SizeOrder{c_ElementsCount < 50 ? SizeOrder::SMALL
@@ -397,9 +397,9 @@ void CPP17ConceptsTests::testConstexprIfIsSame()
     QVERIFY(DataTypes::STRING_VIEW == _getType("abcd"sv));
     QVERIFY(DataTypes::CSTYLESTRING == _getType("abcd"));
     QVERIFY(DataTypes::STRINGINTPAIR == _getType(StringIntPair{"Robert", 16}));
-    QVERIFY(DataTypes::INTMATRIX == _getType(IntMatrix{2, 3, 5}));
-    QVERIFY(DataTypes::UNKNOWN == _getType(StringMatrix{2, 3, "abcd"}));
-    QVERIFY(DataTypes::UNKNOWN == _getType(Matrix<unsigned int>{2, 3, 5}));
+    QVERIFY(DataTypes::INTMATRIX == _getType(IntMatrix{5, 2, 3}));
+    QVERIFY(DataTypes::UNKNOWN == _getType(StringMatrix{"abcd", 2, 3}));
+    QVERIFY(DataTypes::UNKNOWN == _getType(Matrix<unsigned int>{5, 2, 3}));
 
     const unsigned char ch{'a'};
     QVERIFY(DataTypes::UNSIGNED_INTEGER == _getType(ch));
@@ -551,7 +551,7 @@ void CPP17ConceptsTests::testStdOptional()
     QVERIFY(std::nullopt == intMatrixLowestDiagonalNr);
     QVERIFY(INT_MIN == intMatrixLowestDiagonalNr.value_or(INT_MIN));
 
-    StringMatrix stringMatrix{1, 1, "abcd"};
+    StringMatrix stringMatrix{"abcd", 1, 1};
     std::optional<matrix_diff_t> stringMatrixLowestDiagonalNr{_getLowestDiagonalNr(stringMatrix)};
     std::optional<matrix_diff_t> stringMatrixHighestDiagonalNr{_getHighestDiagonalNr(stringMatrix)};
 
@@ -707,33 +707,33 @@ void CPP17ConceptsTests::testStdStringView()
 void CPP17ConceptsTests::testTemplateTypeDeductionInConstructors()
 {
     // std::string
-    const Matrix c_FirstStringMatrix{2, 4, std::string{"stringValue"}}; // std::string should be explicitly mentioned otherwise const char* assumed
-    const Matrix<std::string> c_SecondStringMatrix{2, 4, "stringValue"};
+    const Matrix c_FirstStringMatrix{std::string{"stringValue"}, 2, 4}; // std::string should be explicitly mentioned otherwise const char* assumed
+    const Matrix<std::string> c_SecondStringMatrix{"stringValue", 2, 4};
 
     QVERIFY(c_FirstStringMatrix == c_SecondStringMatrix);
 
     // std::pair<const char*, int>
-    const Matrix c_FirstConstCharPtrIntPairMatrix{8, 4, std::pair{"constCharValue", 2}}; // template type deduction both for pair and for matrix
-    const Matrix<std::pair<const char*, int>> c_SecondConstCharPtrIntPairMatrix{8, 4, std::pair<const char*, int>{"constCharValue", 2}};
+    const Matrix c_FirstConstCharPtrIntPairMatrix{std::pair{"constCharValue", 2}, 8, 4}; // template type deduction both for pair and for matrix
+    const Matrix<std::pair<const char*, int>> c_SecondConstCharPtrIntPairMatrix{std::pair<const char*, int>{"constCharValue", 2}, 8, 4};
 
     QVERIFY(c_FirstConstCharPtrIntPairMatrix == c_SecondConstCharPtrIntPairMatrix);
 
     // int
-    const Matrix c_FirstIntMatrix{2, 3, 5};
-    const Matrix<int> c_SecondIntMatrix{2, 3, 5};
+    const Matrix c_FirstIntMatrix{5, 2, 3};
+    const Matrix<int> c_SecondIntMatrix{5, 2, 3};
 
     QVERIFY(c_FirstIntMatrix == c_SecondIntMatrix);
 
     // unsigned int
-    const Matrix c_FirstUnsignedIntMatrix{4, 5, 3u};
-    const Matrix<unsigned int> c_SecondUnsignedIntMatrix{4, 5, 3};
+    const Matrix c_FirstUnsignedIntMatrix{3u, 4, 5};
+    const Matrix<unsigned int> c_SecondUnsignedIntMatrix{3, 4, 5};
 
     QVERIFY(c_FirstUnsignedIntMatrix == c_SecondUnsignedIntMatrix);
 
     // unsigned short
     unsigned short c_UnsignedShortVal{3u};
-    const Matrix c_FirstUnsignedShortMatrix{9, 8, c_UnsignedShortVal};
-    const Matrix<unsigned short> c_SecondUnsignedShortMatrix{9, 8, 3};
+    const Matrix c_FirstUnsignedShortMatrix{c_UnsignedShortVal, 9, 8};
+    const Matrix<unsigned short> c_SecondUnsignedShortMatrix{3, 9, 8};
 
     QVERIFY(c_FirstUnsignedShortMatrix == c_SecondUnsignedShortMatrix);
 }

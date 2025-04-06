@@ -11,10 +11,10 @@ void retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes, Matrix<matrix_size
     matrix_size_t maxFittingIndex{0};
 
     // fitting boxes count for each box (including the box)
-    Matrix<matrix_size_t> fittingBoxesCounts{c_NrOfBoxes, 1, 1};
+    Matrix<matrix_size_t> fittingBoxesCounts{1, c_NrOfBoxes, 1};
 
     // index (in lexicographically sorted series) of first preceding box that fits into current box; by default -1 (no preceding fitting box)
-    Matrix<std::optional<matrix_size_t>> prevFittingBoxIndexes{c_NrOfBoxes, 1, std::nullopt};
+    Matrix<std::optional<matrix_size_t>> prevFittingBoxIndexes{std::nullopt, c_NrOfBoxes, 1};
 
     for (matrix_size_t boxIndex{1}; boxIndex < c_NrOfBoxes; ++boxIndex)
     {
@@ -34,7 +34,7 @@ void retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes, Matrix<matrix_size
         }
     }
 
-    Matrix<matrix_size_t> recoveredIndexes{1, 1, maxFittingIndex};
+    Matrix<matrix_size_t> recoveredIndexes{maxFittingIndex, 1, 1};
     auto currentIndexToCheck{prevFittingBoxIndexes[maxFittingIndex]};
 
     while(currentIndexToCheck.has_value())
