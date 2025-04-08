@@ -46,7 +46,7 @@ int main()
             Matrix<matrix_size_t> countryColours;
 
             // matrix with dimensions c_NrOfCountries x 1 where each row index of the matrix represents an allocated colour; a single colour (0) is initially stored (initially not allocated)
-            Matrix<bool> uniqueColours{1, 1, false};
+            Matrix<bool> uniqueColours{{1, 1}, false};
 
             // no extra capacity to be allocated for this matrix (the number of countries is known after reading the file)
             countryColours.resize(c_NrOfCountries, 1, c_NrOfCountries, 1);

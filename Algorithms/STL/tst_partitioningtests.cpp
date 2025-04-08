@@ -92,8 +92,8 @@ void PartitioningTests::testPartitionCopy()
     StringIntPairMatrix sourceMatrix{mSecondaryStringIntPairMatrix};
     const matrix_size_t c_DestinationElementsCount{sourceMatrix.getNrOfColumns()};
 
-    StringIntPairMatrix firstDestinationMatrix{{"Zorba", 100}, c_DestinationElementsCount, 1};
-    StringIntPairMatrix secondDestinationMatrix{{"Zorba's brother", 101}, 1, c_DestinationElementsCount};
+    StringIntPairMatrix firstDestinationMatrix{{c_DestinationElementsCount, 1}, {"Zorba", 100}};
+    StringIntPairMatrix secondDestinationMatrix{{1, c_DestinationElementsCount}, {"Zorba's brother", 101}};
 
     std::partition_copy(sourceMatrix.constZBegin(), sourceMatrix.constZRowEnd(0), firstDestinationMatrix.nBegin(), secondDestinationMatrix.zBegin(), [](StringIntPair element) {return element.second < 11;});
 

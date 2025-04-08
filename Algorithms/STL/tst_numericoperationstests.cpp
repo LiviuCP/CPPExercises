@@ -37,7 +37,7 @@ NumericOperationsTests::NumericOperationsTests()
                                 1,  2,  3,  3,  4,
                                 5,  7,  11, 11, 14
                         }}
-    , mSecondaryIntMatrix{0, 4, 4}
+    , mSecondaryIntMatrix{{4, 4}, 0}
     , mThirdIntMatrix{5, 4, {1, -2, -3, -4,
                              0, -4, -4, -4,
                             -3,  4,  4,  4,

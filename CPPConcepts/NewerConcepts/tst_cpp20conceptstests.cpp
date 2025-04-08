@@ -48,7 +48,7 @@ private:
     {
     public:
         MatrixWrapper() {}
-        MatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, const DataType& value) : mMatrix{value, nrOfRows, nrOfColumns} {}
+        MatrixWrapper(matrix_size_t nrOfRows, matrix_size_t nrOfColumns, const DataType& value) : mMatrix{{nrOfRows, nrOfColumns}, value} {}
 
         size_t size() const {return mMatrix.getNrOfRows() * mMatrix.getNrOfColumns();}
 
