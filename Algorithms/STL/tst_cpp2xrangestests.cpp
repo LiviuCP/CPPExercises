@@ -227,7 +227,7 @@ void CPP2xRangesTests::testKeyValueViews()
     auto keysView{mPrimaryStringIntPairMatrix | std::views::keys};
     auto reverseValuesView{mPrimaryStringIntPairMatrix | std::views::values | std::views::reverse};
 
-    StringMatrix keysMatrix{"", 5, 2};
+    StringMatrix keysMatrix{{5, 2}, ""};
 
     const StringMatrix c_KeysMatrixRef{5, 2, {"Jeff",    "Jack",
                                               "Johnny",  "Juan",
@@ -240,7 +240,7 @@ void CPP2xRangesTests::testKeyValueViews()
 
     QVERIFY(c_KeysMatrixRef == keysMatrix);
 
-    IntMatrix valuesMatrix{-1, 5, 2};
+    IntMatrix valuesMatrix{{5, 2}, -1};
 
     const IntMatrix c_ValuesMatrixRef{5, 2, {15,  8,
                                               9, 10,
@@ -283,7 +283,7 @@ void CPP2xRangesTests::testJoinView()
     std::vector<IntMatrix> matrixesToJoin{firstIntMatrix, secondIntMatrix};
     auto joinMatrixesView{matrixesToJoin | std::views::join};
 
-    IntMatrix thirdIntMatrix{0, 5, 3};
+    IntMatrix thirdIntMatrix{{5, 3}, 0};
 
     std::ranges::copy(joinMatrixesView, thirdIntMatrix.begin());
 
