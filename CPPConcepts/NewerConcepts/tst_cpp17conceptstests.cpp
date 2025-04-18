@@ -224,7 +224,7 @@ void CPP17ConceptsTests::testVariableDeclarationInIf()
     QVERIFY(c_SecondMatrixRef == matrix);
 
     // scenario 3: else branching (here comes the real power: the scope of "value" covers both "if" AND "else", yet the variable is not visible outside the if-else construct)
-    if (int value{std::accumulate(matrix.constDBegin(0), matrix.constDEnd(0), 0) / (matrix.constDEnd(0) - matrix.constDBegin(0))}; value > matrix.at(1, 1))
+    if (const int value{static_cast<int>(std::accumulate(matrix.constDBegin(0), matrix.constDEnd(0), 0) / (matrix.constDEnd(0) - matrix.constDBegin(0)))}; value > matrix.at(1, 1))
     {
         std::fill(matrix.begin(), matrix.end(), 0);
         std::fill(matrix.dBegin(0), matrix.dEnd(0), value);
