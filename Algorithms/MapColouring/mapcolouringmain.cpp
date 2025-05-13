@@ -49,7 +49,8 @@ int main()
             Matrix<bool> uniqueColours{{1, 1}, false};
 
             // no extra capacity to be allocated for this matrix (the number of countries is known after reading the file)
-            countryColours.resize(c_NrOfCountries, 1, c_NrOfCountries, 1);
+            countryColours.reserve(c_NrOfCountries, 1);
+            countryColours.resize(c_NrOfCountries, 1);
 
             for (Matrix<bool>::ConstZIterator countryIt{neighbourhoodMatrix.constZBegin()}; countryIt != neighbourhoodMatrix.constZRowEnd(0); ++countryIt)
             {

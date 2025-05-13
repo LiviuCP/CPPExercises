@@ -9,14 +9,14 @@ ChessTable::ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
     , m_IsFullyTraversed{false}
 {
     assert(nrOfRows > 0 && nrOfColumns > 0 && "Invalid chess table dimensions provided");
-    m_Table.resizeWithValue(nrOfRows, nrOfColumns, 0);
+    m_Table.resize(nrOfRows, nrOfColumns, 0);
 }
 
 void ChessTable::setSize(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
 {
     if (nrOfRows > 0 && nrOfColumns > 0)
     {
-        m_Table.resizeWithValue(nrOfRows, nrOfColumns, 0);
+        m_Table.resize(nrOfRows, nrOfColumns, 0);
         m_IsFullyTraversed = false;
     }
 }

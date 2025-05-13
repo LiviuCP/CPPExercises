@@ -434,7 +434,7 @@ void CPP17ConceptsTests::testStdApply()
 
     QVERIFY(19 == std::apply(floorAverage, std::make_tuple(matrix, initValue)));
 
-    matrix.resizeWithValue(3, 4, 11);
+    matrix.resize(3, 4, 11);
 
     QVERIFY(13 == std::apply(floorAverage, std::make_tuple(matrix, 0)));
 
@@ -541,7 +541,7 @@ void CPP17ConceptsTests::testStdOptional()
 
     QVERIFY(!intMatrixLowestDiagonalNr.has_value());
 
-    intMatrix.resizeWithValue(3, 2, -5);
+    intMatrix.resize(3, 2, -5);
     intMatrixLowestDiagonalNr = _getLowestDiagonalNr(intMatrix);
 
     QVERIFY(intMatrixLowestDiagonalNr.has_value() && -2 == intMatrixLowestDiagonalNr.value());
