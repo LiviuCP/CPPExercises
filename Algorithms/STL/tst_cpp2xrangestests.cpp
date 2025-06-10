@@ -292,7 +292,7 @@ void CPP2xRangesTests::testJoinView()
             -7 == thirdIntMatrix.at(2, 0) &&
             -8 == std::accumulate(thirdIntMatrix.constZBegin(), thirdIntMatrix.constZEnd(), 0));
 
-    firstIntMatrix.catByRow(firstIntMatrix, secondIntMatrix);
+    firstIntMatrix.catByRow(secondIntMatrix);
 
     QVERIFY(firstIntMatrix == thirdIntMatrix);
 
@@ -318,7 +318,8 @@ void CPP2xRangesTests::testJoinView()
             -7 == thirdIntMatrix.at(0, 2) &&
             -8 == std::accumulate(thirdIntMatrix.constNBegin(), thirdIntMatrix.constNEnd(), 0));
 
-    secondIntMatrix.catByColumn(firstIntMatrix, secondIntMatrix);
+    firstIntMatrix.catByColumn(secondIntMatrix);
+    secondIntMatrix = firstIntMatrix;
 
     QVERIFY(secondIntMatrix == thirdIntMatrix);
 }
