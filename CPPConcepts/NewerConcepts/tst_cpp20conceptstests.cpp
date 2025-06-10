@@ -59,9 +59,10 @@ private:
     class StringWrapper
     {
     public:
-        StringWrapper() = delete;
+        StringWrapper() {}
         StringWrapper(const std::string& str) : myStr{str} {}
 
+        friend bool operator==(const StringWrapper& firstWrapper, const StringWrapper& secondWrapper) {return firstWrapper.myStr == secondWrapper.myStr;}
         ssize_t size() const {return static_cast<ssize_t>(myStr.size());}
 
     private:
@@ -79,7 +80,7 @@ private:
     struct AdvancedAggregate
     {
         IntMatrix matrix{2, 3, {-1, 3, 2, 8, -9, 5}};
-        int integer;
+        int integer{0};
         std::string stdString{"MyString"};
         StringVector stringVector{"a2", "b1"};
     };

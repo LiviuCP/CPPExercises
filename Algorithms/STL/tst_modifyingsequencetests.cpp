@@ -59,7 +59,11 @@ private:
 
     struct Movable
     {
-        Movable() = default;
+        Movable()
+            : mValue{0}
+        {
+        }
+
         Movable(int value)
             : mValue{value}
         {
