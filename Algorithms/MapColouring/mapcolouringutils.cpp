@@ -11,8 +11,8 @@ bool MapColouringUtils::isValidNeighbourhoodMatrix(Matrix<bool> neighbours)
 
     if (c_NrOfCountries > 0 && c_NrOfCountries == neighbours.getNrOfColumns())
     {
-        Matrix<bool> neighboursTransposed;
-        neighbours.transpose(neighboursTransposed);
+        Matrix<bool> neighboursTransposed{neighbours};
+        neighboursTransposed.transpose();
 
         if (neighbours == neighboursTransposed)
         {

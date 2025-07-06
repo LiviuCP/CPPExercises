@@ -303,10 +303,11 @@ void CPP2xRangesTests::testJoinView()
     secondIntMatrix = mSecondaryIntMatrix;
     thirdIntMatrix.resize(3, 5, 0);
 
-    IntMatrix firstIntMatrixTransposed, secondIntMatrixTransposed;
+    IntMatrix firstIntMatrixTransposed{firstIntMatrix};
+    IntMatrix secondIntMatrixTransposed{secondIntMatrix};
 
-    firstIntMatrix.transpose(firstIntMatrixTransposed);
-    secondIntMatrix.transpose(secondIntMatrixTransposed);
+    firstIntMatrixTransposed.transpose();
+    secondIntMatrixTransposed.transpose();
 
     matrixesToJoin = {firstIntMatrixTransposed, secondIntMatrixTransposed};
     joinMatrixesView = matrixesToJoin | std::views::join;
