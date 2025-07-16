@@ -50,16 +50,14 @@ std::pair<BidirectionalIt, BidirectionalIt> gatherSequenceElements(Bidirectional
 */
 
 template<typename DataType>
-std::tuple<MatrixPoint<DataType>,
-           MatrixPoint<DataType>,
-           matrix_size_t> gatherMatrixElements(Matrix<DataType>& matrix,
-                      MatrixPoint<DataType> startingPoint,
-                      MatrixPoint<DataType> endingPoint,
-                      MatrixPoint<DataType> gatheringPoint,
-                      std::function<bool(const DataType&)>& predicate)
+std::tuple<MatrixPoint, MatrixPoint, matrix_size_t> gatherMatrixElements(Matrix<DataType>& matrix,
+                                                                         MatrixPoint startingPoint,
+                                                                         MatrixPoint endingPoint,
+                                                                         MatrixPoint gatheringPoint,
+                                                                         std::function<bool(const DataType&)>& predicate)
 {
-    MatrixPoint<DataType> innerRectStartingPoint{0u, 0u};
-    MatrixPoint<DataType> innerRectEndingPoint{0u, 0u};
+    MatrixPoint innerRectStartingPoint{0u, 0u};
+    MatrixPoint innerRectEndingPoint{0u, 0u};
     matrix_size_t gatheredElementsCount{0u};
 
     if (!matrix.isEmpty())
