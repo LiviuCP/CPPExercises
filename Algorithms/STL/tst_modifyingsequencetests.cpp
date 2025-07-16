@@ -1,6 +1,7 @@
-#include <QtTest>
+#include <QTest>
 
 #include <algorithm>
+#include <random>
 
 #include "datautils.h"
 
