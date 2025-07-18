@@ -178,7 +178,7 @@ std::pair<MatrixPoint, std::optional<matrix_diff_t>> mapDiagonalIndexToRowAndCol
         {
             // case 2: index is in the max size diagonals
             const matrix_diff_t c_DiagonalNr{c_FirstMaxDiagonalNr + (*diagonalIndexToConvert - c_ElementsCountBeforeFirstMaxDiagonal) / static_cast<matrix_diff_t>(c_MaxDiagonalSize)};
-            const matrix_size_t c_RelativeDiagonalIndex{static_cast<matrix_size_t>((*diagonalIndexToConvert - c_ElementsCountBeforeFirstMaxDiagonal) % c_MaxDiagonalSize)}; // index relative to containing diagonal
+            const matrix_size_t c_RelativeDiagonalIndex{static_cast<matrix_size_t>(*diagonalIndexToConvert - c_ElementsCountBeforeFirstMaxDiagonal) % c_MaxDiagonalSize}; // index relative to containing diagonal
             const matrix_size_t c_RelativeMaxDiagonalNr{static_cast<matrix_size_t>(c_DiagonalNr - c_FirstMaxDiagonalNr)}; // max diagonal number relative to the number of max diagonals
             rowNr = c_NrOfRows <= c_NrOfColumns ? c_NrOfRows - 1 - c_RelativeDiagonalIndex : c_NrOfColumns + c_RelativeMaxDiagonalNr - 1 - c_RelativeDiagonalIndex;
             columnNr = c_NrOfRows <= c_NrOfColumns ? c_RelativeMaxDiagonalNr + c_RelativeDiagonalIndex : c_RelativeDiagonalIndex;
@@ -198,9 +198,9 @@ std::pair<MatrixPoint, std::optional<matrix_diff_t>> mapDiagonalIndexToRowAndCol
     return result;
 }
 
-/* This function performs the inverse operation (comparing to previous function), namely calculates a diagonal index based on the provided coordinates
-   - same considerations regarding usage of Matrix and type-independent trait
-   - similar to the previous function, for empty matrixes an empty value (containing std::nullopt) is returned
+/* This function retrieves the diagonal index based on the provided coordinates (row and column number)
+   - same considerations as for previous function regarding usage of Matrix and type-independent relationship between diagonal index and coordinates
+   - similar to the previous function, for empty matrixes a null value is returned
 */
 template<typename T>
 std::pair<std::optional<matrix_diff_t>, MatrixPoint> mapRowAndColumnNrToDiagonalIndex(const Matrix<T>& matrix, MatrixPoint rowAndColumnNr)
@@ -215,7 +215,7 @@ std::pair<std::optional<matrix_diff_t>, MatrixPoint> mapRowAndColumnNrToDiagonal
         const matrix_size_t c_NrOfRows{matrix.getNrOfRows()};
         const matrix_size_t c_NrOfColumns{matrix.getNrOfColumns()};
         const matrix_diff_t c_TotalElementsCount{static_cast<matrix_diff_t>(c_NrOfRows) * static_cast<matrix_diff_t>(c_NrOfColumns)};
-        const matrix_diff_t c_NrOfDiagonals{c_NrOfRows + c_NrOfColumns - 1};
+        const matrix_diff_t c_NrOfDiagonals{static_cast<matrix_diff_t>(c_NrOfRows) + static_cast<matrix_diff_t>(c_NrOfColumns) - 1};
         const matrix_size_t c_MaxDiagonalSize{std::min(c_NrOfRows, c_NrOfColumns)};
 
         rowNr = std::clamp<matrix_size_t>(*rowAndColumnNr.first, 0, c_NrOfRows - 1);
