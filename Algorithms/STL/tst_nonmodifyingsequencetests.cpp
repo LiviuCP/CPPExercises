@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 class NonModifyingSequenceTests : public QObject
 {

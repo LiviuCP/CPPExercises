@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 static constexpr auto lexicographicalCompare{[](const IntPair& firstIntPair, const IntPair& secondIntPair) {
     auto equivalence{firstIntPair.first <=> secondIntPair.first};

@@ -1,7 +1,7 @@
 #ifndef TST_COMBINEDSTLTESTS_DATA_H
 #define TST_COMBINEDSTLTESTS_DATA_H
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 static const IntVector c_IntVectorRef1{2, 5, -1, -8, -7, -5, -9, 0, 3, 4, 10, 8, 0, 1};
 static const IntVector c_IntVectorRef2{-1, -8, -7, -5, -9, 2, 5, 0, 3, 4, 10, 8, 0, 1};

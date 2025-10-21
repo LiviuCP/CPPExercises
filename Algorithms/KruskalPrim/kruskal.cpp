@@ -1,5 +1,4 @@
 #include "kruskal.h"
-#include "datautils.h"
 
 KruskalEngine::KruskalEngine()
     : BaseEngine{"Kruskal"}

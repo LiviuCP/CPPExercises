@@ -3,7 +3,6 @@
 #include "baseengine.h"
 #include "utils.h"
 #include "matrixutils.h"
-#include "datautils.h"
 
 static void writeTreeToFile(std::ofstream& out, const GraphMatrix& graphMatrix, const Tree& tree)
 {

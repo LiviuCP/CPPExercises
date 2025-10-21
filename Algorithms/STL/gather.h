@@ -1,7 +1,7 @@
 #ifndef GATHER_H
 #define GATHER_H
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 /* Unidimensional gathering:
    - elements from a sequence are gathered around a chosen position (gathering point) by using a unary predicate

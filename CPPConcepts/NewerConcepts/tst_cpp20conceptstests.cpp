@@ -6,6 +6,7 @@
 #include <span>
 
 #include "variadictemplates.h"
+#include "matrixutils.h"
 
 using namespace std::literals;
 namespace vrd = Variadic;

@@ -2,7 +2,6 @@
 #define MAPCOLOURINGUTILS_H
 
 #include "matrix.h"
-#include "datautils.h"
 
 namespace MapColouringUtils
 {

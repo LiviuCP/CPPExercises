@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 class MinMaxTests : public QObject
 {

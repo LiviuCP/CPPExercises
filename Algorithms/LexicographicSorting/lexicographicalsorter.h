@@ -10,7 +10,6 @@
 #include <algorithm>
 
 #include "matrix.h"
-#include "datautils.h"
 
 template<std::integral T>
 class LexicographicalSorter

@@ -9,7 +9,21 @@
 #include <fstream>
 #include <cmath>
 
+#include "matrix.h"
 #include "datautils.h"
+
+// std::nullopt corresponds to the "negative" value (previously noted -1)
+using MatrixPoint = std::pair<std::optional<matrix_size_t>, std::optional<matrix_size_t>>;
+
+using IntMatrix = Matrix<int>;
+using IntPairMatrix = Matrix<IntPair>;
+using IntVectorMatrix = Matrix<IntVector>;
+using StringMatrix = Matrix<std::string>;
+using StringVectorMatrix = Matrix<StringVector>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
+using BoolMatrix = Matrix<bool>;
+using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
+using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
 
 template<typename T>
 std::ifstream& operator>>(std::ifstream& in, Matrix<T>& data);

@@ -1,7 +1,6 @@
 #include <sstream>
 
 #include "datatypes.h"
-#include "datautils.h"
 
 Thermometer::Thermometer(double temp, bool isDigital)
     : mTemperature{temp}

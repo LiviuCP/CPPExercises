@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 
 class UninitializedMemoryOperationsTests : public QObject

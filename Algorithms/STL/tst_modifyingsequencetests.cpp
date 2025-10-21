@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <random>
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 class ModifyingSequenceTests : public QObject
 {

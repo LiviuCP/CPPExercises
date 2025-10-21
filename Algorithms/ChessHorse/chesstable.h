@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "matrix.h"
-#include "datautils.h"
 
 class ChessTable
 {

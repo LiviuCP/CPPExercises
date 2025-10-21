@@ -9,8 +9,6 @@
 #include <utility>
 #include <string>
 
-#include "matrix.h"
-
 #define FAIL_DEALLOC(ptr, message) \
     std::free(ptr); \
     ptr = nullptr; \
@@ -27,31 +25,18 @@
 template<typename DataType>
 using ValueSizePair = std::pair<DataType, size_t>;
 
-// std::nullopt corresponds to the "negative" value (previously noted -1)
-using MatrixPoint = std::pair<std::optional<matrix_size_t>, std::optional<matrix_size_t>>;
-
-using IntMatrix = Matrix<int>;
 using IntPair = std::pair<int, int>;
-using IntPairMatrix = Matrix<IntPair>;
-using StringMatrix = Matrix<std::string>;
 using StringSet = std::set<std::string>;
 using StringIntPair = std::pair<std::string, int>;
-using StringIntPairMatrix = Matrix<StringIntPair>;
 using StringIntMap = std::map<std::string, int>;
 using IntVector = std::vector<int>;
-using IntVectorMatrix = Matrix<IntVector>;
 using IntVectorDiff = IntVector::difference_type;
 using StringVector = std::vector<std::string>;
-using StringVectorMatrix = Matrix<StringVector>;
 using IntPairVector = std::vector<std::pair<int, int>>;
 using StringIntPairVector = std::vector<StringIntPair>;
 using IntList = std::list<int>;
-using BoolMatrix = Matrix<bool>;
 using SizePair = std::pair<size_t, size_t>;
 using TripleSizeTuple = std::tuple<size_t, size_t, size_t>;
-
-using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
-using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
 
 using DataWord = std::vector<bool>;
 using DataSet = std::vector<DataWord>;

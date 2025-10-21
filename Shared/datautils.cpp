@@ -1,53 +1,25 @@
+#include <algorithm>
+
 #include "datautils.h"
 
 bool Utilities::convertBitStringToDataWord(const std::string& bitString, DataWord& word)
 {
-    bool success{false};
+    const bool c_IsInputValid{!bitString.empty() && std::all_of(bitString.cbegin(), bitString.cend(), [](auto ch){return ch == '0' || ch == '1';})};
 
-    DataWord result;
-
-    const size_t c_WordSize{bitString.size()};
-
-    if (c_WordSize > 0u)
+    if (c_IsInputValid)
     {
-        result.reserve(c_WordSize);
-
-        for (std::string::const_iterator it{bitString.cbegin()}; it != bitString.cend(); ++it)
-        {
-            if ('0' == *it)
-            {
-                result.push_back(false);
-            }
-            else if ('1' == *it)
-            {
-                result.push_back(true);
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        if (c_WordSize == result.size())
-        {
-            word = move(result);
-            success = true;
-        }
+        word.clear();
+        word.resize(bitString.size(), false);
+        std::transform(bitString.cbegin(), bitString.cend(), word.begin(), [](char ch){return ch == '1';});
     }
 
-    return success;
+    return c_IsInputValid;
 }
 
 DataWord Utilities::invertDataWord(const DataWord& word)
 {
-    DataWord result;
-
-    result.reserve(word.size());
-
-    for (const auto& currentBit : word)
-    {
-        result.push_back(!currentBit);
-    }
+    DataWord result(word.size(), false);
+    std::transform(word.cbegin(), word.cend(), result.begin(), [](const bool& value){return !value;});
 
     return result;
 }

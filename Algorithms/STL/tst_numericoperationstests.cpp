@@ -2,7 +2,7 @@
 
 #include <numeric>
 
-#include "datautils.h"
+#include "matrixutils.h"
 
 class NumericOperationsTests : public QObject
 {
