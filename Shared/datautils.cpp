@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cctype>
 
 #include "datautils.h"
 
@@ -22,4 +23,24 @@ DataWord Utilities::invertDataWord(const DataWord& word)
     std::transform(word.cbegin(), word.cend(), result.begin(), [](const bool& value){return !value;});
 
     return result;
+}
+
+void Utilities::leftTrimWhiteSpace(std::string& str)
+{
+    const auto it{std::find_if(str.cbegin(), str.cend(), [](char ch){return !std::isspace(ch);})};
+    str.erase(str.cbegin(), it);
+}
+
+void Utilities::rightTrimWhiteSpace(std::string& str)
+{
+    const auto reverseIt{std::find_if(str.crbegin(), str.crend(), [](char ch){return !std::isspace(ch);})};
+    const auto it{str.cbegin() + str.size() - std::distance(str.crbegin(), reverseIt)};
+
+    str.erase(it, str.cend());
+}
+
+void Utilities::trimWhiteSpace(std::string& str)
+{
+    leftTrimWhiteSpace(str);
+    rightTrimWhiteSpace(str);
 }

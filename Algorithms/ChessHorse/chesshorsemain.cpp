@@ -2,72 +2,70 @@
    It is also possible that no solution exists.
 */
 #include <iostream>
-#include <string>
 
 #include "chesstable.h"
+#include "userinput.h"
 #include "utils.h"
 
 using namespace std;
 
-void retrieveInput(std::optional<matrix_size_t>& input, const string& inputRequestMessage);
+void displayTraversingOutcome(const ChessTable& chessTable);
 
-int main()
+int main(int argc, char** argv)
 {
-    std::optional<matrix_size_t> tableLength;
-    std::optional<matrix_size_t> tableWidth;
-    std::optional<matrix_size_t> startPositionX;
-    std::optional<matrix_size_t> startPositionY;
-
     Utilities::clearScreen();
 
-    cout << "Enter the chess table dimensions:" << endl;
-    retrieveInput(tableLength, "Length = ");
-    retrieveInput(tableWidth, "Width = ");
-    cout << endl;
-    cout << "Enter the initial position of the horse:" << endl;
-    retrieveInput(startPositionX, "Horizontal = ");
-    retrieveInput(startPositionY, "Vertical = ");
-    cout << endl;
+    constexpr int c_RequiredParametersCount{4};
 
-    assert(tableLength.has_value() && tableWidth.has_value() && startPositionX.has_value() && startPositionY.has_value());
-
-    if (tableLength == 0 || tableWidth == 0 || startPositionX < 1 || startPositionX > tableLength || startPositionY < 1 || startPositionY > tableWidth)
+    if (argc > c_RequiredParametersCount)
     {
-        cerr << "Invalid table dimensions and/or start position of the horse" << endl;
-    }
-    else
-    {
-        ChessTable chessTable{*tableLength, *tableWidth};
-        chessTable.traverse(*startPositionX - 1, *startPositionY - 1);
+        const UserInput userInput{{argv[1]}, {argv[2]}, {argv[3]}, {argv[4]}};
 
-        if (chessTable.isFullyTraversed())
+        if (userInput.isValid())
         {
-            cout << "The resulting chess table traversing is:" << endl << endl;
-            chessTable.printTable();
+            ChessTable chessTable{*userInput.m_TableLength, *userInput.m_TableWidth};
+            chessTable.traverse(*userInput.m_StartPositionX - 1, *userInput.m_StartPositionY - 1);
+
+            displayTraversingOutcome(chessTable);
         }
         else
         {
-            cout << "No table traversing solution found!" << endl;
+            cerr << "Invalid input!\n\n";
+            cerr << "Possible reasons:\n";
+            cerr << "- invalid (non-numeric) characters\n";
+            cerr << "- invalid table size (both dimension should be greater than 0)\n";
+            cerr << "- invalid starting position (should be between 1 and rows/columns count)\n\n";
+            cerr << "Please check and try again.\n";
         }
     }
-
-    cout << endl;
+    else
+    {
+        Utilities::clearScreen();
+        cerr << "Insufficient arguments count (should be " << c_RequiredParametersCount << ")!\n";
+    }
 
     return 0;
 }
 
-void retrieveInput(std::optional<matrix_size_t>& input, const string& inputRequestMessage)
+void displayTraversingOutcome(const ChessTable& chessTable)
 {
-    matrix_size_t buffer;
-
-    cout << inputRequestMessage;
-    cin >> buffer;
-
-    if (cin.fail())
+    if (chessTable.isFullyTraversed())
     {
-        cerr << "Bad input. Aborted" << endl;
-        exit(-1);
-    }
+        const IntMatrix& c_TraversedPositions{chessTable.getTraversedPositions()};
+        cout << "The resulting chess table traversing is:\n\n";
 
-    input = buffer;
+        for (matrix_size_t row{0}; row < c_TraversedPositions.getNrOfRows(); ++row)
+        {
+            for (Matrix<int>::ConstZIterator it{c_TraversedPositions.constZRowBegin(row)}; it != c_TraversedPositions.constZRowEnd(row); ++it)
+            {
+                cout << *it << " ";
+            }
+
+            cout << "\n";
+        }
+    }
+    else
+    {
+        cout << "No table traversing solution found!\n";
+    }
 }

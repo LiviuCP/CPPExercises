@@ -3,19 +3,17 @@
 
 #include <vector>
 
-#include "matrix.h"
+#include "matrixutils.h"
 
 class ChessTable
 {
 public:
-    ChessTable() = delete;
     ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns);
 
-    void setSize(matrix_size_t nrOfRows, matrix_size_t columns);
     void traverse(matrix_size_t startingRow = 0, matrix_size_t startingColumn = 0);
 
-    void printTable() const;
     bool isFullyTraversed() const;
+    const IntMatrix& getTraversedPositions() const;
 
 private:
     struct Point
@@ -30,10 +28,10 @@ private:
 
     bool _getBestSuccessor(const Point& currentPosition, Point& bestSuccessor) const;
     std::vector<Point> _getSuccessors(const Point& currentPosition) const;
-    bool _isValidMovePosition(Point position) const;
+    bool _isValidMovePosition(const Point& position) const;
     bool _isValidTablePosition(matrix_diff_t x, matrix_diff_t y) const;
 
-    Matrix<int> m_Table;
+    IntMatrix m_Table;
     bool m_IsFullyTraversed;
 };
 

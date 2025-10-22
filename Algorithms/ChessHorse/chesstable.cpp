@@ -1,23 +1,18 @@
-#include <iostream>
 #include <algorithm>
 #include <cassert>
 
 #include "chesstable.h"
 
 ChessTable::ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
-    : m_Table{}
-    , m_IsFullyTraversed{false}
-{
-    assert(nrOfRows > 0 && nrOfColumns > 0 && "Invalid chess table dimensions provided");
-    m_Table.resize(nrOfRows, nrOfColumns, 0);
-}
-
-void ChessTable::setSize(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
+    : m_IsFullyTraversed{false}
 {
     if (nrOfRows > 0 && nrOfColumns > 0)
     {
         m_Table.resize(nrOfRows, nrOfColumns, 0);
-        m_IsFullyTraversed = false;
+    }
+    else
+    {
+        assert(false && "Invalid chess table dimensions provided");
     }
 }
 
@@ -50,22 +45,14 @@ void ChessTable::traverse(matrix_size_t startingRow, matrix_size_t startingColum
     }
 }
 
-void ChessTable::printTable() const
-{
-    for (matrix_size_t row{0}; row < m_Table.getNrOfRows(); ++row)
-    {
-        for (Matrix<int>::ConstZIterator it{m_Table.constZRowBegin(row)}; it != m_Table.constZRowEnd(row); ++it)
-        {
-            std::cout << *it << " ";
-        }
-
-        std::cout << std::endl;
-    }
-}
-
 bool ChessTable::isFullyTraversed() const
 {
     return m_IsFullyTraversed;
+}
+
+const IntMatrix& ChessTable::getTraversedPositions() const
+{
+    return m_Table;
 }
 
 void ChessTable::_resetTable()
@@ -121,16 +108,21 @@ std::vector<ChessTable::Point> ChessTable::_getSuccessors(const ChessTable::Poin
     return result;
 }
 
-bool ChessTable::_isValidMovePosition(ChessTable::Point position) const
+bool ChessTable::_isValidMovePosition(const ChessTable::Point& position) const
 {
-    bool isValid{_isValidTablePosition(position.m_X, position.m_Y) && m_Table.at(position.m_X, position.m_Y) == 0};
-    return isValid;
+    bool c_IsValidPos{_isValidTablePosition(position.m_X, position.m_Y) && m_Table.at(position.m_X, position.m_Y) == 0};
+    return c_IsValidPos;
 }
 
 bool ChessTable::_isValidTablePosition(matrix_diff_t x, matrix_diff_t y) const
 {
-    const bool c_IsValid{x >= 0 && static_cast<matrix_size_t>(x) < m_Table.getNrOfRows() && y >= 0 && static_cast<matrix_size_t>(y) < m_Table.getNrOfColumns()};
-    return c_IsValid;
+    const matrix_diff_t c_NrOfTableRows{static_cast<matrix_diff_t>(m_Table.getNrOfRows())};
+    const matrix_diff_t c_NrOfTableColumns{static_cast<matrix_diff_t>(m_Table.getNrOfColumns())};
+    const bool c_IsValidXPos{x >= 0 && x < c_NrOfTableRows};
+    const bool c_IsValidYPos{y >= 0 && y < c_NrOfTableColumns};
+    const bool c_IsValidPos{c_IsValidXPos && c_IsValidYPos};
+
+    return c_IsValidPos;
 }
 
 ChessTable::Point::Point(matrix_diff_t x, matrix_diff_t y)

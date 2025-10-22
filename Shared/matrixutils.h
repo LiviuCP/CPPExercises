@@ -8,12 +8,15 @@
 
 #include <fstream>
 #include <cmath>
+#include <optional>
 
 #include "matrix.h"
 #include "datautils.h"
 
+using matrix_opt_size_t = std::optional<matrix_size_t>;
+
 // std::nullopt corresponds to the "negative" value (previously noted -1)
-using MatrixPoint = std::pair<std::optional<matrix_size_t>, std::optional<matrix_size_t>>;
+using MatrixPoint = std::pair<matrix_opt_size_t, matrix_opt_size_t>;
 
 using IntMatrix = Matrix<int>;
 using IntPairMatrix = Matrix<IntPair>;

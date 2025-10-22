@@ -60,6 +60,10 @@ namespace Utilities
 
         return it;
     }
+
+    void leftTrimWhiteSpace(std::string& str);
+    void rightTrimWhiteSpace(std::string& str);
+    void trimWhiteSpace(std::string& str);
 }
 
 #endif // DATAUTILS_H
