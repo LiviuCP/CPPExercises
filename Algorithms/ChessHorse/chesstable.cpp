@@ -16,18 +16,22 @@ ChessTable::ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
     }
 }
 
-void ChessTable::traverse(matrix_size_t startingRow, matrix_size_t startingColumn)
+void ChessTable::traverse(matrix_size_t startPositionX, matrix_size_t startPositionY)
 {
-    if (_isValidTablePosition(startingRow, startingColumn))
+    // user coordinates to be mapped to Matrix coordinates
+    const matrix_size_t c_StartingXPos = startPositionX - 1;
+    const matrix_size_t c_StartingYPos = startPositionY - 1;
+
+    if (_isValidTablePosition(c_StartingXPos, c_StartingYPos))
     {
         // ensure any previous traversal is cleared for a fresh new start
         _resetTable();
 
         // each traversed position contains the number of the current move; first move belongs to the starting position
         matrix_size_t moveNumber{1};
-        m_Table.at(startingRow, startingColumn) = moveNumber;
+        m_Table.at(c_StartingXPos, c_StartingYPos) = moveNumber;
 
-        Point currentPos{static_cast<matrix_diff_t>(startingRow), static_cast<matrix_diff_t>(startingColumn)};
+        Point currentPos{static_cast<matrix_diff_t>(c_StartingXPos), static_cast<matrix_diff_t>(c_StartingYPos)};
         Point successor{currentPos}; // stores the best successor (initially initialized with the current position so it is not left uninitialized - could be any other initial value)
         bool hasSuccessor{_getBestSuccessor(currentPos, successor)};
 
@@ -42,6 +46,10 @@ void ChessTable::traverse(matrix_size_t startingRow, matrix_size_t startingColum
 
         // check that all table positions have been passed through (no "dead-end" has been encountered)
         m_IsFullyTraversed = (moveNumber == m_Table.getNrOfRows() * m_Table.getNrOfColumns());
+    }
+    else
+    {
+        assert(false && "Invalid starting position on table!");
     }
 }
 

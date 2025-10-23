@@ -2,10 +2,18 @@
    It is also possible that no solution exists.
 */
 #include <iostream>
+#include <map>
 
 #include "chesstable.h"
-#include "userinput.h"
+#include "commandargumentsparser.h"
 #include "utils.h"
+
+static const std::map<ResultType, std::string> c_ErrorMessages {
+    {ResultType::INVALID_ARGUMENTS_COUNT, "Insufficient arguments provided, should be at least 5 (including application file path).\n"},
+    {ResultType::INVALID_STRING, "The input contains invalid (non-numeric) characters.\n"},
+    {ResultType::INVALID_TABLE_SIZE, "The table size is invalid (both dimension should be greater than 0).\n"},
+    {ResultType::INVALID_START_POSITION, "The starting position is invalid (should be between 1 and rows/columns count).\n"},
+};
 
 using namespace std;
 
@@ -15,33 +23,27 @@ int main(int argc, char** argv)
 {
     Utilities::clearScreen();
 
-    constexpr int c_RequiredParametersCount{4};
+    const auto&[resultType, applicationInput]{parseCommandArguments(argc, argv)};
 
-    if (argc > c_RequiredParametersCount)
+    if (resultType == ResultType::SUCCESS)
     {
-        const UserInput userInput{{argv[1]}, {argv[2]}, {argv[3]}, {argv[4]}};
-
-        if (userInput.isValid())
+        if (applicationInput.has_value())
         {
-            ChessTable chessTable{*userInput.m_TableLength, *userInput.m_TableWidth};
-            chessTable.traverse(*userInput.m_StartPositionX - 1, *userInput.m_StartPositionY - 1);
+            ChessTable chessTable{applicationInput->m_TableLength, applicationInput->m_TableWidth};
+            chessTable.traverse(applicationInput->m_StartPositionX, applicationInput->m_StartPositionY);
 
             displayTraversingOutcome(chessTable);
         }
         else
         {
-            cerr << "Invalid input!\n\n";
-            cerr << "Possible reasons:\n";
-            cerr << "- invalid (non-numeric) characters\n";
-            cerr << "- invalid table size (both dimension should be greater than 0)\n";
-            cerr << "- invalid starting position (should be between 1 and rows/columns count)\n\n";
-            cerr << "Please check and try again.\n";
+            assert(false);
         }
     }
     else
     {
-        Utilities::clearScreen();
-        cerr << "Insufficient arguments count (should be " << c_RequiredParametersCount << ")!\n";
+        cerr << "Invalid input!\n\n";
+        cerr << c_ErrorMessages.at(resultType) << "\n";
+        cerr << "Please check and try again.\n";
     }
 
     return 0;

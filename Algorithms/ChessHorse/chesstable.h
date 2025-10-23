@@ -10,7 +10,7 @@ class ChessTable
 public:
     ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns);
 
-    void traverse(matrix_size_t startingRow = 0, matrix_size_t startingColumn = 0);
+    void traverse(matrix_size_t startPositionX, matrix_size_t startPositionY);
 
     bool isFullyTraversed() const;
     const IntMatrix& getTraversedPositions() const;
