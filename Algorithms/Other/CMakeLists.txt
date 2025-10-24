@@ -24,4 +24,10 @@ enable_testing()
 add_executable(MatrixAlgorithmsTests tst_matrixalgorithmstests.cpp)
 add_test(NAME MatrixAlgorithmsTests COMMAND MatrixAlgorithmsTests)
 
+add_executable(DataUtilsTests tst_datautilstests.cpp)
+add_test(NAME DataUtilsTests COMMAND DataUtilsTests)
+
 target_link_libraries(MatrixAlgorithmsTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+
+target_link_libraries(DataUtilsTests PRIVATE Shared)
+target_link_libraries(DataUtilsTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
