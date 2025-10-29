@@ -14,9 +14,10 @@
 */
 
 #include <iostream>
-#include <fstream>
+#include <cassert>
 
 #include "dataorderingengine.h"
+#include "dataordering_io.h"
 #include "utils.h"
 
 //#include "matrixutils.h" // uncomment if the adjustment matrix needs to be displayed for debugging purposes (otherwise the default ostream operator handles it as boolean)
@@ -31,189 +32,78 @@ using namespace std;
 static const string c_InFile{Utilities::c_InputOutputDir + "dataorderinginput.txt"};
 static const string c_OutFile{Utilities::c_InputOutputDir + "dataorderingoutput.txt"};
 
-bool readDataSetFromFile(ifstream& in, DataSet& dataSet);
-void writeScenarioOutputToFile(ofstream& out, const DataOrderingEngine& engine);
-
-// writes resulting dataset (ordered and if required inverted) to file
-void writeConvertedDataSetToFile(ofstream& out, const DataOrderingEngine& engine);
-
-// original word indexes in dataset reordered
-void writeOrderingIndexesToFile(ofstream& out, const OrderingIndexes& indexes);
-
-// used for writing both each data word and the inversion flags to file
-void writeBitSetToFile(ofstream& out, const DataWord& word);
+void handleResult(ResultType resultType, const string& inputFilePath, const string& outputFilePath);
 
 int main()
 {
-    ifstream in{c_InFile};
-    ofstream out{c_OutFile};
+    DataOrderingFileReader fileReader{c_InFile};
+    DataOrderingFileWriter fileWriter{c_OutFile};
 
     Utilities::clearScreen();
+    cout << "Reading dataset from input file:\n" << fileReader.getInputFilePath() << "\n\n";
 
-    DataSet dataSet;
+    Result result{fileReader.readDataSetFromFile()};
 
-    const bool c_IsValidInput{readDataSetFromFile(in, dataSet)};
-
-    if (c_IsValidInput)
+    do
     {
-        cout << "Reading dataset from input file: " << endl << c_InFile << endl << endl;
-        cout << "Input is valid: " << dataSet.size() << " " << dataSet.at(0).size() << "-bit words" << endl << endl;
+        if (result.first != ResultType::SUCCESS)
+        {
+            break;
+        }
+
+        if (!result.second.has_value())
+        {
+            assert(false);
+            break;
+        }
+
+        const DataSet& dataSet{*result.second};
+        cout << "Input is valid: " << dataSet.size() << " " << dataSet.at(0).size() << "-bit words\n\n";
 
         DataOrderingEngine engine{dataSet};
+        result = fileWriter.writeScenarioOutputToFile("Scenario 1: initial order", engine);
 
-        out << "Scenario 1: initial order" << endl << endl;
-        writeScenarioOutputToFile(out, engine);
+        if (result.first != ResultType::SUCCESS)
+        {
+            break;
+        }
 
         engine.performGreedyMinSimplified();
+        result = fileWriter.writeScenarioOutputToFile("\n\nScenario 2: Greedy min simplified (GMS) without inversion", engine);
 
-        out << endl << endl << "Scenario 2: Greedy min simplified (GMS) without inversion" << endl << endl;
-        writeScenarioOutputToFile(out, engine);
+        if (result.first != ResultType::SUCCESS)
+        {
+            break;
+        }
 
         engine.performGreedyMinSimplifiedWithInversion();
-
-        out << endl << endl << "Scenario 3: Greedy min simplified (GMS) with inversion" << endl << endl;
-        writeScenarioOutputToFile(out, engine);
-
-        cout << "Resulting ordering written to file: " << endl << c_OutFile << endl << endl;
+        result = fileWriter.writeScenarioOutputToFile("\n\nScenario 3: Greedy min simplified (GMS) with inversion", engine);
     }
-    else
-    {
-        cout << "Invalid input! Please check file:" << endl << c_InFile << endl << endl;
-    }
+    while(false);
 
-    return static_cast<int>(!c_IsValidInput);
+    handleResult(result.first, fileReader.getInputFilePath(), fileWriter.getOutputFilePath());
+
+    return static_cast<int>(result.first);
 }
 
-bool readDataSetFromFile(ifstream& in, DataSet& dataSet)
+void handleResult(ResultType resultType, const std::string& inputFilePath, const std::string& outputFilePath)
 {
-    bool isValidSet{false};
-
-    size_t wordsCount{0};
-    size_t wordSize{0};
-
-    in >> wordsCount;
-
-    if (!in.fail() && wordsCount > 0)
+    switch (resultType)
     {
-        in >> wordSize;
-
-        if (!in.fail() && wordSize > 0)
-        {
-            DataSet tempDataSet;
-            tempDataSet.reserve(wordsCount);
-
-            for (size_t currentWordNr{0}; currentWordNr < wordsCount; ++currentWordNr)
-            {
-                bool isValidWord{false};
-                string currentBitString;
-
-                in >> currentBitString;
-
-                if (!in.fail())
-                {
-                    DataWord currentWord;
-
-                    const bool c_IsValidBinary{Utilities::convertBitStringToDataWord(currentBitString, currentWord)};
-
-                    if (c_IsValidBinary && wordSize == currentWord.size())
-                    {
-                        tempDataSet.push_back(currentWord);
-                        isValidWord = true;
-                    }
-                }
-
-                if (!isValidWord)
-                {
-                    break;
-                }
-            }
-
-            if (wordsCount == tempDataSet.size())
-            {
-                dataSet = std::move(tempDataSet);
-                isValidSet = true;
-            }
-        }
-    }
-
-    return isValidSet;
-}
-
-void writeScenarioOutputToFile(ofstream& out, const DataOrderingEngine& engine)
-{
-    out << "The transmitted data words are: " << endl << endl;
-
-    writeConvertedDataSetToFile(out, engine);
-
-    out << endl << "Transmission order: ";
-
-    writeOrderingIndexesToFile(out, engine.getOrderingIndexes());
-
-    out << endl << "Inversion status: ";
-
-    writeBitSetToFile(out, engine.getInversionFlags());
-
-    out << endl << "Total number of transitions is: ";
-    out << engine.getTotalTransitionsCount() << endl;
-}
-
-void writeConvertedDataSetToFile(ofstream& out, const DataOrderingEngine& engine)
-{
-    const DataSet& c_DataSet{engine.getDataSet()};
-    const OrderingIndexes& c_OrderingIndexes{engine.getOrderingIndexes()};
-    const InversionFlags& c_InversionFlags{engine.getInversionFlags()};
-
-    const size_t c_DataSetSize{c_DataSet.size()};
-
-    if (c_DataSetSize == c_OrderingIndexes.size() && c_DataSetSize == c_InversionFlags.size())
-    {
-        DataSet convertedDataSet;
-        convertedDataSet.reserve(c_DataSetSize);
-
-        for (size_t currentWordIndex{0}; currentWordIndex < c_DataSet.size(); ++currentWordIndex)
-        {
-            if (c_InversionFlags.at(currentWordIndex))
-            {
-                convertedDataSet.push_back(Utilities::invertDataWord(c_DataSet.at(c_OrderingIndexes.at(currentWordIndex))));
-            }
-            else
-            {
-                convertedDataSet.push_back(c_DataSet.at(c_OrderingIndexes.at(currentWordIndex)));
-            }
-        }
-
-        for (const auto& currentConvertedWord : convertedDataSet)
-        {
-            writeBitSetToFile(out, currentConvertedWord);
-            out << endl;
-        }
-    }
-    else
-    {
+    case ResultType::SUCCESS:
+        cout << "Resulting ordering written to file:\n" << outputFilePath << "\n\n";
+        break;
+    case ResultType::INPUT_FILE_OPENING_ERROR:
+        cout << "Invalid input! Please check file:\n" << inputFilePath << "\n\n";
+        break;
+    case ResultType::OUTPUT_FILE_OPENING_ERROR:
+        cout << "Error! Cannot open output file:\n" << outputFilePath << "\n\n";
+        break;
+    case ResultType::INVALID_INPUT:
+        cout << "Invalid input in file:\n" << inputFilePath << "\n\n";
+        break;
+    default:
         assert(false);
-    }
-}
-
-void writeOrderingIndexesToFile(ofstream& out, const OrderingIndexes& indexes)
-{
-    const size_t c_IndexesSize{indexes.size()};
-
-    if (c_IndexesSize > 0)
-    {
-        for (size_t currentIndex{0}; currentIndex < c_IndexesSize - 1; ++currentIndex)
-        {
-            out << indexes.at(currentIndex);
-            out << ", ";
-        }
-
-        out << indexes.at(c_IndexesSize - 1);
-    }
-}
-
-void writeBitSetToFile(ofstream& out, const DataWord& word)
-{
-    for (const auto& currentBit : word)
-    {
-        out << currentBit;
+        break;
     }
 }

@@ -8,13 +8,12 @@
 
 using HammingDistance = int;
 using OrderingIndexes = std::vector<size_t>;
-using InversionFlags = std::vector<bool>;
+using InversionFlags = DataWord;
 
 class DataOrderingEngine
 {
 public:
-    DataOrderingEngine() = delete;
-    DataOrderingEngine(const DataSet& dataSet);
+    DataOrderingEngine(const DataSet& dataSet = {});
 
     // to be implemented if required in practice
     DataOrderingEngine(const DataOrderingEngine&) = delete;
@@ -27,7 +26,7 @@ public:
 
     void setDataSet(const DataSet& dataSet);
 
-    const DataSet& getDataSet() const;
+    const DataSet& getOrderedDataSet() const;
     const OrderingIndexes& getOrderingIndexes() const;
     const InversionFlags& getInversionFlags() const;
     HammingDistance getTotalTransitionsCount() const;
@@ -44,10 +43,12 @@ private:
     void _init();
     void _buildAdjacencyMatrix();
     bool _retrieveMinimumDistancePair(bool inversionAllowed, WordsPair& minDistancePair) const;
+    void _updateOrderedDataSet();
 
     std::optional<matrix_size_t> _initGreedyMinSimplified(bool inversionAllowed, std::vector<bool>& wordAlreadyAddedStatuses);
 
     DataSet mDataSet;
+    DataSet mOrderedDataSet;
     AdjacencyMatrix mAdjacencyMatrix;
     OrderingIndexes mOrderingIndexes; // original index of each word (permutation occurs by indexes, original dataset is not modified)
     InversionFlags mInversionFlags; // each word has a flag mentioning if inverted or not (flags are also "permutated")

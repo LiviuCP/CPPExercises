@@ -8,6 +8,7 @@
 #include <map>
 #include <utility>
 #include <string>
+#include <iostream>
 
 #define FAIL_DEALLOC(ptr, message) \
     std::free(ptr); \
@@ -36,6 +37,7 @@ using IntPairVector = std::vector<std::pair<int, int>>;
 using StringIntPairVector = std::vector<StringIntPair>;
 using IntList = std::list<int>;
 using SizePair = std::pair<size_t, size_t>;
+using SizeVector = std::vector<size_t>;
 using TripleSizeTuple = std::tuple<size_t, size_t, size_t>;
 
 using DataWord = std::vector<bool>;
@@ -65,5 +67,10 @@ namespace Utilities
     void rightTrimWhiteSpace(std::string& str);
     void trimWhiteSpace(std::string& str);
 }
+
+std::istream& operator>>(std::istream& in, DataSet& dataSet);
+std::ostream& operator<<(std::ostream& out, const DataSet& dataSet);
+std::ostream& operator<<(std::ostream& out, const DataWord& word);
+std::ostream& operator<<(std::ostream& out, const SizeVector& indexes);
 
 #endif // DATAUTILS_H

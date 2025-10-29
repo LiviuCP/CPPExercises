@@ -4,9 +4,8 @@
 #include "dataorderingengine.h"
 
 DataOrderingEngine::DataOrderingEngine(const DataSet& dataSet)
-    : mDataSet{dataSet}
 {
-    _init();
+    setDataSet(dataSet);
 }
 
 void DataOrderingEngine::performGreedyMinSimplified()
@@ -65,6 +64,8 @@ void DataOrderingEngine::performGreedyMinSimplified()
 
         ++addedWordsCount;
     }
+
+    _updateOrderedDataSet();
 }
 
 void DataOrderingEngine::performGreedyMinSimplifiedWithInversion()
@@ -138,18 +139,21 @@ void DataOrderingEngine::performGreedyMinSimplifiedWithInversion()
 
         ++addedWordsCount;
     }
+
+    _updateOrderedDataSet();
 }
 
 void DataOrderingEngine::setDataSet(const DataSet& dataSet)
 {
     _reset();
     mDataSet = dataSet;
+    mOrderedDataSet = dataSet;
     _init();
 }
 
-const DataSet& DataOrderingEngine::getDataSet() const
+const DataSet& DataOrderingEngine::getOrderedDataSet() const
 {
-    return mDataSet;
+    return mOrderedDataSet;
 }
 
 const OrderingIndexes& DataOrderingEngine::getOrderingIndexes() const
@@ -217,6 +221,7 @@ HammingDistance DataOrderingEngine::_getHammingDistance(const DataWord& firstWor
 void DataOrderingEngine::_reset()
 {
     mDataSet.clear();
+    mOrderedDataSet.clear();
     mAdjacencyMatrix.clear();
     mOrderingIndexes.clear();
     mInversionFlags.clear();
@@ -364,6 +369,35 @@ bool DataOrderingEngine::_retrieveMinimumDistancePair(bool inversionAllowed, Dat
     }
 
     return areInverted;
+}
+
+void DataOrderingEngine::_updateOrderedDataSet()
+{
+    DataSet orderedDataSet;
+    const size_t c_DataSetSize{mDataSet.size()};
+
+    if (c_DataSetSize == mOrderingIndexes.size() && c_DataSetSize == mInversionFlags.size())
+    {
+        orderedDataSet.reserve(c_DataSetSize);
+
+        for (size_t currentWordIndex{0}; currentWordIndex < c_DataSetSize; ++currentWordIndex)
+        {
+            if (const bool c_ShouldInvert{mInversionFlags.at(currentWordIndex)}; c_ShouldInvert)
+            {
+                orderedDataSet.push_back(Utilities::invertDataWord(mDataSet.at(mOrderingIndexes.at(currentWordIndex))));
+            }
+            else
+            {
+                orderedDataSet.push_back(mDataSet.at(mOrderingIndexes.at(currentWordIndex)));
+            }
+        }
+
+        mOrderedDataSet = std::move(orderedDataSet);
+    }
+    else
+    {
+        assert(false);
+    }
 }
 
 std::optional<matrix_size_t> DataOrderingEngine::_initGreedyMinSimplified(bool inversionAllowed, std::vector<bool>& wordAlreadyAddedStatuses)
