@@ -1,8 +1,8 @@
 #include "dataordering_io.h"
 
 DataOrderingFileReader::DataOrderingFileReader(const std::string& inputFilePath)
-    : m_InputFilePath{inputFilePath}
 {
+    setInputFilePath(inputFilePath);
 }
 
 Result DataOrderingFileReader::readDataSetFromFile()
@@ -10,7 +10,10 @@ Result DataOrderingFileReader::readDataSetFromFile()
     ResultType resultType{ResultType::SUCCESS};
     std::optional<DataSet> resultingDataSet;
 
-    m_In.open(m_InputFilePath);
+    if (!m_In.is_open())
+    {
+        m_In.open(m_InputFilePath);
+    }
 
     if (m_In.is_open())
     {
@@ -25,8 +28,6 @@ Result DataOrderingFileReader::readDataSetFromFile()
         {
             resultType = ResultType::INVALID_INPUT;
         }
-
-        m_In.close();
     }
     else
     {
@@ -36,19 +37,27 @@ Result DataOrderingFileReader::readDataSetFromFile()
     return {resultType, resultingDataSet};
 }
 
+void DataOrderingFileReader::setInputFilePath(const std::string& inputFilePath)
+{
+    if (m_InputFilePath != inputFilePath)
+    {
+        if (m_In.is_open())
+        {
+            m_In.close();
+        }
+
+        m_InputFilePath = inputFilePath;
+    }
+}
+
 const std::string& DataOrderingFileReader::getInputFilePath() const
 {
     return m_InputFilePath;
 }
 
-DataOrderingFileWriter::DataOrderingFileWriter(const std::string& outputFilePath, bool fileCleanupRequired)
-    : m_OutputFilePath{outputFilePath}
+DataOrderingFileWriter::DataOrderingFileWriter(const std::string& outputFilePath)
 {
-    if (fileCleanupRequired)
-    {
-        m_Out.open(m_OutputFilePath);
-        m_Out.close();
-    }
+    setOutputFilePath(outputFilePath);
 }
 
 Result DataOrderingFileWriter::writeScenarioOutputToFile(const std::string& header, const DataOrderingEngine& engine)
@@ -56,7 +65,10 @@ Result DataOrderingFileWriter::writeScenarioOutputToFile(const std::string& head
     ResultType resultType{ResultType::SUCCESS};
     std::optional<DataSet> resultingDataSet;
 
-    m_Out.open(m_OutputFilePath, std::ios::app);
+    if (!m_Out.is_open())
+    {
+        m_Out.open(m_OutputFilePath);
+    }
 
     if (m_Out.is_open())
     {
@@ -71,8 +83,6 @@ Result DataOrderingFileWriter::writeScenarioOutputToFile(const std::string& head
         m_Out << engine.getInversionFlags() << "\n";
         m_Out << "Total number of transitions is: ";
         m_Out << engine.getTotalTransitionsCount() << "\n";
-
-        m_Out.close();
     }
     else
     {
@@ -80,6 +90,42 @@ Result DataOrderingFileWriter::writeScenarioOutputToFile(const std::string& head
     }
 
     return {resultType, resultingDataSet};
+}
+
+void DataOrderingFileWriter::beginSection()
+{
+    if (!m_Out.is_open())
+    {
+        m_Out.open(m_OutputFilePath);
+    }
+
+    if (m_Out.is_open())
+    {
+        m_Out << "******************************** Section " << m_SectionNumber << " ********************************\n\n";
+    }
+}
+
+void DataOrderingFileWriter::endSection()
+{
+    if (m_Out.is_open())
+    {
+        m_Out << "\n\n";
+        ++m_SectionNumber;
+    }
+}
+
+void DataOrderingFileWriter::setOutputFilePath(const std::string& outputFilePath)
+{
+    if (m_OutputFilePath != outputFilePath)
+    {
+        if (m_Out.is_open())
+        {
+            m_Out.close();
+        }
+
+        m_SectionNumber = 1;
+        m_OutputFilePath = outputFilePath;
+    }
 }
 
 const std::string& DataOrderingFileWriter::getOutputFilePath() const

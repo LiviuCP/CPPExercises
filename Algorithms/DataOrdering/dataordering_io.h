@@ -23,6 +23,8 @@ public:
     DataOrderingFileReader(const std::string& inputFilePath);
 
     Result readDataSetFromFile();
+
+    void setInputFilePath(const std::string& inputFilePath);
     const std::string& getInputFilePath() const;
 
 private:
@@ -33,14 +35,19 @@ private:
 class DataOrderingFileWriter
 {
 public:
-    DataOrderingFileWriter(const std::string& outputFilePath, bool fileCleanupRequired = true);
+    DataOrderingFileWriter(const std::string& outputFilePath);
 
     Result writeScenarioOutputToFile(const std::string& header, const DataOrderingEngine& engine);
+    void beginSection();
+    void endSection();
+
+    void setOutputFilePath(const std::string& outputFilePath);
     const std::string& getOutputFilePath() const;
 
 private:
     std::ofstream m_Out;
     std::string m_OutputFilePath;
+    size_t m_SectionNumber;
 };
 
 #endif // DATAORDERING_IO_H
