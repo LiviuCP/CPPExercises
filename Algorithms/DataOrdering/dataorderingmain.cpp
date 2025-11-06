@@ -84,7 +84,7 @@ int main()
             break;
         }
 
-        engine.performGreedyMinSimplifiedWithInversion();
+        engine.performGreedyMinSimplifiedUsingInversion();
         result = fileWriter.writeScenarioOutputToFile("\n\nC. Scenario 2: Greedy min simplified (GMS) with inversion", engine);
 
         if (result.first != ResultType::SUCCESS)

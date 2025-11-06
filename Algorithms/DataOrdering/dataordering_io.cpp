@@ -1,4 +1,5 @@
 #include "dataordering_io.h"
+#include "matrixutils.h"
 
 DataOrderingFileReader::DataOrderingFileReader(const std::string& inputFilePath)
 {
@@ -78,11 +79,11 @@ Result DataOrderingFileWriter::writeScenarioOutputToFile(const std::string& head
         m_Out << "The transmitted data words are: \n\n";
         m_Out << *resultingDataSet << "\n";
         m_Out << "Transmission order: ";
-        m_Out << engine.getOrderingIndexes() << "\n";
+        m_Out << toSizeVector(engine.getOrderingIndexes()) << "\n";
         m_Out << "Inversion status: ";
         m_Out << engine.getInversionFlags() << "\n";
         m_Out << "Total number of transitions is: ";
-        m_Out << engine.getTotalTransitionsCount() << "\n";
+        m_Out << *engine.getTotalTransitionsCount() << "\n";
     }
     else
     {

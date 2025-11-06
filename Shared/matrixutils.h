@@ -27,6 +27,7 @@ using StringIntPairMatrix = Matrix<StringIntPair>;
 using BoolMatrix = Matrix<bool>;
 using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
 using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
+using MatrixSizeVector = std::vector<matrix_size_t>;
 
 template<typename T>
 std::ifstream& operator>>(std::ifstream& in, Matrix<T>& data);
@@ -267,5 +268,7 @@ std::pair<std::optional<matrix_diff_t>, MatrixPoint> mapRowAndColumnNrToDiagonal
 
     return result;
 }
+
+SizeVector toSizeVector(const MatrixSizeVector& matrixSizeVector);
 
 #endif // MATRIXUTILS_H

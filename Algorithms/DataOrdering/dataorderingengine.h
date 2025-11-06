@@ -6,9 +6,11 @@
 #include "matrix.h"
 #include "datautils.h"
 
-using HammingDistance = int;
-using OrderingIndexes = std::vector<size_t>;
+using HammingDistance = std::optional<size_t>;
+using OrderingIndex = matrix_size_t;
+using OrderingIndexes = std::vector<OrderingIndex>;
 using InversionFlags = DataWord;
+using StatusFlags = DataWord;
 
 class DataOrderingEngine
 {
@@ -22,7 +24,7 @@ public:
     DataOrderingEngine& operator=(DataOrderingEngine&&) = delete;
 
     void performGreedyMinSimplified();
-    void performGreedyMinSimplifiedWithInversion();
+    void performGreedyMinSimplifiedUsingInversion();
 
     void setDataSet(const DataSet& dataSet);
 
@@ -35,23 +37,29 @@ private:
     using AdjacencyMatrix = Matrix<HammingDistance>;
 
     // indexes of a pair of data words (as contained in the data set but converted to adjacency matrix index types)
-    using WordsPair = std::pair<matrix_size_t, matrix_size_t>;
+    using OrderingIndexesPair = std::pair<OrderingIndex, OrderingIndex>;
 
     static HammingDistance _getHammingDistance(const DataWord& firstWord, const DataWord& secondWord);
 
-    void _reset();
     void _init();
+    void _computeWordSize();
     void _buildAdjacencyMatrix();
-    bool _retrieveMinimumDistancePair(bool inversionAllowed, WordsPair& minDistancePair) const;
+    void _reset();
+
+    std::optional<OrderingIndex> _initGreedyMinSimplified(bool inversionAllowed, StatusFlags& wordAlreadyAddedStatuses);
+    void _updateCurrentIndexAndMinDistance(const StatusFlags& wordAlreadyAddedStatuses, std::optional<OrderingIndex>& currentWordIndex, HammingDistance& currentMinHammingDistance) const;
+    bool _updatedCurrentIndexAndMinDistanceUsingInversion(const StatusFlags& wordAlreadyAddedStatuses, std::optional<OrderingIndex>& currentWordIndex, HammingDistance& currentMinHammingDistance) const;
+    void _retrieveMinDistanceIndexes(OrderingIndexesPair& minDistancePair) const;
+    bool _retrieveMinDistanceIndexesUsingInversion(OrderingIndexesPair& minDistancePair) const;
+    HammingDistance _retrieveFirstTwoWordsDistance() const;
     void _updateOrderedDataSet();
 
-    std::optional<matrix_size_t> _initGreedyMinSimplified(bool inversionAllowed, std::vector<bool>& wordAlreadyAddedStatuses);
-
-    DataSet mDataSet;
-    DataSet mOrderedDataSet;
-    AdjacencyMatrix mAdjacencyMatrix;
-    OrderingIndexes mOrderingIndexes; // original index of each word (permutation occurs by indexes, original dataset is not modified)
-    InversionFlags mInversionFlags; // each word has a flag mentioning if inverted or not (flags are also "permutated")
+    DataSet m_DataSet;
+    DataSet m_OrderedDataSet;
+    AdjacencyMatrix m_AdjacencyMatrix;
+    OrderingIndexes m_OrderingIndexes; // original index of each word (permutation occurs by indexes, original dataset is not modified)
+    InversionFlags m_InversionFlags; // each word has a flag mentioning if inverted or not (flags are also "permutated")
+    HammingDistance m_WordSize;
 };
 
 #endif // DATAORDERINGENGINE_H
