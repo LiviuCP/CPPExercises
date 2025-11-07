@@ -6,7 +6,7 @@
 #ifndef MATRIXUTILS_H
 #define MATRIXUTILS_H
 
-#include <fstream>
+#include <iostream>
 #include <cmath>
 #include <optional>
 
@@ -30,62 +30,52 @@ using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterato
 using MatrixSizeVector = std::vector<matrix_size_t>;
 
 template<typename T>
-std::ifstream& operator>>(std::ifstream& in, Matrix<T>& data);
-
-template<typename T>
-std::ofstream& operator<<(std::ofstream& out, const Matrix<T>& data);
-
-template<typename T>
-std::ifstream& operator>>(std::ifstream& in, Matrix<T>& data)
+std::istream& operator>>(std::istream& in, Matrix<T>& data)
 {
-    bool success{false};
-
     Matrix<T> matrix{};
 
-    int nrOfRows{0};
-    int nrOfColumns{0};
-
-    in >> nrOfRows;
-
-    if (!in.fail() && nrOfRows > 0)
+    do
     {
+        int nrOfRows{0};
+        int nrOfColumns{0};
+
+        in >> nrOfRows;
+
+        if (in.fail() || nrOfRows <= 0)
+        {
+            break;
+        }
+
         in >> nrOfColumns;
 
-        if (!in.fail() && nrOfColumns > 0)
+        if (in.fail() && nrOfColumns <= 0)
         {
-            matrix.resize(nrOfRows, nrOfColumns);
-            success = true;
+            break;
+        }
 
-            for (typename Matrix<T>::ZIterator it{matrix.zBegin()}; it != matrix.zEnd(); ++it)
+        matrix.resize(nrOfRows, nrOfColumns);
+
+        for (typename Matrix<T>::ZIterator it{matrix.zBegin()}; it != matrix.zEnd(); ++it)
+        {
+            in >> *it;
+
+            if (in.fail())
             {
-                in >> *it;
-
-                if (in.fail())
-                {
-                    success = false;
-                    break;
-                }
-            }
-
-            if (success)
-            {
-                data = std::move(matrix);
+                matrix.clear();
+                break;
             }
         }
     }
+    while(false);
 
-    // ensure an empty matrix is provided if reading has not been done successfully
-    if (!success)
-    {
-        data.clear();
-    }
+    data = std::move(matrix);
 
     return in;
 }
 
 // this operator needs to be included (by including "matrixutils.h") otherwise the boolean value of the matrix will get printed
 template<typename T>
-std::ofstream& operator<<(std::ofstream& out, const Matrix<T>& data)
+std::ostream& operator<<(std::ostream& out, const Matrix<T>& data)
 {
     for(int row{0}; row < data.getNrOfRows(); ++row)
     {

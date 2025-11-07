@@ -11,7 +11,7 @@
    - the output file contains the chosen mapping of colours to countries
 */
 
-#include <iostream>
+#include <fstream>
 #include <algorithm>
 
 #include "matrix.h"
