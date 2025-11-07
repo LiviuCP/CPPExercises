@@ -15,8 +15,12 @@ class DataUtilsTests : public QObject
 
 private slots:
     void testWhiteSpaceTrimming();
+    void testConvertBitStringToDataWord();
+    void testInvertDataWord();
 
     void testWhiteSpaceTrimming_data();
+    void testConvertBitStringToDataWord_data();
+    void testInvertDataWord_data();
 };
 
 void DataUtilsTests::testWhiteSpaceTrimming()
@@ -42,6 +46,32 @@ void DataUtilsTests::testWhiteSpaceTrimming()
     }
 
     QVERIFY(stringToTrim == requiredValueAfterTrimming);
+}
+
+void DataUtilsTests::testConvertBitStringToDataWord()
+{
+    QFETCH(std::string, bitString);
+    QFETCH(bool, expectedResult);
+    QFETCH(DataWord, expectedDataWord);
+
+    DataWord dataWord;
+    const bool c_Result{Utilities::convertBitStringToDataWord(bitString, dataWord)};
+
+    QVERIFY(c_Result == expectedResult);
+
+    if (c_Result)
+    {
+        QVERIFY(dataWord == expectedDataWord);
+    }
+}
+
+void DataUtilsTests::testInvertDataWord()
+{
+    QFETCH(DataWord, dataWord);
+    QFETCH(DataWord, expectedDataWord);
+
+    const DataWord c_InvertedDataWord{Utilities::invertDataWord(dataWord)};
+    QVERIFY(c_InvertedDataWord == expectedDataWord);
 }
 
 void DataUtilsTests::testWhiteSpaceTrimming_data()
@@ -104,6 +134,56 @@ void DataUtilsTests::testWhiteSpaceTrimming_data()
     QTest::newRow("trim both sides: 16") << std::string{"a"} << TrimOperation::TRIM_BOTH_SIDES << std::string{"a"};
     QTest::newRow("trim both sides: 17") << std::string{" "} << TrimOperation::TRIM_BOTH_SIDES << std::string{""};
     QTest::newRow("trim both sides: 18") << std::string{""} << TrimOperation::TRIM_BOTH_SIDES << std::string{""};
+}
+
+void DataUtilsTests::testConvertBitStringToDataWord_data()
+{
+    QTest::addColumn<std::string>("bitString");
+    QTest::addColumn<bool>("expectedResult");
+    QTest::addColumn<DataWord>("expectedDataWord");
+
+    QTest::newRow("valid bitstring: 1") << std::string{"0010110101011010"} << true << DataWord{0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0};
+    QTest::newRow("valid bitstring: 2") << std::string{"1101001010100101"} << true << DataWord{1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1};
+    QTest::newRow("valid bitstring: 3") << std::string{"11111111"} << true << DataWord{1, 1, 1, 1, 1, 1, 1, 1};
+    QTest::newRow("valid bitstring: 4") << std::string{"0000"} << true << DataWord{0, 0, 0, 0};
+    QTest::newRow("valid bitstring: 5") << std::string{"00"} << true << DataWord{0, 0};
+    QTest::newRow("valid bitstring: 6") << std::string{"01"} << true << DataWord{0, 1};
+    QTest::newRow("valid bitstring: 7") << std::string{"10"} << true << DataWord{1, 0};
+    QTest::newRow("valid bitstring: 8") << std::string{"11"} << true << DataWord{1, 1};
+    QTest::newRow("valid bitstring: 9") << std::string{"0"} << true << DataWord{0};
+    QTest::newRow("valid bitstring: 10") << std::string{"1"} << true << DataWord{1};
+    QTest::newRow("invalid bitstring: 1") << std::string{"10102010"} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 2") << std::string{"1010_010"} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 3") << std::string{"1010a010"} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 4") << std::string{"1010 010"} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 5") << std::string{" 0101010"} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 6") << std::string{"1010101 "} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 7") << std::string{"+01\n101a"} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 8") << std::string{2} << false << DataWord{};
+    QTest::newRow("invalid bitstring: 9") << std::string{ } << false << DataWord{};
+    QTest::newRow("invalid bitstring: 10") << std::string{} << false << DataWord{};
+}
+
+void DataUtilsTests::testInvertDataWord_data()
+{
+    QTest::addColumn<DataWord>("dataWord");
+    QTest::addColumn<DataWord>("expectedDataWord");
+
+    QTest::newRow("invert data word: 1") << DataWord{0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0} << DataWord{1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1};
+    QTest::newRow("invert data word: 2") << DataWord{1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1} << DataWord{0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0};
+    QTest::newRow("invert data word: 3") << DataWord{0, 0, 0, 0, 0, 0, 0, 0} << DataWord{1, 1, 1, 1, 1, 1, 1, 1};
+    QTest::newRow("invert data word: 4") << DataWord{1, 1, 1, 1, 1, 1, 1, 1} << DataWord{0, 0, 0, 0, 0, 0, 0, 0};
+    QTest::newRow("invert data word: 5") << DataWord{0, 1, 0, 1} << DataWord{1, 0, 1, 0};
+    QTest::newRow("invert data word: 6") << DataWord{1, 0, 1, 0} << DataWord{0, 1, 0, 1};
+    QTest::newRow("invert data word: 7") << DataWord{0, 0, 1} << DataWord{1, 1, 0};
+    QTest::newRow("invert data word: 8") << DataWord{1, 1, 0} << DataWord{0, 0, 1};
+    QTest::newRow("invert data word: 9") << DataWord{0, 0} << DataWord{1, 1};
+    QTest::newRow("invert data word: 10") << DataWord{0, 1} << DataWord{1, 0};
+    QTest::newRow("invert data word: 11") << DataWord{1, 0} << DataWord{0, 1};
+    QTest::newRow("invert data word: 12") << DataWord{1, 1} << DataWord{0, 0};
+    QTest::newRow("invert data word: 13") << DataWord{0} << DataWord{1};
+    QTest::newRow("invert data word: 14") << DataWord{1} << DataWord{0};
+    QTest::newRow("invert data word: 15") << DataWord{} << DataWord{};
 }
 
 QTEST_APPLESS_MAIN(DataUtilsTests)
