@@ -47,11 +47,11 @@ private:
     void _reset();
 
     std::optional<OrderingIndex> _initGreedyMinSimplified(bool inversionAllowed, StatusFlags& wordAlreadyAddedStatuses);
-    void _updateCurrentIndexAndMinDistance(const StatusFlags& wordAlreadyAddedStatuses, std::optional<OrderingIndex>& currentWordIndex, HammingDistance& currentMinHammingDistance) const;
-    bool _updatedCurrentIndexAndMinDistanceUsingInversion(const StatusFlags& wordAlreadyAddedStatuses, std::optional<OrderingIndex>& currentWordIndex, HammingDistance& currentMinHammingDistance) const;
-    void _retrieveMinDistanceIndexes(OrderingIndexesPair& minDistancePair) const;
-    bool _retrieveMinDistanceIndexesUsingInversion(OrderingIndexesPair& minDistancePair) const;
-    HammingDistance _retrieveFirstTwoWordsDistance() const;
+    void _retrieveFirstTwoOrderedWords(std::optional<OrderingIndexesPair>& minDistancePair) const;
+    bool _retrieveFirstTwoOrderedWordsUsingInversion(std::optional<OrderingIndexesPair>& minDistancePair) const;
+    void _retrieveNextOrderedWord(const StatusFlags& wordAlreadyAddedStatuses, const std::optional<OrderingIndex>& currentWordIndex, std::optional<OrderingIndex>& nextWordIndex) const;
+    bool _retrieveNextOrderedWordUsingInversion(const StatusFlags& wordAlreadyAddedStatuses, const std::optional<OrderingIndex>& currentWordIndex, std::optional<OrderingIndex>& nextWordIndex) const;
+    HammingDistance _retrieveDistanceBetweenFirstTwoUnorderedWords() const;
     void _updateOrderedDataSet();
 
     DataSet m_DataSet;
