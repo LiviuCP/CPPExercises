@@ -8,7 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(
     ../../External/Matrix/MatrixLib/Matrix
-    ../../Shared
+    ../../Utilities/UtilitiesLib
 )
 
 add_executable(${PROJECT_NAME}
@@ -17,4 +17,4 @@ add_executable(${PROJECT_NAME}
     datatypes.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Shared)
+target_link_libraries(${PROJECT_NAME} PRIVATE UtilitiesLib)

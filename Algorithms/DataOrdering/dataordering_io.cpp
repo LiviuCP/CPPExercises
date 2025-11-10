@@ -79,7 +79,7 @@ Result DataOrderingFileWriter::writeScenarioOutputToFile(const std::string& head
         m_Out << "The transmitted data words are: \n\n";
         m_Out << *resultingDataSet << "\n";
         m_Out << "Transmission order: ";
-        m_Out << toSizeVector(engine.getOrderingIndexes()) << "\n";
+        m_Out << Utilities::toSizeVector(engine.getOrderingIndexes()) << "\n";
         m_Out << "Inversion status: ";
         m_Out << engine.getInversionFlags() << "\n";
         m_Out << "Total number of transitions is: ";

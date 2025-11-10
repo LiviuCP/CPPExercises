@@ -9,7 +9,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include_directories(
     Clients
     Servers
-    ../../Shared
+    ../../Utilities/UtilitiesLib
 )
 
 add_executable(Client
@@ -32,10 +32,10 @@ add_executable(ConcurrentServer
     Servers/server.cpp
 )
 
-target_link_libraries(Client PRIVATE Shared)
-target_link_libraries(Server PRIVATE Shared)
-target_link_libraries(ConcurrentClients PRIVATE Shared)
-target_link_libraries(ConcurrentServer PRIVATE Shared)
+target_link_libraries(Client PRIVATE UtilitiesLib)
+target_link_libraries(Server PRIVATE UtilitiesLib)
+target_link_libraries(ConcurrentClients PRIVATE UtilitiesLib)
+target_link_libraries(ConcurrentServer PRIVATE UtilitiesLib)
 
 if(UNIX AND NOT APPLE)
     target_link_libraries(Client PRIVATE pthread)

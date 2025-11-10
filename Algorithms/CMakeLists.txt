@@ -15,7 +15,6 @@ add_subdirectory(WordsCounting)
 add_subdirectory(STL)
 add_subdirectory(Regex)
 add_subdirectory(Tree)
-add_subdirectory(Other)
 
 # Some compiling errors occurred with these projects which were caused by the specific implementation of the std::sort algorithm
 # so it has been decided to exclude them from Windows

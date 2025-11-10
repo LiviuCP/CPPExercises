@@ -2,7 +2,7 @@
 
 #include "matrixutils.h"
 
-class MatrixAlgorithmsTests : public QObject
+class MatrixUtilsTests : public QObject
 {
     Q_OBJECT
 
@@ -16,7 +16,7 @@ private slots:
     void testRowAndColumnNrToDiagonalIndexMapping_data();
 };
 
-void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMapping()
+void MatrixUtilsTests::testDiagonalIndexToRowAndColumnNrMapping()
 {
     QFETCH(matrix_size_t, nrOfRows);
     QFETCH(matrix_size_t, nrOfColumns);
@@ -33,7 +33,7 @@ void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMapping()
     // the indexes of the expectedCoordinates vector elements are diagonal indexes to be converted
     for (size_t diagonalIndex{0}; diagonalIndex < expectedCoordinates.size(); ++diagonalIndex)
     {
-        const auto c_Result{mapDiagonalIndexToRowAndColumnNr(c_Matrix, static_cast<matrix_diff_t>(diagonalIndex))};
+        const auto c_Result{Utilities::mapDiagonalIndexToRowAndColumnNr(c_Matrix, static_cast<matrix_diff_t>(diagonalIndex))};
         const auto&[coordinates, convertedDiagonalIndex]{c_Result};
         const auto&[rowNr, columnNr]{coordinates};
         const auto&[expectedRowNr, expectedColumnNr]{expectedCoordinates[diagonalIndex]};
@@ -46,7 +46,7 @@ void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMapping()
     // clamp negative diagonal index
     {
         const matrix_diff_t c_NegativeDiagonalIndex{-1};
-        const auto c_Result{mapDiagonalIndexToRowAndColumnNr(c_Matrix, c_NegativeDiagonalIndex)};
+        const auto c_Result{Utilities::mapDiagonalIndexToRowAndColumnNr(c_Matrix, c_NegativeDiagonalIndex)};
         const auto&[coordinates, convertedDiagonalIndex]{c_Result};
         const auto&[rowNr, columnNr]{coordinates};
         const auto&[expectedRowNr, expectedColumnNr]{expectedCoordinates[0]};
@@ -57,7 +57,7 @@ void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMapping()
     // clamp diagonal index exceeding maximum matrix index
     {
         const matrix_diff_t c_ExceedingDiagonalIndex{c_MatrixElementsCount};
-        const auto c_Result{mapDiagonalIndexToRowAndColumnNr(c_Matrix, c_ExceedingDiagonalIndex)};
+        const auto c_Result{Utilities::mapDiagonalIndexToRowAndColumnNr(c_Matrix, c_ExceedingDiagonalIndex)};
         const auto&[coordinates, convertedDiagonalIndex]{c_Result};
         const auto&[rowNr, columnNr]{coordinates};
         const auto&[expectedRowNr, expectedColumnNr]{expectedCoordinates[expectedCoordinates.size() - 1]};
@@ -66,14 +66,14 @@ void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMapping()
     }
 }
 
-void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMappingWithEmptyMatrix()
+void MatrixUtilsTests::testDiagonalIndexToRowAndColumnNrMappingWithEmptyMatrix()
 {
     const IntMatrix c_Matrix;
     const std::vector<matrix_diff_t> c_DiagonalIndexesToCheck{-1, 0, 1};
 
     for (auto diagonalIndex : c_DiagonalIndexesToCheck)
     {
-        const auto c_Result{mapDiagonalIndexToRowAndColumnNr(c_Matrix, diagonalIndex)};
+        const auto c_Result{Utilities::mapDiagonalIndexToRowAndColumnNr(c_Matrix, diagonalIndex)};
         const auto&[coordinates, convertedDiagonalIndex]{c_Result};
         const auto&[rowNr, columnNr]{coordinates};
 
@@ -81,7 +81,7 @@ void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMappingWithEmptyMat
     }
 }
 
-void MatrixAlgorithmsTests::testRowAndColumnNrToDiagonalIndexMapping()
+void MatrixUtilsTests::testRowAndColumnNrToDiagonalIndexMapping()
 {
     QFETCH(Matrix<std::optional<matrix_diff_t>>, expectedDiagIndexesMatrix);
     QVERIFY(!expectedDiagIndexesMatrix.isEmpty());
@@ -94,7 +94,7 @@ void MatrixAlgorithmsTests::testRowAndColumnNrToDiagonalIndexMapping()
 
     for (auto it{diagIndexesMatrix.zBegin()}; it != diagIndexesMatrix.zEnd(); ++it)
     {
-        const auto result{mapRowAndColumnNrToDiagonalIndex(c_Matrix, {it.getRowNr(), it.getColumnNr()})};
+        const auto result{Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {it.getRowNr(), it.getColumnNr()})};
         const auto&[diagonalIndex, coordinates]{result};
         const auto&[rowNr, columnNr]{coordinates};
 
@@ -106,23 +106,23 @@ void MatrixAlgorithmsTests::testRowAndColumnNrToDiagonalIndexMapping()
     QVERIFY(diagIndexesMatrix == expectedDiagIndexesMatrix);
 
     // test clamping coordinates
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows, 0}) == mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows - 1, 0}));
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {0, c_NrOfColumns}) == mapRowAndColumnNrToDiagonalIndex(c_Matrix, {0, c_NrOfColumns - 1}));
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows, c_NrOfColumns}) == mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows - 1, c_NrOfColumns - 1}));
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows, 0}) == Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows - 1, 0}));
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {0, c_NrOfColumns}) == Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {0, c_NrOfColumns - 1}));
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows, c_NrOfColumns}) == Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows - 1, c_NrOfColumns - 1}));
 
     const std::pair<std::optional<matrix_diff_t>, MatrixPoint> c_NoValue;
 
     // test (partially) null coordinates
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, std::nullopt}) == c_NoValue);
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, 0}) == c_NoValue);
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, c_NrOfColumns - 1}) == c_NoValue);
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, c_NrOfColumns}) == c_NoValue);
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {0, std::nullopt}) == c_NoValue);
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows - 1, std::nullopt}) == c_NoValue);
-    QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows, std::nullopt}) == c_NoValue);
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, std::nullopt}) == c_NoValue);
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, 0}) == c_NoValue);
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, c_NrOfColumns - 1}) == c_NoValue);
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {std::nullopt, c_NrOfColumns}) == c_NoValue);
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {0, std::nullopt}) == c_NoValue);
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows - 1, std::nullopt}) == c_NoValue);
+    QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, {c_NrOfRows, std::nullopt}) == c_NoValue);
 }
 
-void MatrixAlgorithmsTests::testRowAndColumnNrToDiagonalIndexMappingWithEmptyMatrix()
+void MatrixUtilsTests::testRowAndColumnNrToDiagonalIndexMappingWithEmptyMatrix()
 {
     const IntMatrix c_Matrix;
     const std::pair<std::optional<matrix_diff_t>, MatrixPoint> c_NoValue;
@@ -130,11 +130,11 @@ void MatrixAlgorithmsTests::testRowAndColumnNrToDiagonalIndexMappingWithEmptyMat
 
     for (const auto& point : c_MatrixPointsToCheck)
     {
-        QVERIFY(mapRowAndColumnNrToDiagonalIndex(c_Matrix, point) == c_NoValue);
+        QVERIFY(Utilities::mapRowAndColumnNrToDiagonalIndex(c_Matrix, point) == c_NoValue);
     }
 }
 
-void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMapping_data()
+void MatrixUtilsTests::testDiagonalIndexToRowAndColumnNrMapping_data()
 {
     QTest::addColumn<matrix_size_t>("nrOfRows");
     QTest::addColumn<matrix_size_t>("nrOfColumns");
@@ -148,7 +148,7 @@ void MatrixAlgorithmsTests::testDiagonalIndexToRowAndColumnNrMapping_data()
     QTest::newRow("6: element matrix") << matrix_size_t{1u} << matrix_size_t{1u} << std::vector<MatrixPoint>{{0, 0}};
 }
 
-void MatrixAlgorithmsTests::testRowAndColumnNrToDiagonalIndexMapping_data()
+void MatrixUtilsTests::testRowAndColumnNrToDiagonalIndexMapping_data()
 {
     QTest::addColumn<Matrix<std::optional<matrix_diff_t>>>("expectedDiagIndexesMatrix");
 
@@ -192,6 +192,6 @@ void MatrixAlgorithmsTests::testRowAndColumnNrToDiagonalIndexMapping_data()
     QTest::newRow("6: element matrix") << Matrix<std::optional<matrix_diff_t>>{1, 1, {{0}}};
 }
 
-QTEST_APPLESS_MAIN(MatrixAlgorithmsTests)
+QTEST_APPLESS_MAIN(MatrixUtilsTests)
 
-#include "tst_matrixalgorithmstests.moc"
+#include "tst_matrixutilstests.moc"

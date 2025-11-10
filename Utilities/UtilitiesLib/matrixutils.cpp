@@ -1,6 +1,8 @@
 #include "matrixutils.h"
 
-// this (dummy) file is required for preventing any link errors on X-Code (OS-X). Don't fill anything in, don't use it!
+/* This file is required for preventing any link errors on X-Code (MacOS).
+   Neither the file nor the below dummy function should be deleted.
+*/
 
 // used for suppressing warning message
 int dummyFunctionMatrixUtilsCPP()
@@ -8,7 +10,7 @@ int dummyFunctionMatrixUtilsCPP()
     return 0;
 }
 
-SizeVector toSizeVector(const MatrixSizeVector& matrixSizeVector)
+SizeVector Utilities::toSizeVector(const MatrixSizeVector& matrixSizeVector)
 {
     SizeVector sizeVector;
     sizeVector.reserve(matrixSizeVector.size());

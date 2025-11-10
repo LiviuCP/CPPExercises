@@ -8,7 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(
     ../../External/Matrix/MatrixLib/Matrix
-    ../../Shared
+    ../../Utilities/UtilitiesLib
 )
 
 add_executable(Kruskal
@@ -25,5 +25,5 @@ add_executable(Prim
     treeutils.cpp
 )
 
-target_link_libraries(Kruskal PRIVATE Shared)
-target_link_libraries(Prim PRIVATE Shared)
+target_link_libraries(Kruskal PRIVATE UtilitiesLib)
+target_link_libraries(Prim PRIVATE UtilitiesLib)

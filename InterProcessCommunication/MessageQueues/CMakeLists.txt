@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(
-    ../../Shared
+    ../../Utilities/UtilitiesLib
 )
 
 add_executable(QueueSender
@@ -24,5 +24,5 @@ add_executable(QueueReceiver
     queuedatamessages.cpp
 )
 
-target_link_libraries(QueueSender PRIVATE Shared)
-target_link_libraries(QueueReceiver PRIVATE Shared)
+target_link_libraries(QueueSender PRIVATE UtilitiesLib)
+target_link_libraries(QueueReceiver PRIVATE UtilitiesLib)
