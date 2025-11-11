@@ -1,5 +1,4 @@
-#ifndef NODE_H
-#define NODE_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -34,5 +33,3 @@ private:
     NodeValue m_Value;
     std::vector<std::shared_ptr<Node>> m_Children;
 };
-
-#endif // NODE_H

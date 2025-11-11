@@ -1,5 +1,4 @@
-#ifndef NONVIRTUALDESTRUCTOR_H
-#define NONVIRTUALDESTRUCTOR_H
+#pragma once
 
 class BaseNonVirtual
 {
@@ -14,5 +13,3 @@ public:
     DerivedNonVirtual();
     ~DerivedNonVirtual();
 };
-
-#endif // NONVIRTUALDESTRUCTOR_H

@@ -1,5 +1,4 @@
-#ifndef BASEENGINE_H
-#define BASEENGINE_H
+#pragma once
 
 #include <string>
 
@@ -26,5 +25,3 @@ protected:
 
     std::string mName;
 };
-
-#endif // BASEENGINE_H

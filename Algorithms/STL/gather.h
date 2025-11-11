@@ -1,5 +1,4 @@
-#ifndef GATHER_H
-#define GATHER_H
+#pragma once
 
 #include "matrixutils.h"
 
@@ -123,5 +122,3 @@ std::tuple<MatrixPoint, MatrixPoint, matrix_size_t> gatherMatrixElements(Matrix<
 
     return {innerRectStartingPoint, innerRectEndingPoint, gatheredElementsCount};
 }
-
-#endif // GATHER_H

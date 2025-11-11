@@ -1,5 +1,4 @@
-#ifndef HDMI_H
-#define HDMI_H
+#pragma once
 
 #include <string>
 
@@ -19,7 +18,3 @@ protected:
 
     std::string m_SerialNumber;
 };
-
-
-
-#endif // HDMI_H

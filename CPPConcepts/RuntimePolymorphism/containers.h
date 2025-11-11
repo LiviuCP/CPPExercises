@@ -1,5 +1,4 @@
-#ifndef CONTAINERS_H
-#define CONTAINERS_H
+#pragma once
 
 #include <vector>
 #include <map>
@@ -15,5 +14,3 @@ using Bag = std::map<std::string, DataWrapper>;
 
 void display(const Bag& bag, std::ofstream& out, size_t indentation);
 size_t countContent(const Bag& bag);
-
-#endif // CONTAINERS_H

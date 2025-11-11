@@ -1,6 +1,5 @@
 /* General-purpose utility functions */
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
 
 #include <string>
 
@@ -19,5 +18,3 @@ namespace Utilities
 
     void clearScreen();
 }
-
-#endif // UTILS_H

@@ -1,5 +1,4 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -40,5 +39,3 @@ private:
     std::vector<int> m_Data;
     std::mutex m_LogMutex; // for multi-threaded clients (ConcurrentClients), otherwise log messages get scrambled
 };
-
-#endif // CLIENT_H

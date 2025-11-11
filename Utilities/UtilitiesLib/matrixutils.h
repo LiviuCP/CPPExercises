@@ -3,8 +3,7 @@
    2) CPPExercises/External/Matrix/MatrixLib/Utils
 */
 
-#ifndef MATRIXUTILS_H
-#define MATRIXUTILS_H
+#pragma once
 
 #include <iostream>
 #include <cmath>
@@ -264,5 +263,3 @@ namespace Utilities
 
     SizeVector toSizeVector(const MatrixSizeVector& matrixSizeVector);
 }
-
-#endif // MATRIXUTILS_H

@@ -4,8 +4,7 @@
    - a column matrix with the original row numbers is provided
 */
 
-#ifndef LEXICOGRAPHICALSORTER_H
-#define LEXICOGRAPHICALSORTER_H
+#pragma once
 
 #include <algorithm>
 
@@ -93,5 +92,3 @@ Matrix<T> LexicographicalSorter<T>::sData{};
 
 template<std::integral T>
 Matrix<matrix_size_t> LexicographicalSorter<T>::sOriginalRowNumbers{};
-
-#endif // LEXICOGRAPHICALSORTER_H

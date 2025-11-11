@@ -1,5 +1,4 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#pragma once
 
 class HDMIDisplay;
 
@@ -16,5 +15,3 @@ public:
 private:
     HDMIDisplay* m_pDisplay;
 };
-
-#endif // CLIENT_H

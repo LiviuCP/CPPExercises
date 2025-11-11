@@ -1,5 +1,4 @@
-#ifndef QUEUEUTILS_H
-#define QUEUEUTILS_H
+#pragma once
 
 
 class QueueUtils
@@ -8,5 +7,3 @@ class QueueUtils
 public:
     QueueUtils();
 };
-
-#endif // QUEUEUTILS_H

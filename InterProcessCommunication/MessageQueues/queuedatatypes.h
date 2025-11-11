@@ -1,5 +1,4 @@
-#ifndef QUEUEDATA_H
-#define QUEUEDATA_H
+#pragma once
 
 #include <map>
 
@@ -17,5 +16,3 @@ const std::map<DataTypes, std::string> c_DataTypesNames
     {DataTypes::DOUBLE, "double"},
     {DataTypes::METEODATA, "meteorological data"}
 };
-
-#endif // QUEUEDATA_H

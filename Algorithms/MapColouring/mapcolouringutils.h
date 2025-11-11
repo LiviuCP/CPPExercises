@@ -1,5 +1,4 @@
-#ifndef MAPCOLOURINGUTILS_H
-#define MAPCOLOURINGUTILS_H
+#pragma once
 
 #include "matrix.h"
 
@@ -8,5 +7,3 @@ namespace MapColouringUtils
     bool isValidNeighbourhoodMatrix(Matrix<bool> neighbours);
     std::optional<matrix_size_t> getFirstAvailableColour(const Matrix<bool>& availableColours);
 }
-
-#endif // MAPCOLOURINGUTILS_H

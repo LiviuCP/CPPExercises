@@ -1,5 +1,4 @@
-#ifndef QUEUEDATASTRUCTS_H
-#define QUEUEDATASTRUCTS_H
+#pragma once
 
 #include "queuedataobjects.h"
 
@@ -32,5 +31,3 @@ struct MeteoDataMessage
     MeteoDataMessage() = delete;
     MeteoDataMessage(long objType, const MeteoData &obj);
 };
-
-#endif // QUEUEDATASTRUCTS_H

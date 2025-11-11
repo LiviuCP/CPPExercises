@@ -1,5 +1,4 @@
-#ifndef DATAWRAPPER_H
-#define DATAWRAPPER_H
+#pragma once
 
 #include <fstream>
 #include <memory>
@@ -143,5 +142,3 @@ size_t DataWrapper::ConcreteModel<DataType>::countModelContent() const
 {
     return countContent(mData);
 }
-
-#endif // DATAWRAPPER_H

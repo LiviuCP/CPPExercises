@@ -1,5 +1,4 @@
-#ifndef HDMIADAPTER_H
-#define HDMIADAPTER_H
+#pragma once
 
 #include "hdmidisplay.h"
 
@@ -18,5 +17,3 @@ public:
 private:
     VGADisplay* m_pVGADisplay;
 };
-
-#endif // HDMIADAPTER_H

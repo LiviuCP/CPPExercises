@@ -1,5 +1,4 @@
-#ifndef INHERITANCECHAIN_H
-#define INHERITANCECHAIN_H
+#pragma once
 
 #include <cstdlib>
 
@@ -40,5 +39,3 @@ public:
 private:
     size_t mGrandChildId;
 };
-
-#endif // INHERITANCECHAIN_H

@@ -1,5 +1,4 @@
-#ifndef POINTERTEMPLATES_H
-#define POINTERTEMPLATES_H
+#pragma once
 
 /* GENERALIZATIONS */
 template<typename T> bool isPointer(T t)
@@ -27,5 +26,3 @@ template<typename T> bool isSecondOrderPointer(T** t)
     (void)t;
     return true;
 }
-
-#endif // POINTERTEMPLATES_H

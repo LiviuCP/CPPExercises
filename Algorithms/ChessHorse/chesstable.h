@@ -1,5 +1,4 @@
-#ifndef CHESSTABLE_H
-#define CHESSTABLE_H
+#pragma once
 
 #include <vector>
 
@@ -34,5 +33,3 @@ private:
     IntMatrix m_Table;
     bool m_IsFullyTraversed;
 };
-
-#endif // CHESSTABLE_H

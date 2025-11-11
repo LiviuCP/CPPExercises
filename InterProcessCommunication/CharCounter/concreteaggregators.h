@@ -1,5 +1,4 @@
-#ifndef CONCRETEAGGREGATORS_H
-#define CONCRETEAGGREGATORS_H
+#pragma once
 
 #include "utilities.h"
 #include "iaggregator.h"
@@ -48,5 +47,3 @@ private:
     CharOccurrencesArray m_AverageCharOccurrences;
     size_t m_AggregationsCount;
 };
-
-#endif // CONCRETEAGGREGATORS_H

@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #include <cstdlib>
 #include <string>
@@ -29,5 +28,3 @@ private:
     char* m_Buffer;
     int m_ServerFileDescriptor;
 };
-
-#endif // SERVER_H

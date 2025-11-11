@@ -1,5 +1,4 @@
-#ifndef WORDSCOUNTER_H
-#define WORDSCOUNTER_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -30,5 +29,3 @@ private:
     FileContent m_Content;
     WordOccurrencesMap m_OccurrencesMap;
 };
-
-#endif // WORDSCOUNTER_H

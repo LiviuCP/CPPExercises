@@ -1,5 +1,4 @@
-#ifndef VGA_H
-#define VGA_H
+#pragma once
 
 /* This class is the adaptee. The client (HDMICard) doesn't "know" the adaptee functions so a direct connection cannot be established.
    An adapter is required to match the VGADisplay functionality to the required one (HDMIDisplay) */
@@ -13,5 +12,3 @@ public:
 private:
     unsigned short m_SerNr;
 };
-
-#endif // VGA_H

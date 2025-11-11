@@ -6,8 +6,7 @@
    - timer runs in separate non-blocking thread in active mode
 */
 
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #include <chrono>
 #include <string>
@@ -78,5 +77,3 @@ public:
     virtual void onTimeout(const Timer* const timer) = 0;
     virtual ~ITimeoutHandler();
 };
-
-#endif // TIMER_H

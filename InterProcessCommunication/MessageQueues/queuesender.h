@@ -1,5 +1,4 @@
-#ifndef QUEUESENDER_H
-#define QUEUESENDER_H
+#pragma once
 
 #include <string>
 
@@ -17,5 +16,3 @@ private:
     std::string m_QueueFilename;
     int m_QueueId;
 };
-
-#endif // QUEUESENDER_H

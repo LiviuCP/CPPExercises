@@ -1,5 +1,4 @@
-#ifndef TREE_H
-#define TREE_H
+#pragma once
 
 #include <memory>
 
@@ -32,7 +31,3 @@ protected:
 private:
     NodeSp m_Root;
 };
-
-
-
-#endif // TREE_H

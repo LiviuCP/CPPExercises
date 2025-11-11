@@ -1,5 +1,4 @@
-#ifndef PARSER_H
-#define PARSER_H
+#pragma once
 
 #include <cstdio>
 
@@ -31,5 +30,3 @@ private:
     size_t m_TotalParsedCharsCount;
     bool m_MaxCharsCountExceeded;
 };
-
-#endif

@@ -1,6 +1,5 @@
 /* General purpose data type(def)s and conversion functions*/
-#ifndef DATAUTILS_H
-#define DATAUTILS_H
+#pragma once
 
 #include <vector>
 #include <list>
@@ -72,5 +71,3 @@ std::istream& operator>>(std::istream& in, DataSet& dataSet);
 std::ostream& operator<<(std::ostream& out, const DataSet& dataSet);
 std::ostream& operator<<(std::ostream& out, const DataWord& word);
 std::ostream& operator<<(std::ostream& out, const SizeVector& indexes);
-
-#endif // DATAUTILS_H

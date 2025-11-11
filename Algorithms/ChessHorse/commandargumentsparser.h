@@ -1,5 +1,4 @@
-#ifndef COMMANDARGUMENTSPARSER_H
-#define COMMANDARGUMENTSPARSER_H
+#pragma once
 
 #include "matrix.h"
 
@@ -23,5 +22,3 @@ struct ApplicationInput
 using Result = std::pair<ResultType, std::optional<ApplicationInput>>;
 
 Result parseCommandArguments(int argc, char** argv);
-
-#endif // COMMANDARGUMENTSPARSER_H

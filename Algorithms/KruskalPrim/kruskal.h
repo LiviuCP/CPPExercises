@@ -1,5 +1,4 @@
-#ifndef KRUSKAL_H
-#define KRUSKAL_H
+#pragma once
 
 #include <vector>
 #include <map>
@@ -34,5 +33,3 @@ private:
     std::vector<Component> mComponents;
     std::vector<size_t> mComponentNumbers;
 };
-
-#endif // KRUSKAL_H

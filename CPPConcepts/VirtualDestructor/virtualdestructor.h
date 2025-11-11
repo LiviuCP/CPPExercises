@@ -1,5 +1,4 @@
-#ifndef VIRTUALDESTRUCTOR_H
-#define VIRTUALDESTRUCTOR_H
+#pragma once
 
 class BaseVirtual
 {
@@ -14,5 +13,3 @@ public:
     DerivedVirtual();
     ~DerivedVirtual();
 };
-
-#endif // VIRTUALDESTRUCTOR_H

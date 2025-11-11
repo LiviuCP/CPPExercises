@@ -1,5 +1,4 @@
-#ifndef VARIADICTEMPLATES_H
-#define VARIADICTEMPLATES_H
+#pragma once
 
 #include <cstdlib>
 #include <algorithm>
@@ -351,5 +350,3 @@ auto Variadic::square(numeric auto value)
 {
     return value * value;
 }
-
-#endif // VARIADICTEMPLATES_H

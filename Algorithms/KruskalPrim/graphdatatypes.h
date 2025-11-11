@@ -1,5 +1,4 @@
-#ifndef GRAPHDATATYPES_H
-#define GRAPHDATATYPES_H
+#pragma once
 
 #include <list>
 #include <utility>
@@ -11,5 +10,3 @@ using Edge = std::pair<Node, Node>;
 using Cost = size_t;
 using GraphMatrix = Matrix<Cost>;
 using Tree = std::list<Edge>;
-
-#endif // GRAPHDATATYPES_H

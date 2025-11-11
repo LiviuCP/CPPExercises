@@ -1,5 +1,4 @@
-#ifndef SERVER_H
-#define SERVER_H
+#pragma once
 
 #include <string>
 
@@ -20,5 +19,3 @@ public:
     virtual std::string getDescription() const = 0;
     virtual ~Server();
 };
-
-#endif // SERVER_H

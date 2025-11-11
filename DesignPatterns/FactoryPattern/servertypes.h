@@ -1,5 +1,4 @@
-#ifndef SERVERTYPES_H
-#define SERVERTYPES_H
+#pragma once
 
 #include <string>
 
@@ -28,5 +27,3 @@ class Firewall : public Server
 public:
     std::string getDescription() const;
 };
-
-#endif // SERVERTYPES_H

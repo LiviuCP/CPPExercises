@@ -1,5 +1,4 @@
-#ifndef AGGREGATORFACTORY_H
-#define AGGREGATORFACTORY_H
+#pragma once
 
 #include "iaggregator.h"
 
@@ -17,5 +16,3 @@ public:
     AggregatorFactory() = delete;
     static IAggregator* createAggregator(AggregatorType aggregatorType);
 };
-
-#endif // AGGREGATORFACTORY_H

@@ -1,5 +1,4 @@
-#ifndef CUSTOMCPP20CONCEPTS_H
-#define CUSTOMCPP20CONCEPTS_H
+#pragma once
 
 #include <concepts>
 #include <cstdlib>
@@ -16,5 +15,3 @@ template<typename DataType> concept hasAddOperator = requires(DataType first, Da
 
 template<typename DataType> concept nonBooleanIntegral = std::integral<DataType> && (!std::same_as<DataType, bool>);
 template<typename DataType> concept numeric = nonBooleanIntegral<DataType> || std::floating_point<DataType>;
-
-#endif // CUSTOMCPP20CONCEPTS_H

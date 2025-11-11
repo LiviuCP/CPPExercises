@@ -1,5 +1,4 @@
-#ifndef PRIM_H
-#define PRIM_H
+#pragma once
 
 #include <vector>
 #include <limits>
@@ -36,5 +35,3 @@ private:
 
     GraphMatrix mGraphMatrix;
 };
-
-#endif // PRIM_H

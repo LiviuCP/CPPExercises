@@ -1,5 +1,4 @@
-#ifndef DATATYPES_H
-#define DATATYPES_H
+#pragma once
 
 #include <utility>
 #include <map>
@@ -73,5 +72,3 @@ using ColorBoard = Matrix<Color>;
 */
 void display(const ColorBoard& data, std::ofstream& out, size_t);
 size_t countContent(const ColorBoard& data);
-
-#endif // DATATYPES_H

@@ -1,5 +1,4 @@
-#ifndef TST_COMBINEDSTLTESTS_DATA_H
-#define TST_COMBINEDSTLTESTS_DATA_H
+#pragma once
 
 #include "matrixutils.h"
 
@@ -316,5 +315,3 @@ static const IntMatrix c_IntMatrixRef9a{9, 1, {5, 3, -1, -3, -7, -5, 0, 4, 9}};
 static const IntMatrix c_IntMatrixRef9b{9, 1, {-1, -3, -7, -5, 5, 3, 0, 4, 9}};
 static const IntMatrix c_IntMatrixRef9c{9, 1, {5, 3, 0, 4, 9, -1, -3, -7, -5}};
 static const IntMatrix c_IntMatrixRef9d{9, 1, {-1, 5, 3, 0, -3, -7, 4, 9, -5}};
-
-#endif // TST_COMBINEDSTLTESTS_DATA_H

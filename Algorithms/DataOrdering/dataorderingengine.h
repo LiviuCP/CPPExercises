@@ -1,5 +1,4 @@
-#ifndef DATAORDERINGENGINE_H
-#define DATAORDERINGENGINE_H
+#pragma once
 
 #include <utility>
 
@@ -61,5 +60,3 @@ private:
     InversionFlags m_InversionFlags; // each word has a flag mentioning if inverted or not (flags are also "permutated")
     HammingDistance m_WordSize;
 };
-
-#endif // DATAORDERINGENGINE_H

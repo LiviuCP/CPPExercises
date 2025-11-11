@@ -1,5 +1,4 @@
-#ifndef IAGGREGATOR_H
-#define IAGGREGATOR_H
+#pragma once
 
 #include <mutex>
 
@@ -15,5 +14,3 @@ public:
 protected:
     std::mutex m_AggregationMutex;
 };
-
-#endif // IAGGREGATOR_H

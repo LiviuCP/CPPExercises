@@ -1,5 +1,4 @@
-#ifndef QUEUERECEIVER_H
-#define QUEUERECEIVER_H
+#pragma once
 
 #include <string>
 
@@ -20,5 +19,3 @@ private:
     int m_QueueId;
     int m_Flags;
 };
-
-#endif // QUEUERECEIVER_H

@@ -1,5 +1,4 @@
-#ifndef QUEUEDATAOBJECTS_H
-#define QUEUEDATAOBJECTS_H
+#pragma once
 
 #include <iostream>
 
@@ -25,5 +24,3 @@ private:
     double atmosphericPressure;
     float humidity;
 };
-
-#endif // QUEUEDATAOBJECTS_H

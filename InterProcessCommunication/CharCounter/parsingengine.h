@@ -1,5 +1,4 @@
-#ifndef PARSINGENGINE_H
-#define PARSINGENGINE_H
+#pragma once
 
 #include "utilities.h"
 
@@ -29,5 +28,3 @@ private:
     size_t m_TotalMatchingDigitsCount;
     CharOccurrencesArray m_CharOccurrences;
 };
-
-#endif // PARSINGENGINE_H

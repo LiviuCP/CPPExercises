@@ -2,10 +2,7 @@
 #include <sys/msg.h>
 #include <cassert>
 
-#include <iostream>
-
 #include "queuedatamessages.h"
-
 #include "queuereceiver.h"
 
 #define READ_MESSAGE(messageType, objectType)                                                                                                                           \

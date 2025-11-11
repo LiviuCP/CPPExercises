@@ -1,5 +1,4 @@
-#ifndef DATAORDERING_IO_H
-#define DATAORDERING_IO_H
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -48,5 +47,3 @@ private:
     std::string m_OutputFilePath;
     size_t m_SectionNumber;
 };
-
-#endif // DATAORDERING_IO_H

@@ -1,5 +1,4 @@
-#ifndef HUFFMANENCODER_H
-#define HUFFMANENCODER_H
+#pragma once
 
 #include <set>
 #include <map>
@@ -63,5 +62,3 @@ private:
     EncodingOutput mEncodingResult;
     double mEncodingEfficiency;
 };
-
-#endif // HUFFMANENCODER_H

@@ -1,5 +1,4 @@
-#ifndef CONCRETEPARSERS_H
-#define CONCRETEPARSERS_H
+#pragma once
 
 #include "parser.h"
 
@@ -47,5 +46,3 @@ public:
 protected:
     bool isValidChar(char c) override;
 };
-
-#endif // CONCRETEPARSERS_H

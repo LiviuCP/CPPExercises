@@ -1,5 +1,4 @@
-#ifndef SEMAPHORE_H
-#define SEMAPHORE_H
+#pragma once
 
 #include <condition_variable>
 #include <mutex>
@@ -20,5 +19,3 @@ private:
     std::mutex m_Mutex;
     std::condition_variable m_CondVar;
 };
-
-#endif // SEMAPHORE_H
