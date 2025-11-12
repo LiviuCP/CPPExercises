@@ -51,8 +51,9 @@ void MinAggregator::aggregate(const CharOccurrencesArray& charOccurrences)
     // exclude 0 occurrences from minimum calculation (unless the character really doesn't exist in any of the files)
     for (size_t index{0}; index < charOccurrences.size(); ++index)
     {
-        m_MinCharOccurrences[index] = (0 == m_MinCharOccurrences[index] || 0 == charOccurrences[index]) ? std::max(m_MinCharOccurrences[index], charOccurrences[index])
-                                                                                                        : std::min(m_MinCharOccurrences[index], charOccurrences[index]);
+        m_MinCharOccurrences[index] = (0 == m_MinCharOccurrences[index] || 0 == charOccurrences[index])
+                                          ? std::max(m_MinCharOccurrences[index], charOccurrences[index])
+                                          : std::min(m_MinCharOccurrences[index], charOccurrences[index]);
     }
 }
 

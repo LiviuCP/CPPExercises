@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include "tree.h"
@@ -310,3 +311,4 @@ void TreeTests::_buildEmptyTree()
 QTEST_APPLESS_MAIN(TreeTests)
 
 #include "tst_treetests.moc"
+// clang-format on

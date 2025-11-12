@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -598,3 +599,4 @@ bool CPP2xRangesTests::_isPrime(int number)
 QTEST_APPLESS_MAIN(CPP2xRangesTests)
 
 #include "tst_cpp2xrangestests.moc"
+// clang-format on

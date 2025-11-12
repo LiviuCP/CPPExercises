@@ -1,8 +1,8 @@
 #include <fstream>
 
 #include "baseengine.h"
-#include "utils.h"
 #include "matrixutils.h"
+#include "utils.h"
 
 static void writeTreeToFile(std::ofstream& out, const GraphMatrix& graphMatrix, const Tree& tree)
 {
@@ -42,7 +42,7 @@ int treeAppMain(const std::string& inputFile, const std::string& outputFile, Bas
 
     Utilities::clearScreen();
 
-    if(in.is_open() && out.is_open())
+    if (in.is_open() && out.is_open())
     {
         GraphMatrix graphMatrix;
         in >> graphMatrix;
@@ -65,14 +65,18 @@ int treeAppMain(const std::string& inputFile, const std::string& outputFile, Bas
                 const matrix_size_t c_NodesCount{graphMatrix.getNrOfRows()};
                 const matrix_size_t c_RequiredEdgesCount{c_NodesCount - 1};
 
-                // no need to check the count of the maximum tree (if any nodes are loose then both trees will be incomplete)
+                // no need to check the count of the maximum tree (if any nodes are loose then both trees will be
+                // incomplete)
                 if (c_RequiredEdgesCount == treeEngine.getMinTree().size())
                 {
-                    std::cout << c_AlgorithmName << " minimum and maximum cost trees successfully written to: \n\n" << outputFile << "\n\n";
+                    std::cout << c_AlgorithmName << " minimum and maximum cost trees successfully written to: \n\n"
+                              << outputFile << "\n\n";
                 }
                 else
                 {
-                    std::cout << "The " << c_AlgorithmName << " minimum and maximum cost trees have been incompletely built (insufficient edges provided)\n\n";
+                    std::cout << "The " << c_AlgorithmName
+                              << " minimum and maximum cost trees have been incompletely built (insufficient edges "
+                                 "provided)\n\n";
                     std::cout << "Please check input file: \n\n" << inputFile << "\n\n";
                 }
             }
@@ -93,4 +97,3 @@ int treeAppMain(const std::string& inputFile, const std::string& outputFile, Bas
 
     return 0;
 }
-

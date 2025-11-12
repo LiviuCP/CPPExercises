@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -448,3 +449,4 @@ void SortedRangesTests::testSetUnion()
 QTEST_APPLESS_MAIN(SortedRangesTests)
 
 #include "tst_sortedrangestests.moc"
+// clang-format on

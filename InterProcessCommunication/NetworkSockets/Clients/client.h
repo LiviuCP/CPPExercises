@@ -1,14 +1,14 @@
 #pragma once
 
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
 
 class Client
 {
 public:
     explicit Client();
-    explicit Client(size_t bufferSize, int portNumber, std::string m_IpAddress, const std::string &name = "");
+    explicit Client(size_t bufferSize, int portNumber, std::string m_IpAddress, const std::string& name = "");
     ~Client();
 
     void retrieveDataFromServer(size_t requestedNrOfElements);
@@ -31,7 +31,7 @@ private:
     void _logMessage(const std::string& message, bool isErrorMessage = false);
 
     size_t m_BufferSize; // should match the server buffer size
-    int m_PortNumber; // port should match the server one and should have four numeric digits to avoid binding errors
+    int m_PortNumber;    // port should match the server one and should have four numeric digits to avoid binding errors
     std::string m_IpAddress;
     std::string m_Name;
     char* m_Buffer;

@@ -10,9 +10,5 @@ enum class DataTypes
     DataTypesCount
 };
 
-const std::map<DataTypes, std::string> c_DataTypesNames
-{
-    {DataTypes::INT, "integer"},
-    {DataTypes::DOUBLE, "double"},
-    {DataTypes::METEODATA, "meteorological data"}
-};
+const std::map<DataTypes, std::string> c_DataTypesNames{
+    {DataTypes::INT, "integer"}, {DataTypes::DOUBLE, "double"}, {DataTypes::METEODATA, "meteorological data"}};

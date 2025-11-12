@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <regex>
@@ -346,3 +347,4 @@ bool RegexTests::_isValidEmail(const std::string& email)
 QTEST_APPLESS_MAIN(RegexTests)
 
 #include "tst_regextests.moc"
+// clang-format on

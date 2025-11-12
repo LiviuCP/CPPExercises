@@ -1,6 +1,6 @@
 #include "containers.h"
 
-void display(const Box& box, std::ofstream &out, size_t indentation)
+void display(const Box& box, std::ofstream& out, size_t indentation)
 {
     if (out.is_open())
     {

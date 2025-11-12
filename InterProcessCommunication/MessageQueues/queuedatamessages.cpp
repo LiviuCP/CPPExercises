@@ -6,7 +6,7 @@ DoubleMessage::DoubleMessage(long objType, double obj)
 {
 }
 
-MeteoDataMessage::MeteoDataMessage(long objType, const MeteoData &obj)
+MeteoDataMessage::MeteoDataMessage(long objType, const MeteoData& obj)
     : objectType{objType}
     , object{obj}
 {

@@ -1,13 +1,13 @@
 #pragma once
 
 /* GENERALIZATIONS */
-template<typename T> bool isPointer(T t)
+template <typename T> bool isPointer(T t)
 {
     (void)t;
     return false;
 }
 
-template<typename T> bool isSecondOrderPointer(T t)
+template <typename T> bool isSecondOrderPointer(T t)
 {
     (void)t;
     return false;
@@ -15,13 +15,13 @@ template<typename T> bool isSecondOrderPointer(T t)
 
 /* SPECIALIZATIONS */
 
-template<typename T> bool isPointer(T* t)
+template <typename T> bool isPointer(T* t)
 {
     (void)t;
     return true;
 }
 
-template<typename T> bool isSecondOrderPointer(T** t)
+template <typename T> bool isSecondOrderPointer(T** t)
 {
     (void)t;
     return true;

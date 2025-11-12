@@ -6,7 +6,6 @@ Thermometer::Thermometer(double temp, bool isDigital)
     : mTemperature{temp}
     , mIsDigital{isDigital}
 {
-
 }
 
 std::string Thermometer::getInfo() const
@@ -35,16 +34,14 @@ void display(const Thermometer& thermometer, std::ofstream& out, size_t indentat
 
 /***************************************************************************************************************************************************/
 
-template<>
-void display<BottleCapacity>(const BottleCapacity& data, std::ofstream& out, size_t indentation)
+template <> void display<BottleCapacity>(const BottleCapacity& data, std::ofstream& out, size_t indentation)
 {
     out << std::string(indentation, ' ') << data << "l bottle" << std::endl;
 }
 
 /***************************************************************************************************************************************************/
 
-template<>
-void display<Color>(const Color& data, std::ofstream &out, size_t indentation)
+template <> void display<Color>(const Color& data, std::ofstream& out, size_t indentation)
 {
     if (out.is_open())
     {
@@ -58,12 +55,12 @@ void display<Color>(const Color& data, std::ofstream &out, size_t indentation)
 
 /***************************************************************************************************************************************************/
 
-template<>
-void display<ColorPair>(const ColorPair& data, std::ofstream& out, size_t indentation)
+template <> void display<ColorPair>(const ColorPair& data, std::ofstream& out, size_t indentation)
 {
     if (out.is_open())
     {
-        out << std::string(indentation, ' ') << "(" << c_ColorMapping.at(data.first) << ", " << c_ColorMapping.at(data.second) << ")" << std::endl;
+        out << std::string(indentation, ' ') << "(" << c_ColorMapping.at(data.first) << ", "
+            << c_ColorMapping.at(data.second) << ")" << std::endl;
     }
     else
     {
@@ -71,16 +68,14 @@ void display<ColorPair>(const ColorPair& data, std::ofstream& out, size_t indent
     }
 }
 
-template<>
-size_t countContent<ColorPair>(const ColorPair&)
+template <> size_t countContent<ColorPair>(const ColorPair&)
 {
     return 2;
 }
 
 /***************************************************************************************************************************************************/
 
-template<>
-void display<FoodMix>(const FoodMix& data, std::ofstream& out, size_t indentation)
+template <> void display<FoodMix>(const FoodMix& data, std::ofstream& out, size_t indentation)
 {
     if (out.is_open())
     {
@@ -104,7 +99,7 @@ void display(const ColorBoard& data, std::ofstream& out, size_t indentation)
 
             for (matrix_size_t columnNr{0}; columnNr < data.getNrOfColumns(); ++columnNr)
             {
-                out << " ("<< c_ColorMapping.at(data.at(rowNr, columnNr)) << ") ";
+                out << " (" << c_ColorMapping.at(data.at(rowNr, columnNr)) << ") ";
             }
 
             out << "]" << std::endl;

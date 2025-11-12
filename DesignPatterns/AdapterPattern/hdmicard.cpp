@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "hdmidisplay.h"
 #include "hdmicard.h"
+#include "hdmidisplay.h"
 
 HDMICard::HDMICard()
     : m_pDisplay{nullptr}

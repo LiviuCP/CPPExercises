@@ -1,5 +1,5 @@
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 
 #include "dataorderingengine.h"
 
@@ -42,8 +42,10 @@ void DataOrderingEngine::performGreedyMinSimplified()
             break;
         }
 
-        // continue with the remaining words, add them at one end of the ordered set (first the distance between second added word and another one is considered and so on...)
-        size_t addedWordsCount{static_cast<size_t>(std::count(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), true))};
+        // continue with the remaining words, add them at one end of the ordered set (first the distance between second
+        // added word and another one is considered and so on...)
+        size_t addedWordsCount{
+            static_cast<size_t>(std::count(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), true))};
 
         if (0 == addedWordsCount)
         {
@@ -68,15 +70,15 @@ void DataOrderingEngine::performGreedyMinSimplified()
             wordAlreadyAddedStatuses[*currentWordIndex] = true;
         }
 
-        if (std::any_of(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), [](bool added){return !added;}))
+        if (std::any_of(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(),
+                        [](bool added) { return !added; }))
         {
             assert(false);
             break;
         }
 
         _updateOrderedDataSet();
-    }
-    while(false);
+    } while (false);
 }
 
 void DataOrderingEngine::performGreedyMinSimplifiedUsingInversion()
@@ -102,7 +104,8 @@ void DataOrderingEngine::performGreedyMinSimplifiedUsingInversion()
         }
 
         StatusFlags wordAlreadyAddedStatuses;
-        std::optional<OrderingIndex> currentWordIndex{_initGreedyMinSimplified(INVERSION_ALLOWED, wordAlreadyAddedStatuses)};
+        std::optional<OrderingIndex> currentWordIndex{
+            _initGreedyMinSimplified(INVERSION_ALLOWED, wordAlreadyAddedStatuses)};
 
         if (wordAlreadyAddedStatuses.size() != c_DataSetSize)
         {
@@ -110,8 +113,10 @@ void DataOrderingEngine::performGreedyMinSimplifiedUsingInversion()
             break;
         }
 
-        // continue with the remaining words, add them at one end of the ordered set (first the distance between second added word and another one is considered and so on...)
-        size_t addedWordsCount{static_cast<size_t>(std::count(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), true))};
+        // continue with the remaining words, add them at one end of the ordered set (first the distance between second
+        // added word and another one is considered and so on...)
+        size_t addedWordsCount{
+            static_cast<size_t>(std::count(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), true))};
 
         if (0 == addedWordsCount)
         {
@@ -122,7 +127,8 @@ void DataOrderingEngine::performGreedyMinSimplifiedUsingInversion()
         for (; addedWordsCount < c_DataSetSize; ++addedWordsCount)
         {
             std::optional<OrderingIndex> nextWordIndex;
-            const bool isInvertedSuccessor{_retrieveNextOrderedWordUsingInversion(wordAlreadyAddedStatuses, currentWordIndex, nextWordIndex)};
+            const bool isInvertedSuccessor{
+                _retrieveNextOrderedWordUsingInversion(wordAlreadyAddedStatuses, currentWordIndex, nextWordIndex)};
 
             if (!nextWordIndex.has_value() || nextWordIndex >= c_DataSetSize || nextWordIndex == currentWordIndex)
             {
@@ -132,19 +138,20 @@ void DataOrderingEngine::performGreedyMinSimplifiedUsingInversion()
 
             currentWordIndex = nextWordIndex;
             m_OrderingIndexes[addedWordsCount] = *currentWordIndex;
-            m_InversionFlags[addedWordsCount] = isInvertedSuccessor ? !m_InversionFlags.at(addedWordsCount - 1) : m_InversionFlags.at(addedWordsCount - 1);
+            m_InversionFlags[addedWordsCount] = isInvertedSuccessor ? !m_InversionFlags.at(addedWordsCount - 1)
+                                                                    : m_InversionFlags.at(addedWordsCount - 1);
             wordAlreadyAddedStatuses[*currentWordIndex] = true;
         }
 
-        if (std::any_of(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(), [](bool added){return !added;}))
+        if (std::any_of(wordAlreadyAddedStatuses.cbegin(), wordAlreadyAddedStatuses.cend(),
+                        [](bool added) { return !added; }))
         {
             assert(false);
             break;
         }
 
         _updateOrderedDataSet();
-    }
-    while(false);
+    } while (false);
 }
 
 void DataOrderingEngine::setDataSet(const DataSet& dataSet)
@@ -185,20 +192,16 @@ HammingDistance DataOrderingEngine::getTotalTransitionsCount() const
     assert(c_NrOfRows == c_DataSetSize);
     assert(c_NrOfColumns == c_DataSetSize);
 
-    if (m_WordSize.has_value() &&
-        m_WordSize > 0 &&
-        c_DataSetSize > 1 &&
-        c_OrderingIndexesSize == c_DataSetSize &&
-        c_InversionFlagsSize == c_DataSetSize &&
-        c_NrOfRows == c_DataSetSize &&
-        c_NrOfColumns == c_DataSetSize)
+    if (m_WordSize.has_value() && m_WordSize > 0 && c_DataSetSize > 1 && c_OrderingIndexesSize == c_DataSetSize &&
+        c_InversionFlagsSize == c_DataSetSize && c_NrOfRows == c_DataSetSize && c_NrOfColumns == c_DataSetSize)
     {
         for (size_t currentWordIndex{0}; currentWordIndex < c_DataSetSize - 1; ++currentWordIndex)
         {
             const matrix_size_t c_FirstWordIndex{m_OrderingIndexes[currentWordIndex]};
             const matrix_size_t c_SecondWordIndex{m_OrderingIndexes[currentWordIndex + 1]};
 
-            if (c_FirstWordIndex >= c_DataSetSize || c_SecondWordIndex >= c_DataSetSize || c_FirstWordIndex == c_SecondWordIndex)
+            if (c_FirstWordIndex >= c_DataSetSize || c_SecondWordIndex >= c_DataSetSize ||
+                c_FirstWordIndex == c_SecondWordIndex)
             {
                 assert(false);
                 break;
@@ -214,7 +217,8 @@ HammingDistance DataOrderingEngine::getTotalTransitionsCount() const
 
             if (m_InversionFlags[currentWordIndex] != m_InversionFlags[currentWordIndex + 1])
             {
-                hammingDistance = *m_WordSize - *hammingDistance; // normalize Hamming distance if one of the words is inverted
+                hammingDistance =
+                    *m_WordSize - *hammingDistance; // normalize Hamming distance if one of the words is inverted
             }
 
             transitionsCount = *transitionsCount + *hammingDistance;
@@ -251,7 +255,8 @@ void DataOrderingEngine::_init()
         _computeWordSize();
     }
 
-    if (m_WordSize.has_value() && m_WordSize > 0 && m_AdjacencyMatrix.isEmpty() && m_OrderingIndexes.empty() && m_InversionFlags.empty())
+    if (m_WordSize.has_value() && m_WordSize > 0 && m_AdjacencyMatrix.isEmpty() && m_OrderingIndexes.empty() &&
+        m_InversionFlags.empty())
     {
         _buildAdjacencyMatrix();
     }
@@ -283,7 +288,8 @@ void DataOrderingEngine::_computeWordSize()
         const HammingDistance c_WordSize = m_DataSet.at(0).size();
 
         // the dataset is considered invalid if the words don't have the same size
-        if (std::all_of(m_DataSet.begin(), m_DataSet.end(), [c_WordSize](const auto& word){return c_WordSize == word.size();}))
+        if (std::all_of(m_DataSet.begin(), m_DataSet.end(),
+                        [c_WordSize](const auto& word) { return c_WordSize == word.size(); }))
         {
             m_WordSize = c_WordSize;
             assert(c_WordSize > 0);
@@ -306,7 +312,8 @@ void DataOrderingEngine::_buildAdjacencyMatrix()
         {
             for (matrix_size_t secondWordPos{firstWordPos + 1}; secondWordPos < c_WordsCount; ++secondWordPos)
             {
-                const HammingDistance c_HammingDistance{_getHammingDistance(m_DataSet.at(firstWordPos), m_DataSet.at(secondWordPos))};
+                const HammingDistance c_HammingDistance{
+                    _getHammingDistance(m_DataSet.at(firstWordPos), m_DataSet.at(secondWordPos))};
 
                 if (!c_HammingDistance.has_value() || c_HammingDistance > m_WordSize)
                 {
@@ -343,7 +350,8 @@ void DataOrderingEngine::_reset()
     m_WordSize.reset();
 }
 
-std::optional<OrderingIndex> DataOrderingEngine::_initGreedyMinSimplified(bool inversionAllowed, StatusFlags& wordAlreadyAddedStatuses)
+std::optional<OrderingIndex> DataOrderingEngine::_initGreedyMinSimplified(bool inversionAllowed,
+                                                                          StatusFlags& wordAlreadyAddedStatuses)
 {
     std::optional<OrderingIndex> currentWordIndex;
 
@@ -373,7 +381,8 @@ std::optional<OrderingIndex> DataOrderingEngine::_initGreedyMinSimplified(bool i
                 _retrieveFirstTwoOrderedWords(minDistancePair);
             }
 
-            if (minDistancePair.has_value() && minDistancePair->first != minDistancePair->second && minDistancePair->first < c_DataSetSize && minDistancePair->second < c_DataSetSize)
+            if (minDistancePair.has_value() && minDistancePair->first != minDistancePair->second &&
+                minDistancePair->first < c_DataSetSize && minDistancePair->second < c_DataSetSize)
             {
                 m_OrderingIndexes[0] = minDistancePair->first;
                 m_OrderingIndexes[1] = minDistancePair->second;
@@ -440,7 +449,8 @@ void DataOrderingEngine::_retrieveFirstTwoOrderedWords(std::optional<OrderingInd
 
         for (matrix_size_t currentDiagNr{1}; currentDiagNr < c_PositiveDiagonalsCount; ++currentDiagNr)
         {
-            for (AdjacencyMatrix::ConstDIterator it{m_AdjacencyMatrix.constDBegin(currentDiagNr)}; it != m_AdjacencyMatrix.constDEnd(currentDiagNr); ++it)
+            for (AdjacencyMatrix::ConstDIterator it{m_AdjacencyMatrix.constDBegin(currentDiagNr)};
+                 it != m_AdjacencyMatrix.constDEnd(currentDiagNr); ++it)
             {
                 if (!it->has_value() || *it > m_WordSize)
                 {
@@ -453,7 +463,8 @@ void DataOrderingEngine::_retrieveFirstTwoOrderedWords(std::optional<OrderingInd
                 {
                     currentDistance = *it;
 
-                    // no need to check the validity of getRowNr() and getColumnNr() as the matrix is not empty and the iterators are not reverse
+                    // no need to check the validity of getRowNr() and getColumnNr() as the matrix is not empty and the
+                    // iterators are not reverse
                     currentFirstWordIndex = *it.getRowNr();
                     currentSecondWordIndex = *it.getColumnNr();
                 }
@@ -461,11 +472,11 @@ void DataOrderingEngine::_retrieveFirstTwoOrderedWords(std::optional<OrderingInd
         }
 
         minDistancePair = {currentFirstWordIndex, currentSecondWordIndex};
-    }
-    while(false);
+    } while (false);
 }
 
-bool DataOrderingEngine::_retrieveFirstTwoOrderedWordsUsingInversion(std::optional<OrderingIndexesPair>& minDistancePair) const
+bool DataOrderingEngine::_retrieveFirstTwoOrderedWordsUsingInversion(
+    std::optional<OrderingIndexesPair>& minDistancePair) const
 {
     bool areInverted{false};
 
@@ -483,7 +494,7 @@ bool DataOrderingEngine::_retrieveFirstTwoOrderedWordsUsingInversion(std::option
             break;
         }
 
-        if(m_AdjacencyMatrix.getNrOfRows() != c_DataSetSize || m_AdjacencyMatrix.getNrOfColumns() != c_DataSetSize)
+        if (m_AdjacencyMatrix.getNrOfRows() != c_DataSetSize || m_AdjacencyMatrix.getNrOfColumns() != c_DataSetSize)
         {
             assert(false);
             break;
@@ -511,7 +522,8 @@ bool DataOrderingEngine::_retrieveFirstTwoOrderedWordsUsingInversion(std::option
 
         for (matrix_size_t currentDiagNr{1}; currentDiagNr < c_PositiveDiagonalsCount; ++currentDiagNr)
         {
-            for (AdjacencyMatrix::ConstDIterator it{m_AdjacencyMatrix.constDBegin(currentDiagNr)}; it != m_AdjacencyMatrix.constDEnd(currentDiagNr); ++it)
+            for (AdjacencyMatrix::ConstDIterator it{m_AdjacencyMatrix.constDBegin(currentDiagNr)};
+                 it != m_AdjacencyMatrix.constDEnd(currentDiagNr); ++it)
             {
                 if (!it->has_value() || *it > m_WordSize)
                 {
@@ -520,7 +532,8 @@ bool DataOrderingEngine::_retrieveFirstTwoOrderedWordsUsingInversion(std::option
                     break;
                 }
 
-                // no need to check the validity of getRowNr() and getColumnNr() as the matrix is not empty and the iterators are not reverse
+                // no need to check the validity of getRowNr() and getColumnNr() as the matrix is not empty and the
+                // iterators are not reverse
                 const matrix_size_t c_RowNr{*it.getRowNr()};
                 const matrix_size_t c_ColumnNr{*it.getColumnNr()};
 
@@ -545,24 +558,22 @@ bool DataOrderingEngine::_retrieveFirstTwoOrderedWordsUsingInversion(std::option
         }
 
         minDistancePair = {currentFirstWordIndex, currentSecondWordIndex};
-    }
-    while(false);
+    } while (false);
 
     return areInverted;
 }
 
-void DataOrderingEngine::_retrieveNextOrderedWord(const StatusFlags& wordAlreadyAddedStatuses, const std::optional<OrderingIndex>& currentWordIndex, std::optional<OrderingIndex>& nextWordIndex) const
+void DataOrderingEngine::_retrieveNextOrderedWord(const StatusFlags& wordAlreadyAddedStatuses,
+                                                  const std::optional<OrderingIndex>& currentWordIndex,
+                                                  std::optional<OrderingIndex>& nextWordIndex) const
 {
     do
     {
         const size_t c_DataSetSize{m_DataSet.size()};
 
-        if (!m_WordSize.has_value() ||
-            m_AdjacencyMatrix.getNrOfRows() != c_DataSetSize ||
-            m_AdjacencyMatrix.getNrOfColumns() != c_DataSetSize ||
-            wordAlreadyAddedStatuses.size() != c_DataSetSize ||
-            !currentWordIndex.has_value() ||
-            currentWordIndex >= c_DataSetSize)
+        if (!m_WordSize.has_value() || m_AdjacencyMatrix.getNrOfRows() != c_DataSetSize ||
+            m_AdjacencyMatrix.getNrOfColumns() != c_DataSetSize || wordAlreadyAddedStatuses.size() != c_DataSetSize ||
+            !currentWordIndex.has_value() || currentWordIndex >= c_DataSetSize)
         {
             assert(false);
             break;
@@ -571,13 +582,16 @@ void DataOrderingEngine::_retrieveNextOrderedWord(const StatusFlags& wordAlready
         // start with current word, detemine next word
         nextWordIndex = currentWordIndex;
 
-        // start by adding 1 to maximum distance (word size) to ensure one of the remaining words is added to ordered set
+        // start by adding 1 to maximum distance (word size) to ensure one of the remaining words is added to ordered
+        // set
         HammingDistance minHammingDistance{*m_WordSize + 1};
 
-        AdjacencyMatrix::ConstZIterator currentWordIt{m_AdjacencyMatrix.getConstZIterator(*nextWordIndex, *nextWordIndex)};
+        AdjacencyMatrix::ConstZIterator currentWordIt{
+            m_AdjacencyMatrix.getConstZIterator(*nextWordIndex, *nextWordIndex)};
         const std::optional<matrix_size_t> c_CurrentWordItRowNr{currentWordIt.getRowNr()};
 
-        for (AdjacencyMatrix::ConstZIterator it{m_AdjacencyMatrix.constZRowBegin(*c_CurrentWordItRowNr)}; it != m_AdjacencyMatrix.constZRowEnd(*c_CurrentWordItRowNr); ++it)
+        for (AdjacencyMatrix::ConstZIterator it{m_AdjacencyMatrix.constZRowBegin(*c_CurrentWordItRowNr)};
+             it != m_AdjacencyMatrix.constZRowEnd(*c_CurrentWordItRowNr); ++it)
         {
             if (!it->has_value() || *it > m_WordSize)
             {
@@ -585,7 +599,8 @@ void DataOrderingEngine::_retrieveNextOrderedWord(const StatusFlags& wordAlready
                 break;
             }
 
-            // no need to check optional validity for it.getColumnNr() before getting its value (*) because the iterator should be valid
+            // no need to check optional validity for it.getColumnNr() before getting its value (*) because the iterator
+            // should be valid
             const matrix_size_t c_CheckedIndex{*it.getColumnNr()};
 
             if (it != currentWordIt && !wordAlreadyAddedStatuses[c_CheckedIndex] && *it < minHammingDistance)
@@ -594,11 +609,12 @@ void DataOrderingEngine::_retrieveNextOrderedWord(const StatusFlags& wordAlready
                 nextWordIndex = c_CheckedIndex;
             }
         }
-    }
-    while(false);
+    } while (false);
 }
 
-bool DataOrderingEngine::_retrieveNextOrderedWordUsingInversion(const StatusFlags& wordAlreadyAddedStatuses, const std::optional<OrderingIndex>& currentWordIndex, std::optional<OrderingIndex>& nextWordIndex) const
+bool DataOrderingEngine::_retrieveNextOrderedWordUsingInversion(const StatusFlags& wordAlreadyAddedStatuses,
+                                                                const std::optional<OrderingIndex>& currentWordIndex,
+                                                                std::optional<OrderingIndex>& nextWordIndex) const
 {
     bool isInvertedSuccessor{false};
 
@@ -606,12 +622,9 @@ bool DataOrderingEngine::_retrieveNextOrderedWordUsingInversion(const StatusFlag
     {
         const size_t c_DataSetSize{m_DataSet.size()};
 
-        if (!m_WordSize.has_value() ||
-            m_AdjacencyMatrix.getNrOfRows() != c_DataSetSize ||
-            m_AdjacencyMatrix.getNrOfColumns() != c_DataSetSize ||
-            wordAlreadyAddedStatuses.size() != c_DataSetSize ||
-            !currentWordIndex.has_value() ||
-            currentWordIndex >= c_DataSetSize)
+        if (!m_WordSize.has_value() || m_AdjacencyMatrix.getNrOfRows() != c_DataSetSize ||
+            m_AdjacencyMatrix.getNrOfColumns() != c_DataSetSize || wordAlreadyAddedStatuses.size() != c_DataSetSize ||
+            !currentWordIndex.has_value() || currentWordIndex >= c_DataSetSize)
         {
             assert(false);
             break;
@@ -620,14 +633,18 @@ bool DataOrderingEngine::_retrieveNextOrderedWordUsingInversion(const StatusFlag
         // start with current word, detemine next word
         nextWordIndex = currentWordIndex;
 
-        // start by adding 1 to maximum distance (word size) to ensure one of the remaining words is added to ordered set
+        // start by adding 1 to maximum distance (word size) to ensure one of the remaining words is added to ordered
+        // set
         HammingDistance minHammingDistance{*m_WordSize + 1};
 
-        AdjacencyMatrix::ConstZIterator currentWordIt{m_AdjacencyMatrix.getConstZIterator(*nextWordIndex, *nextWordIndex)};
+        AdjacencyMatrix::ConstZIterator currentWordIt{
+            m_AdjacencyMatrix.getConstZIterator(*nextWordIndex, *nextWordIndex)};
         const std::optional<matrix_size_t> c_CurrentWordItRowNr{currentWordIt.getRowNr()};
 
-        // no need to check optional validity for it.getColumnNr() before getting its value (*) because the matrix is presumed non-empty (see above check) and the iterator is not reverse
-        for (AdjacencyMatrix::ConstZIterator it{m_AdjacencyMatrix.constZRowBegin(*c_CurrentWordItRowNr)}; it != m_AdjacencyMatrix.constZRowEnd(*c_CurrentWordItRowNr); ++it)
+        // no need to check optional validity for it.getColumnNr() before getting its value (*) because the matrix is
+        // presumed non-empty (see above check) and the iterator is not reverse
+        for (AdjacencyMatrix::ConstZIterator it{m_AdjacencyMatrix.constZRowBegin(*c_CurrentWordItRowNr)};
+             it != m_AdjacencyMatrix.constZRowEnd(*c_CurrentWordItRowNr); ++it)
         {
             if (!it->has_value() || *it > m_WordSize)
             {
@@ -635,7 +652,8 @@ bool DataOrderingEngine::_retrieveNextOrderedWordUsingInversion(const StatusFlag
                 break;
             }
 
-            // no need to check optional validity for it.getColumnNr() before getting its value (*) because the iterator should be valid
+            // no need to check optional validity for it.getColumnNr() before getting its value (*) because the iterator
+            // should be valid
             const matrix_size_t c_CheckedIndex{*it.getColumnNr()};
 
             if (it != currentWordIt && !wordAlreadyAddedStatuses[c_CheckedIndex])
@@ -657,8 +675,7 @@ bool DataOrderingEngine::_retrieveNextOrderedWordUsingInversion(const StatusFlag
                 }
             }
         }
-    }
-    while(false);
+    } while (false);
 
     return isInvertedSuccessor;
 }
@@ -671,7 +688,8 @@ HammingDistance DataOrderingEngine::_retrieveDistanceBetweenFirstTwoUnorderedWor
     const matrix_size_t currentSecondWordIndex{1};
     const size_t c_DataSetSize{m_DataSet.size()};
 
-    if (c_DataSetSize > 1 && m_AdjacencyMatrix.getNrOfRows() == c_DataSetSize && m_AdjacencyMatrix.getNrOfColumns() == c_DataSetSize)
+    if (c_DataSetSize > 1 && m_AdjacencyMatrix.getNrOfRows() == c_DataSetSize &&
+        m_AdjacencyMatrix.getNrOfColumns() == c_DataSetSize)
     {
         startingDistance = m_AdjacencyMatrix.at(currentFirstWordIndex, currentSecondWordIndex);
         assert(startingDistance.has_value());

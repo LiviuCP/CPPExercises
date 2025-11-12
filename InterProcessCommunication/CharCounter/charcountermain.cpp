@@ -1,30 +1,27 @@
-#include <map>
 #include <iostream>
+#include <map>
 
 #include "parsingengine.h"
 
 static constexpr size_t c_MinRequiredDataParamsCount{3};
 
-static const std::map<std::string, std::string> c_ParsingOptionsLabels{
-    {"-d", "digits"},
-    {"-l", "lower case"},
-    {"-u", "upper case"},
-    {"-lu", "lower and upper case"},
-    {"-ad", "alphanumeric and digits"}
-};
+static const std::map<std::string, std::string> c_ParsingOptionsLabels{{"-d", "digits"},
+                                                                       {"-l", "lower case"},
+                                                                       {"-u", "upper case"},
+                                                                       {"-lu", "lower and upper case"},
+                                                                       {"-ad", "alphanumeric and digits"}};
 
-static const std::map<std::string, std::string> c_AggregatingOptionsLabels{
-    {"-t", "total occurrences"},
-    {"-m", "minimum occurrences"},
-    {"-a", "average occurrences"},
-    {"-M", "maximum occurrences"}
-};
+static const std::map<std::string, std::string> c_AggregatingOptionsLabels{{"-t", "total occurrences"},
+                                                                           {"-m", "minimum occurrences"},
+                                                                           {"-a", "average occurrences"},
+                                                                           {"-M", "maximum occurrences"}};
 
 bool checkArguments(int argc, char* argv[])
 {
     bool result{false};
 
-    const size_t c_DataParamsCount{static_cast<size_t>(argc - 1)}; // application executable taken out from arguments count
+    const size_t c_DataParamsCount{
+        static_cast<size_t>(argc - 1)}; // application executable taken out from arguments count
 
     if (c_DataParamsCount < c_MinRequiredDataParamsCount)
     {
@@ -49,7 +46,8 @@ bool checkArguments(int argc, char* argv[])
     return result;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     std::vector<Parser*> parsers;
 
     const bool c_AreArgumentsOk{checkArguments(argc, argv)};
@@ -57,7 +55,9 @@ int main(int argc, char* argv[]) {
     if (c_AreArgumentsOk)
     {
         const size_t c_NonFilePathArgumentsCount{3};
-        const size_t c_FilePathsCount{static_cast<size_t>(argc) - c_NonFilePathArgumentsCount}; // take out the application executable path, parsing and aggregation options
+        const size_t c_FilePathsCount{
+            static_cast<size_t>(argc) -
+            c_NonFilePathArgumentsCount}; // take out the application executable path, parsing and aggregation options
 
         FilePathsArray filePaths;
         for (size_t fileIndex{0}; fileIndex < c_FilePathsCount; ++fileIndex)
@@ -77,11 +77,13 @@ int main(int argc, char* argv[]) {
         if (c_TotalParsedDigitsCount > 0)
         {
             std::cout << "Parsed characters: " << c_TotalParsedDigitsCount << "\n";
-            std::cout << "Matching characters (" << c_ParsingOptionsLabels.at(c_ParsingOption) << "): " << c_TotalMatchingDigitsCount << "\n";
+            std::cout << "Matching characters (" << c_ParsingOptionsLabels.at(c_ParsingOption)
+                      << "): " << c_TotalMatchingDigitsCount << "\n";
         }
         else
         {
-            std::cout << "No characters have been parsed!\nPlease check if the provided files exist and the right permissions are in place.\n";
+            std::cout << "No characters have been parsed!\nPlease check if the provided files exist and the right "
+                         "permissions are in place.\n";
         }
 
         if (c_TotalMatchingDigitsCount > 0)

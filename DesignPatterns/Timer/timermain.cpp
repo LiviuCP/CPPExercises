@@ -1,18 +1,19 @@
+#include <cassert>
 #include <iostream>
 #include <thread>
-#include <cassert>
 
 #include "timer.h"
 #include "utils.h"
 
 using namespace std;
 
-class SimpleObserver: public ITimeoutHandler
+class SimpleObserver : public ITimeoutHandler
 {
 public:
     SimpleObserver();
     void setTimer(Timer* timer);
     void onTimeout(const Timer* const timer);
+
 private:
     const Timer* m_Timer1;
 };
@@ -24,6 +25,7 @@ public:
     void setFirstTimer(const Timer* timer);
     void setSecondTimer(const Timer* timer);
     void onTimeout(const Timer* const timer);
+
 private:
     const Timer* m_Timer1;
     const Timer* m_Timer2;
@@ -68,7 +70,8 @@ int main()
     timer4.start(7000);
     timer5.start(9000);
 
-    while (timer1.isRunning() || timer2.isRunning() || timer3.isRunning() || timer4.isRunning());
+    while (timer1.isRunning() || timer2.isRunning() || timer3.isRunning() || timer4.isRunning())
+        ;
 
     cout << "* First four timers timed out" << endl;
     if (timer5.isRunning())
@@ -78,37 +81,46 @@ int main()
     }
 
     this_thread::sleep_for(millisecond_t{500});
-    cout << endl << "* Restarting timer " << timer3.getName() << " and starting timer " << timer4.getName() << " with a different timeout period" << endl;
+    cout << endl
+         << "* Restarting timer " << timer3.getName() << " and starting timer " << timer4.getName()
+         << " with a different timeout period" << endl;
     timer3.restart();
     timer4.start(4500);
-    while (timer3.isRunning() || timer4.isRunning());
+    while (timer3.isRunning() || timer4.isRunning())
+        ;
     cout << "* Both timers timed out" << endl;
 
     this_thread::sleep_for(millisecond_t{500});
     cout << endl << "* Restarting timer " << timer2.getName() << " for immediate timeout" << endl;
     timer2.start();
-    while (timer2.isRunning());
+    while (timer2.isRunning())
+        ;
     cout << "* Timer timed out" << endl;
 
     this_thread::sleep_for(millisecond_t{500});
-    cout << endl << "* Removing simple object from timeout handlers of " << timer1.getName() << " and adding it to timer " << timer3.getName() << endl;
+    cout << endl
+         << "* Removing simple object from timeout handlers of " << timer1.getName() << " and adding it to timer "
+         << timer3.getName() << endl;
     timer1.removeTimeoutHandler(&simpleObserver);
     timer3.addTimeoutHandler(&simpleObserver);
-    cout << "* Adding timer " << timer5.getName() << " as internal timer of simple object and adding object to handlers for this timer" << endl;
+    cout << "* Adding timer " << timer5.getName()
+         << " as internal timer of simple object and adding object to handlers for this timer" << endl;
     timer5.addTimeoutHandler(&simpleObserver);
     simpleObserver.setTimer(&timer5);
-    cout << "* Restarting all 3 timers with same timout intervals as before namely: " << timer1.getTimeoutInterval() << ", " << timer3.getTimeoutInterval() << " and " << timer5.getTimeoutInterval();
+    cout << "* Restarting all 3 timers with same timout intervals as before namely: " << timer1.getTimeoutInterval()
+         << ", " << timer3.getTimeoutInterval() << " and " << timer5.getTimeoutInterval();
     cout << " milliseconds" << endl;
     timer1.restart();
     timer3.restart();
     timer5.restart();
-    while (timer1.isRunning() || timer3.isRunning() || timer5.isRunning());
+    while (timer1.isRunning() || timer3.isRunning() || timer5.isRunning())
+        ;
     cout << "* All timers timed out. No more jobs to assign to them" << endl;
 
     this_thread::sleep_for(millisecond_t{500});
     cout << endl << "* Finally we'll test a cyclical timer" << endl;
     CyclicalObserver cyclicalObserver;
-    (void) cyclicalObserver;
+    (void)cyclicalObserver;
     this_thread::sleep_for(millisecond_t{5500});
     cout << "* Goodbye!" << endl << endl;
 
@@ -128,7 +140,7 @@ void SimpleObserver::setTimer(Timer* timer)
     }
 }
 
-void SimpleObserver::onTimeout(const Timer * const timer)
+void SimpleObserver::onTimeout(const Timer* const timer)
 {
     assert(timer && "Null pointer detected for timer");
 
@@ -164,7 +176,7 @@ void ComplexObserver::setSecondTimer(const Timer* timer)
     }
 }
 
-void ComplexObserver::onTimeout(const Timer * const timer)
+void ComplexObserver::onTimeout(const Timer* const timer)
 {
     assert(timer && "Null pointer detected for timer");
 
@@ -190,7 +202,7 @@ CyclicalObserver::CyclicalObserver()
     m_CyclicalTimer.start(1000);
 }
 
-void CyclicalObserver::onTimeout(const Timer * const timer)
+void CyclicalObserver::onTimeout(const Timer* const timer)
 {
     if (timer == &m_CyclicalTimer)
     {

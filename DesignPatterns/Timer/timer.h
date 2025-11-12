@@ -13,7 +13,7 @@
 #include <vector>
 
 using h_r_clock_t = std::chrono::high_resolution_clock;
-using millisecond_t = std::chrono::duration<double, std::ratio<1, 1000> >;
+using millisecond_t = std::chrono::duration<double, std::ratio<1, 1000>>;
 
 class ITimeoutHandler;
 
@@ -41,7 +41,7 @@ public:
     void removeTimeoutHandler(ITimeoutHandler* handler);
 
 protected:
-    void timeout(); // in case inheriting is required for creating more complex timers
+    void timeout();          // in case inheriting is required for creating more complex timers
     void resetCurrentTime(); // enables resetting current time while timer running
 
     bool m_IsRunning;

@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include "matrixutils.h"
@@ -195,3 +196,4 @@ void MatrixUtilsTests::testRowAndColumnNrToDiagonalIndexMapping_data()
 QTEST_APPLESS_MAIN(MatrixUtilsTests)
 
 #include "tst_matrixutilstests.moc"
+// clang-format on

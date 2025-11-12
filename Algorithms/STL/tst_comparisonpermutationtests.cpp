@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -352,3 +353,4 @@ bool ComparisonPermutationTests::compareStringIntPairsLexicographically(const St
 QTEST_APPLESS_MAIN(ComparisonPermutationTests)
 
 #include "tst_comparisonpermutationtests.moc"
+// clang-format on

@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
-#include "queuereceiver.h"
 #include "queuedataobjects.h"
+#include "queuereceiver.h"
 #include "utils.h"
 
 using namespace std;
@@ -34,7 +34,8 @@ int main()
         cout << "Child process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
 
         childQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
-        cout << "Child process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
+        cout << "Child process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer
+             << endl;
 
         childQueueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
         cout << "Child process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
@@ -50,7 +51,8 @@ int main()
         QueueReceiver parentQueueReceiver{c_QueueFilename, true};
 
         parentQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
-        cout << "Parent process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer << endl;
+        cout << "Parent process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer
+             << endl;
 
         parentQueueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
         cout << "Parent process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;

@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -175,3 +176,4 @@ void SortingTests::testNthElement()
 QTEST_APPLESS_MAIN(SortingTests)
 
 #include "tst_sortingtests.moc"
+// clang-format on

@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "matrix.h"
 #include "datautils.h"
+#include "matrix.h"
 
 using HammingDistance = std::optional<size_t>;
 using OrderingIndex = matrix_size_t;
@@ -48,15 +48,20 @@ private:
     std::optional<OrderingIndex> _initGreedyMinSimplified(bool inversionAllowed, StatusFlags& wordAlreadyAddedStatuses);
     void _retrieveFirstTwoOrderedWords(std::optional<OrderingIndexesPair>& minDistancePair) const;
     bool _retrieveFirstTwoOrderedWordsUsingInversion(std::optional<OrderingIndexesPair>& minDistancePair) const;
-    void _retrieveNextOrderedWord(const StatusFlags& wordAlreadyAddedStatuses, const std::optional<OrderingIndex>& currentWordIndex, std::optional<OrderingIndex>& nextWordIndex) const;
-    bool _retrieveNextOrderedWordUsingInversion(const StatusFlags& wordAlreadyAddedStatuses, const std::optional<OrderingIndex>& currentWordIndex, std::optional<OrderingIndex>& nextWordIndex) const;
+    void _retrieveNextOrderedWord(const StatusFlags& wordAlreadyAddedStatuses,
+                                  const std::optional<OrderingIndex>& currentWordIndex,
+                                  std::optional<OrderingIndex>& nextWordIndex) const;
+    bool _retrieveNextOrderedWordUsingInversion(const StatusFlags& wordAlreadyAddedStatuses,
+                                                const std::optional<OrderingIndex>& currentWordIndex,
+                                                std::optional<OrderingIndex>& nextWordIndex) const;
     HammingDistance _retrieveDistanceBetweenFirstTwoUnorderedWords() const;
     void _updateOrderedDataSet();
 
     DataSet m_DataSet;
     DataSet m_OrderedDataSet;
     AdjacencyMatrix m_AdjacencyMatrix;
-    OrderingIndexes m_OrderingIndexes; // original index of each word (permutation occurs by indexes, original dataset is not modified)
+    OrderingIndexes m_OrderingIndexes; // original index of each word (permutation occurs by indexes, original dataset
+                                       // is not modified)
     InversionFlags m_InversionFlags; // each word has a flag mentioning if inverted or not (flags are also "permutated")
     HammingDistance m_WordSize;
 };

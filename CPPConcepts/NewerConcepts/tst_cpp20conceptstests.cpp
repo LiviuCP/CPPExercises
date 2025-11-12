@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <array>
@@ -813,3 +814,4 @@ void CPP20ConceptsTests::testIndexSequences()
 QTEST_APPLESS_MAIN(CPP20ConceptsTests)
 
 #include "tst_cpp20conceptstests.moc"
+// clang-format on

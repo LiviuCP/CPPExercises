@@ -14,7 +14,8 @@ SizeVector Utilities::toSizeVector(const MatrixSizeVector& matrixSizeVector)
 {
     SizeVector sizeVector;
     sizeVector.reserve(matrixSizeVector.size());
-    std::transform(matrixSizeVector.begin(), matrixSizeVector.end(), std::back_inserter(sizeVector), [](const auto& element){return static_cast<size_t>(element);});
+    std::transform(matrixSizeVector.begin(), matrixSizeVector.end(), std::back_inserter(sizeVector),
+                   [](const auto& element) { return static_cast<size_t>(element); });
 
     return sizeVector;
 }

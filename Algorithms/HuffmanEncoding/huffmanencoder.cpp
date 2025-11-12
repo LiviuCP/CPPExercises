@@ -1,5 +1,5 @@
-#include <sstream>
 #include <cassert>
+#include <sstream>
 
 #include "huffmanencoder.h"
 
@@ -42,11 +42,13 @@ bool HuffmanEncoder::_buildOccurrenceMap(const EncodingInput& encodingInput)
     CharOccurrenceMap huffmanOccurrenceMap;
     const ssize_t c_CharOccurrencePairSize{2};
 
-    if (!encodingInput.isEmpty() && encodingInput.getNrOfRows() >= scMinRequiredCharsCount && c_CharOccurrencePairSize == encodingInput.getNrOfColumns())
+    if (!encodingInput.isEmpty() && encodingInput.getNrOfRows() >= scMinRequiredCharsCount &&
+        c_CharOccurrencePairSize == encodingInput.getNrOfColumns())
     {
         CharSet foundCharacters;
 
-        for (EncodingInput::ConstNIterator it{encodingInput.constNBegin()}; it != encodingInput.constNColumnEnd(0); ++it)
+        for (EncodingInput::ConstNIterator it{encodingInput.constNBegin()}; it != encodingInput.constNColumnEnd(0);
+             ++it)
         {
             bool isValidTuple{false};
             std::string currentSymbol{*it};
@@ -62,7 +64,8 @@ bool HuffmanEncoder::_buildOccurrenceMap(const EncodingInput& encodingInput)
                 {
                     std::stringstream stream;
 
-                    // no need to check validity of getRowNr() / getColumnNr() output, the matrix is not empty and it is a forward iterator
+                    // no need to check validity of getRowNr() / getColumnNr() output, the matrix is not empty and it is
+                    // a forward iterator
                     stream << encodingInput.at(*it.getRowNr(), *it.getColumnNr() + 1);
                     stream >> occurrence;
 
@@ -102,9 +105,11 @@ bool HuffmanEncoder::_buildOccurrenceMap(const EncodingInput& encodingInput)
         - binding nodes
     - each node contains:
         - a character (symbol) for leaf nodes or a character placeholder for binding nodes (used '\0')
-        - a value: parent has the sum of the values of the children; for leaf nodes the value is the occurrence of the character
+        - a value: parent has the sum of the values of the children; for leaf nodes the value is the occurrence of the
+   character
     - left child has a lower value than the right child
-    - the edge from each parent node to its left child is a "0" while the edge to the right child is a "1"; the edge path from the root to each leaf determines the encoding of each character
+    - the edge from each parent node to its left child is a "0" while the edge to the right child is a "1"; the edge
+   path from the root to each leaf determines the encoding of each character
 
    As can be seen the tree is different from a binary search tree (BST).
    Also it is not balanced.
@@ -113,13 +118,15 @@ void HuffmanEncoder::_buildTree()
 {
     size_t c_CharsCount{mOccurrenceMap.size()};
 
-    // There should be at least 2 characters to encode and the tree should be initially empty (reset method to be called before executing this method)
+    // There should be at least 2 characters to encode and the tree should be initially empty (reset method to be called
+    // before executing this method)
     if (c_CharsCount >= scMinRequiredCharsCount)
     {
         // ensure the tree has been previously reset to ensure a valid result
-        assert (nullptr == mpRoot && 0u == mTreeContainer.size());
+        assert(nullptr == mpRoot && 0u == mTreeContainer.size());
 
-        // resulting nodes count after connecting first 2 leaf nodes to a non-leaf (binding) node and then each other leaf to the previously obtained binding node
+        // resulting nodes count after connecting first 2 leaf nodes to a non-leaf (binding) node and then each other
+        // leaf to the previously obtained binding node
         const size_t c_RequiredNodesCount{2 * c_CharsCount - 1};
 
         mTreeContainer.resize(c_RequiredNodesCount);
@@ -138,7 +145,8 @@ void HuffmanEncoder::_buildTree()
             ++occurrenceMapIt;
         }
 
-        // connect all other nodes in increasing occurrence order and move the root upwards (in order to obtain a smaller code size for higher character occurrence)
+        // connect all other nodes in increasing occurrence order and move the root upwards (in order to obtain a
+        // smaller code size for higher character occurrence)
         while (occurrenceMapIt != mOccurrenceMap.cend() && treeContainerIt != mTreeContainer.end())
         {
             Node* const pNewNode{&(*treeContainerIt)};
@@ -213,11 +221,11 @@ void HuffmanEncoder::_retrieveEncodingFromTree()
     }
 }
 
-/* The efficiency might be negative when the characters are uniformly distributed regarding occurrence (extreme case: they have perfectly equal occurrence).
-   The least uniform the chars are distributed the higher is the efficiency.
-   The efficiency is measured by how much the number of used bits decreases (or increases: negative) when using Huffman algorithm
-   comparing to using a fixed-size encoding.
-   Minimum number of bits required (for the given number of symbols) is taken into account for fixed-size encoding (e.g. 3 for 6 symbols: 'a', 'b', 'p', 'p', 'u', 'z').
+/* The efficiency might be negative when the characters are uniformly distributed regarding occurrence (extreme case:
+   they have perfectly equal occurrence). The least uniform the chars are distributed the higher is the efficiency. The
+   efficiency is measured by how much the number of used bits decreases (or increases: negative) when using Huffman
+   algorithm comparing to using a fixed-size encoding. Minimum number of bits required (for the given number of symbols)
+   is taken into account for fixed-size encoding (e.g. 3 for 6 symbols: 'a', 'b', 'p', 'p', 'u', 'z').
 */
 void HuffmanEncoder::_computeEncodingEfficiency()
 {
@@ -233,8 +241,7 @@ void HuffmanEncoder::_computeEncodingEfficiency()
         {
             quotient /= 2;
             ++requiredBitsPerSymbolCount;
-        }
-        while (quotient > 0u);
+        } while (quotient > 0u);
 
         ssize_t totalBitsCountPrefixCoding{0u};
         ssize_t totalOccurrencesCount{0u};
@@ -243,12 +250,14 @@ void HuffmanEncoder::_computeEncodingEfficiency()
         {
             const ssize_t c_CurrentCharacterOccurrencesCount{it->first};
             const char c_CurrentCharacter{it->second};
-            totalBitsCountPrefixCoding += c_CurrentCharacterOccurrencesCount * static_cast<ssize_t>(mEncodingResult[c_CurrentCharacter].size());
+            totalBitsCountPrefixCoding +=
+                c_CurrentCharacterOccurrencesCount * static_cast<ssize_t>(mEncodingResult[c_CurrentCharacter].size());
             totalOccurrencesCount += c_CurrentCharacterOccurrencesCount;
         }
 
         const ssize_t c_TotalBitsCountFixedLength{totalOccurrencesCount * requiredBitsPerSymbolCount};
-        mEncodingEfficiency = static_cast<double>(c_TotalBitsCountFixedLength - totalBitsCountPrefixCoding) / c_TotalBitsCountFixedLength;
+        mEncodingEfficiency =
+            static_cast<double>(c_TotalBitsCountFixedLength - totalBitsCountPrefixCoding) / c_TotalBitsCountFixedLength;
     }
 }
 

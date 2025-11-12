@@ -11,20 +11,21 @@
    - the output file contains the chosen mapping of colours to countries
 */
 
-#include <fstream>
 #include <algorithm>
+#include <fstream>
 
-#include "matrix.h"
-#include "utils.h"
-#include "matrixutils.h"
 #include "mapcolouringutils.h"
+#include "matrix.h"
+#include "matrixutils.h"
+#include "utils.h"
 
 using namespace std;
 
 static const string c_InFile{Utilities::c_InputOutputDir + "countriesinput.txt"};
 static const string c_OutFile{Utilities::c_InputOutputDir + "countriesoutput.txt"};
 
-void printCountryColoursToFile(ofstream& output, const Matrix<matrix_size_t>& countryColours, const Matrix<bool>& uniqueColours);
+void printCountryColoursToFile(ofstream& output, const Matrix<matrix_size_t>& countryColours,
+                               const Matrix<bool>& uniqueColours);
 
 int main()
 {
@@ -33,7 +34,7 @@ int main()
 
     Utilities::clearScreen();
 
-    if(in.is_open() && out.is_open())
+    if (in.is_open() && out.is_open())
     {
         Matrix<bool> neighbourhoodMatrix;
         in >> neighbourhoodMatrix;
@@ -45,34 +46,41 @@ int main()
             // matrix with dimensions 1 x c_NrOfCountries used for storing the colour assigned for each country
             Matrix<matrix_size_t> countryColours;
 
-            // matrix with dimensions c_NrOfCountries x 1 where each row index of the matrix represents an allocated colour; a single colour (0) is initially stored (initially not allocated)
+            // matrix with dimensions c_NrOfCountries x 1 where each row index of the matrix represents an allocated
+            // colour; a single colour (0) is initially stored (initially not allocated)
             Matrix<bool> uniqueColours{{1, 1}, false};
 
-            // no extra capacity to be allocated for this matrix (the number of countries is known after reading the file)
+            // no extra capacity to be allocated for this matrix (the number of countries is known after reading the
+            // file)
             countryColours.reserve(c_NrOfCountries, 1);
             countryColours.resize(c_NrOfCountries, 1);
 
-            for (Matrix<bool>::ConstZIterator countryIt{neighbourhoodMatrix.constZBegin()}; countryIt != neighbourhoodMatrix.constZRowEnd(0); ++countryIt)
+            for (Matrix<bool>::ConstZIterator countryIt{neighbourhoodMatrix.constZBegin()};
+                 countryIt != neighbourhoodMatrix.constZRowEnd(0); ++countryIt)
             {
                 const auto c_CurrentUncolouredCountry{*countryIt.getColumnNr()};
-                Matrix<matrix_size_t>::ConstNIterator currentUncolouredCountryIt{countryColours.getConstNIterator(c_CurrentUncolouredCountry)};
+                Matrix<matrix_size_t>::ConstNIterator currentUncolouredCountryIt{
+                    countryColours.getConstNIterator(c_CurrentUncolouredCountry)};
 
                 std::fill(uniqueColours.begin(), uniqueColours.end(), false);
 
                 // mark colours that are in use by neighbors that were coloured in previous iterations
-                for (Matrix<matrix_size_t>::ConstNIterator colouredCountryIt{countryColours.constNBegin()}; colouredCountryIt != currentUncolouredCountryIt; ++colouredCountryIt)
+                for (Matrix<matrix_size_t>::ConstNIterator colouredCountryIt{countryColours.constNBegin()};
+                     colouredCountryIt != currentUncolouredCountryIt; ++colouredCountryIt)
                 {
                     const auto c_CurrentColouredCountry{*colouredCountryIt.getRowNr()};
 
                     if (true == neighbourhoodMatrix.at(c_CurrentColouredCountry, c_CurrentUncolouredCountry))
                     {
-                        uniqueColours[*colouredCountryIt] = true; // mark the colour used by neighbor as already allocated to a country
+                        uniqueColours[*colouredCountryIt] =
+                            true; // mark the colour used by neighbor as already allocated to a country
                     }
                 }
 
                 auto designatedColour{MapColouringUtils::getFirstAvailableColour(uniqueColours)};
 
-                // choose colour with lowest index that is not in use by a neighbor (if available), otherwise create a new colour and append it to the available colours list
+                // choose colour with lowest index that is not in use by a neighbor (if available), otherwise create a
+                // new colour and append it to the available colours list
                 if (designatedColour.has_value())
                 {
                     uniqueColours[*designatedColour] = true;
@@ -104,11 +112,13 @@ int main()
     return 0;
 }
 
-void printCountryColoursToFile(ofstream& output, const Matrix<matrix_size_t>& countryColours, const Matrix<bool>& uniqueColours)
+void printCountryColoursToFile(ofstream& output, const Matrix<matrix_size_t>& countryColours,
+                               const Matrix<bool>& uniqueColours)
 {
     assert(uniqueColours.getNrOfRows() == 1);
 
-    output << countryColours.getNrOfRows() << " countries, " << uniqueColours.getNrOfColumns() << " colours" << endl << endl;
+    output << countryColours.getNrOfRows() << " countries, " << uniqueColours.getNrOfColumns() << " colours" << endl
+           << endl;
     output << "Colour mapping ordered by country index:" << endl << endl;
 
     for (Matrix<matrix_size_t>::ConstNIterator it{countryColours.constNBegin()}; it != countryColours.constNEnd(); ++it)

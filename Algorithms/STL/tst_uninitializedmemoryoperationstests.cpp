@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <memory>
@@ -742,3 +743,4 @@ void UninitializedMemoryOperationsTests::testConstructAt()
 QTEST_APPLESS_MAIN(UninitializedMemoryOperationsTests)
 
 #include "tst_uninitializedmemoryoperationstests.moc"
+// clang-format on

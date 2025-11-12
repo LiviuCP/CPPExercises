@@ -2,7 +2,6 @@
 
 #include "queuedataobjects.h"
 
-
 MeteoData::MeteoData()
     : temperature{0}
     , atmosphericPressure{1.0}
@@ -51,7 +50,7 @@ float MeteoData::getHumidity() const
     return humidity;
 }
 
-std::ostream& operator<<(std::ostream& out, const MeteoData &data)
+std::ostream& operator<<(std::ostream& out, const MeteoData& data)
 {
     out << "(T: " << data.temperature << "C, P: " << data.atmosphericPressure << "B, H: " << data.humidity << "%)";
     return out;

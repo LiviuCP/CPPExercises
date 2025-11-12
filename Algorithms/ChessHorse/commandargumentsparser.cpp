@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <cctype>
 #include <cassert>
+#include <cctype>
 
 #include "commandargumentsparser.h"
 #include "matrixutils.h"
@@ -21,7 +21,8 @@ static matrix_opt_size_t convertArgumentToInt(const std::string& argument)
     std::string inputCopy{argument};
     Utilities::trimWhiteSpace(inputCopy);
 
-    if (!inputCopy.empty() && std::all_of(inputCopy.cbegin(), inputCopy.cend(), [](char ch){return std::isdigit(ch);}))
+    if (!inputCopy.empty() &&
+        std::all_of(inputCopy.cbegin(), inputCopy.cend(), [](char ch) { return std::isdigit(ch); }))
     {
         result = static_cast<matrix_size_t>(std::stoi(inputCopy));
     }
@@ -31,10 +32,8 @@ static matrix_opt_size_t convertArgumentToInt(const std::string& argument)
 
 static Result convertArgumentsToApplicationInput(const ApplicationArguments& applicationArguments)
 {
-    assert(!applicationArguments.m_TableLengthStr.empty() &&
-           !applicationArguments.m_TableWidthStr.empty() &&
-           !applicationArguments.m_StartPositionXStr.empty() &&
-           !applicationArguments.m_StartPositionYStr.empty());
+    assert(!applicationArguments.m_TableLengthStr.empty() && !applicationArguments.m_TableWidthStr.empty() &&
+           !applicationArguments.m_StartPositionXStr.empty() && !applicationArguments.m_StartPositionYStr.empty());
 
     const matrix_opt_size_t c_TableLength{convertArgumentToInt(applicationArguments.m_TableLengthStr)};
     const matrix_opt_size_t c_TableWidth{convertArgumentToInt(applicationArguments.m_TableWidthStr)};
@@ -43,7 +42,8 @@ static Result convertArgumentsToApplicationInput(const ApplicationArguments& app
 
     std::optional<ApplicationInput> applicationInput;
 
-    if (c_TableLength.has_value() && c_TableWidth.has_value() && c_StartPositionX.has_value() && c_StartPositionY.has_value())
+    if (c_TableLength.has_value() && c_TableWidth.has_value() && c_StartPositionX.has_value() &&
+        c_StartPositionY.has_value())
     {
         applicationInput = {*c_TableLength, *c_TableWidth, *c_StartPositionX, *c_StartPositionY};
     }
@@ -72,8 +72,7 @@ static Result convertArgumentsToApplicationInput(const ApplicationArguments& app
             resultType = ResultType::INVALID_START_POSITION;
             break;
         }
-    }
-    while(false);
+    } while (false);
 
     return {resultType, applicationInput};
 }

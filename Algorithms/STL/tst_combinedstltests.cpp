@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -677,3 +678,4 @@ void CombinedSTLTests::testGatherAlgorithmMatrix_data()
 QTEST_APPLESS_MAIN(CombinedSTLTests)
 
 #include "tst_combinedstltests.moc"
+// clang-format on

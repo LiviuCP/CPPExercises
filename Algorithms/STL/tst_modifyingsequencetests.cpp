@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -828,3 +829,4 @@ void ModifyingSequenceTests::testUniqueCopy()
 QTEST_APPLESS_MAIN(ModifyingSequenceTests)
 
 #include "tst_modifyingsequencetests.moc"
+// clang-format on

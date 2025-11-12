@@ -1,11 +1,11 @@
-#include "concreteaggregators.h"
 #include "aggregatorfactory.h"
+#include "concreteaggregators.h"
 
 IAggregator* AggregatorFactory::createAggregator(AggregatorType aggregatorType)
 {
     IAggregator* pIAggregator{nullptr};
 
-    switch(aggregatorType)
+    switch (aggregatorType)
     {
     case AggregatorType::TOTAL_COUNT:
         pIAggregator = new Aggregator;

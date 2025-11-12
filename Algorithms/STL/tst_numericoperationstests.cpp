@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <numeric>
@@ -422,3 +423,4 @@ void NumericOperationsTests::testTransformInclusiveScan()
 QTEST_APPLESS_MAIN(NumericOperationsTests)
 
 #include "tst_numericoperationstests.moc"
+// clang-format on

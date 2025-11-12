@@ -1,8 +1,8 @@
-#include <iostream>
-#include <fstream>
-#include <cctype>
 #include <algorithm>
 #include <cassert>
+#include <cctype>
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <regex>
 
@@ -33,7 +33,8 @@ void CSVParser::parse()
     }
     catch (std::ios_base::failure&)
     {
-        std::cerr << "An error occurred when handling input CSV file: " << std::filesystem::canonical(m_CSVFilePath).string() << "\n";
+        std::cerr << "An error occurred when handling input CSV file: "
+                  << std::filesystem::canonical(m_CSVFilePath).string() << "\n";
         success = false;
     }
 
@@ -100,43 +101,56 @@ CSVParser::ErrorCode CSVParser::_parseRow(const std::string& row)
 
     do
     {
-        if (ErrorCode::SUCCESS != result) break;
+        if (ErrorCode::SUCCESS != result)
+            break;
 
         currentPosition = _readStringField(row, hostName, 0);
-        result = !currentPosition.has_value() ? ErrorCode::LESS_INFO : !_hasQuotes(hostName) ? ErrorCode::INVALID_HOSTNAME : ErrorCode::SUCCESS;
+        result = !currentPosition.has_value() ? ErrorCode::LESS_INFO
+                 : !_hasQuotes(hostName)      ? ErrorCode::INVALID_HOSTNAME
+                                              : ErrorCode::SUCCESS;
 
-        if (ErrorCode::SUCCESS != result) break;
+        if (ErrorCode::SUCCESS != result)
+            break;
 
         currentPosition = _readStringField(row, macAddress, currentPosition);
-        result = !currentPosition.has_value() ? ErrorCode::LESS_INFO : !_hasQuotes(macAddress) ? ErrorCode::INVALID_MAC : ErrorCode::SUCCESS;
+        result = !currentPosition.has_value() ? ErrorCode::LESS_INFO
+                 : !_hasQuotes(macAddress)    ? ErrorCode::INVALID_MAC
+                                              : ErrorCode::SUCCESS;
 
-        if (ErrorCode::SUCCESS != result) break;
+        if (ErrorCode::SUCCESS != result)
+            break;
 
         currentPosition = _readStringField(row, ipAddress, currentPosition);
-        result = currentPosition.has_value() ? ErrorCode::ADDITIONAL_INFO : !_hasQuotes(ipAddress) ? ErrorCode::INVALID_IP : ErrorCode::SUCCESS;
+        result = currentPosition.has_value() ? ErrorCode::ADDITIONAL_INFO
+                 : !_hasQuotes(ipAddress)    ? ErrorCode::INVALID_IP
+                                             : ErrorCode::SUCCESS;
 
-        if (ErrorCode::SUCCESS != result) break;
+        if (ErrorCode::SUCCESS != result)
+            break;
 
         _trimQuotesAndWhiteSpaceFromString(hostName);
         result = !_isValidHostName(hostName) ? ErrorCode::INVALID_HOSTNAME : ErrorCode::SUCCESS;
 
-        if (ErrorCode::SUCCESS != result) break;
+        if (ErrorCode::SUCCESS != result)
+            break;
 
         _trimQuotesAndWhiteSpaceFromString(macAddress);
         result = !_isValidMacAddress(macAddress) ? ErrorCode::INVALID_MAC : ErrorCode::SUCCESS;
 
-        if (ErrorCode::SUCCESS != result) break;
+        if (ErrorCode::SUCCESS != result)
+            break;
 
         _trimQuotesAndWhiteSpaceFromString(ipAddress);
         ipClass = _retrieveIpClass(ipAddress);
         result = ipClass.empty() ? ErrorCode::INVALID_IP : ErrorCode::SUCCESS;
-    }
-    while (false);
+    } while (false);
 
     if (ErrorCode::SUCCESS == result)
     {
-        std::transform(hostName.cbegin(), hostName.cend(), hostName.begin(), [](unsigned char c){return std::tolower(c);});
-        std::transform(macAddress.cbegin(), macAddress.cend(), macAddress.begin(), [](unsigned char c){return std::toupper(c);});
+        std::transform(hostName.cbegin(), hostName.cend(), hostName.begin(),
+                       [](unsigned char c) { return std::tolower(c); });
+        std::transform(macAddress.cbegin(), macAddress.cend(), macAddress.begin(),
+                       [](unsigned char c) { return std::toupper(c); });
 
         hostName = c_Quotes + hostName + c_Quotes;
         macAddress = c_Quotes + macAddress + c_Quotes;
@@ -174,16 +188,16 @@ void CSVParser::_logParsingErrorsToFile()
 
     if (!m_ParsingErrors.empty())
     {
-        const std::map<ErrorCode, std::string> c_ErrorsMap {
+        const std::map<ErrorCode, std::string> c_ErrorsMap{
             {ErrorCode::EMPTY_ROW, "The row is empty!"},
             {ErrorCode::INVALID_IP, "The IP address is invalid!"},
             {ErrorCode::INVALID_MAC, "The Mac address is invalid!"},
             {ErrorCode::INVALID_HOSTNAME, "The hostname is invalid!"},
             {ErrorCode::ADDITIONAL_INFO, "More CSV columns than required have been provided!"},
             {ErrorCode::LESS_INFO, "Less CSV columns than required have been provided!"},
-            {ErrorCode::PARSING_LIMIT_EXCEEEDED, "The maximum allowed number of rows to parse has been exceeded! Extra rows have been ignored."},
-            {ErrorCode::SUCCESS, ""}
-        };
+            {ErrorCode::PARSING_LIMIT_EXCEEEDED,
+             "The maximum allowed number of rows to parse has been exceeded! Extra rows have been ignored."},
+            {ErrorCode::SUCCESS, ""}};
 
         std::filesystem::path errorsFilePath{m_CSVFilePath.parent_path()};
         errorsFilePath /= m_CSVFilePath.stem();
@@ -198,7 +212,7 @@ void CSVParser::_logParsingErrorsToFile()
 
             if (success)
             {
-                for (const auto&[errCode, rowNumber] : m_ParsingErrors)
+                for (const auto& [errCode, rowNumber] : m_ParsingErrors)
                 {
                     errStream << "Row number: " << rowNumber << " " << c_ErrorsMap.at(errCode) << "\n";
                 }
@@ -211,21 +225,23 @@ void CSVParser::_logParsingErrorsToFile()
 
         if (!success)
         {
-            std::cerr << "An error occurred when writing to error file: " << std::filesystem::canonical(errorsFilePath).string() << "\n";
+            std::cerr << "An error occurred when writing to error file: "
+                      << std::filesystem::canonical(errorsFilePath).string() << "\n";
         }
     }
 }
 
-CSVParser::Index_t CSVParser::_readStringField(const std::string& source, std::string& destination, Index_t index, char separator)
+CSVParser::Index_t CSVParser::_readStringField(const std::string& source, std::string& destination, Index_t index,
+                                               char separator)
 {
     Index_t nextIndex;
 
-    if(const size_t c_Length{source.size()};
-        c_Length > 0u && index.has_value() && index < c_Length)
+    if (const size_t c_Length{source.size()}; c_Length > 0u && index.has_value() && index < c_Length)
     {
         size_t currentIndex{index.value()};
 
-        // the field separator should not be taken into account unless it's the first character in the string (resulting in an empty starting field)
+        // the field separator should not be taken into account unless it's the first character in the string (resulting
+        // in an empty starting field)
         if (0 != currentIndex && separator == source[currentIndex])
         {
             ++currentIndex;
@@ -250,11 +266,12 @@ void CSVParser::_trimQuotesAndWhiteSpaceFromString(std::string& str)
     if (!str.empty())
     {
         // left trim
-        auto isNotSpaceOrQuote{[](unsigned char c){return !std::isspace(c) && '\"' != c;}};
+        auto isNotSpaceOrQuote{[](unsigned char c) { return !std::isspace(c) && '\"' != c; }};
         auto leftTrimIt{std::find_if(str.begin(), str.end(), isNotSpaceOrQuote)};
         str.erase(str.begin(), leftTrimIt);
 
-        // right trim is a bit trickier as apparently string erase doesn't work well with reverse iterators (so last character should be checked before applying reverse so costs are minimized)
+        // right trim is a bit trickier as apparently string erase doesn't work well with reverse iterators (so last
+        // character should be checked before applying reverse so costs are minimized)
         if (!str.empty() && !isNotSpaceOrQuote(str[str.length() - 1]))
         {
             std::reverse(str.begin(), str.end());
@@ -275,8 +292,7 @@ bool CSVParser::_isValidMacAddress(const std::string& macAddress)
     std::regex nullAddressRe{"0{12}"};
     std::regex macAddressRe{"[\\da-fA-F]{12}"};
 
-    return !std::regex_match(macAddress, nullAddressRe) &&
-           std::regex_match(macAddress, macAddressRe);
+    return !std::regex_match(macAddress, nullAddressRe) && std::regex_match(macAddress, macAddressRe);
 }
 
 bool CSVParser::_isValidHostName(const std::string& hostName)
@@ -330,7 +346,8 @@ bool CSVParser::_isValidClassAIpAddress(const std::string& ipAddress)
 bool CSVParser::_isValidClassBIpAddress(const std::string& ipAddress)
 {
     // network (e.g. 190.2.0.0) and broadcast (e.g. 191.4.255.255) addresses to be excluded
-    std::regex classBNetworkOrBroadcastAddressRe{"(12[8-9]|1[3-8]\\d|19[0-1])(\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]\\d|\\d))((\\.255){2}|(\\.0){2})"};
+    std::regex classBNetworkOrBroadcastAddressRe{
+        "(12[8-9]|1[3-8]\\d|19[0-1])(\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]\\d|\\d))((\\.255){2}|(\\.0){2})"};
     std::regex ipAddressClassBRe{"(12[8-9]|1[3-8]\\d|19[0-1])(\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]\\d|\\d)){3}"};
 
     return !std::regex_match(ipAddress, classBNetworkOrBroadcastAddressRe) &&
@@ -339,8 +356,10 @@ bool CSVParser::_isValidClassBIpAddress(const std::string& ipAddress)
 
 bool CSVParser::_isValidClassCIpAddress(const std::string& ipAddress)
 {
-    // unlike class A/B (see above) the ip class regex for C excludes the network (e.g. 192.168.5.0) and broadcast (e.g. 194.178.2.255) addresses
-    std::regex ipAddressClassCRe{"(19[2-9]|2[0-1]\\d|22[0-3])(\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]\\d|\\d)){2}(\\.(25[0-4]|2[0-4]\\d|1\\d{2}|[1-9]\\d|[1-9]))"};
+    // unlike class A/B (see above) the ip class regex for C excludes the network (e.g. 192.168.5.0) and broadcast (e.g.
+    // 194.178.2.255) addresses
+    std::regex ipAddressClassCRe{"(19[2-9]|2[0-1]\\d|22[0-3])(\\.(25[0-5]|2[0-4]\\d|1\\d{2}|[1-9]\\d|\\d)){2}(\\.(25[0-"
+                                 "4]|2[0-4]\\d|1\\d{2}|[1-9]\\d|[1-9]))"};
     return std::regex_match(ipAddress, ipAddressClassCRe);
 }
 

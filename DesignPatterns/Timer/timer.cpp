@@ -1,5 +1,5 @@
-#include <thread>
 #include <algorithm>
+#include <thread>
 
 #include "timer.h"
 
@@ -90,7 +90,8 @@ bool Timer::isRunning() const
 
 void Timer::addTimeoutHandler(ITimeoutHandler* handler)
 {
-    if (handler && (std::find(m_TimeoutHandlers.cbegin(), m_TimeoutHandlers.cend(), handler) == m_TimeoutHandlers.end()))
+    if (handler &&
+        (std::find(m_TimeoutHandlers.cbegin(), m_TimeoutHandlers.cend(), handler) == m_TimeoutHandlers.end()))
     {
         m_TimeoutHandlers.push_back(handler);
     }
@@ -98,9 +99,11 @@ void Timer::addTimeoutHandler(ITimeoutHandler* handler)
 
 void Timer::removeTimeoutHandler(ITimeoutHandler* handler)
 {
-    if (handler && (std::find(m_TimeoutHandlers.cbegin(), m_TimeoutHandlers.cend(), handler) != m_TimeoutHandlers.end()))
+    if (handler &&
+        (std::find(m_TimeoutHandlers.cbegin(), m_TimeoutHandlers.cend(), handler) != m_TimeoutHandlers.end()))
     {
-        m_TimeoutHandlers.erase(std::remove(m_TimeoutHandlers.begin(), m_TimeoutHandlers.end(), handler)); // erase-remove idiom
+        m_TimeoutHandlers.erase(
+            std::remove(m_TimeoutHandlers.begin(), m_TimeoutHandlers.end(), handler)); // erase-remove idiom
     }
 }
 
@@ -137,7 +140,7 @@ void Timer::_doStart()
 
 void Timer::_sampleForTimeout()
 {
-    while(m_IsRunning)
+    while (m_IsRunning)
     {
         if (getElapsedTime() < m_TimeoutInterval.count())
         {
@@ -197,7 +200,7 @@ void CyclicalTimer::_doStart()
 void CyclicalTimer::_run()
 {
     bool isTimedOut{false};
-    while(m_IsRunning)
+    while (m_IsRunning)
     {
         if (isTimedOut)
         {

@@ -32,11 +32,12 @@ void ChessTable::traverse(matrix_size_t startPositionX, matrix_size_t startPosit
         m_Table.at(c_StartingXPos, c_StartingYPos) = moveNumber;
 
         Point currentPos{static_cast<matrix_diff_t>(c_StartingXPos), static_cast<matrix_diff_t>(c_StartingYPos)};
-        Point successor{currentPos}; // stores the best successor (initially initialized with the current position so it is not left uninitialized - could be any other initial value)
+        Point successor{currentPos}; // stores the best successor (initially initialized with the current position so it
+                                     // is not left uninitialized - could be any other initial value)
         bool hasSuccessor{_getBestSuccessor(currentPos, successor)};
 
         // traverse the table and update each found best successor position
-        while(hasSuccessor)
+        while (hasSuccessor)
         {
             currentPos = successor;
             ++moveNumber;
@@ -69,7 +70,8 @@ void ChessTable::_resetTable()
     std::fill(m_Table.begin(), m_Table.end(), 0);
 }
 
-// best successor is the one with minimum number of successors (successor = eligible next move position meaning it is both existing within table and not traversed in a previous move)
+// best successor is the one with minimum number of successors (successor = eligible next move position meaning it is
+// both existing within table and not traversed in a previous move)
 bool ChessTable::_getBestSuccessor(const ChessTable::Point& currentPosition, ChessTable::Point& bestSuccessor) const
 {
     bool hasSuccessors{false};
@@ -79,7 +81,9 @@ bool ChessTable::_getBestSuccessor(const ChessTable::Point& currentPosition, Che
     if (successors.size() > 0)
     {
         hasSuccessors = true;
-        matrix_size_t minNrOfSuccessors{8}; // assume each successor has maximum number of successors (8 possible) and update each time a possible next moving position with less successors is identified
+        matrix_size_t minNrOfSuccessors{
+            8}; // assume each successor has maximum number of successors (8 possible) and update each time a possible
+                // next moving position with less successors is identified
 
         for (const auto& successor : successors)
         {
@@ -134,6 +138,7 @@ bool ChessTable::_isValidTablePosition(matrix_diff_t x, matrix_diff_t y) const
 }
 
 ChessTable::Point::Point(matrix_diff_t x, matrix_diff_t y)
-    : m_X{x}, m_Y{y}
+    : m_X{x}
+    , m_Y{y}
 {
 }

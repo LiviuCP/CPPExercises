@@ -1,7 +1,7 @@
-#include <cstdint>
-#include <iostream>
-#include <cstring>
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <iostream>
 
 #include "utils.h"
 
@@ -9,8 +9,7 @@ using namespace std;
 
 static constexpr size_t c_MaskSize{32};
 
-union Primitives
-{
+union Primitives {
     bool boolean;
     int integer;
     short shortInt;
@@ -22,8 +21,7 @@ union Primitives
     char mask[c_MaskSize];
 };
 
-union Endian
-{
+union Endian {
     uint16_t number;
     byte bytes[2];
 };

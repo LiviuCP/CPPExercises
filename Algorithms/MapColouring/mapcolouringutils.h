@@ -4,6 +4,6 @@
 
 namespace MapColouringUtils
 {
-    bool isValidNeighbourhoodMatrix(Matrix<bool> neighbours);
-    std::optional<matrix_size_t> getFirstAvailableColour(const Matrix<bool>& availableColours);
-}
+bool isValidNeighbourhoodMatrix(Matrix<bool> neighbours);
+std::optional<matrix_size_t> getFirstAvailableColour(const Matrix<bool>& availableColours);
+} // namespace MapColouringUtils

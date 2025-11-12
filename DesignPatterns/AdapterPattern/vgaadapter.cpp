@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "vgadisplay.h"
 #include "vgaadapter.h"
+#include "vgadisplay.h"
 
 VGAAdapter::VGAAdapter(VGADisplay* display)
     : HDMIDisplay()

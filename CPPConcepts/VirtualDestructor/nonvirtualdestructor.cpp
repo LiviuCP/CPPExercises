@@ -22,4 +22,3 @@ DerivedNonVirtual::~DerivedNonVirtual()
 {
     std::cout << "Destroying object DerivedNonVirtual" << std::endl;
 }
-

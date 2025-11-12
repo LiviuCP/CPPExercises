@@ -49,7 +49,8 @@ int main(int argc, char** argv)
 void useResource(const string& threadName, int milliseconds, Semaphore& semaphore)
 {
     semaphore.aquire(threadName);
-    cout << "I am a resource, I am being used by thread " << threadName << " for " << milliseconds << " milliseconds" << endl;
+    cout << "I am a resource, I am being used by thread " << threadName << " for " << milliseconds << " milliseconds"
+         << endl;
     std::this_thread::sleep_for(std::chrono::milliseconds{milliseconds});
     semaphore.release(threadName);
 }

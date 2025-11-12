@@ -1,16 +1,16 @@
+#include <cassert>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-#include <cassert>
 
 #include "queuedatamessages.h"
 
 #include "queuesender.h"
 
-#define WRITE_MESSAGE(messageType, objectType)                                                                                              \
-{                                                                                                                                           \
-    messageType message{static_cast<long>(dataType), *(reinterpret_cast<objectType*>(data))};                                               \
-    msgsnd(m_QueueId, &message, sizeof(message), IPC_NOWAIT);                                                                               \
-}
+#define WRITE_MESSAGE(messageType, objectType)                                                                         \
+    {                                                                                                                  \
+        messageType message{static_cast<long>(dataType), *(reinterpret_cast<objectType*>(data))};                      \
+        msgsnd(m_QueueId, &message, sizeof(message), IPC_NOWAIT);                                                      \
+    }
 
 constexpr int c_BaseId{543};
 

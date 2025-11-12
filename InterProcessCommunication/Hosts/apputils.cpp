@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <cctype>
 #include <cassert>
+#include <cctype>
 #include <regex>
 
 #include "apputils.h"
@@ -8,7 +8,8 @@
 static const char* c_ErrorFileSuffix{"_error.txt"};
 static const char* c_OutputCSVFileName{"output.csv"};
 
-static std::vector<std::filesystem::path> retrieveFilePathsBySuffix(const std::filesystem::directory_entry& dir, const std::string& suffix)
+static std::vector<std::filesystem::path> retrieveFilePathsBySuffix(const std::filesystem::directory_entry& dir,
+                                                                    const std::string& suffix)
 {
     assert(dir.is_directory() && !suffix.empty());
     std::vector<std::filesystem::path> result;
@@ -18,7 +19,8 @@ static std::vector<std::filesystem::path> retrieveFilePathsBySuffix(const std::f
         if (entry.is_regular_file())
         {
             std::string filePathStr{entry.path().string()};
-            std::transform(filePathStr.cbegin(), filePathStr.cend(), filePathStr.begin(), [](unsigned char c){return std::tolower(c);});
+            std::transform(filePathStr.cbegin(), filePathStr.cend(), filePathStr.begin(),
+                           [](unsigned char c) { return std::tolower(c); });
 
             if (filePathStr.ends_with(suffix))
             {
@@ -45,7 +47,7 @@ std::filesystem::path Utils::computeOutputFilePath(const std::filesystem::direct
     return outFilePath;
 }
 
-std::vector<std::filesystem::path> Utils::retrieveErrorFilePaths(const std::filesystem::directory_entry &inputDir)
+std::vector<std::filesystem::path> Utils::retrieveErrorFilePaths(const std::filesystem::directory_entry& inputDir)
 {
     const std::vector<std::filesystem::path> c_ErrorFilePaths{retrieveFilePathsBySuffix(inputDir, c_ErrorFileSuffix)};
     return c_ErrorFilePaths;

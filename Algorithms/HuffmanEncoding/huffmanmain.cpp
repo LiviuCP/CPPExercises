@@ -1,10 +1,10 @@
-#include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 
 #include "huffmanencoder.h"
-#include "utils.h"
 #include "matrixutils.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ int main()
 
     Utilities::clearScreen();
 
-    if(in.is_open() && out.is_open())
+    if (in.is_open() && out.is_open())
     {
         EncodingInput encodingInput;
         in >> encodingInput;
@@ -33,7 +33,8 @@ int main()
             const EncodingOutput c_EncodingOutput{encoder.getEncodingResult()};
             const size_t c_EncodedCharsCount{c_EncodingOutput.size()};
 
-            // the efficiency is provided as a double number (typically between -1 and 1) by the encoder and should be converted to percentage
+            // the efficiency is provided as a double number (typically between -1 and 1) by the encoder and should be
+            // converted to percentage
             const double c_EncodingEfficiencyPercentage{100.0 * encoder.getEncodingEfficiency()};
 
             writeToFile(out, c_EncodingOutput, c_EncodingEfficiencyPercentage);
@@ -42,7 +43,12 @@ int main()
         }
         else
         {
-            cerr << "Invalid input provided" << endl << endl << "Please check input file: " << endl << endl << c_InFile << endl << endl;
+            cerr << "Invalid input provided" << endl
+                 << endl
+                 << "Please check input file: " << endl
+                 << endl
+                 << c_InFile << endl
+                 << endl;
         }
     }
     else

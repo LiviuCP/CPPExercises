@@ -9,6 +9,7 @@ class QueueSender
 public:
     QueueSender(std::string queueFile);
     void writeToQueue(void* data, DataTypes dataType);
+
 private:
     void _createQueueFile();
     void _retrieveQueueId();

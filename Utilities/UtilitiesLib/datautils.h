@@ -1,29 +1,28 @@
 /* General purpose data type(def)s and conversion functions*/
 #pragma once
 
-#include <vector>
-#include <list>
-#include <set>
-#include <map>
-#include <utility>
-#include <string>
 #include <iostream>
+#include <list>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
-#define FAIL_DEALLOC(ptr, message) \
-    std::free(ptr); \
-    ptr = nullptr; \
+#define FAIL_DEALLOC(ptr, message)                                                                                     \
+    std::free(ptr);                                                                                                    \
+    ptr = nullptr;                                                                                                     \
     QFAIL(message);
 
-#define DEALLOC(ptr) \
-    std::free(ptr); \
+#define DEALLOC(ptr)                                                                                                   \
+    std::free(ptr);                                                                                                    \
     ptr = nullptr;
 
-#if (defined (__APPLE__) && defined (__MACH__))
+#if (defined(__APPLE__) && defined(__MACH__))
 #define MACOS
 #endif
 
-template<typename DataType>
-using ValueSizePair = std::pair<DataType, size_t>;
+template <typename DataType> using ValueSizePair = std::pair<DataType, size_t>;
 
 using IntPair = std::pair<int, int>;
 using StringSet = std::set<std::string>;
@@ -44,28 +43,29 @@ using DataSet = std::vector<DataWord>;
 
 namespace Utilities
 {
-    bool convertBitStringToDataWord(const std::string& bitString, DataWord& word);
-    DataWord invertDataWord(const DataWord& word);
+bool convertBitStringToDataWord(const std::string& bitString, DataWord& word);
+DataWord invertDataWord(const DataWord& word);
 
-    /* Convenience function for getting a std::list<DataType>::iterator based on a "virtual index", i.e. number of hops from the starting element */
-    template<typename DataType>
-    typename std::list<DataType>::iterator getListIteratorAtIndex(std::list<DataType>& myList, size_t index)
+/* Convenience function for getting a std::list<DataType>::iterator based on a "virtual index", i.e. number of hops from
+ * the starting element */
+template <typename DataType>
+typename std::list<DataType>::iterator getListIteratorAtIndex(std::list<DataType>& myList, size_t index)
+{
+    auto it{myList.begin()};
+
+    while (index > 0 && it != myList.end())
     {
-        auto it{myList.begin()};
-
-        while (index > 0 && it != myList.end())
-        {
-            ++it;
-            --index;
-        }
-
-        return it;
+        ++it;
+        --index;
     }
 
-    void leftTrimWhiteSpace(std::string& str);
-    void rightTrimWhiteSpace(std::string& str);
-    void trimWhiteSpace(std::string& str);
+    return it;
 }
+
+void leftTrimWhiteSpace(std::string& str);
+void rightTrimWhiteSpace(std::string& str);
+void trimWhiteSpace(std::string& str);
+} // namespace Utilities
 
 std::istream& operator>>(std::istream& in, DataSet& dataSet);
 std::ostream& operator<<(std::ostream& out, const DataSet& dataSet);

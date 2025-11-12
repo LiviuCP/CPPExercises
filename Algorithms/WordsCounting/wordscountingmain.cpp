@@ -1,8 +1,8 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include "wordscounter.h"
 #include "utils.h"
+#include "wordscounter.h"
 
 static const std::string c_InFile{Utilities::c_InputOutputDir + "wordscountinginput.txt"};
 static const std::string c_OutFile{Utilities::c_InputOutputDir + "wordscountingoutput.txt"};
@@ -13,7 +13,7 @@ FileContent readInputFileContent(std::ifstream& in)
 
     if (in.is_open())
     {
-        while(!in.eof())
+        while (!in.eof())
         {
             Line currentLine;
             getline(in, currentLine);
@@ -37,7 +37,7 @@ void writeOutputFileContent(const WordOccurrencesMap& occurrencesMap, std::ofstr
 
         size_t totalWordsCount{0};
 
-        for (const auto&[word, count] : occurrencesMap)
+        for (const auto& [word, count] : occurrencesMap)
         {
             totalWordsCount += count;
             out << "\"" << word << "\" / " << count << "\n";
@@ -63,7 +63,7 @@ int main()
 
     Utilities::clearScreen();
 
-    if(in.is_open() && out.is_open())
+    if (in.is_open() && out.is_open())
     {
         FileContent content{readInputFileContent(in)};
         WordsCounter wordsCounter(std::move(content));

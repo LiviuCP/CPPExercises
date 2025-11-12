@@ -102,7 +102,8 @@ void DataOrderingFileWriter::beginSection()
 
     if (m_Out.is_open())
     {
-        m_Out << "******************************** Section " << m_SectionNumber << " ********************************\n\n";
+        m_Out << "******************************** Section " << m_SectionNumber
+              << " ********************************\n\n";
     }
 }
 

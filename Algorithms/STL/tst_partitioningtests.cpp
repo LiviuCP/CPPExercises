@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -142,3 +143,4 @@ void PartitioningTests::testPartitionPoint()
 QTEST_APPLESS_MAIN(PartitioningTests)
 
 #include "tst_partitioningtests.moc"
+// clang-format on

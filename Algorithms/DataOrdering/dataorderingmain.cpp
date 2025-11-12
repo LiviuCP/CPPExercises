@@ -6,18 +6,19 @@
    - it is possible to invert any of the words (e.g. 01101010 -> 10010101)
 
    Challenge:
-   - find a way to transmit the words that minimizes the total number of bit transitions (Hamming distances kept to a minimum)
+   - find a way to transmit the words that minimizes the total number of bit transitions (Hamming distances kept to a
+   minimum)
 
    Two algorithms will be used:
    - Greedy Min Simplified (GMS): ordering only, no inversion
    - Greedy Min Simplified with inversion: words are ordered and possibly inverted
 */
 
-#include <iostream>
 #include <cassert>
+#include <iostream>
 
-#include "dataorderingengine.h"
 #include "dataordering_io.h"
+#include "dataorderingengine.h"
 #include "utils.h"
 
 using namespace std;
@@ -30,7 +31,8 @@ using namespace std;
 static const string c_InFile{Utilities::c_InputOutputDir + "dataorderinginput.txt"};
 static const string c_OutFile{Utilities::c_InputOutputDir + "dataorderingoutput.txt"};
 
-void displayResult(ResultType resultType, size_t orderedDataSetsCount, const string& inputFilePath, const string& outputFilePath);
+void displayResult(ResultType resultType, size_t orderedDataSetsCount, const string& inputFilePath,
+                   const string& outputFilePath);
 
 int main()
 {
@@ -77,7 +79,8 @@ int main()
         }
 
         engine.performGreedyMinSimplified();
-        result = fileWriter.writeScenarioOutputToFile("\n\nB. Scenario 1: Greedy min simplified (GMS) without inversion", engine);
+        result = fileWriter.writeScenarioOutputToFile(
+            "\n\nB. Scenario 1: Greedy min simplified (GMS) without inversion", engine);
 
         if (result.first != ResultType::SUCCESS)
         {
@@ -85,7 +88,8 @@ int main()
         }
 
         engine.performGreedyMinSimplifiedUsingInversion();
-        result = fileWriter.writeScenarioOutputToFile("\n\nC. Scenario 2: Greedy min simplified (GMS) with inversion", engine);
+        result = fileWriter.writeScenarioOutputToFile("\n\nC. Scenario 2: Greedy min simplified (GMS) with inversion",
+                                                      engine);
 
         if (result.first != ResultType::SUCCESS)
         {
@@ -100,7 +104,8 @@ int main()
     return 0;
 }
 
-void displayResult(ResultType resultType, size_t orderedDataSetsCount, const std::string& inputFilePath, const std::string& outputFilePath)
+void displayResult(ResultType resultType, size_t orderedDataSetsCount, const std::string& inputFilePath,
+                   const std::string& outputFilePath)
 {
     if (orderedDataSetsCount > 0)
     {

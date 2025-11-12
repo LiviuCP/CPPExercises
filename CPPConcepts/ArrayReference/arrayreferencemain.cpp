@@ -44,7 +44,8 @@ void displayArrayInformation(const int (&array)[c_ArraySize])
     cout << endl;
 
     int count{0}, sum{0};
-    for (auto& element : array)  // actually reference is not required, yet just wanted to test it works (it does but it is not allowed to modify element for obvious reasons)
+    for (auto& element : array) // actually reference is not required, yet just wanted to test it works (it does but it
+                                // is not allowed to modify element for obvious reasons)
     {
         sum += element;
         ++count;

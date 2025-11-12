@@ -34,7 +34,8 @@ void Parser::parse()
 {
     if (m_pFile)
     {
-        while(!feof(m_pFile)) {
+        while (!feof(m_pFile))
+        {
             if (c_CharCountThreshold == m_TotalParsedCharsCount)
             {
                 m_MaxCharsCountExceeded = true;
@@ -43,7 +44,8 @@ void Parser::parse()
 
             const char c{static_cast<char>(fgetc(m_pFile))};
 
-            if (c >= 0 && isValidChar(c)) {
+            if (c >= 0 && isValidChar(c))
+            {
 
                 m_TotalFoundCharsCount = m_TotalFoundCharsCount + 1;
                 ++m_CharOccurrences[c];

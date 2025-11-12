@@ -1,12 +1,12 @@
+#include <arpa/inet.h>
 #include <cassert>
 #include <cstring>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <netdb.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <iostream>
 #include <thread>
@@ -47,7 +47,7 @@ Client::Client(size_t bufferSize, int portNumber, std::string ipAddress, const s
 
 Client::~Client()
 {
-    delete []m_Buffer;
+    delete[] m_Buffer;
     m_Buffer = nullptr;
 
     if (m_FileDescriptor >= 0)
@@ -63,7 +63,8 @@ void Client::retrieveDataFromServer(size_t requiredElementsCount)
         _logMessage("CLIENT :name: Connecting to server...");
         _establishConnectionToServer();
         _logMessage("CLIENT :name: Connection established");
-        _logMessage("CLIENT :name: " + std::to_string(requiredElementsCount) + " elements required. Querying server for availability...");
+        _logMessage("CLIENT :name: " + std::to_string(requiredElementsCount) +
+                    " elements required. Querying server for availability...");
 
         size_t availableElementsCount{0};
         const ssize_t c_NrOfBytesSentInFirstQuery{_requestDataFromServer(0)};
@@ -80,29 +81,40 @@ void Client::retrieveDataFromServer(size_t requiredElementsCount)
 
         if (availableElementsCount > 0)
         {
-            const size_t c_RequestedElementsCount{std::min(requiredElementsCount, availableElementsCount)}; // number of requested elements to be limited by maximum that are available at server side
-            _logMessage("CLIENT :name: " + std::to_string(availableElementsCount) + " elements can be provided by server");
-            _logMessage("CLIENT :name: Requesting " + std::to_string(static_cast<int>(c_RequestedElementsCount)) + " elements");
+            const size_t c_RequestedElementsCount{std::min(
+                requiredElementsCount, availableElementsCount)}; // number of requested elements to be limited by
+                                                                 // maximum that are available at server side
+            _logMessage("CLIENT :name: " + std::to_string(availableElementsCount) +
+                        " elements can be provided by server");
+            _logMessage("CLIENT :name: Requesting " + std::to_string(static_cast<int>(c_RequestedElementsCount)) +
+                        " elements");
             const ssize_t c_NrOfBytesSentInSecondQuery{_requestDataFromServer(c_RequestedElementsCount)};
 
             if (c_NrOfBytesSentInSecondQuery > 0)
             {
                 ssize_t c_NrOfBytesReceivedInSecondQuery{_receiveDataFromServer()};
-                _logMessage("CLIENT :name: Received response from server (" + std::to_string(c_NrOfBytesReceivedInSecondQuery) + " bytes)");
+                _logMessage("CLIENT :name: Received response from server (" +
+                            std::to_string(c_NrOfBytesReceivedInSecondQuery) + " bytes)");
 
-                if (c_RequestedElementsCount * sizeof(int) <= static_cast<size_t>(c_NrOfBytesReceivedInSecondQuery)) // number of received bytes should match (or exceed) requested elements
+                if (c_RequestedElementsCount * sizeof(int) <=
+                    static_cast<size_t>(c_NrOfBytesReceivedInSecondQuery)) // number of received bytes should match (or
+                                                                           // exceed) requested elements
                 {
                     _storeReceivedData(c_RequestedElementsCount);
                 }
                 else
                 {
-                    _logMessage("CLIENT :name: The request could not be completed (no data or insufficient data received)", true);
+                    _logMessage(
+                        "CLIENT :name: The request could not be completed (no data or insufficient data received)",
+                        true);
                 }
             }
         }
         else
         {
-            _logMessage("CLIENT :name: No elements are available for download or the count info received from server is corrupt.", true);
+            _logMessage("CLIENT :name: No elements are available for download or the count info received from server "
+                        "is corrupt.",
+                        true);
         }
 
         close(m_FileDescriptor);
@@ -169,7 +181,7 @@ void Client::_establishConnectionToServer()
     socketAddress.sin_family = AF_INET;
     socketAddress.sin_port = htons(static_cast<uint16_t>(m_PortNumber));
 
-    if(inet_pton(AF_INET, m_IpAddress.c_str(), &socketAddress.sin_addr)<=0)
+    if (inet_pton(AF_INET, m_IpAddress.c_str(), &socketAddress.sin_addr) <= 0)
     {
         _logMessage("CLIENT :name: IP address error", true);
         exit(-1);
@@ -212,7 +224,8 @@ void Client::_storeReceivedData(size_t elementsCount)
     {
         usleep(250000);
         m_Data.push_back(*(reinterpret_cast<int*>(m_Buffer) + index));
-        _logMessage("CLIENT :name: Added element with value: " + std::to_string(*(reinterpret_cast<int*>(m_Buffer) + index)));
+        _logMessage("CLIENT :name: Added element with value: " +
+                    std::to_string(*(reinterpret_cast<int*>(m_Buffer) + index)));
     }
 }
 

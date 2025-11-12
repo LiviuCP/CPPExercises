@@ -1,6 +1,6 @@
+#include <cassert>
 #include <chrono>
 #include <iostream>
-#include <cassert>
 
 #include "parser.h"
 #include "parsingqueue.h"
@@ -16,7 +16,7 @@ ParsingQueue::ParsingQueue(size_t threadsCount)
     {
         _createParsingThreads();
     }
-    catch(std::system_error&)
+    catch (std::system_error&)
     {
         success = false;
         std::cerr << "An error occurred! Unable to start parsing\n";
@@ -80,9 +80,10 @@ void ParsingQueue::stop() noexcept
                 thread.join();
             }
         }
-        catch(std::system_error&)
+        catch (std::system_error&)
         {
-            // no action required, just catch the exception (should not propagate outside this method as it is also called by destructor)
+            // no action required, just catch the exception (should not propagate outside this method as it is also
+            // called by destructor)
         }
     }
 }
@@ -91,14 +92,15 @@ void ParsingQueue::_createParsingThreads()
 {
     for (size_t threadNumber{0}; threadNumber < m_ThreadsCount; ++threadNumber)
     {
-        m_ThreadPool.emplace_back([this](){
+        m_ThreadPool.emplace_back([this]() {
             for (;;)
             {
                 Parser* pParser{nullptr};
 
                 {
                     std::unique_lock<std::mutex> lock{m_QueueMutex};
-                    m_QueueConditionVariable.wait(lock, [this](){return !m_QueuedParsers.empty() || m_ShouldStopParsing;});
+                    m_QueueConditionVariable.wait(lock,
+                                                  [this]() { return !m_QueuedParsers.empty() || m_ShouldStopParsing; });
 
                     if (m_QueuedParsers.empty() || m_ShouldStopParsing)
                     {

@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -188,3 +189,4 @@ void NonModifyingSequenceTests::testSearchN()
 QTEST_APPLESS_MAIN(NonModifyingSequenceTests)
 
 #include "tst_nonmodifyingsequencetests.moc"
+// clang-format on

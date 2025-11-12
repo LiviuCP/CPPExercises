@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -235,3 +236,4 @@ void MinMaxTests::testClamp()
 QTEST_APPLESS_MAIN(MinMaxTests)
 
 #include "tst_minmaxtests.moc"
+// clang-format on

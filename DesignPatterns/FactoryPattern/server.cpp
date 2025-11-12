@@ -1,11 +1,11 @@
-#include "servertypes.h"
 #include "server.h"
+#include "servertypes.h"
 
 Server* Server::createServer(Server::ServerTypes serverType)
 {
     Server* result{nullptr};
 
-    switch(serverType)
+    switch (serverType)
     {
     case Server::ServerTypes::WEB:
         result = new WebServer;
@@ -28,5 +28,4 @@ Server* Server::createServer(Server::ServerTypes serverType)
 
 Server::~Server()
 {
-
 }

@@ -9,14 +9,14 @@ Semaphore::Semaphore(int count)
     assert(m_Count >= 0 && "Semaphore initialized with wrong value");
 }
 
-void Semaphore::aquire(const std::string &threadName)
+void Semaphore::aquire(const std::string& threadName)
 {
     std::unique_lock<std::mutex> lock{m_Mutex};
 
     if (m_Count == 0)
     {
         std::clog << "Semaphore is locked, thread " << threadName << " needs to wait for release" << std::endl;
-        m_CondVar.wait(lock, [this](){return m_Count > 0;});
+        m_CondVar.wait(lock, [this]() { return m_Count > 0; });
     }
 
     --m_Count;

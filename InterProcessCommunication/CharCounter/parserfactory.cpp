@@ -1,5 +1,5 @@
-#include "concreteparsers.h"
 #include "parserfactory.h"
+#include "concreteparsers.h"
 
 Parser* ParserFactory::createParser(ParserType parserType, const std::string& filePath, IAggregator* pIAggregator)
 {

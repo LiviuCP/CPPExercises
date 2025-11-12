@@ -30,7 +30,8 @@ bool CSVAggregator::writeDataToOutputCSV()
         {
             for (const auto& info : m_Info)
             {
-                out << info.first << "," << info.second.m_MacAddress << "," << info.second.m_IpAddress << "," << info.second.m_IpClass << "\n";
+                out << info.first << "," << info.second.m_MacAddress << "," << info.second.m_IpAddress << ","
+                    << info.second.m_IpClass << "\n";
             }
         }
     }

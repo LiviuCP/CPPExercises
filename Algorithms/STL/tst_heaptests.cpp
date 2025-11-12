@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include <algorithm>
@@ -255,3 +256,4 @@ void HeapTests::testSortHeap()
 QTEST_APPLESS_MAIN(HeapTests)
 
 #include "tst_heaptests.moc"
+// clang-format on

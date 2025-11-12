@@ -29,5 +29,5 @@ struct MeteoDataMessage
 
     // make thorough initialization of each member mandatory (see QueueReceiver READ_MESSAGE comments)
     MeteoDataMessage() = delete;
-    MeteoDataMessage(long objType, const MeteoData &obj);
+    MeteoDataMessage(long objType, const MeteoData& obj);
 };

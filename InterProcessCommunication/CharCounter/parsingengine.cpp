@@ -1,16 +1,17 @@
-#include <thread>
-#include <map>
 #include <iostream>
+#include <map>
+#include <thread>
 
-#include "parsingqueue.h"
+#include "aggregatorfactory.h"
 #include "parser.h"
 #include "parserfactory.h"
-#include "aggregatorfactory.h"
 #include "parsingengine.h"
+#include "parsingqueue.h"
 
 static constexpr size_t c_MinPoolingThreshold{4};
 
-ParsingEngine::ParsingEngine(const std::string& parsingOption, const FilePathsArray& filePaths, const std::string& aggregationOption)
+ParsingEngine::ParsingEngine(const std::string& parsingOption, const FilePathsArray& filePaths,
+                             const std::string& aggregationOption)
     : m_pIAggregator{nullptr}
     , m_TotalParsedDigitsCount{0}
     , m_TotalMatchingDigitsCount{0}
@@ -39,7 +40,8 @@ ParsingEngine::~ParsingEngine()
 
 void ParsingEngine::run()
 {
-    // use thread pool only if number of files to be parsed reaches the threshold (otherwise use dedicated thread per parser)
+    // use thread pool only if number of files to be parsed reaches the threshold (otherwise use dedicated thread per
+    // parser)
     if (const size_t c_ParsersCount{m_Parsers.size()}; c_ParsersCount >= c_MinPoolingThreshold)
     {
         ParsingQueue parsingQueue{c_MinPoolingThreshold};
@@ -84,15 +86,13 @@ const CharOccurrencesArray& ParsingEngine::getCharOccurrences() const
     return m_CharOccurrences;
 }
 
-
 void ParsingEngine::_buildAggregator(const std::string& aggregationOption)
 {
-    const std::map<std::string, AggregatorFactory::AggregatorType> c_AggregatingOptionsMap {
+    const std::map<std::string, AggregatorFactory::AggregatorType> c_AggregatingOptionsMap{
         {"-t", AggregatorFactory::AggregatorType::TOTAL_COUNT},
         {"-m", AggregatorFactory::AggregatorType::MIN_COUNT},
         {"-a", AggregatorFactory::AggregatorType::AVERAGE_COUNT},
-        {"-M", AggregatorFactory::AggregatorType::MAX_COUNT}
-    };
+        {"-M", AggregatorFactory::AggregatorType::MAX_COUNT}};
 
     auto aggregatorTypeIt{c_AggregatingOptionsMap.find(aggregationOption)};
 
@@ -106,12 +106,12 @@ void ParsingEngine::_buildParsers(const std::string& parsingOption, const FilePa
 {
     if (m_pIAggregator)
     {
-        const std::map<std::string, ParserFactory::ParserType> c_ParsingOptionsMap {
-           {"-d", ParserFactory::ParserType::DIGITS},
-           {"-l", ParserFactory::ParserType::LOWERCASE},
-           {"-u", ParserFactory::ParserType::UPPERCASE},
-           {"-lu", ParserFactory::ParserType::LOWER_UPPER_CASE},
-           {"-ad", ParserFactory::ParserType::ALPHA_AND_DIGITS},
+        const std::map<std::string, ParserFactory::ParserType> c_ParsingOptionsMap{
+            {"-d", ParserFactory::ParserType::DIGITS},
+            {"-l", ParserFactory::ParserType::LOWERCASE},
+            {"-u", ParserFactory::ParserType::UPPERCASE},
+            {"-lu", ParserFactory::ParserType::LOWER_UPPER_CASE},
+            {"-ad", ParserFactory::ParserType::ALPHA_AND_DIGITS},
         };
 
         auto parserTypeIt{c_ParsingOptionsMap.find(parsingOption)};
@@ -145,7 +145,9 @@ void ParsingEngine::_computeStatistics()
 
             if (pParser->maxCharsExceeeded())
             {
-                std::clog << "File " << pParser->getFilePath() << ": the number of characters to parse exceeds the maximum allowed count!\nThe extra chars have been ignored.\n\n";
+                std::clog << "File " << pParser->getFilePath()
+                          << ": the number of characters to parse exceeds the maximum allowed count!\nThe extra chars "
+                             "have been ignored.\n\n";
             }
         }
     }

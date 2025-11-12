@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include "datautils.h"
@@ -189,3 +190,4 @@ void DataUtilsTests::testInvertDataWord_data()
 QTEST_APPLESS_MAIN(DataUtilsTests)
 
 #include "tst_datautilstests.moc"
+// clang-format on

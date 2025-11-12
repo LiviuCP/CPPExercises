@@ -46,17 +46,19 @@ int main()
 
     Derived derived;
 
-    /* foo1() is declared virtual in Base class so a late binding is performed at runtime when invoking it from bar1() even if bar1() belongs to Base and is not declared virtual.
-       This means foo1() is called according to the object type which is Derived in this case.
+    /* foo1() is declared virtual in Base class so a late binding is performed at runtime when invoking it from bar1()
+       even if bar1() belongs to Base and is not declared virtual. This means foo1() is called according to the object
+       type which is Derived in this case.
     */
 
     derived.bar1();
 
     /* foo2() is not declared virtual in Base class.
-       As bar2() was only declared in Base and is not virtual (so it "belongs" to Base even when called with a Derived object) an early binding is performed at compile time for the call to foo2().
-       This means bar2() will always call Base::foo2() no matter the object type.
-       The fact that foo2() is declared virtual in Derived class has no effect on this behavior.
-       Only when declaring it virtual in Base class could Derived::foo2() be called by bar2() for a Derived object.
+       As bar2() was only declared in Base and is not virtual (so it "belongs" to Base even when called with a Derived
+       object) an early binding is performed at compile time for the call to foo2(). This means bar2() will always call
+       Base::foo2() no matter the object type. The fact that foo2() is declared virtual in Derived class has no effect
+       on this behavior. Only when declaring it virtual in Base class could Derived::foo2() be called by bar2() for a
+       Derived object.
     */
 
     derived.bar2();

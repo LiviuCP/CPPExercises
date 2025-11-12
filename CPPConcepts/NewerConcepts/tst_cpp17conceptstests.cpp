@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 #include <QString>
 
@@ -876,3 +877,4 @@ void CPP17ConceptsTests::testFoldExpressionsCommaOperator()
 QTEST_APPLESS_MAIN(CPP17ConceptsTests)
 
 #include "tst_cpp17conceptstests.moc"
+// clang-format on

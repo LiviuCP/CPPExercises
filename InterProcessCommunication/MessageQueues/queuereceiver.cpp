@@ -1,23 +1,25 @@
+#include <cassert>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-#include <cassert>
 
 #include "queuedatamessages.h"
 #include "queuereceiver.h"
 
-#define READ_MESSAGE(messageType, objectType)                                                                                                                           \
-{                                                                                                                                                                       \
-    messageType message{static_cast<long>(dataType), objectType{}}; /* the message struct needs to be initialized, otherwise the msgrcv is likely to crash */           \
-                                                                                                                                                                        \
-    if (msgrcv(m_QueueId, &message, sizeof(message), static_cast<long>(dataType), m_Flags) < 0)                                                                         \
-    {                                                                                                                                                                   \
-        fprintf(stderr, "Issues with receiving message\n");                                                                                                             \
-    }                                                                                                                                                                   \
-    else                                                                                                                                                                \
-    {                                                                                                                                                                   \
-        *(reinterpret_cast<objectType*>(data)) = message.object;                                                                                                        \
-    }                                                                                                                                                                   \
-}
+#define READ_MESSAGE(messageType, objectType)                                                                          \
+    {                                                                                                                  \
+        messageType message{                                                                                           \
+            static_cast<long>(dataType),                                                                               \
+            objectType{}}; /* the message struct needs to be initialized, otherwise the msgrcv is likely to crash */   \
+                                                                                                                       \
+        if (msgrcv(m_QueueId, &message, sizeof(message), static_cast<long>(dataType), m_Flags) < 0)                    \
+        {                                                                                                              \
+            fprintf(stderr, "Issues with receiving message\n");                                                        \
+        }                                                                                                              \
+        else                                                                                                           \
+        {                                                                                                              \
+            *(reinterpret_cast<objectType*>(data)) = message.object;                                                   \
+        }                                                                                                              \
+    }
 
 constexpr int c_BaseId{543};
 
@@ -34,7 +36,7 @@ void QueueReceiver::readFromQueue(void* data, DataTypes dataType)
 {
     if (data)
     {
-        switch(dataType)
+        switch (dataType)
         {
         case DataTypes::INT:
             READ_MESSAGE(IntMessage, int);

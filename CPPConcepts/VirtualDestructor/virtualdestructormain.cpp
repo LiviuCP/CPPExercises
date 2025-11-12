@@ -1,16 +1,16 @@
 /* This is a mini-app that demonstrates the importance of using virtual destructor along with inheritance
    !!! Always use VIRTUAL destructor when inheritance is intended !!!
-   This ensures that when having a Base* pointer to a Derived object and a delete operation is invoked to the pointer the destructor of the derived object is being called
-   (same as for any other virtual function declared in Base with "virtual" keyword).
-   The derived destructor will in turn call the base destructor once the derived part deallocation is over.
-   The normal operation mode is: destructor executes the constructor operation in reverse!!!
+   This ensures that when having a Base* pointer to a Derived object and a delete operation is invoked to the pointer
+   the destructor of the derived object is being called (same as for any other virtual function declared in Base with
+   "virtual" keyword). The derived destructor will in turn call the base destructor once the derived part deallocation
+   is over. The normal operation mode is: destructor executes the constructor operation in reverse!!!
 */
 
 #include <iostream>
 
 #include "nonvirtualdestructor.h"
-#include "virtualdestructor.h"
 #include "utils.h"
+#include "virtualdestructor.h"
 
 using namespace std;
 
@@ -36,5 +36,3 @@ int main()
 
     return 0;
 }
-
-

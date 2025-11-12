@@ -1,9 +1,9 @@
 #pragma once
 
+#include <filesystem>
+#include <optional>
 #include <string_view>
 #include <vector>
-#include <optional>
-#include <filesystem>
 
 #include "hostdatautils.h"
 
@@ -37,7 +37,8 @@ private:
     ErrorCode _parseRow(const std::string& row);
     void _logParsingErrorsToFile();
 
-    static Index_t _readStringField(const std::string& source, std::string& destination, Index_t index, char separator = ',');
+    static Index_t _readStringField(const std::string& source, std::string& destination, Index_t index,
+                                    char separator = ',');
     static void _trimQuotesAndWhiteSpaceFromString(std::string& str);
     static bool _hasQuotes(const std::string_view str);
 

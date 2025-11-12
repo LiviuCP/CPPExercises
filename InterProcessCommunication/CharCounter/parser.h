@@ -22,7 +22,7 @@ protected:
     virtual bool isValidChar(char c) = 0;
 
 private:
-    FILE * m_pFile;
+    FILE* m_pFile;
     std::string m_FilePath;
     IAggregator* m_pIAggregator;
     CharOccurrencesArray m_CharOccurrences; // only the non-negative chars are taken into consideration

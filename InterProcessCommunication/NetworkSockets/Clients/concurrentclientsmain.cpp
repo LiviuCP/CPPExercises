@@ -1,6 +1,6 @@
+#include <chrono>
 #include <iostream>
 #include <thread>
-#include <chrono>
 
 #include "client.h"
 #include "utils.h"
@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 
 void executeOperation(Client& client, size_t requestedValuesCount)
 {
-    cout << "Client " << client.getName() << " will connect to server with IP " << client.getIpAddress() << "and attempt to retrieve some data" << endl;
+    cout << "Client " << client.getName() << " will connect to server with IP " << client.getIpAddress()
+         << "and attempt to retrieve some data" << endl;
 
     this_thread::sleep_for(chrono::seconds{1});
     client.retrieveDataFromServer(requestedValuesCount);

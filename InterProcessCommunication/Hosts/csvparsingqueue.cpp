@@ -1,11 +1,11 @@
+#include <cassert>
 #include <chrono>
 #include <iostream>
-#include <cassert>
 
-#include "csvparser.h"
-#include "icsvaggregator.h"
 #include "apputils.h"
+#include "csvparser.h"
 #include "csvparsingqueue.h"
+#include "icsvaggregator.h"
 
 CSVParsingQueue::CSVParsingQueue(ICSVAggregator& csvAggregator, size_t threadsCount)
     : m_CsvAggregator{csvAggregator}
@@ -19,7 +19,7 @@ CSVParsingQueue::CSVParsingQueue(ICSVAggregator& csvAggregator, size_t threadsCo
     {
         _createParsingThreads();
     }
-    catch(std::system_error&)
+    catch (std::system_error&)
     {
         success = false;
         std::cerr << "An error occurred! Unable to start parsing\n";
@@ -83,9 +83,10 @@ void CSVParsingQueue::stop() noexcept
                 thread.join();
             }
         }
-        catch(std::system_error&)
+        catch (std::system_error&)
         {
-            // no action required, just catch the exception (should not propagate outside this method as it is also called by destructor)
+            // no action required, just catch the exception (should not propagate outside this method as it is also
+            // called by destructor)
         }
     }
 }
@@ -94,14 +95,15 @@ void CSVParsingQueue::_createParsingThreads()
 {
     for (size_t threadNumber{0}; threadNumber < m_ThreadsCount; ++threadNumber)
     {
-        m_ThreadPool.emplace_back([this](){
+        m_ThreadPool.emplace_back([this]() {
             for (;;)
             {
                 std::filesystem::path csvPath;
 
                 {
                     std::unique_lock<std::mutex> lock{m_QueueMutex};
-                    m_QueueConditionVariable.wait(lock, [this](){return !m_CsvFilePathsQueue.empty() || m_ShouldStopParsing;});
+                    m_QueueConditionVariable.wait(
+                        lock, [this]() { return !m_CsvFilePathsQueue.empty() || m_ShouldStopParsing; });
 
                     if (m_CsvFilePathsQueue.empty() || m_ShouldStopParsing)
                     {

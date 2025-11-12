@@ -2,7 +2,6 @@
 
 #include "mapcolouringutils.h"
 
-
 bool MapColouringUtils::isValidNeighbourhoodMatrix(Matrix<bool> neighbours)
 {
     bool isValid{false};
@@ -31,7 +30,8 @@ std::optional<matrix_size_t> MapColouringUtils::getFirstAvailableColour(const Ma
     if (availableColours.getNrOfRows() == 1)
     {
         // choose colour with lowest index that is not in use by a neighbor
-        for (Matrix<bool>::ConstZIterator colourIt{availableColours.constZBegin()}; colourIt != availableColours.constZEnd(); ++colourIt)
+        for (Matrix<bool>::ConstZIterator colourIt{availableColours.constZBegin()};
+             colourIt != availableColours.constZEnd(); ++colourIt)
         {
             if (false == *colourIt)
             {

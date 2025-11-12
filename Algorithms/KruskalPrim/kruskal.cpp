@@ -35,11 +35,13 @@ void KruskalEngine::_buildGraph(const GraphMatrix& graphMatrix)
 
         for (matrix_size_t row{0}; row < c_RowsCount - 1; ++row)
         {
-            for (Matrix<Cost>::ConstZIterator it{graphMatrix.getConstZIterator(row, row + 1)}; it != graphMatrix.constZRowEnd(row); ++it)
+            for (Matrix<Cost>::ConstZIterator it{graphMatrix.getConstZIterator(row, row + 1)};
+                 it != graphMatrix.constZRowEnd(row); ++it)
             {
                 if (*it != 0)
                 {
-                    // no need to check validity of getRowNr() / getColumnNr() output, the matrix is not empty and it is a forward iterator
+                    // no need to check validity of getRowNr() / getColumnNr() output, the matrix is not empty and it is
+                    // a forward iterator
                     mEdgeCostsMap.insert(std::pair<Cost, Edge>{*it, Edge{*it.getRowNr(), *it.getColumnNr()}});
                 }
             }
@@ -52,7 +54,7 @@ void KruskalEngine::_buildGraph(const GraphMatrix& graphMatrix)
 }
 
 /* Edges should be appended in increasing cost size order to ensure a minimum total cost.
-*/
+ */
 void KruskalEngine::_buildMinTreeFromGraph()
 {
     if (mNodesCount > 0)
@@ -61,7 +63,8 @@ void KruskalEngine::_buildMinTreeFromGraph()
 
         size_t requiredEdgesCount{mNodesCount - 1};
 
-        for (EdgeCostsMap::const_iterator it{mEdgeCostsMap.cbegin()}; it != mEdgeCostsMap.cend() && requiredEdgesCount > 0; ++it)
+        for (EdgeCostsMap::const_iterator it{mEdgeCostsMap.cbegin()};
+             it != mEdgeCostsMap.cend() && requiredEdgesCount > 0; ++it)
         {
             bool edgeAdded{_addEdgeToTree(it->second)};
 
@@ -88,7 +91,8 @@ void KruskalEngine::_buildMaxTreeFromGraph()
 
         size_t requiredEdgesCount{mNodesCount - 1};
 
-        for (EdgeCostsMap::const_reverse_iterator it{mEdgeCostsMap.crbegin()}; it != mEdgeCostsMap.crend() && requiredEdgesCount > 0; ++it)
+        for (EdgeCostsMap::const_reverse_iterator it{mEdgeCostsMap.crbegin()};
+             it != mEdgeCostsMap.crend() && requiredEdgesCount > 0; ++it)
         {
             bool edgeAdded{_addEdgeToTree(it->second)};
 
@@ -101,8 +105,9 @@ void KruskalEngine::_buildMaxTreeFromGraph()
     }
 }
 
-/* Empty components (one per node) are created. However initially no node "belongs" to its component but instead is considered standalone ("orphan")
-   Nodes would then be progressively added to components and these ones are merged until finally a single component representing the Kruskal tree remains.
+/* Empty components (one per node) are created. However initially no node "belongs" to its component but instead is
+   considered standalone ("orphan") Nodes would then be progressively added to components and these ones are merged
+   until finally a single component representing the Kruskal tree remains.
 */
 void KruskalEngine::_buildEmptyComponents()
 {
@@ -135,14 +140,16 @@ void KruskalEngine::_reset()
     mComponentNumbers.clear();
 }
 
-/* Add the nodes to components and merge the components together until only one component remains which contains all nodes.
+/* Add the nodes to components and merge the components together until only one component remains which contains all
+   nodes.
 
    For each edge 3 cases should be considered:
    a) one of the nodes has no component (orphan): add it to the component of the other node
    b) none of the nodes is assigned to a component: add both to the component corresponding to the lower numbered node
    c) both nodes have components: merge the smaller component into the larger one
 
-   The goal is to avoid creating any loops within minimum cost tree by ensuring only edges containing nodes from different components (or no component) are appended to it.
+   The goal is to avoid creating any loops within minimum cost tree by ensuring only edges containing nodes from
+   different components (or no component) are appended to it.
 */
 bool KruskalEngine::_addEdgeToTree(const Edge& edge)
 {
@@ -158,7 +165,8 @@ bool KruskalEngine::_addEdgeToTree(const Edge& edge)
         {
             _bindOrphanNodeToNonOrphanNode(edge.second, edge.first);
         }
-        else if (mComponents[mComponentNumbers[edge.first]].size() >= mComponents[mComponentNumbers[edge.second]].size())
+        else if (mComponents[mComponentNumbers[edge.first]].size() >=
+                 mComponents[mComponentNumbers[edge.second]].size())
         {
             _mergeComponents(edge.first, edge.second);
         }

@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "csvparsingqueue.h"
-#include "csvaggregator.h"
 #include "apputils.h"
+#include "csvaggregator.h"
+#include "csvparsingqueue.h"
 
 static constexpr size_t c_MaxCSVFilesCount{5};
 
@@ -34,7 +34,8 @@ int main(int argc, char* argv[])
             }
             else if (const size_t c_CSVFilesCount{c_InFilePaths.size()}; c_CSVFilesCount > c_MaxCSVFilesCount)
             {
-                std::cerr << "\nThe actual count of CSV files (" << c_CSVFilesCount << ") exceeds the maximum allowed (" << c_MaxCSVFilesCount << ")!\n";
+                std::cerr << "\nThe actual count of CSV files (" << c_CSVFilesCount << ") exceeds the maximum allowed ("
+                          << c_MaxCSVFilesCount << ")!\n";
                 std::cerr << "Please remove part of the files and try again.\n";
             }
             else
@@ -63,12 +64,14 @@ int main(int argc, char* argv[])
 
                         if (Utils::errorFilesExist(inputDir))
                         {
-                            std::cerr << "\nInvalid entries have been detected. Please check the error files from the input directory\n";
+                            std::cerr << "\nInvalid entries have been detected. Please check the error files from the "
+                                         "input directory\n";
                         }
                     }
                     else
                     {
-                        std::cerr << "An error occurred when writing to output file: " << c_OutFilePath.string() << "\n";
+                        std::cerr << "An error occurred when writing to output file: " << c_OutFilePath.string()
+                                  << "\n";
                     }
                 }
             }

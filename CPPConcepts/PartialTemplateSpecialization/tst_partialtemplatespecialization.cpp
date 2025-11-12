@@ -1,3 +1,4 @@
+// clang-format off
 #include <QTest>
 
 #include "pointertemplates.h"
@@ -112,3 +113,4 @@ void PartialTemplateSpecialization::testIsNotSecondOrderPointer()
 QTEST_APPLESS_MAIN(PartialTemplateSpecialization)
 
 #include "tst_partialtemplatespecialization.moc"
+// clang-format on

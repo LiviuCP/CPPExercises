@@ -15,9 +15,9 @@
 
 #include "hdmicard.h"
 #include "hdmidisplay.h"
-#include "vgadisplay.h"
-#include "vgaadapter.h"
 #include "utils.h"
+#include "vgaadapter.h"
+#include "vgadisplay.h"
 
 using namespace std;
 

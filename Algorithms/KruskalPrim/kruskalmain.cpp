@@ -1,7 +1,7 @@
-/* This is a small application that illustrates the "greedy" Kruskal algorithm for determining the minimum/maximum cost tree.
-   The purpose is to build a loop-free tree that connects all graph nodes: n graph nodes connected by n-1 edges.
-   Input is the whole graph where every node might be connected to every other node by an edge that has a specific value (cost).
-   The output is a list of edges that create the loop-free tree connecting all nodes at minimum cost.
+/* This is a small application that illustrates the "greedy" Kruskal algorithm for determining the minimum/maximum cost
+   tree. The purpose is to build a loop-free tree that connects all graph nodes: n graph nodes connected by n-1 edges.
+   Input is the whole graph where every node might be connected to every other node by an edge that has a specific value
+   (cost). The output is a list of edges that create the loop-free tree connecting all nodes at minimum cost.
 */
 
 #include "kruskal.h"

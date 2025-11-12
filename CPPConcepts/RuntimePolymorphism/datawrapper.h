@@ -1,23 +1,21 @@
 #pragma once
 
+#include <cassert>
 #include <fstream>
 #include <memory>
 #include <string>
-#include <cassert>
 
 /* These 2 methods should be defined for each data type if a specific behavior is required:
    - either as template specialization
    - or as free function having the specific data type as argument (either way it is acceptable)
 */
-template<typename DataType>
-void display(const DataType& data, std::ofstream& out, size_t indentation);
+template <typename DataType> void display(const DataType& data, std::ofstream& out, size_t indentation);
 
-template<typename DataType>
-size_t countContent(const DataType&);
+template <typename DataType> size_t countContent(const DataType&);
 
 /* A compact implementation that allows implementing a unitary behavior to virtually any data type
-   The only requirement is to define the above methods for that specific data type if the default implementation is not wanted
-   or is not applicable to the specific object (no stream << operator defined)
+   The only requirement is to define the above methods for that specific data type if the default implementation is not
+   wanted or is not applicable to the specific object (no stream << operator defined)
 
    Example for a class MyObject:
 
@@ -34,8 +32,7 @@ size_t countContent(const DataType&);
 class DataWrapper
 {
 public:
-    template<typename DataType>
-    DataWrapper(DataType data);
+    template <typename DataType> DataWrapper(DataType data);
 
     DataWrapper(const DataWrapper& wrapper);
     DataWrapper(DataWrapper&&) noexcept = default;
@@ -55,8 +52,7 @@ private:
         virtual size_t countModelContent() const = 0;
     };
 
-    template<typename DataType>
-    struct ConcreteModel final : AbstractModel
+    template <typename DataType> struct ConcreteModel final : AbstractModel
     {
         ConcreteModel(DataType data);
 
@@ -70,9 +66,7 @@ private:
     std::unique_ptr<AbstractModel> m_pModel;
 };
 
-
-template<typename DataType>
-void display(const DataType& data, std::ofstream& out, size_t indentation)
+template <typename DataType> void display(const DataType& data, std::ofstream& out, size_t indentation)
 {
     if (out.is_open())
     {
@@ -85,15 +79,15 @@ void display(const DataType& data, std::ofstream& out, size_t indentation)
 }
 
 /* Some of the objects might be counted as more than 1 (e.g. a std::pair might be counted as 2)
-   This should be explicitly stated (either by using a template specialization or in a free function with the respective data type as argument)
+   This should be explicitly stated (either by using a template specialization or in a free function with the respective
+   data type as argument)
 */
-template<typename DataType>
-size_t countContent(const DataType&)
+template <typename DataType> size_t countContent(const DataType&)
 {
     return 1;
 }
 
-template<typename DataType>
+template <typename DataType>
 DataWrapper::DataWrapper(DataType data)
     : m_pModel(std::make_unique<ConcreteModel<DataType>>(std::move(data)))
 {
@@ -104,7 +98,7 @@ inline DataWrapper::DataWrapper(const DataWrapper& wrapper)
 {
 }
 
-inline DataWrapper &DataWrapper::operator=(const DataWrapper &data)
+inline DataWrapper& DataWrapper::operator=(const DataWrapper& data)
 {
     return *this = DataWrapper(data);
 }
@@ -119,26 +113,25 @@ inline size_t countDataContent(const DataWrapper& wrapper)
     return wrapper.m_pModel->countModelContent();
 }
 
-template<typename DataType>
+template <typename DataType>
 DataWrapper::ConcreteModel<DataType>::ConcreteModel(DataType data)
     : mData(std::move(data))
 {
 }
 
-template<typename DataType>
+template <typename DataType>
 std::unique_ptr<DataWrapper::AbstractModel> DataWrapper::ConcreteModel<DataType>::copy() const
 {
     return std::make_unique<ConcreteModel>(*this);
 }
 
-template<typename DataType>
-void DataWrapper::ConcreteModel<DataType>::displayModel(std::ofstream &out, size_t indentation) const
+template <typename DataType>
+void DataWrapper::ConcreteModel<DataType>::displayModel(std::ofstream& out, size_t indentation) const
 {
     display(mData, out, indentation);
 }
 
-template<typename DataType>
-size_t DataWrapper::ConcreteModel<DataType>::countModelContent() const
+template <typename DataType> size_t DataWrapper::ConcreteModel<DataType>::countModelContent() const
 {
     return countContent(mData);
 }

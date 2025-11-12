@@ -16,7 +16,7 @@ int main()
 {
     std::ofstream out{c_OutFile};
 
-    if(out.is_open())
+    if (out.is_open())
     {
         Box box;
         Bag bag;
@@ -29,7 +29,9 @@ int main()
         bag.emplace(make_pair("fruit", "banana"));
         bag.emplace(make_pair("muesli", FoodMix{"cereal", "dried fruit"}));
         bag.emplace(make_pair("color", Color::BROWN));
-        bag.emplace(make_pair("6 colors board\n", ColorBoard{2, 3, {Color::BLUE, Color::RED, Color::MAGENTA, Color::BROWN, Color::LILA, Color::YELLOW}}));
+        bag.emplace(make_pair(
+            "6 colors board\n",
+            ColorBoard{2, 3, {Color::BLUE, Color::RED, Color::MAGENTA, Color::BROWN, Color::LILA, Color::YELLOW}}));
         bag.emplace(make_pair("number plate", 52445));
         bag.emplace(make_pair("plastic", 2.0));
         box.emplace_back(bag);

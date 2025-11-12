@@ -8,7 +8,8 @@ class IAggregator;
 class ParsingEngine
 {
 public:
-    ParsingEngine(const std::string& parsingOption, const FilePathsArray& filePaths, const std::string& aggregationOption);
+    ParsingEngine(const std::string& parsingOption, const FilePathsArray& filePaths,
+                  const std::string& aggregationOption);
     ~ParsingEngine();
 
     void run();

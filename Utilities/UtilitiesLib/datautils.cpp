@@ -1,18 +1,19 @@
 #include <algorithm>
-#include <numeric>
 #include <cctype>
+#include <numeric>
 
 #include "datautils.h"
 
 bool Utilities::convertBitStringToDataWord(const std::string& bitString, DataWord& word)
 {
-    const bool c_IsInputValid{!bitString.empty() && std::all_of(bitString.cbegin(), bitString.cend(), [](auto ch){return ch == '0' || ch == '1';})};
+    const bool c_IsInputValid{!bitString.empty() && std::all_of(bitString.cbegin(), bitString.cend(),
+                                                                [](auto ch) { return ch == '0' || ch == '1'; })};
 
     if (c_IsInputValid)
     {
         word.clear();
         word.resize(bitString.size(), false);
-        std::transform(bitString.cbegin(), bitString.cend(), word.begin(), [](char ch){return ch == '1';});
+        std::transform(bitString.cbegin(), bitString.cend(), word.begin(), [](char ch) { return ch == '1'; });
     }
 
     return c_IsInputValid;
@@ -21,20 +22,20 @@ bool Utilities::convertBitStringToDataWord(const std::string& bitString, DataWor
 DataWord Utilities::invertDataWord(const DataWord& word)
 {
     DataWord result(word.size(), false);
-    std::transform(word.cbegin(), word.cend(), result.begin(), [](const bool& value){return !value;});
+    std::transform(word.cbegin(), word.cend(), result.begin(), [](const bool& value) { return !value; });
 
     return result;
 }
 
 void Utilities::leftTrimWhiteSpace(std::string& str)
 {
-    const auto it{std::find_if(str.cbegin(), str.cend(), [](char ch){return !std::isspace(ch);})};
+    const auto it{std::find_if(str.cbegin(), str.cend(), [](char ch) { return !std::isspace(ch); })};
     str.erase(str.cbegin(), it);
 }
 
 void Utilities::rightTrimWhiteSpace(std::string& str)
 {
-    const auto reverseIt{std::find_if(str.crbegin(), str.crend(), [](char ch){return !std::isspace(ch);})};
+    const auto reverseIt{std::find_if(str.crbegin(), str.crend(), [](char ch) { return !std::isspace(ch); })};
     const auto it{str.cbegin() + str.size() - std::distance(str.crbegin(), reverseIt)};
 
     str.erase(it, str.cend());
@@ -70,8 +71,7 @@ std::istream& operator>>(std::istream& in, DataSet& dataSet)
         }
 
         tempDataSet.reserve(wordsCount);
-    }
-    while(false);
+    } while (false);
 
     for (size_t currentWordNr{0}; currentWordNr < wordsCount; ++currentWordNr)
     {
@@ -109,14 +109,18 @@ std::istream& operator>>(std::istream& in, DataSet& dataSet)
 
 std::ostream& operator<<(std::ostream& out, const DataSet& dataSet)
 {
-    const size_t c_CharsCount = dataSet.size() + std::accumulate(dataSet.cbegin(), dataSet.cend(), 0, [](const size_t partialSum, const auto& toAdd) {return partialSum + toAdd.size();});
+    const size_t c_CharsCount = dataSet.size() + std::accumulate(dataSet.cbegin(), dataSet.cend(), 0,
+                                                                 [](const size_t partialSum, const auto& toAdd) {
+                                                                     return partialSum + toAdd.size();
+                                                                 });
     std::string charsToWrite;
 
     charsToWrite.reserve(c_CharsCount);
 
     for (const auto& word : dataSet)
     {
-        std::transform(word.cbegin(), word.cend(), std::back_inserter(charsToWrite), [](bool value){return value ? '1' : '0';});
+        std::transform(word.cbegin(), word.cend(), std::back_inserter(charsToWrite),
+                       [](bool value) { return value ? '1' : '0'; });
         charsToWrite.push_back('\n');
     }
 
@@ -130,7 +134,8 @@ std::ostream& operator<<(std::ostream& out, const DataWord& word)
     std::string charsToWrite;
     charsToWrite.reserve(word.size());
 
-    std::transform(word.cbegin(), word.cend(), std::back_inserter(charsToWrite), [](bool value){return value ? '1' : '0';});
+    std::transform(word.cbegin(), word.cend(), std::back_inserter(charsToWrite),
+                   [](bool value) { return value ? '1' : '0'; });
     out << charsToWrite;
 
     return out;

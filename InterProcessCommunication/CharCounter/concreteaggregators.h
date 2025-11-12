@@ -1,7 +1,7 @@
 #pragma once
 
-#include "utilities.h"
 #include "iaggregator.h"
+#include "utilities.h"
 
 class Aggregator : public IAggregator
 {
