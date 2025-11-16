@@ -1,11 +1,14 @@
-#pragma pack(1)
-
 #include <algorithm>
 #include <cctype>
 #include <iostream>
 
-#include "objects.h"
 #include "utils.h"
+
+// this ensures that all Point/ComposedObject member variables are contiguously placed in memory
+// (otherwise reinterpret_cast might fail due to padding bytes)
+#pragma pack(1)
+
+#include "objects.h"
 
 /* This small application has been written just for fun!
    This should NEVER be applied in real-world scenarios as it is an obvious violation of the elementary encapsulation

@@ -1,3 +1,4 @@
+// this ensures that all Point/ComposedObject member variables are contiguously placed in memory
 #pragma pack(1)
 
 #include "objects.h"

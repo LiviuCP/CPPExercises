@@ -1,5 +1,4 @@
 #pragma once
-#pragma pack(1)
 
 #include <string>
 
@@ -28,8 +27,6 @@ public:
     const Point& getPoint() const;
 
 private:
-    // pragma pack ensures that all bytes are contiguous
-    // (otherwise reinterpret_cast might fail due to padding bytes)
     int32_t m_Int;
     int16_t m_Short;
     int8_t m_Ch;
