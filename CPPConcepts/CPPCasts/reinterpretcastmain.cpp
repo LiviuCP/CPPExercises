@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <cctype>
-#include <iostream>
 
 #include "utils.h"
+#include "objectprintutils.h"
 
 // this ensures that all Point/ComposedObject member variables are contiguously placed in memory
 // (otherwise reinterpret_cast might fail due to padding bytes)
@@ -17,16 +17,12 @@
    Otherwise mentioned: "Do not try this at home!"
 */
 
-void printObject(const ComposedObject& object);
-
 int main()
 {
-    Utilities::clearScreen();
-
     ComposedObject object{-5, 2, 'a', "abcdefghij", {-1.05, 2.99}};
 
-    std::cout << "Before modifications the object had following values: \n";
-    printObject(object);
+    Utilities::clearScreen();
+    std::cout << "Initial object values: \n" << object;
 
     // modify the private members of the object "from outside"
     // (including the members of the point which are private to the containing object as well)
@@ -38,6 +34,7 @@ int main()
     double* pointXPtr{reinterpret_cast<double*>(strPtr + 1)};
     double* pointYPtr{reinterpret_cast<double*>(pointXPtr + 1)};
 
+    // in this particular case it is safe to swap the int and short as we know the values and there is no overflow risk
     const int c_TempInt = *intPtr;
     *intPtr = *shortPtr;
     *shortPtr = static_cast<short>(c_TempInt);
@@ -49,20 +46,7 @@ int main()
     *pointXPtr *= -1.0;
     *pointYPtr *= -1.0;
 
-    std::cout << "\nAfter \"illegal\" modifications the object has following values: \n";
-    printObject(object);
+    std::cout << "Modified object values: \n" << object;
 
     return 0;
-}
-
-void printObject(const ComposedObject& object)
-{
-    std::cout << "\tInt value: " << object.getInt() << "\n";
-    std::cout << "\tShort value: " << object.getShort() << "\n";
-    std::cout << "\tChar value: " << object.getChar() << "\n";
-    std::cout << "\tString value: " << object.getString() << "\n";
-
-    const Point& point{object.getPoint()};
-
-    std::cout << "\tPoint value: (" << point.x() << ", " << point.y() << ")\n";
 }

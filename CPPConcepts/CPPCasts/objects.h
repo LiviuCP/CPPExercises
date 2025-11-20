@@ -7,8 +7,8 @@ class Point
 public:
     Point(double x, double y);
 
-    double x() const;
-    double y() const;
+    const double& x() const;
+    const double& y() const;
 
 private:
     double m_X;
@@ -19,6 +19,12 @@ class ComposedObject
 {
 public:
     ComposedObject(int32_t int_, int16_t short_, int8_t ch, const std::string& str, const Point& point);
+
+    void convertStringToUpperCase();
+    void invertPoint();
+
+    // this method is an example of bad usage of const_cast (see definition for more details)
+    void invertInt() const;
 
     int32_t getInt() const;
     int16_t getShort() const;
