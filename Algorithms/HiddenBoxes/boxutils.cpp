@@ -17,32 +17,47 @@ void retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes, Matrix<matrix_size
     // index (in lexicographically sorted series) of first preceding box that fits into current box; by default -1 (no
     // preceding fitting box)
     Matrix<std::optional<matrix_size_t>> prevFittingBoxIndexes{{c_NrOfBoxes, 1}, std::nullopt};
+    const auto c_PrevFittingBoxIndexesColumnsCount{prevFittingBoxIndexes.getNrOfColumns()};
 
     for (matrix_size_t boxIndex{1}; boxIndex < c_NrOfBoxes; ++boxIndex)
     {
+        const auto c_FittingBoxesCountsColumnsCount{fittingBoxesCounts.getNrOfColumns()};
+        auto& currentFittingBoxesCount{fittingBoxesCounts.at(boxIndex / c_FittingBoxesCountsColumnsCount,
+                                                             boxIndex % c_FittingBoxesCountsColumnsCount)};
+
         for (matrix_size_t prevBoxIndex{0}; prevBoxIndex < boxIndex; ++prevBoxIndex)
         {
+            const auto& c_PrevFittingBoxesCount{fittingBoxesCounts.at(prevBoxIndex / c_FittingBoxesCountsColumnsCount,
+                                                                      prevBoxIndex % c_FittingBoxesCountsColumnsCount)};
+            auto& currentPrevFittingBoxIndex{prevFittingBoxIndexes.at(boxIndex / c_PrevFittingBoxIndexesColumnsCount,
+                                                                      boxIndex % c_PrevFittingBoxIndexesColumnsCount)};
+
             if (boxFitsIntoBox(prevBoxIndex, boxIndex, boxes) &&
-                ((fittingBoxesCounts[prevBoxIndex] + 1) > fittingBoxesCounts[boxIndex]))
+                (c_PrevFittingBoxesCount + 1 > currentFittingBoxesCount))
             {
-                fittingBoxesCounts[boxIndex] = fittingBoxesCounts[prevBoxIndex] + 1;
-                prevFittingBoxIndexes[boxIndex] = prevBoxIndex;
+                currentFittingBoxesCount = c_PrevFittingBoxesCount + 1;
+                currentPrevFittingBoxIndex = prevBoxIndex;
             }
         }
 
-        if (fittingBoxesCounts[boxIndex] > fittingBoxesCounts[maxFittingIndex])
+        const auto& c_MaxFittingBoxesCount{fittingBoxesCounts.at(maxFittingIndex / c_FittingBoxesCountsColumnsCount,
+                                                                 maxFittingIndex % c_FittingBoxesCountsColumnsCount)};
+
+        if (currentFittingBoxesCount > c_MaxFittingBoxesCount)
         {
             maxFittingIndex = boxIndex;
         }
     }
 
     Matrix<matrix_size_t> recoveredIndexes{{1, 1}, maxFittingIndex};
-    auto currentIndexToCheck{prevFittingBoxIndexes[maxFittingIndex]};
+    auto currentIndexToCheck{prevFittingBoxIndexes.at(maxFittingIndex / c_PrevFittingBoxIndexesColumnsCount,
+                                                      maxFittingIndex % c_PrevFittingBoxIndexesColumnsCount)};
 
     while (currentIndexToCheck.has_value())
     {
         recoveredIndexes.insertColumn(0, *currentIndexToCheck);
-        currentIndexToCheck = prevFittingBoxIndexes[*currentIndexToCheck];
+        currentIndexToCheck = prevFittingBoxIndexes.at(*currentIndexToCheck / c_PrevFittingBoxIndexesColumnsCount,
+                                                       *currentIndexToCheck % c_PrevFittingBoxIndexesColumnsCount);
     }
 
     fittingBoxIndexes = std::move(recoveredIndexes);

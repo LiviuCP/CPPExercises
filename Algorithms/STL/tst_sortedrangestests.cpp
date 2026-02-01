@@ -86,7 +86,7 @@ SortedRangesTests::SortedRangesTests()
 void SortedRangesTests::testBounds()
 {
     // lower bound
-    QVERIFY(mPrimaryIntMatrix.getConstZIterator(2) == std::lower_bound(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd(), -6));
+    QVERIFY(mPrimaryIntMatrix.getConstZIterator(0, 2) == std::lower_bound(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd(), -6));
     QVERIFY(mPrimaryIntMatrix.getConstZIterator(3, 4) == std::lower_bound(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd(), 12));
     QVERIFY(mPrimaryIntMatrix.getConstZIterator(3, 4) == std::lower_bound(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd(), 14));
     QVERIFY(mPrimaryIntMatrix.constZRowBegin(1) == std::lower_bound(mPrimaryIntMatrix.constZRowBegin(1), mPrimaryIntMatrix.constZRowEnd(1), -4));

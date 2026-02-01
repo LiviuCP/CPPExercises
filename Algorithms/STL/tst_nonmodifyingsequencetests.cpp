@@ -128,7 +128,7 @@ void NonModifyingSequenceTests::testFind()
 {
     QVERIFY(mPrimaryIntMatrix.getConstMIterator(1, 1) == std::find(mPrimaryIntMatrix.constMBegin(1), mPrimaryIntMatrix.constMEnd(1), 4));
     QVERIFY(mPrimaryIntMatrix.constNColumnEnd(2) == std::find(mPrimaryIntMatrix.constNColumnBegin(2), mPrimaryIntMatrix.constNColumnEnd(2), 6));
-    QVERIFY(mPrimaryStringIntPairMatrix.getConstZIterator(8) == std::find_if(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return element.first.size() > 6 && 14 == element.second;}));
+    QVERIFY(mPrimaryStringIntPairMatrix.getConstZIterator(1, 3) == std::find_if(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return element.first.size() > 6 && 14 == element.second;}));
     QVERIFY(mPrimaryStringIntPairMatrix.constZEnd() == std::find_if(mPrimaryStringIntPairMatrix.constZRowBegin(1), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element) {return 7 == element.first.size() && 12 == element.second;}));
     QVERIFY(mPrimaryStringIntPairMatrix.getConstZIterator(0, 3) == std::find_if_not(mPrimaryStringIntPairMatrix.getConstZIterator(0, 1), mPrimaryStringIntPairMatrix.constZRowEnd(0), [](StringIntPair element) {return element.second < 12;}));
     QVERIFY(mPrimaryStringIntPairMatrix.constZEnd() == std::find_if_not(mPrimaryStringIntPairMatrix.getConstZIterator(1, 2), mPrimaryStringIntPairMatrix.constZEnd(), [](StringIntPair element){return element.first.size() > 3; }));
@@ -137,8 +137,8 @@ void NonModifyingSequenceTests::testFind()
 void NonModifyingSequenceTests::testFindEnd()
 {
     QVERIFY(mThirdIntMatrix.getConstZIterator(1, 8) == std::find_end(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(0, 6), mThirdIntMatrix.constZRowEnd(0)));
-    QVERIFY(mThirdIntMatrix.getConstZIterator(5) == std::find_end(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(5), mThirdIntMatrix.getConstZIterator(8)));
-    QVERIFY(mThirdIntMatrix.constZEnd() == std::find_end(mThirdIntMatrix.constZRowBegin(2), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(5), mThirdIntMatrix.getConstZIterator(8)));
+    QVERIFY(mThirdIntMatrix.getConstZIterator(0, 5) == std::find_end(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(0, 5), mThirdIntMatrix.getConstZIterator(0, 8)));
+    QVERIFY(mThirdIntMatrix.constZEnd() == std::find_end(mThirdIntMatrix.constZRowBegin(2), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(0, 5), mThirdIntMatrix.getConstZIterator(0, 8)));
     QVERIFY(mThirdIntMatrix.getConstZIterator(2, 1) == std::find_end(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mSecondaryIntVector.cbegin(), mSecondaryIntVector.cend()));
     QVERIFY(mThirdIntMatrix.constZEnd() == std::find_end(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntVector.cbegin(), mThirdIntVector.cend()));
 }
@@ -153,7 +153,7 @@ void NonModifyingSequenceTests::testFindFirstOf()
 void NonModifyingSequenceTests::testAdjacentFind()
 {
     IntMatrix::ConstZIterator it{std::adjacent_find(mPrimaryIntMatrix.constZBegin(), mPrimaryIntMatrix.constZEnd())};
-    QVERIFY(mPrimaryIntMatrix.getConstZIterator(1) == it);
+    QVERIFY(mPrimaryIntMatrix.getConstZIterator(0, 1) == it);
     it = std::adjacent_find(it + 1, mPrimaryIntMatrix.constZEnd());
     QVERIFY(mPrimaryIntMatrix.getConstZIterator(2, 1) == it);
     it = std::adjacent_find(it, mPrimaryIntMatrix.constZEnd());
@@ -167,16 +167,16 @@ void NonModifyingSequenceTests::testAdjacentFind()
 
 void NonModifyingSequenceTests::testSearch()
 {
-    QVERIFY(mThirdIntMatrix.getConstZIterator(1) == std::search(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(1, 8), mThirdIntMatrix.getConstZIterator(2, 2)));
-    QVERIFY(mThirdIntMatrix.getConstZIterator(5) == std::search(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(5), mThirdIntMatrix.getConstZIterator(8)));
-    QVERIFY(mThirdIntMatrix.constZEnd() == std::search(mThirdIntMatrix.constZRowBegin(1), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(5), mThirdIntMatrix.getConstZIterator(8)));
-    QVERIFY(mThirdIntMatrix.getConstZIterator(3) == std::search(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mSecondaryIntVector.cbegin(), mSecondaryIntVector.cend()));
+    QVERIFY(mThirdIntMatrix.getConstZIterator(0, 1) == std::search(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(1, 8), mThirdIntMatrix.getConstZIterator(2, 2)));
+    QVERIFY(mThirdIntMatrix.getConstZIterator(0, 5) == std::search(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(0, 5), mThirdIntMatrix.getConstZIterator(0, 8)));
+    QVERIFY(mThirdIntMatrix.constZEnd() == std::search(mThirdIntMatrix.constZRowBegin(1), mThirdIntMatrix.constZEnd(), mThirdIntMatrix.getConstZIterator(0, 5), mThirdIntMatrix.getConstZIterator(0, 8)));
+    QVERIFY(mThirdIntMatrix.getConstZIterator(0, 3) == std::search(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mSecondaryIntVector.cbegin(), mSecondaryIntVector.cend()));
     QVERIFY(mThirdIntMatrix.constZEnd() == std::search(mThirdIntMatrix.constZBegin(), mThirdIntMatrix.constZEnd(), mThirdIntVector.cbegin(), mThirdIntVector.cend()));
 }
 
 void NonModifyingSequenceTests::testSearchN()
 {
-    QVERIFY(mFourthIntMatrix.getConstZIterator(2) == std::search_n(mFourthIntMatrix.constZBegin(), mFourthIntMatrix.constZEnd(), 2, -4));
+    QVERIFY(mFourthIntMatrix.getConstZIterator(0, 2) == std::search_n(mFourthIntMatrix.constZBegin(), mFourthIntMatrix.constZEnd(), 2, -4));
     QVERIFY(mFourthIntMatrix.getConstZIterator(1, 1) == std::search_n(mFourthIntMatrix.constZRowBegin(1), mFourthIntMatrix.constZEnd(), 2, -4));
     QVERIFY(mFourthIntMatrix.getConstZIterator(1, 1) == std::search_n(mFourthIntMatrix.constZRowBegin(1), mFourthIntMatrix.constZEnd(), 3, -4));
     QVERIFY(mFourthIntMatrix.getConstZIterator(1, 2) == std::search_n(mFourthIntMatrix.getConstZIterator(1, 2), mFourthIntMatrix.constZEnd(), 2, -4));

@@ -179,10 +179,10 @@ void ModifyingSequenceTests::testCopy()
 
     StringIntPairMatrix::ConstReverseZIterator it2{std::copy_if(mPrimaryStringIntPairMatrix.getConstZIterator(1, 1),
                                                                 mPrimaryStringIntPairMatrix.constZEnd(),
-                                                                secondMatrix.getReverseZIterator(3),
+                                                                secondMatrix.getReverseZIterator(0, 3),
                                                                 [](StringIntPair element) {return element.second <= 12;})};
 
-    QVERIFY(c_SecondMatrixRef == secondMatrix && secondMatrix.getReverseZIterator(0) == it2);
+    QVERIFY(c_SecondMatrixRef == secondMatrix && secondMatrix.getReverseZIterator(0, 0) == it2);
 
     // test overlap
     firstMatrix = mSecondaryIntMatrix;
@@ -192,7 +192,7 @@ void ModifyingSequenceTests::testCopy()
                               0, 1,  3, 5, -2
                       }};
 
-    IntMatrix::ConstZIterator it3{std::copy(firstMatrix.zRowBegin(1), firstMatrix.zRowEnd(1), firstMatrix.getZIterator(3))};
+    IntMatrix::ConstZIterator it3{std::copy(firstMatrix.zRowBegin(1), firstMatrix.zRowEnd(1), firstMatrix.getZIterator(0, 3))};
 
     QVERIFY(firstMatrixRef == firstMatrix && firstMatrix.getConstZIterator(1, 3) == it3);
 }
@@ -354,7 +354,7 @@ void ModifyingSequenceTests::testTransform()
 
     IntMatrix::ConstReverseZIterator it1{std::transform(mSecondaryIntMatrix.constDBegin(1), mSecondaryIntMatrix.constDEnd(1), mThirdIntMatrix.constMBegin(0), matrix.reverseZRowBegin(1), [](int firstElement, int secondElement) {return std::abs(firstElement * secondElement);})};
 
-    QVERIFY(matrixRef == matrix && matrix.getConstReverseZIterator(3) == it1);
+    QVERIFY(matrixRef == matrix && matrix.getConstReverseZIterator(0, 3) == it1);
 
     matrix = mSecondaryIntMatrix;
     matrixRef = {4, 5, {2, 2, 2, 1, 3,
@@ -496,7 +496,7 @@ void ModifyingSequenceTests::testRemoveCopy()
 
     StringIntPairMatrix::ConstZIterator it2{std::remove_copy_if(mPrimaryStringIntPairMatrix.constZBegin(), mPrimaryStringIntPairMatrix.constZEnd(), secondMatrix.zBegin(), [](StringIntPair element) {return element.first.size() >= 6;})};
 
-    QVERIFY(c_SecondMatrixRef == secondMatrix && secondMatrix.getConstZIterator(4) == it2);
+    QVERIFY(c_SecondMatrixRef == secondMatrix && secondMatrix.getConstZIterator(0, 4) == it2);
 }
 
 void ModifyingSequenceTests::testReplace()
@@ -546,7 +546,7 @@ void ModifyingSequenceTests::testReplaceCopy()
                                                                  [](StringIntPair element) {return 7 == element.first.size();},
                                                                  StringIntPair{"RESERVED", 0})};
 
-    QVERIFY(c_SecondMatrixRef == secondMatrix && secondMatrix.getConstZIterator(4) == it2);
+    QVERIFY(c_SecondMatrixRef == secondMatrix && secondMatrix.getConstZIterator(0, 4) == it2);
 }
 
 void ModifyingSequenceTests::testSwap()
@@ -713,7 +713,7 @@ void ModifyingSequenceTests::testRotateCopy()
 
                  }};
 
-    IntMatrix::ConstReverseZIterator it2{std::rotate_copy(matrix.getConstZIterator(2), matrix.getConstZIterator(4), matrix.getConstZIterator(7), matrix.getReverseZIterator(2, 7))};
+    IntMatrix::ConstReverseZIterator it2{std::rotate_copy(matrix.getConstZIterator(0, 2), matrix.getConstZIterator(0, 4), matrix.getConstZIterator(0, 7), matrix.getReverseZIterator(2, 7))};
 
     QVERIFY(matrixRef == matrix && matrix.getConstReverseZIterator(2, 2) == it2);
 }
@@ -809,7 +809,7 @@ void ModifyingSequenceTests::testUnique()
     IntMatrix::ReverseZIterator it{std::unique(matrix.reverseZBegin(), matrix.reverseZEnd())};
     std::fill(it, matrix.reverseZEnd(), -9);
 
-    QVERIFY(c_MatrixRef == matrix && matrix.getConstReverseZIterator(6) == it);
+    QVERIFY(c_MatrixRef == matrix && matrix.getConstReverseZIterator(1, 1) == it);
 }
 
 void ModifyingSequenceTests::testUniqueCopy()

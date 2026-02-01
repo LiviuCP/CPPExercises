@@ -59,10 +59,15 @@ int main()
                  countryIt != neighbourhoodMatrix.constZRowEnd(0); ++countryIt)
             {
                 const auto c_CurrentUncolouredCountry{*countryIt.getColumnNr()};
+                const auto c_CountryColoursRowsCount{countryColours.getNrOfRows()};
+
                 Matrix<matrix_size_t>::ConstNIterator currentUncolouredCountryIt{
-                    countryColours.getConstNIterator(c_CurrentUncolouredCountry)};
+                    countryColours.getConstNIterator(c_CurrentUncolouredCountry % c_CountryColoursRowsCount,
+                                                     c_CurrentUncolouredCountry / c_CountryColoursRowsCount)};
 
                 std::fill(uniqueColours.begin(), uniqueColours.end(), false);
+
+                const auto c_UniqueColorsColumnsCount{uniqueColours.getNrOfColumns()};
 
                 // mark colours that are in use by neighbors that were coloured in previous iterations
                 for (Matrix<matrix_size_t>::ConstNIterator colouredCountryIt{countryColours.constNBegin()};
@@ -72,7 +77,8 @@ int main()
 
                     if (true == neighbourhoodMatrix.at(c_CurrentColouredCountry, c_CurrentUncolouredCountry))
                     {
-                        uniqueColours[*colouredCountryIt] =
+                        uniqueColours.at(*colouredCountryIt / c_UniqueColorsColumnsCount,
+                                         *colouredCountryIt % c_UniqueColorsColumnsCount) =
                             true; // mark the colour used by neighbor as already allocated to a country
                     }
                 }
@@ -83,15 +89,18 @@ int main()
                 // new colour and append it to the available colours list
                 if (designatedColour.has_value())
                 {
-                    uniqueColours[*designatedColour] = true;
+                    uniqueColours.at(*designatedColour / c_UniqueColorsColumnsCount,
+                                     *designatedColour % c_UniqueColorsColumnsCount) = true;
                 }
                 else
                 {
-                    designatedColour = uniqueColours.getNrOfColumns();
+                    designatedColour = c_UniqueColorsColumnsCount;
                     uniqueColours.insertColumn(*designatedColour, true);
                 }
 
-                countryColours[c_CurrentUncolouredCountry] = *designatedColour;
+                const auto c_CountryColoursColumnsCount{countryColours.getNrOfColumns()};
+                countryColours.at(c_CurrentUncolouredCountry / c_CountryColoursColumnsCount,
+                                  c_CurrentUncolouredCountry % c_CountryColoursColumnsCount) = *designatedColour;
             }
 
             printCountryColoursToFile(out, countryColours, uniqueColours);

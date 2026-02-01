@@ -158,8 +158,9 @@ bool CPP20ConceptsTests::_areDecimalValuesEqual(DataType firstValue, DataType se
 template<numeric DataType> Matrix<DataType> CPP20ConceptsTests::_getCumulativeTotals(const Matrix<DataType> matrix)
 {
     Matrix result{matrix};
+    const matrix_size_t c_ResultColumnsCount{result.getNrOfColumns()};
 
-    for (auto it{result.getZIterator(1)}; it != result.zEnd(); ++it)
+    for (auto it{result.getZIterator(1 / c_ResultColumnsCount, 1 % c_ResultColumnsCount)}; it != result.zEnd(); ++it)
     {
         *it += it[-1];
     }

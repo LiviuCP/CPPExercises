@@ -72,6 +72,7 @@ void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fit
 {
     const matrix_diff_t c_NrOfFittingBoxes{
         std::distance(fittingBoxIndexes.constZBegin(), fittingBoxIndexes.constZEnd())};
+    const matrix_size_t c_OriginalIndexesColumnsCount{originalIndexes.getNrOfColumns()};
 
     outStream << "In-order box numbers (boxes sorted increasingly by size): ";
 
@@ -79,7 +80,7 @@ void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fit
          ++it)
     {
         const matrix_size_t boxNumber{
-            originalIndexes[*it] +
+            originalIndexes.at(*it / c_OriginalIndexesColumnsCount, *it % c_OriginalIndexesColumnsCount) +
             1}; // provide a "human readable" number to the box so it can easily be identifed in the input file
         outStream << boxNumber << " ";
     }
