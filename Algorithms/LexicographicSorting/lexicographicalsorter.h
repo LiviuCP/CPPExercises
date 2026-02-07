@@ -61,9 +61,8 @@ Matrix<matrix_size_t> LexicographicalSorter<T>::sort(Matrix<T>& data, bool sorti
 template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort()
 {
     const matrix_size_t c_NrOfRows{s_Data.getNrOfRows()};
-    assert(c_NrOfRows > 0);
 
-    if (c_NrOfRows > 0)
+    if (c_NrOfRows > 0 && c_NrOfRows == s_OriginalRowNumbers.getNrOfRows())
     {
         // for the moment bubble sort is used for simplicity reasons (to be replaced with a more efficient algorithm for
         // larger amounts of data)
@@ -84,6 +83,10 @@ template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort
                 }
             }
         }
+    }
+    else
+    {
+        assert(false);
     }
 }
 
