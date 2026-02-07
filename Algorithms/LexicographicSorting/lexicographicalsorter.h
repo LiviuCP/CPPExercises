@@ -20,24 +20,24 @@ private:
 
     static void _doLexicographicalSort();
 
-    static Matrix<T> sData;
-    static Matrix<matrix_size_t> sOriginalRowNumbers;
+    static Matrix<T> s_Data;
+    static Matrix<matrix_size_t> s_OriginalRowNumbers;
 };
 
 template <std::integral T>
 Matrix<matrix_size_t> LexicographicalSorter<T>::sort(Matrix<T>& data, bool sortingPerRowRequired)
 {
-    sOriginalRowNumbers.clear();
+    s_OriginalRowNumbers.clear();
 
-    sData = data;
-    const matrix_size_t c_NrOfRows{sData.getNrOfRows()};
+    s_Data = data;
+    const matrix_size_t c_NrOfRows{s_Data.getNrOfRows()};
 
     if (c_NrOfRows > 0)
     {
-        sOriginalRowNumbers.resize(c_NrOfRows, 1);
+        s_OriginalRowNumbers.resize(c_NrOfRows, 1);
 
-        for (typename Matrix<matrix_size_t>::NIterator it{sOriginalRowNumbers.nBegin()};
-             it != sOriginalRowNumbers.nEnd(); ++it)
+        for (typename Matrix<matrix_size_t>::NIterator it{s_OriginalRowNumbers.nBegin()};
+             it != s_OriginalRowNumbers.nEnd(); ++it)
         {
             *it = *it.getRowNr();
         }
@@ -46,21 +46,21 @@ Matrix<matrix_size_t> LexicographicalSorter<T>::sort(Matrix<T>& data, bool sorti
         {
             for (auto rowNr{0}; rowNr < c_NrOfRows; ++rowNr)
             {
-                std::sort(sData.zRowBegin(rowNr), sData.zRowEnd(rowNr));
+                std::sort(s_Data.zRowBegin(rowNr), s_Data.zRowEnd(rowNr));
             }
         }
 
         _doLexicographicalSort();
 
-        data = std::move(sData);
+        data = std::move(s_Data);
     }
 
-    return sOriginalRowNumbers;
+    return s_OriginalRowNumbers;
 }
 
 template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort()
 {
-    const matrix_size_t c_NrOfRows{sData.getNrOfRows()};
+    const matrix_size_t c_NrOfRows{s_Data.getNrOfRows()};
     assert(c_NrOfRows > 0);
 
     if (c_NrOfRows > 0)
@@ -75,11 +75,11 @@ template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort
 
             for (auto rowNr{0}; rowNr < c_NrOfRows - 1; ++rowNr)
             {
-                if (!std::lexicographical_compare(sData.constZRowBegin(rowNr), sData.constZRowEnd(rowNr),
-                                                  sData.constZRowBegin(rowNr + 1), sData.constZRowEnd(rowNr + 1)))
+                if (!std::lexicographical_compare(s_Data.constZRowBegin(rowNr), s_Data.constZRowEnd(rowNr),
+                                                  s_Data.constZRowBegin(rowNr + 1), s_Data.constZRowEnd(rowNr + 1)))
                 {
-                    sData.swapRows(rowNr, rowNr + 1);
-                    sOriginalRowNumbers.swapRows(rowNr, rowNr + 1);
+                    s_Data.swapRows(rowNr, rowNr + 1);
+                    s_OriginalRowNumbers.swapRows(rowNr, rowNr + 1);
                     sortingRequired = true;
                 }
             }
@@ -87,6 +87,6 @@ template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort
     }
 }
 
-template <std::integral T> Matrix<T> LexicographicalSorter<T>::sData{};
+template <std::integral T> Matrix<T> LexicographicalSorter<T>::s_Data{};
 
-template <std::integral T> Matrix<matrix_size_t> LexicographicalSorter<T>::sOriginalRowNumbers{};
+template <std::integral T> Matrix<matrix_size_t> LexicographicalSorter<T>::s_OriginalRowNumbers{};
