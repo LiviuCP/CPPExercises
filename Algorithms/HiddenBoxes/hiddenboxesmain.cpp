@@ -33,8 +33,7 @@ int main()
     if (in.is_open() && out.is_open())
     {
         Matrix<matrix_size_t> sortedBoxData;
-        Matrix<matrix_size_t> originalIndexes; // box indexes before lexicographic sort
-        Matrix<matrix_size_t> fittingBoxes;    // original indexes of the boxes that belong to maximum fitting series
+        Matrix<matrix_size_t> fittingBoxes; // original indexes of the boxes that belong to maximum fitting series
 
         cout << "Reading all existing box series from input file: " << c_InFile << endl << endl;
 
@@ -46,12 +45,14 @@ int main()
 
             if (sortedBoxData.getNrOfRows() > 0)
             {
-                LexicographicalSorter<matrix_size_t>::sort(sortedBoxData, originalIndexes, true);
+                // the original indexes are the box indexes before lexicographic sort
+                const Matrix<matrix_size_t> c_OriginalIndexes{
+                    LexicographicalSorter<matrix_size_t>::sort(sortedBoxData, true)};
                 retrieveFittingBoxes(sortedBoxData, fittingBoxes);
 
                 cout << "Writing maximum fitting range of boxes to output file: " << c_OutFile << endl;
 
-                logFittingBoxesToFile(out, fittingBoxes, originalIndexes);
+                logFittingBoxesToFile(out, fittingBoxes, c_OriginalIndexes);
                 ++nrOfSeries;
             }
         }

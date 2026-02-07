@@ -13,7 +13,7 @@
 template <std::integral T> class LexicographicalSorter
 {
 public:
-    static bool sort(Matrix<T>& data, Matrix<matrix_size_t>& originalRowNumbers, bool sortingPerRowRequired);
+    static Matrix<matrix_size_t> sort(Matrix<T>& data, bool sortingPerRowRequired);
 
 private:
     LexicographicalSorter() = delete; // class is fully static, no need to instantiate objects
@@ -25,10 +25,10 @@ private:
 };
 
 template <std::integral T>
-bool LexicographicalSorter<T>::sort(Matrix<T>& data, Matrix<matrix_size_t>& originalRowNumbers,
-                                    bool sortingPerRowRequired)
+Matrix<matrix_size_t> LexicographicalSorter<T>::sort(Matrix<T>& data, bool sortingPerRowRequired)
 {
-    bool success{false};
+    sOriginalRowNumbers.clear();
+
     sData = data;
     const matrix_size_t c_NrOfRows{sData.getNrOfRows()};
 
@@ -53,11 +53,9 @@ bool LexicographicalSorter<T>::sort(Matrix<T>& data, Matrix<matrix_size_t>& orig
         _doLexicographicalSort();
 
         data = std::move(sData);
-        originalRowNumbers = std::move(sOriginalRowNumbers);
-        success = true;
     }
 
-    return success;
+    return sOriginalRowNumbers;
 }
 
 template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort()

@@ -17,7 +17,6 @@ void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sorted
 int main()
 {
     Matrix<int> matrix;
-    Matrix<matrix_size_t> originalRowNumbers;
     std::ifstream in{c_InFile};
 
     Utilities::clearScreen();
@@ -29,14 +28,14 @@ int main()
 
         if (!matrix.isEmpty())
         {
-            (void)LexicographicalSorter<int>::sort(matrix, originalRowNumbers, true);
+            const Matrix<matrix_size_t> c_OriginalRowNumbers{LexicographicalSorter<int>::sort(matrix, true)};
             cout << "The matrix has been successfully read and lexicographically sorted" << endl;
 
             std::ofstream out{c_OutFile};
 
             if (out.is_open())
             {
-                logLexicographicalSortOutput(out, matrix, originalRowNumbers);
+                logLexicographicalSortOutput(out, matrix, c_OriginalRowNumbers);
                 cout << "Output has been written to file: " << c_OutFile << endl << endl;
             }
             else
