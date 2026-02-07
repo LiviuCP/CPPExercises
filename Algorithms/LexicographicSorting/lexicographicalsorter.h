@@ -44,9 +44,9 @@ Matrix<matrix_size_t> LexicographicalSorter<T>::sort(Matrix<T>& data, bool sorti
 
         if (sortingPerRowRequired)
         {
-            for (auto row{0}; row < c_NrOfRows; ++row)
+            for (auto rowNr{0}; rowNr < c_NrOfRows; ++rowNr)
             {
-                std::sort(sData.zRowBegin(row), sData.zRowEnd(row));
+                std::sort(sData.zRowBegin(rowNr), sData.zRowEnd(rowNr));
             }
         }
 
@@ -73,13 +73,13 @@ template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort
         {
             sortingRequired = false;
 
-            for (auto row{0}; row < c_NrOfRows - 1; ++row)
+            for (auto rowNr{0}; rowNr < c_NrOfRows - 1; ++rowNr)
             {
-                if (!std::lexicographical_compare(sData.constZRowBegin(row), sData.constZRowEnd(row),
-                                                  sData.constZRowBegin(row + 1), sData.constZRowEnd(row + 1)))
+                if (!std::lexicographical_compare(sData.constZRowBegin(rowNr), sData.constZRowEnd(rowNr),
+                                                  sData.constZRowBegin(rowNr + 1), sData.constZRowEnd(rowNr + 1)))
                 {
-                    sData.swapRows(row, row + 1);
-                    sOriginalRowNumbers.swapRows(row, row + 1);
+                    sData.swapRows(rowNr, rowNr + 1);
+                    sOriginalRowNumbers.swapRows(rowNr, rowNr + 1);
                     sortingRequired = true;
                 }
             }
