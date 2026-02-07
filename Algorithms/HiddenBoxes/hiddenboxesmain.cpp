@@ -35,7 +35,7 @@ int main()
         Matrix<matrix_size_t> sortedBoxData;
         Matrix<matrix_size_t> fittingBoxes; // original indexes of the boxes that belong to maximum fitting series
 
-        cout << "Reading all existing box series from input file: " << c_InFile << endl << endl;
+        cout << "Reading all existing box series from input file: " << c_InFile << "\n\n";
 
         int nrOfSeries{0};
 
@@ -50,18 +50,18 @@ int main()
                     LexicographicalSorter<matrix_size_t>::sort(sortedBoxData, true)};
                 retrieveFittingBoxes(sortedBoxData, fittingBoxes);
 
-                cout << "Writing maximum fitting range of boxes to output file: " << c_OutFile << endl;
+                cout << "Writing maximum fitting range of boxes to output file: " << c_OutFile << "\n";
 
                 logFittingBoxesToFile(out, fittingBoxes, c_OriginalIndexes);
                 ++nrOfSeries;
             }
         }
 
-        cout << endl << nrOfSeries << " series found and processed" << endl << endl;
+        cout << "\n" << nrOfSeries << " series found and processed\n\n";
     }
     else
     {
-        cerr << "Error in opening input and/or output file" << endl << endl;
+        cerr << "Error in opening input and/or output file\n\n";
     }
 
     return 0;
@@ -84,5 +84,5 @@ void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fit
         outStream << c_BoxNumber << " ";
     }
 
-    outStream << endl << c_NrOfFittingBoxes << " fitting boxes found" << endl << endl;
+    outStream << "\n" << c_NrOfFittingBoxes << " fitting boxes found\n\n";
 }
