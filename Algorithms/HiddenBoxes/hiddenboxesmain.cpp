@@ -80,8 +80,8 @@ void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fit
          ++it)
     {
         // provide a "human readable" number to the box so it can easily be identifed in the input file
-        const matrix_size_t boxNumber{originalIndexes[*it] + 1};
-        outStream << boxNumber << " ";
+        const matrix_size_t c_BoxNumber{originalIndexes[*it] + 1};
+        outStream << c_BoxNumber << " ";
     }
 
     outStream << endl << c_NrOfFittingBoxes << " fitting boxes found" << endl << endl;
