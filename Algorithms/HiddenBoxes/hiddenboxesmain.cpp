@@ -21,7 +21,7 @@ static const string c_InFile{Utilities::c_InputOutputDir + "boxesinput.txt"};
 static const string c_OutFile{Utilities::c_InputOutputDir + "boxesoutput.txt"};
 
 void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fittingBoxIndexes,
-                           const Matrix<matrix_size_t>& originalIndexes);
+                           const std::vector<matrix_size_t>& originalIndexes);
 
 int main()
 {
@@ -46,7 +46,7 @@ int main()
             if (sortedBoxData.getNrOfRows() > 0)
             {
                 // the original indexes are the box indexes before lexicographic sort
-                const Matrix<matrix_size_t> c_OriginalIndexes{
+                const std::vector<matrix_size_t> c_OriginalIndexes{
                     LexicographicalSorter<matrix_size_t>::sort(sortedBoxData, true)};
                 retrieveFittingBoxes(sortedBoxData, fittingBoxes);
 
@@ -69,20 +69,18 @@ int main()
 
 // logs the input file row number of each found box by taking the lexicographical ordering into consideration
 void logFittingBoxesToFile(ofstream& outStream, const Matrix<matrix_size_t>& fittingBoxIndexes,
-                           const Matrix<matrix_size_t>& originalIndexes)
+                           const std::vector<matrix_size_t>& originalIndexes)
 {
     const matrix_diff_t c_NrOfFittingBoxes{
         std::distance(fittingBoxIndexes.constZBegin(), fittingBoxIndexes.constZEnd())};
-    const matrix_size_t c_OriginalIndexesColumnsCount{originalIndexes.getNrOfColumns()};
 
     outStream << "In-order box numbers (boxes sorted increasingly by size): ";
 
     for (Matrix<matrix_size_t>::ConstZIterator it{fittingBoxIndexes.constZBegin()}; it != fittingBoxIndexes.constZEnd();
          ++it)
     {
-        const matrix_size_t boxNumber{
-            originalIndexes.at(*it / c_OriginalIndexesColumnsCount, *it % c_OriginalIndexesColumnsCount) +
-            1}; // provide a "human readable" number to the box so it can easily be identifed in the input file
+        // provide a "human readable" number to the box so it can easily be identifed in the input file
+        const matrix_size_t boxNumber{originalIndexes[*it] + 1};
         outStream << boxNumber << " ";
     }
 

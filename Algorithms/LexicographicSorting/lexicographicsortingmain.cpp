@@ -12,7 +12,7 @@ static const string c_InFile{Utilities::c_InputOutputDir + "lexicographicinput.t
 static const string c_OutFile{Utilities::c_InputOutputDir + "lexicographicoutput.txt"};
 
 void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix,
-                                  const Matrix<matrix_size_t>& originalRowNumbersMatrix);
+                                  const std::vector<matrix_size_t>& originalRowNumbers);
 
 int main()
 {
@@ -28,7 +28,7 @@ int main()
 
         if (!matrix.isEmpty())
         {
-            const Matrix<matrix_size_t> c_OriginalRowNumbers{LexicographicalSorter<int>::sort(matrix, true)};
+            const std::vector<matrix_size_t> c_OriginalRowNumbers{LexicographicalSorter<int>::sort(matrix, true)};
             cout << "The matrix has been successfully read and lexicographically sorted" << endl;
 
             std::ofstream out{c_OutFile};
@@ -57,17 +57,15 @@ int main()
 }
 
 void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix,
-                                  const Matrix<matrix_size_t>& originalRowNumbersMatrix)
+                                  const std::vector<matrix_size_t>& originalRowNumbers)
 {
-    assert(originalRowNumbersMatrix.getNrOfColumns() == 1 &&
-           originalRowNumbersMatrix.getNrOfRows() == sortedMatrix.getNrOfRows());
+    assert(originalRowNumbers.size() == sortedMatrix.getNrOfRows());
 
     outStream << "The lexicographically sorted matrix is:\n\n";
     outStream << sortedMatrix << endl;
     outStream << "Number of each row before lexicographic sorting: " << endl << endl;
 
-    for (Matrix<matrix_size_t>::ConstNIterator it{originalRowNumbersMatrix.constNBegin()};
-         it != originalRowNumbersMatrix.constNEnd(); ++it)
+    for (auto it{originalRowNumbers.cbegin()}; it != originalRowNumbers.cend(); ++it)
     {
         outStream << *it << endl;
     }
