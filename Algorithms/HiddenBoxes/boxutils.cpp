@@ -65,19 +65,26 @@ void retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes, Matrix<matrix_size
 
 bool boxFitsIntoBox(matrix_size_t fittingBoxNumber, matrix_size_t includingBoxNumber, Matrix<matrix_size_t> boxes)
 {
-    assert(boxes.getNrOfColumns() > 1 && "Invalid dimensions for boxes");
-    assert((fittingBoxNumber >= 0 && fittingBoxNumber < boxes.getNrOfRows()) && "Invalid box number (fitting box)");
-    assert((includingBoxNumber >= 0 && includingBoxNumber < boxes.getNrOfRows()) &&
-           "Invalid box number (including box)");
+    const matrix_size_t c_BoxesRowsCount{boxes.getNrOfRows()};
+    const matrix_size_t c_BoxesColumnsCount{boxes.getNrOfColumns()};
 
-    bool fitsIntoBox{true};
+    assert(fittingBoxNumber < c_BoxesRowsCount && "Invalid box number (fitting box)");
+    assert(includingBoxNumber < c_BoxesRowsCount && "Invalid box number (including box)");
+    assert(c_BoxesColumnsCount > 1 && "Invalid dimensions for boxes");
 
-    for (matrix_size_t column{0}; column < boxes.getNrOfColumns(); ++column)
+    bool fitsIntoBox{false};
+
+    if (fittingBoxNumber < c_BoxesRowsCount && includingBoxNumber < c_BoxesRowsCount && c_BoxesColumnsCount > 1)
     {
-        if (boxes.at(fittingBoxNumber, column) >= boxes.at(includingBoxNumber, column))
+        fitsIntoBox = true;
+
+        for (matrix_size_t column{0}; column < c_BoxesColumnsCount; ++column)
         {
-            fitsIntoBox = false;
-            break;
+            if (boxes.at(fittingBoxNumber, column) >= boxes.at(includingBoxNumber, column))
+            {
+                fitsIntoBox = false;
+                break;
+            }
         }
     }
 
