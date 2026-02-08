@@ -2,7 +2,7 @@
 
 #include "boxutils.h"
 
-void retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes, Matrix<matrix_size_t>& fittingBoxIndexes)
+std::vector<matrix_size_t> retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes)
 {
     // total number of boxes belonging to series
     const matrix_size_t c_NrOfBoxes{boxes.getNrOfRows()};
@@ -49,18 +49,26 @@ void retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes, Matrix<matrix_size
         }
     }
 
-    Matrix<matrix_size_t> recoveredIndexes{{1, 1}, maxFittingIndex};
+    std::vector<matrix_size_t> recoveredIndexes;
+
+    // recovered indexes should be prepended to the found ones, yet they will be initially appended instead due to the
+    // std::vector behavior/functionality; finally the vector will be reversed, see below
+    recoveredIndexes.reserve(c_NrOfBoxes);
+    recoveredIndexes.push_back(maxFittingIndex);
+
     std::optional<matrix_size_t> currentIndexToCheck{prevFittingBoxIndexes.at(
         maxFittingIndex / c_PrevFittingBoxIndexesColumnsCount, maxFittingIndex % c_PrevFittingBoxIndexesColumnsCount)};
 
     while (currentIndexToCheck.has_value())
     {
-        recoveredIndexes.insertColumn(0, *currentIndexToCheck);
+        recoveredIndexes.push_back(*currentIndexToCheck);
         currentIndexToCheck = prevFittingBoxIndexes.at(*currentIndexToCheck / c_PrevFittingBoxIndexesColumnsCount,
                                                        *currentIndexToCheck % c_PrevFittingBoxIndexesColumnsCount);
     }
 
-    fittingBoxIndexes = std::move(recoveredIndexes);
+    std::reverse(recoveredIndexes.begin(), recoveredIndexes.end());
+
+    return recoveredIndexes;
 }
 
 bool boxFitsIntoBox(matrix_size_t fittingBoxNumber, matrix_size_t includingBoxNumber,
