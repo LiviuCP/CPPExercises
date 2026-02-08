@@ -12,64 +12,61 @@ static const string c_InFile{Utilities::c_InputOutputDir + "lexicographicinput.t
 static const string c_OutFile{Utilities::c_InputOutputDir + "lexicographicoutput.txt"};
 
 void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix,
-                                  const Matrix<matrix_size_t>& originalRowNumbersMatrix);
+                                  const std::vector<matrix_size_t>& originalRowNumbers);
 
 int main()
 {
     Matrix<int> matrix;
-    Matrix<matrix_size_t> originalRowNumbers;
     std::ifstream in{c_InFile};
 
     Utilities::clearScreen();
 
     if (in.is_open())
     {
-        cout << "Reading matrix elements from input file: " << c_InFile << endl << endl;
+        cout << "Reading matrix elements from input file: " << c_InFile << "\n\n";
         in >> matrix;
 
         if (!matrix.isEmpty())
         {
-            (void)LexicographicalSorter<int>::sort(matrix, originalRowNumbers, true);
-            cout << "The matrix has been successfully read and lexicographically sorted" << endl;
+            const std::vector<matrix_size_t> c_OriginalRowNumbers{LexicographicalSorter<int>::sort(matrix, true)};
+            cout << "The matrix has been successfully read and lexicographically sorted\n";
 
             std::ofstream out{c_OutFile};
 
             if (out.is_open())
             {
-                logLexicographicalSortOutput(out, matrix, originalRowNumbers);
-                cout << "Output has been written to file: " << c_OutFile << endl << endl;
+                logLexicographicalSortOutput(out, matrix, c_OriginalRowNumbers);
+                cout << "Output has been written to file: " << c_OutFile << "\n\n";
             }
             else
             {
-                cerr << "Error in opening output file: " << c_OutFile << endl;
+                cerr << "Error in opening output file: " << c_OutFile << "\n";
             }
         }
         else
         {
-            cerr << "Invalid matrix data" << endl << endl;
+            cerr << "Invalid matrix data\n\n";
         }
     }
     else
     {
-        cerr << "Error opening file: " << c_InFile << endl;
+        cerr << "Error opening file: " << c_InFile << "\n";
     }
 
     return 0;
 }
 
 void logLexicographicalSortOutput(ofstream& outStream, const Matrix<int>& sortedMatrix,
-                                  const Matrix<matrix_size_t>& originalRowNumbersMatrix)
+                                  const std::vector<matrix_size_t>& originalRowNumbers)
 {
-    assert(originalRowNumbersMatrix.getNrOfColumns() == 1 &&
-           originalRowNumbersMatrix.getNrOfRows() == sortedMatrix.getNrOfRows());
+    assert(originalRowNumbers.size() == sortedMatrix.getNrOfRows());
 
     outStream << "The lexicographically sorted matrix is:\n\n";
-    outStream << sortedMatrix << endl;
-    outStream << "Number of each row before lexicographic sorting: " << endl << endl;
+    outStream << sortedMatrix << "\n";
+    outStream << "Number of each row before lexicographic sorting:\n\n";
 
-    for (Matrix<matrix_size_t>::ConstNIterator it{originalRowNumbersMatrix.constNBegin()};
-         it != originalRowNumbersMatrix.constNEnd(); ++it)
+    for (auto it{originalRowNumbers.cbegin()}; it != originalRowNumbers.cend(); ++it)
     {
-        outStream << *it << endl;
+        outStream << *it << "\n";
     }
 }

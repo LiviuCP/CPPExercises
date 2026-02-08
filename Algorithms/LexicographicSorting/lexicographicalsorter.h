@@ -7,65 +7,62 @@
 #pragma once
 
 #include <algorithm>
+#include <vector>
 
 #include "matrix.h"
 
 template <std::integral T> class LexicographicalSorter
 {
 public:
-    static bool sort(Matrix<T>& data, Matrix<matrix_size_t>& originalRowNumbers, bool sortingPerRowRequired);
+    static std::vector<matrix_size_t> sort(Matrix<T>& data, bool sortingPerRowRequired);
 
 private:
     LexicographicalSorter() = delete; // class is fully static, no need to instantiate objects
 
     static void _doLexicographicalSort();
 
-    static Matrix<T> sData;
-    static Matrix<matrix_size_t> sOriginalRowNumbers;
+    static Matrix<T> s_Data;
+    static std::vector<matrix_size_t> s_OriginalRowNumbers;
 };
 
 template <std::integral T>
-bool LexicographicalSorter<T>::sort(Matrix<T>& data, Matrix<matrix_size_t>& originalRowNumbers,
-                                    bool sortingPerRowRequired)
+std::vector<matrix_size_t> LexicographicalSorter<T>::sort(Matrix<T>& data, bool sortingPerRowRequired)
 {
-    bool success{false};
-    sData = data;
-    const matrix_size_t c_NrOfRows{sData.getNrOfRows()};
+    s_OriginalRowNumbers.clear();
+
+    s_Data = data;
+    const matrix_size_t c_NrOfRows{s_Data.getNrOfRows()};
 
     if (c_NrOfRows > 0)
     {
-        sOriginalRowNumbers.resize(c_NrOfRows, 1);
+        s_OriginalRowNumbers.reserve(c_NrOfRows);
 
-        for (typename Matrix<matrix_size_t>::NIterator it{sOriginalRowNumbers.nBegin()};
-             it != sOriginalRowNumbers.nEnd(); ++it)
+        for (typename Matrix<T>::ConstNIterator it{s_Data.constNColumnBegin(0)}; it != s_Data.constNColumnEnd(0); ++it)
         {
-            *it = *it.getRowNr();
+            s_OriginalRowNumbers.push_back(*it.getRowNr());
         }
 
         if (sortingPerRowRequired)
         {
-            for (auto row{0}; row < c_NrOfRows; ++row)
+            for (auto rowNr{0}; rowNr < c_NrOfRows; ++rowNr)
             {
-                std::sort(sData.zRowBegin(row), sData.zRowEnd(row));
+                std::sort(s_Data.zRowBegin(rowNr), s_Data.zRowEnd(rowNr));
             }
         }
 
         _doLexicographicalSort();
 
-        data = std::move(sData);
-        originalRowNumbers = std::move(sOriginalRowNumbers);
-        success = true;
+        data = std::move(s_Data);
     }
 
-    return success;
+    return s_OriginalRowNumbers;
 }
 
 template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort()
 {
-    const matrix_size_t c_NrOfRows{sData.getNrOfRows()};
-    assert(c_NrOfRows > 0);
+    const matrix_size_t c_NrOfRows{s_Data.getNrOfRows()};
 
-    if (c_NrOfRows > 0)
+    if (c_NrOfRows > 0 && c_NrOfRows == s_OriginalRowNumbers.size())
     {
         // for the moment bubble sort is used for simplicity reasons (to be replaced with a more efficient algorithm for
         // larger amounts of data)
@@ -75,20 +72,26 @@ template <std::integral T> void LexicographicalSorter<T>::_doLexicographicalSort
         {
             sortingRequired = false;
 
-            for (auto row{0}; row < c_NrOfRows - 1; ++row)
+            for (auto rowNr{0}; rowNr < c_NrOfRows - 1; ++rowNr)
             {
-                if (!std::lexicographical_compare(sData.constZRowBegin(row), sData.constZRowEnd(row),
-                                                  sData.constZRowBegin(row + 1), sData.constZRowEnd(row + 1)))
+                if (!std::lexicographical_compare(s_Data.constZRowBegin(rowNr), s_Data.constZRowEnd(rowNr),
+                                                  s_Data.constZRowBegin(rowNr + 1), s_Data.constZRowEnd(rowNr + 1)))
                 {
-                    sData.swapRows(row, row + 1);
-                    sOriginalRowNumbers.swapRows(row, row + 1);
+                    const auto beginIt{s_OriginalRowNumbers.begin()};
+
+                    std::iter_swap(beginIt + rowNr, beginIt + rowNr + 1);
+                    s_Data.swapRows(rowNr, rowNr + 1);
                     sortingRequired = true;
                 }
             }
         }
     }
+    else
+    {
+        assert(false);
+    }
 }
 
-template <std::integral T> Matrix<T> LexicographicalSorter<T>::sData{};
+template <std::integral T> Matrix<T> LexicographicalSorter<T>::s_Data{};
 
-template <std::integral T> Matrix<matrix_size_t> LexicographicalSorter<T>::sOriginalRowNumbers{};
+template <std::integral T> std::vector<matrix_size_t> LexicographicalSorter<T>::s_OriginalRowNumbers{};
