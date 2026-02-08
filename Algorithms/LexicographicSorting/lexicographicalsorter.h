@@ -1,12 +1,13 @@
 /* The class performs ascending lexicographical sorting (ordering of rows) of an integer matrix:
    - sorting it performed with/without prior sorting of row elements
    - sorting is performed ascending (both row sorting and lexical sorting)
-   - a column matrix with the original row numbers is provided
+   - an array with the original row numbers is provided
 */
 
 #pragma once
 
 #include <algorithm>
+#include <numeric>
 #include <vector>
 
 #include "matrix.h"
@@ -35,12 +36,8 @@ std::vector<matrix_size_t> LexicographicalSorter<T>::sort(Matrix<T>& data, bool 
 
     if (c_NrOfRows > 0)
     {
-        s_OriginalRowNumbers.reserve(c_NrOfRows);
-
-        for (typename Matrix<T>::ConstNIterator it{s_Data.constNColumnBegin(0)}; it != s_Data.constNColumnEnd(0); ++it)
-        {
-            s_OriginalRowNumbers.push_back(*it.getRowNr());
-        }
+        s_OriginalRowNumbers.resize(c_NrOfRows);
+        std::iota(s_OriginalRowNumbers.begin(), s_OriginalRowNumbers.end(), 0);
 
         if (sortingPerRowRequired)
         {
