@@ -65,6 +65,7 @@ private slots:
     void testElementsView();
     void testJoinView();
     void testCountedView();
+    void testZippedView();
     void testViewInterface();
 
     // some more complex algorithms implemented by using std::views
@@ -77,6 +78,8 @@ private:
     bool _isPrime(int number);
 
     const IntVector mPrimaryIntVector;
+    const IntVector mSecondaryIntVector;
+    const StringVector mPrimaryStringVector;
     const IntPairVector mPrimaryIntPairVector;
     const IntPairVector mSecondaryIntPairVector;
     const IntPairVector mThirdIntPairVector;
@@ -88,6 +91,8 @@ private:
 
 CPP2xRangesTests::CPP2xRangesTests()
     : mPrimaryIntVector{-3, 4, 2, 2, -5, -1, 0, 2, 3, 1, -4, 8}
+    , mSecondaryIntVector{10, 5, 9, 12, 6, 14, 18, 3}
+    , mPrimaryStringVector{"George", "Alex", "Patricia", "Jimmy", "Josephine", "Reggie", "Anna", "Sophie"}
     , mPrimaryIntPairVector{{-1, 2}, {0, 1}, {1, 2}, {1, 1}, {2, 1}, {-3, 2}, {2, -3}, {5, 1}, {0, 0}, {6, 2}, {-2, 3}, {4, 2}, {1, 0}, {2, 2}}
     , mSecondaryIntPairVector{{-2, 5}, {9, 4}, {6, 7}, {-4, -3}, {0, -1}, {3, 6}, {2, 1}, {5, 0}}
     , mThirdIntPairVector{{7, 8}, {-2, 2}, {7, -5}, {3, 4}, {-2, 9}}
@@ -364,6 +369,64 @@ void CPP2xRangesTests::testCountedView()
     std::ranges::copy(fourthCountedView, thirdIntMatrix.getNIterator(1, 0));
 
     QVERIFY(c_ThirdIntMatrixRef == thirdIntMatrix);
+}
+
+void CPP2xRangesTests::testZippedView()
+{
+    StringVector underAgeTen;
+    const StringVector c_UnderAgeTenRef{"Alex", "Patricia", "Josephine", "Sophie"};
+
+    for (const auto& [name, age] : std::views::zip(mPrimaryStringVector, mSecondaryIntVector))
+    {
+        if (age < 10)
+        {
+            underAgeTen.push_back(name);
+        }
+    }
+
+    QVERIFY(c_UnderAgeTenRef == underAgeTen);
+
+    IntPairMatrix intPairMatrix;
+    intPairMatrix.resize(2, 2);
+
+    const IntPairMatrix c_IntPairMatrixRef{2, 2, {{-1, -7}, {-3, -9},
+                                                    {2, 8}, {4, 10}}
+                                           };
+
+    IntPairMatrix::NIterator it{intPairMatrix.nBegin()};
+
+    for (const auto& [first, second] : std::views::zip(mPrimaryIntMatrix, mSecondaryIntMatrix))
+    {
+        if (it == intPairMatrix.nEnd())
+        {
+            break;
+        }
+
+        *it = {first, second};
+        ++it;
+    }
+
+    QVERIFY(c_IntPairMatrixRef == intPairMatrix);
+
+    IntVector averages;
+    const IntVector c_AveragesRef{-4, 5, -6, 7, -8, 9};
+
+    for (const auto& [first, second] : std::views::zip(mPrimaryIntMatrix, mSecondaryIntMatrix))
+    {
+        averages.emplace_back((first + second) / 2);
+    }
+
+    QVERIFY(c_AveragesRef == averages);
+
+    IntVector reversedAverages;
+    const IntVector c_ReversedAveragesRef{9, -8, 7, -6, 5, -4};
+
+    for (const auto& [first, second] : std::views::zip(mSecondaryIntMatrix, mPrimaryIntMatrix) | std::views::reverse)
+    {
+        reversedAverages.emplace_back((first + second) / 2);
+    }
+
+    QVERIFY(c_ReversedAveragesRef == reversedAverages);
 }
 
 void CPP2xRangesTests::testViewInterface()
