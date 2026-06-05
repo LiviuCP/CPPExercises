@@ -65,6 +65,7 @@ private slots:
     void testElementsView();
     void testJoinView();
     void testCountedView();
+    void testEnumerateView();
     void testZippedView();
     void testViewInterface();
 
@@ -369,6 +370,21 @@ void CPP2xRangesTests::testCountedView()
     std::ranges::copy(fourthCountedView, thirdIntMatrix.getNIterator(1, 0));
 
     QVERIFY(c_ThirdIntMatrixRef == thirdIntMatrix);
+}
+
+void CPP2xRangesTests::testEnumerateView()
+{
+    IntMatrix intMatrix;
+    intMatrix.resize(mPrimaryIntMatrix.getNrOfColumns(), mPrimaryIntMatrix.getNrOfRows());
+
+    const IntMatrix c_IntMatrixRef{3, 2, {-1, 4, 2, -5, -3, 6}};
+
+    for (const auto& [index, element] : std::views::enumerate(mPrimaryIntMatrix))
+    {
+        intMatrix.at(index % intMatrix.getNrOfRows(), index / intMatrix.getNrOfRows()) = element;
+    }
+
+    QVERIFY(c_IntMatrixRef == intMatrix);
 }
 
 void CPP2xRangesTests::testZippedView()
