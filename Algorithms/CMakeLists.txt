@@ -6,7 +6,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_subdirectory(ChessHorse)
+if (NOT WIN32 AND NOT APPLE)
+    #newer version using modules that has only been tested on Linux
+    add_subdirectory(ChessHorseV2)
+else()
+    add_subdirectory(ChessHorse)
+endif()
+
 add_subdirectory(HuffmanEncoding)
 add_subdirectory(KruskalPrim)
 add_subdirectory(MapColouring)
