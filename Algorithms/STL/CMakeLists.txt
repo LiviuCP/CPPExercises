@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 3.5)
-
 project(STLAlgorithms LANGUAGES CXX)
 
 find_package(QT NAMES Qt5 Qt6 COMPONENTS Test REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Test REQUIRED)
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(
     ../../External/Matrix/MatrixLib/Matrix
@@ -19,11 +15,7 @@ set(CMAKE_AUTORCC ON)
 # I tested C++23 specific stuff on Linux only so I disabled them for other major OSes
 if (NOT WIN32 AND NOT APPLE)
     set(CMAKE_CXX_STANDARD 23)
-else()
-    set(CMAKE_CXX_STANDARD 20)
 endif()
-
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
 
