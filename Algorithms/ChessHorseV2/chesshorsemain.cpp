@@ -40,7 +40,7 @@ int main(int argc, char** argv)
         {ErrorType::INVALID_ARGUMENTS_COUNT,
          "Insufficient arguments provided, should be at least 5 (including application file path).\n"},
         {ErrorType::INVALID_STRING, "The input contains invalid (non-numeric) characters.\n"},
-        {ErrorType::INVALID_TABLE_SIZE, "The table size is invalid (both dimension should be greater than 0).\n"},
+        {ErrorType::INVALID_TABLE_SIZE, "The table size is invalid (both dimensions should be greater than 0).\n"},
         {ErrorType::INVALID_START_POSITION,
          "The starting position is invalid (should be between 1 and rows/columns count).\n"},
     };
