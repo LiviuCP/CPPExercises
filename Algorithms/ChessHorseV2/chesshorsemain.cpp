@@ -36,37 +36,32 @@ void displayTraversingOutcome(const ChessTable& chessTable)
 
 int main(int argc, char** argv)
 {
-    static const std::map<ResultType, std::string> c_ErrorMessages{
-        {ResultType::INVALID_ARGUMENTS_COUNT,
+    static const std::map<ErrorType, std::string> c_ErrorMessages{
+        {ErrorType::INVALID_ARGUMENTS_COUNT,
          "Insufficient arguments provided, should be at least 5 (including application file path).\n"},
-        {ResultType::INVALID_STRING, "The input contains invalid (non-numeric) characters.\n"},
-        {ResultType::INVALID_TABLE_SIZE, "The table size is invalid (both dimension should be greater than 0).\n"},
-        {ResultType::INVALID_START_POSITION,
+        {ErrorType::INVALID_STRING, "The input contains invalid (non-numeric) characters.\n"},
+        {ErrorType::INVALID_TABLE_SIZE, "The table size is invalid (both dimension should be greater than 0).\n"},
+        {ErrorType::INVALID_START_POSITION,
          "The starting position is invalid (should be between 1 and rows/columns count).\n"},
     };
 
     Utilities::clearScreen();
 
-    const auto& [resultType, applicationInput]{parseCommandArguments(argc, argv)};
+    const auto result{parseCommandArguments(argc, argv)};
 
-    if (resultType == ResultType::SUCCESS)
+    if (result.has_value())
     {
-        if (applicationInput.has_value())
-        {
-            ChessTable chessTable{applicationInput->m_TableLength, applicationInput->m_TableWidth};
-            chessTable.traverse(applicationInput->m_StartPositionX, applicationInput->m_StartPositionY);
+        const auto& applicationInput{*result};
 
-            displayTraversingOutcome(chessTable);
-        }
-        else
-        {
-            assert(false);
-        }
+        ChessTable chessTable{applicationInput.m_TableLength, applicationInput.m_TableWidth};
+        chessTable.traverse(applicationInput.m_StartPositionX, applicationInput.m_StartPositionY);
+
+        displayTraversingOutcome(chessTable);
     }
     else
     {
         cerr << "Invalid input!\n\n";
-        cerr << c_ErrorMessages.at(resultType) << "\n";
+        cerr << c_ErrorMessages.at(result.error()) << "\n";
         cerr << "Please check and try again.\n";
     }
 

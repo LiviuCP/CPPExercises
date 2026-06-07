@@ -1,14 +1,14 @@
 module;
 
 #include <cctype>
+#include <expected>
 
 #include "matrixutils.h"
 
 export module commandargumentsparser;
 
-export enum class ResultType
+export enum class ErrorType
 {
-    SUCCESS = 0,
     INVALID_ARGUMENTS_COUNT,
     INVALID_STRING,
     INVALID_TABLE_SIZE,
@@ -23,7 +23,7 @@ export struct ApplicationInput
     matrix_size_t m_StartPositionY;
 };
 
-using Result = std::pair<ResultType, std::optional<ApplicationInput>>;
+using Result = std::expected<ApplicationInput, ErrorType>;
 
 export Result parseCommandArguments(int argc, char** argv);
 
@@ -70,19 +70,19 @@ Result convertArgumentsToApplicationInput(const ApplicationArguments& applicatio
         applicationInput = {*c_TableLength, *c_TableWidth, *c_StartPositionX, *c_StartPositionY};
     }
 
-    ResultType resultType{ResultType::SUCCESS};
+    std::optional<ErrorType> errorType;
 
     do
     {
         if (!applicationInput.has_value())
         {
-            resultType = ResultType::INVALID_STRING;
+            errorType = ErrorType::INVALID_STRING;
             break;
         }
 
         if (0 == applicationInput->m_TableLength || 0 == applicationInput->m_TableWidth)
         {
-            resultType = ResultType::INVALID_TABLE_SIZE;
+            errorType = ErrorType::INVALID_TABLE_SIZE;
             break;
         }
 
@@ -91,18 +91,18 @@ Result convertArgumentsToApplicationInput(const ApplicationArguments& applicatio
             0 == applicationInput->m_StartPositionY ||
             applicationInput->m_StartPositionY > applicationInput->m_TableWidth)
         {
-            resultType = ResultType::INVALID_START_POSITION;
-            break;
+            errorType = ErrorType::INVALID_START_POSITION;
         }
     } while (false);
 
-    return {resultType, applicationInput};
+    return !errorType.has_value() ? std::expected<ApplicationInput, ErrorType>{*applicationInput}
+                                  : std::unexpected<ErrorType>{*errorType};
 }
 
 Result parseCommandArguments(int argc, char** argv)
 {
     static constexpr int c_MinRequiredArgumentsCount{5}; // application file path included
-    Result result{ResultType::INVALID_ARGUMENTS_COUNT, std::nullopt};
+    Result result{std::unexpected<ErrorType>{ErrorType::INVALID_ARGUMENTS_COUNT}};
 
     if (argc >= c_MinRequiredArgumentsCount)
     {
