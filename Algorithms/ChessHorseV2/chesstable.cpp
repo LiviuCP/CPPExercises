@@ -1,13 +1,15 @@
 module;
 
+#include <iostream>
+
 #include "matrixutils.h"
 
-export module chesstable;
+module chesstable;
 
-export class ChessTable
+class ChessTable
 {
 public:
-    ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns);
+    ChessTable(matrix_size_t tableLength, matrix_size_t tableWidth);
 
     void traverse(matrix_size_t startPositionX, matrix_size_t startPositionY);
 
@@ -34,12 +36,12 @@ private:
     bool m_IsFullyTraversed;
 };
 
-ChessTable::ChessTable(matrix_size_t nrOfRows, matrix_size_t nrOfColumns)
+ChessTable::ChessTable(matrix_size_t tableLength, matrix_size_t tableWidth)
     : m_IsFullyTraversed{false}
 {
-    if (nrOfRows > 0 && nrOfColumns > 0)
+    if (tableLength > 0 && tableWidth > 0)
     {
-        m_Table.resize(nrOfRows, nrOfColumns, 0);
+        m_Table.resize(tableLength, tableWidth, 0);
     }
     else
     {
@@ -159,10 +161,10 @@ bool ChessTable::_isValidMovePosition(const ChessTable::Point& position) const
 
 bool ChessTable::_isValidTablePosition(matrix_diff_t x, matrix_diff_t y) const
 {
-    const matrix_diff_t c_NrOfTableRows{static_cast<matrix_diff_t>(m_Table.getNrOfRows())};
-    const matrix_diff_t c_NrOfTableColumns{static_cast<matrix_diff_t>(m_Table.getNrOfColumns())};
-    const bool c_IsValidXPos{x >= 0 && x < c_NrOfTableRows};
-    const bool c_IsValidYPos{y >= 0 && y < c_NrOfTableColumns};
+    const matrix_diff_t c_TableLength{static_cast<matrix_diff_t>(m_Table.getNrOfRows())};
+    const matrix_diff_t c_TableWidth{static_cast<matrix_diff_t>(m_Table.getNrOfColumns())};
+    const bool c_IsValidXPos{x >= 0 && x < c_TableLength};
+    const bool c_IsValidYPos{y >= 0 && y < c_TableWidth};
     const bool c_IsValidPos{c_IsValidXPos && c_IsValidYPos};
 
     return c_IsValidPos;
@@ -172,4 +174,37 @@ ChessTable::Point::Point(matrix_diff_t x, matrix_diff_t y)
     : m_X{x}
     , m_Y{y}
 {
+}
+
+void displayTraversingOutcome(const ChessTable& chessTable)
+{
+    if (chessTable.isFullyTraversed())
+    {
+        const IntMatrix& c_TraversedPositions{chessTable.getTraversedPositions()};
+        std::cout << "The resulting chess table traversing is:\n\n";
+
+        for (matrix_size_t row{0}; row < c_TraversedPositions.getNrOfRows(); ++row)
+        {
+            for (Matrix<int>::ConstZIterator it{c_TraversedPositions.constZRowBegin(row)};
+                 it != c_TraversedPositions.constZRowEnd(row); ++it)
+            {
+                std::cout << *it << " ";
+            }
+
+            std::cout << "\n";
+        }
+    }
+    else
+    {
+        std::cout << "No table traversing solution found!\n";
+    }
+}
+
+void traverseChessTable(matrix_size_t tableLength, matrix_size_t tableWidth, matrix_size_t startPositionX,
+                        matrix_size_t startPositionY)
+{
+    ChessTable chessTable{tableLength, tableWidth};
+
+    chessTable.traverse(startPositionX, startPositionY);
+    displayTraversingOutcome(chessTable);
 }

@@ -1,31 +1,20 @@
 module;
 
 #include <cctype>
-#include <expected>
 
+#include "commandargumentsparsingresult.h"
 #include "matrixutils.h"
 
-export module commandargumentsparser;
+module commandargumentsparser;
 
-export enum class ErrorType
+// required input data received by application
+struct ApplicationArguments
 {
-    INVALID_ARGUMENTS_COUNT,
-    INVALID_STRING,
-    INVALID_TABLE_SIZE,
-    INVALID_START_POSITION
+    std::string m_TableLengthStr;
+    std::string m_TableWidthStr;
+    std::string m_StartPositionXStr;
+    std::string m_StartPositionYStr;
 };
-
-export struct ApplicationInput
-{
-    matrix_size_t m_TableLength;
-    matrix_size_t m_TableWidth;
-    matrix_size_t m_StartPositionX;
-    matrix_size_t m_StartPositionY;
-};
-
-using Result = std::expected<ApplicationInput, ErrorType>;
-
-export Result parseCommandArguments(int argc, char** argv);
 
 matrix_opt_size_t convertArgumentToInt(const std::string& argument)
 {
@@ -43,16 +32,7 @@ matrix_opt_size_t convertArgumentToInt(const std::string& argument)
     return result;
 }
 
-// required input data received by application
-struct ApplicationArguments
-{
-    std::string m_TableLengthStr;
-    std::string m_TableWidthStr;
-    std::string m_StartPositionXStr;
-    std::string m_StartPositionYStr;
-};
-
-Result convertArgumentsToApplicationInput(const ApplicationArguments& applicationArguments)
+CommandArgumentsParsingResult convertArgumentsToApplicationInput(const ApplicationArguments& applicationArguments)
 {
     assert(!applicationArguments.m_TableLengthStr.empty() && !applicationArguments.m_TableWidthStr.empty() &&
            !applicationArguments.m_StartPositionXStr.empty() && !applicationArguments.m_StartPositionYStr.empty());
@@ -99,10 +79,10 @@ Result convertArgumentsToApplicationInput(const ApplicationArguments& applicatio
                                   : std::unexpected<ErrorType>{*errorType};
 }
 
-Result parseCommandArguments(int argc, char** argv)
+CommandArgumentsParsingResult parseCommandArguments(int argc, char** argv)
 {
     static constexpr int c_MinRequiredArgumentsCount{5}; // application file path included
-    Result result{std::unexpected<ErrorType>{ErrorType::INVALID_ARGUMENTS_COUNT}};
+    CommandArgumentsParsingResult result{std::unexpected<ErrorType>{ErrorType::INVALID_ARGUMENTS_COUNT}};
 
     if (argc >= c_MinRequiredArgumentsCount)
     {
@@ -131,4 +111,18 @@ Result parseCommandArguments(int argc, char** argv)
     }
 
     return result;
+}
+
+std::string buildErrorMessage(ErrorType errorType)
+{
+    static const std::map<ErrorType, std::string> c_ErrorMessages{
+        {ErrorType::INVALID_ARGUMENTS_COUNT,
+         "Insufficient arguments provided, should be at least 5 (including application file path).\n"},
+        {ErrorType::INVALID_STRING, "The input contains invalid (non-numeric) characters.\n"},
+        {ErrorType::INVALID_TABLE_SIZE, "The table size is invalid (both dimensions should be greater than 0).\n"},
+        {ErrorType::INVALID_START_POSITION,
+         "The starting position is invalid (should be between 1 and rows/columns count).\n"},
+    };
+
+    return c_ErrorMessages.at(errorType);
 }
