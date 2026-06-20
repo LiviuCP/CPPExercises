@@ -7,6 +7,11 @@ if (QT_FOUND AND NOT WIN32)
     add_subdirectory(PartialTemplateSpecialization)
 endif()
 
+# CPP2X modules have only been tested for the CPPExercises project on Linux
+if (NOT WIN32 AND NOT APPLE)
+    add_subdirectory(ModulePartitions)
+endif()
+
 add_subdirectory(ArrayReference)
 add_subdirectory(EarlyAndLateBinding)
 add_subdirectory(InheritanceChain)
