@@ -1,10 +1,10 @@
 project(Algorithms LANGUAGES CXX)
 
+add_subdirectory(ChessHorse)
+
 if (NOT WIN32 AND NOT APPLE)
     #newer version using modules that has only been tested on Linux
     add_subdirectory(ChessHorseV2)
-else()
-    add_subdirectory(ChessHorse)
 endif()
 
 add_subdirectory(HuffmanEncoding)
