@@ -1,7 +1,15 @@
 // clang-format off
 #pragma once
 
-#include "matrixutils.h"
+#include <list>
+#include <vector>
+
+#include "matrix.h"
+
+using IntList = std::list<int>;
+using IntVector = std::vector<int>;
+
+using IntMatrix = Matrix<int>;
 
 static const IntVector c_IntVectorRef1{2, 5, -1, -8, -7, -5, -9, 0, 3, 4, 10, 8, 0, 1};
 static const IntVector c_IntVectorRef2{-1, -8, -7, -5, -9, 2, 5, 0, 3, 4, 10, 8, 0, 1};

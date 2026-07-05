@@ -2,9 +2,11 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <utility>
 
 #include "customcpp20concepts.h"
-#include "datautils.h"
+
+template <typename DataType> using ValueSizePair = std::pair<DataType, size_t>;
 
 namespace Variadic
 {

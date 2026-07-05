@@ -3,10 +3,7 @@
 
 #include <iostream>
 #include <list>
-#include <map>
-#include <set>
 #include <string>
-#include <utility>
 #include <vector>
 
 #define FAIL_DEALLOC(ptr, message)                                                                                     \
@@ -22,21 +19,7 @@
 #define MACOS
 #endif
 
-template <typename DataType> using ValueSizePair = std::pair<DataType, size_t>;
-
-using IntPair = std::pair<int, int>;
-using StringSet = std::set<std::string>;
-using StringIntPair = std::pair<std::string, int>;
-using StringIntMap = std::map<std::string, int>;
-using IntVector = std::vector<int>;
-using IntVectorDiff = IntVector::difference_type;
-using StringVector = std::vector<std::string>;
-using IntPairVector = std::vector<std::pair<int, int>>;
-using StringIntPairVector = std::vector<StringIntPair>;
-using IntList = std::list<int>;
-using SizePair = std::pair<size_t, size_t>;
 using SizeVector = std::vector<size_t>;
-using TripleSizeTuple = std::tuple<size_t, size_t, size_t>;
 
 using DataWord = std::vector<bool>;
 using DataSet = std::vector<DataWord>;

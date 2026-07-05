@@ -2,15 +2,34 @@
 #include <QTest>
 
 #include <array>
-#include <string_view>
 #include <algorithm>
+#include <map>
+#include <set>
 #include <span>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include "variadictemplates.h"
-#include "matrixutils.h"
+#include "matrix.h"
 
 using namespace std::literals;
 namespace vrd = Variadic;
+
+using IntPair = std::pair<int, int>;
+using StringSet = std::set<std::string>;
+using StringIntPair = std::pair<std::string, int>;
+using StringIntMap = std::map<std::string, int>;
+using StringIntPairVector = std::vector<StringIntPair>;
+using IntVector = std::vector<int>;
+using StringVector = std::vector<std::string>;
+using TripleSizeTuple = std::tuple<size_t, size_t, size_t>;
+
+using IntMatrix = Matrix<int>;
+using IntVectorMatrix = Matrix<IntVector>;
+using StringMatrix = Matrix<std::string>;
+using StringVectorMatrix = Matrix<StringVector>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
 
 class CPP20ConceptsTests : public QObject
 {

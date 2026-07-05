@@ -2,9 +2,13 @@
 #include <QTest>
 
 #include <algorithm>
+#include <vector>
 
 #include "tst_combinedstltests_data.h"
 #include "gather.h"
+
+using IntVector = std::vector<int>;
+using IntVectorDiff = IntVector::difference_type;
 
 class CombinedSTLTests : public QObject
 {

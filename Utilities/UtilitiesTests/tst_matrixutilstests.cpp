@@ -3,6 +3,8 @@
 
 #include "matrixutils.h"
 
+using IntMatrix = Matrix<int>;
+
 class MatrixUtilsTests : public QObject
 {
     Q_OBJECT

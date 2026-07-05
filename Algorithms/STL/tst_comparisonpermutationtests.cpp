@@ -2,8 +2,15 @@
 #include <QTest>
 
 #include <algorithm>
+#include <string>
+#include <utility>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using StringIntPair = std::pair<std::string, int>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
+
+using IntMatrix = Matrix<int>;
 
 class ComparisonPermutationTests : public QObject
 {

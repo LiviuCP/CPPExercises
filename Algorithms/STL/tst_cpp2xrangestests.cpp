@@ -2,8 +2,24 @@
 #include <QTest>
 
 #include <algorithm>
+#include <string>
+#include <vector>
+#include <utility>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using IntPair = std::pair<int, int>;
+using StringIntPair = std::pair<std::string, int>;
+using StringIntPairVector = std::vector<StringIntPair>;
+using IntVector = std::vector<int>;
+using StringVector = std::vector<std::string>;
+using IntPairVector = std::vector<std::pair<int, int>>;
+using TripleSizeTuple = std::tuple<size_t, size_t, size_t>;
+
+using IntMatrix = Matrix<int>;
+using IntPairMatrix = Matrix<IntPair>;
+using StringMatrix = Matrix<std::string>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
 
 static constexpr auto lexicographicalCompare{[](const IntPair& firstIntPair, const IntPair& secondIntPair) {
     auto equivalence{firstIntPair.first <=> secondIntPair.first};

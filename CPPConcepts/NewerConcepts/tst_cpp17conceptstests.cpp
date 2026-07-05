@@ -2,20 +2,31 @@
 #include <QTest>
 #include <QString>
 
-#include <array>
-#include <string_view>
-#include <any>
-#include <optional>
-#include <type_traits>
-#include <climits>
 #include <algorithm>
+#include <any>
+#include <array>
 #include <cassert>
+#include <climits>
+#include <optional>
+#include <string_view>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include "variadictemplates.h"
-#include "matrixutils.h"
+#include "matrix.h"
 
 using namespace std::literals;
 namespace vrd = Variadic;
+
+using StringIntPair = std::pair<std::string, int>;
+using IntVector = std::vector<int>;
+using SizePair = std::pair<size_t, size_t>;
+
+using IntMatrix = Matrix<int>;
+using StringMatrix = Matrix<std::string>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
+using BoolMatrix = Matrix<bool>;
 
 class CPP17ConceptsTests : public QObject
 {

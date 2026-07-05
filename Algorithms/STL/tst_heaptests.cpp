@@ -3,7 +3,9 @@
 
 #include <algorithm>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using IntMatrix = Matrix<int>;
 
 class HeapTests : public QObject
 {

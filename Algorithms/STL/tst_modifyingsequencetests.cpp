@@ -3,8 +3,16 @@
 
 #include <algorithm>
 #include <random>
+#include <string>
+#include <vector>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using StringIntPair = std::pair<std::string, int>;
+using IntVector = std::vector<int>;
+
+using IntMatrix = Matrix<int>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
 
 class ModifyingSequenceTests : public QObject
 {

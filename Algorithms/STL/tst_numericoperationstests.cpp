@@ -3,7 +3,9 @@
 
 #include <numeric>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using IntMatrix = Matrix<int>;
 
 class NumericOperationsTests : public QObject
 {

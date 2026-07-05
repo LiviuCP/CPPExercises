@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include <optional>
+#include <utility>
 
 #include "datautils.h"
 #include "matrix.h"
@@ -16,15 +17,6 @@ using matrix_opt_size_t = std::optional<matrix_size_t>;
 // std::nullopt corresponds to the "negative" value (previously noted -1)
 using MatrixPoint = std::pair<matrix_opt_size_t, matrix_opt_size_t>;
 
-using IntMatrix = Matrix<int>;
-using IntPairMatrix = Matrix<IntPair>;
-using IntVectorMatrix = Matrix<IntVector>;
-using StringMatrix = Matrix<std::string>;
-using StringVectorMatrix = Matrix<StringVector>;
-using StringIntPairMatrix = Matrix<StringIntPair>;
-using BoolMatrix = Matrix<bool>;
-using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
-using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
 using MatrixSizeVector = std::vector<matrix_size_t>;
 
 template <typename T> std::istream& operator>>(std::istream& in, Matrix<T>& data)

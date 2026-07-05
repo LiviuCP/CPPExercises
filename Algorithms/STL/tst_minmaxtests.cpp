@@ -2,8 +2,18 @@
 #include <QTest>
 
 #include <algorithm>
+#include <string>
+#include <utility>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using IntPair = std::pair<int, int>;
+using StringIntPair = std::pair<std::string, int>;
+
+using IntMatrix = Matrix<int>;
+using ConstIntZIteratorPair = std::pair<IntMatrix::ConstZIterator, IntMatrix::ConstZIterator>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
+using ConstStringIntZIteratorPair = std::pair<StringIntPairMatrix::ConstZIterator, StringIntPairMatrix::ConstZIterator>;
 
 class MinMaxTests : public QObject
 {

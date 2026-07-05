@@ -3,8 +3,17 @@
 
 #include <algorithm>
 #include <cmath>
+#include <string>
+#include <vector>
+#include <utility>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using StringIntPair = std::pair<std::string, int>;
+using IntVector = std::vector<int>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
+
+using IntMatrix = Matrix<int>;
 
 class NonModifyingSequenceTests : public QObject
 {

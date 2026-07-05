@@ -2,8 +2,15 @@
 #include <QTest>
 
 #include <algorithm>
+#include <string>
+#include <utility>
 
-#include "matrixutils.h"
+#include "matrix.h"
+
+using StringIntPair = std::pair<std::string, int>;
+
+using IntMatrix = Matrix<int>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
 
 class SortedRangesTests : public QObject
 {

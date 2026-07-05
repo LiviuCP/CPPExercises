@@ -2,9 +2,11 @@ module;
 
 #include <iostream>
 
-#include "matrixutils.h"
+#include "matrix.h"
 
 module chesstable;
+
+using IntMatrix = Matrix<int>;
 
 class ChessTable
 {

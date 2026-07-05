@@ -2,9 +2,18 @@
 #include <QTest>
 
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include "matrixutils.h"
+#include "datautils.h"
+#include "matrix.h"
 
+using StringIntPair = std::pair<std::string, int>;
+using StringIntPairVector = std::vector<StringIntPair>;
+
+using IntMatrix = Matrix<int>;
+using StringIntPairMatrix = Matrix<StringIntPair>;
 
 class UninitializedMemoryOperationsTests : public QObject
 {
