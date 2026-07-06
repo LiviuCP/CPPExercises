@@ -1,7 +1,9 @@
 // clang-format off
 #include <QTest>
 
-#include "datautils.h"
+import datautils;
+
+using DataWord = std::vector<bool>;
 
 enum class TrimOperation
 {

@@ -1,8 +1,11 @@
+module;
+
 #include <algorithm>
-#include <cctype>
+#include <iostream>
+#include <list>
 #include <numeric>
 
-#include "datautils.h"
+module datautils;
 
 bool Utilities::convertBitStringToDataWord(const std::string& bitString, DataWord& word)
 {
@@ -25,6 +28,22 @@ DataWord Utilities::invertDataWord(const DataWord& word)
     std::transform(word.cbegin(), word.cend(), result.begin(), [](const bool& value) { return !value; });
 
     return result;
+}
+
+/* Convenience function for getting a std::list<DataType>::iterator based on a "virtual index", i.e. number of hops from
+ * the starting element */
+template <typename DataType>
+typename std::list<DataType>::iterator Utilities::getListIteratorAtIndex(std::list<DataType>& myList, size_t index)
+{
+    auto it{myList.begin()};
+
+    while (index > 0 && it != myList.end())
+    {
+        ++it;
+        --index;
+    }
+
+    return it;
 }
 
 void Utilities::leftTrimWhiteSpace(std::string& str)

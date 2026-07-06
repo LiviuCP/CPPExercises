@@ -1,7 +1,10 @@
 // clang-format off
 #include <QTest>
 
-#include "matrixutils.h"
+import matrixutils;
+
+using matrix_opt_size_t = std::optional<matrix_size_t>;
+using MatrixPoint = std::pair<matrix_opt_size_t, matrix_opt_size_t>;
 
 using IntMatrix = Matrix<int>;
 

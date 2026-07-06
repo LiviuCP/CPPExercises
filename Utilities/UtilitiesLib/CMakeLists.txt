@@ -1,14 +1,14 @@
 project(UtilitiesLib LANGUAGES CXX)
 
-include_directories(
-    ../../External/Matrix/MatrixLib/Matrix
+add_library(${PROJECT_NAME} ${LIB_TYPE})
+
+target_sources(${PROJECT_NAME}
+    PUBLIC
+        FILE_SET utilities_modules
+        TYPE CXX_MODULES
+        FILES datautils.ixx matrixutils.cpp utils.cpp
+    PRIVATE datautils.cpp
+
 )
 
-add_library(${PROJECT_NAME} ${LIB_TYPE}
-    utilities.cpp
-    utils.cpp
-    datautils.cpp
-    matrixutils.cpp
-)
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE UTITILIES_LIBRARY)
+target_link_libraries(${PROJECT_NAME} PUBLIC MatrixLib)
