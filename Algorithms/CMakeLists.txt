@@ -14,5 +14,4 @@ add_subdirectory(Tree)
 # so it has been decided to exclude them from Windows
 if (NOT WIN32)
     add_subdirectory(HiddenBoxes)
-    add_subdirectory(LexicographicSorting)
 endif()

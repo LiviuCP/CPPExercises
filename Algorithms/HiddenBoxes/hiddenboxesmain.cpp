@@ -11,7 +11,6 @@
 #include <iostream>
 
 #include "boxutils.h"
-#include "lexicographicalsorter.h"
 #include "matrixutils.h"
 #include "utils.h"
 
@@ -46,7 +45,7 @@ int main()
             {
                 // the "original indexes" are the indexes of all boxes before lexicographic sort
                 const std::vector<matrix_size_t> c_OriginalIndexes{
-                    LexicographicalSorter<matrix_size_t>::sort(sortedBoxData, true)};
+                    Utilities::lexicographicalSort<matrix_size_t>(sortedBoxData, true)};
 
                 // the "fitting boxes indexes" are the "before lexicographic sort" indexes of the boxes that belong to
                 // maximum fitting series

@@ -3,7 +3,6 @@ project(HiddenBoxes LANGUAGES CXX)
 include_directories(
     ../../External/Matrix/MatrixLib/Matrix
     ../../Utilities/UtilitiesLib
-    ../LexicographicSorting
 )
 
 add_executable(${PROJECT_NAME}

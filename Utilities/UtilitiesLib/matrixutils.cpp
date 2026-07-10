@@ -8,6 +8,7 @@ module;
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <numeric>
 #include <optional>
 #include <vector>
 
@@ -15,11 +16,12 @@ export module matrixutils;
 export import matrix;
 import datautils;
 
-using matrix_opt_size_t = std::optional<matrix_size_t>;
-
 using SizeVector = std::vector<size_t>;
-using MatrixSizeVector = std::vector<matrix_size_t>;
-using MatrixPoint = std::pair<matrix_opt_size_t, matrix_opt_size_t>;
+
+export using MatrixSizeVector = std::vector<matrix_size_t>;
+
+export using matrix_opt_size_t = std::optional<matrix_size_t>;
+export using MatrixPoint = std::pair<matrix_opt_size_t, matrix_opt_size_t>;
 
 export template <typename T> std::istream& operator>>(std::istream& in, Matrix<T>& data)
 {
@@ -300,5 +302,69 @@ SizeVector toSizeVector(const MatrixSizeVector& matrixSizeVector)
                    [](const auto& element) { return static_cast<size_t>(element); });
 
     return sizeVector;
+}
+
+/* This function performs ascending lexicographical sorting (ordering of rows) of an integer matrix:
+   - sorting it performed with/without prior sorting of row elements
+   - sorting is performed ascending (both row sorting and lexical sorting)
+   - an array with the original row numbers is provided
+*/
+
+template <std::integral T> std::vector<matrix_size_t> lexicographicalSort(Matrix<T>& data, bool sortingPerRowRequired)
+{
+    std::vector<matrix_size_t> originalRowNumbers;
+    Matrix<T> dataCopy{data};
+
+    const matrix_size_t c_NrOfRows{data.getNrOfRows()};
+
+    if (c_NrOfRows > 0)
+    {
+        originalRowNumbers.resize(c_NrOfRows);
+        std::iota(originalRowNumbers.begin(), originalRowNumbers.end(), 0);
+
+        if (sortingPerRowRequired)
+        {
+            for (auto rowNr{0}; rowNr < c_NrOfRows; ++rowNr)
+            {
+                std::sort(dataCopy.zRowBegin(rowNr), dataCopy.zRowEnd(rowNr));
+            }
+        }
+
+        // for the moment bubble sort is used for simplicity reasons (to be replaced with a more efficient algorithm for
+        // larger amounts of data)
+        bool sortingRequired{true};
+
+        while (sortingRequired)
+        {
+            sortingRequired = false;
+
+            for (auto rowNr{0}; rowNr < c_NrOfRows - 1; ++rowNr)
+            {
+                // the equality corner case should be taken into consideration to prevent infinite loops
+                // (std::lexicographical_compare() returns false for perfect equality)
+                if (std::equal(dataCopy.constZRowBegin(rowNr), dataCopy.constZRowEnd(rowNr),
+                               dataCopy.constZRowBegin(rowNr + 1), dataCopy.constZRowEnd(rowNr + 1)))
+                {
+                    continue;
+                }
+
+                if (std::lexicographical_compare(dataCopy.constZRowBegin(rowNr), dataCopy.constZRowEnd(rowNr),
+                                                 dataCopy.constZRowBegin(rowNr + 1), dataCopy.constZRowEnd(rowNr + 1)))
+                {
+                    continue;
+                }
+
+                const auto beginIt{originalRowNumbers.begin()};
+
+                std::iter_swap(beginIt + rowNr, beginIt + rowNr + 1);
+                dataCopy.swapRows(rowNr, rowNr + 1);
+                sortingRequired = true;
+            }
+        }
+
+        data = std::move(dataCopy);
+    }
+
+    return originalRowNumbers;
 }
 } // namespace Utilities
