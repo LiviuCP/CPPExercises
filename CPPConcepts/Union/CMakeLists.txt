@@ -1,9 +1,5 @@
 project(Union LANGUAGES CXX)
 
-include_directories(
-    ../../Utilities/UtilitiesLib
-)
-
 add_executable(${PROJECT_NAME}
     unionmain.cpp
 )

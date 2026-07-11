@@ -2,7 +2,8 @@
 #include <cctype>
 
 #include "objectprintutils.h"
-#include "utils.h"
+
+import utils;
 
 // this ensures that all Point/ComposedObject member variables are contiguously placed in memory
 // (otherwise reinterpret_cast might fail due to padding bytes)

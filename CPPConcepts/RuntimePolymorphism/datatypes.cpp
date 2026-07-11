@@ -1,6 +1,73 @@
-#include <sstream>
+module;
 
-#include "datatypes.h"
+#include <map>
+#include <sstream>
+#include <utility>
+
+#include "datawrapper.h"
+
+export module datatypes;
+import matrix;
+
+export enum class Color : unsigned short
+{
+    RED,
+    GREEN,
+    BLUE,
+    MAGENTA,
+    LILA,
+    ORANGE,
+    YELLOW,
+    BROWN
+};
+
+export class Thermometer
+{
+public:
+    Thermometer(double temp, bool isDigital = true);
+    std::string getInfo() const;
+
+    void setTemperature(double temperature);
+
+private:
+    double mTemperature;
+    bool mIsDigital;
+};
+
+export void display(const Thermometer& thermometer, std::ofstream& out, size_t indentation);
+
+export using BottleCapacity = double;
+
+template <> void display(const BottleCapacity& data, std::ofstream& out, size_t indentation);
+
+template <> void display<Color>(const Color& data, std::ofstream& out, size_t indentation);
+
+export using ColorPair = std::pair<Color, Color>;
+
+template <> void display<ColorPair>(const ColorPair& data, std::ofstream& out, size_t indentation);
+
+template <> size_t countContent<ColorPair>(const ColorPair&);
+
+export using FoodMix = std::pair<std::string, std::string>;
+
+template <> void display<FoodMix>(const FoodMix& data, std::ofstream& out, size_t position);
+
+export using ColorBoard = Matrix<Color>;
+
+/* Template specialization is not mandatory for any of the datatypes.
+   It is sufficient to follow the function signature rules, e.g. display(const [DataType]& type, std::ostream& out,
+   size_t position).
+*/
+export void display(const ColorBoard& data, std::ofstream& out, size_t);
+export size_t countContent(const ColorBoard& data);
+
+/* IMPLEMENTATIONS */
+
+const std::map<Color, std::string> c_ColorMapping{
+    {Color::RED, "red"},   {Color::GREEN, "green"},   {Color::BLUE, "blue"},     {Color::MAGENTA, "magenta"},
+    {Color::LILA, "lila"}, {Color::ORANGE, "orange"}, {Color::YELLOW, "yellow"}, {Color::BROWN, "brown"}};
+
+/***************************************************************************************************************************************************/
 
 Thermometer::Thermometer(double temp, bool isDigital)
     : mTemperature{temp}

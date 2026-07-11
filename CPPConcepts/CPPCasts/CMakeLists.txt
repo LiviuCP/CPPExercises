@@ -1,9 +1,5 @@
 project(CPPCasts LANGUAGES CXX)
 
-include_directories(
-    ../../Utilities/UtilitiesLib
-)
-
 add_executable(ReinterpretCast
     reinterpretcastmain.cpp
     objects.cpp

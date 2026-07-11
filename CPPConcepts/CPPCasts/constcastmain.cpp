@@ -1,7 +1,8 @@
 #include <iostream>
 
 #include "objectprintutils.h"
-#include "utils.h"
+
+import utils;
 
 // only required for reinterpret_cast but kept here for consistency and to avoid any errors
 #pragma pack(1)

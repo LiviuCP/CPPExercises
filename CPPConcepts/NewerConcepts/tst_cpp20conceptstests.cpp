@@ -11,7 +11,8 @@
 #include <vector>
 
 #include "variadictemplates.h"
-#include "matrix.h"
+
+import matrix;
 
 using namespace std::literals;
 namespace vrd = Variadic;

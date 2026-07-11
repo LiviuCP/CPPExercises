@@ -9,28 +9,27 @@
 #include <iostream>
 
 #include "nonvirtualdestructor.h"
-#include "utils.h"
 #include "virtualdestructor.h"
 
-using namespace std;
+import utils;
 
 int main()
 {
     Utilities::clearScreen();
 
-    cout << "Case 1a: base pointer to derived class, no virtual destructor" << endl;
+    std::cout << "Case 1a: base pointer to derived class, no virtual destructor" << std::endl;
     BaseNonVirtual* baseNonVirtual{new DerivedNonVirtual};
     delete baseNonVirtual; // only destructor of BaseNonVirtual is called (no virtual keyword in destructor)
 
-    cout << endl << "Case 1b: derived pointer to derived class, no virtual destructor" << endl;
+    std::cout << std::endl << "Case 1b: derived pointer to derived class, no virtual destructor" << std::endl;
     DerivedNonVirtual* derivedNonVirtual{new DerivedNonVirtual};
     delete derivedNonVirtual; // destructor of DerivedNonVirtual is called, then destructor of BaseNonVirtual
 
-    cout << endl << "Case 2a: base pointer to derived class, virtual destructor" << endl;
+    std::cout << std::endl << "Case 2a: base pointer to derived class, virtual destructor" << std::endl;
     BaseVirtual* baseVirtual{new DerivedVirtual};
     delete baseVirtual; // destructor of DerivedVirtual is called (virtual), then destructor of BaseVirtual
 
-    cout << "Case 2b: derived pointer to derived class, virtual destructor" << endl;
+    std::cout << "Case 2b: derived pointer to derived class, virtual destructor" << std::endl;
     DerivedVirtual* derivedVirtual{new DerivedVirtual};
     delete derivedVirtual; // destructor of DerivedVirtual is called, then destructor of BaseVirtual
 
