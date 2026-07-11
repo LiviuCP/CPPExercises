@@ -28,7 +28,7 @@ endif()
 add_subdirectory(Algorithms)
 # add_subdirectory(CPPConcepts)
 # add_subdirectory(DesignPatterns)
-# add_subdirectory(InterProcessCommunication)
+add_subdirectory(InterProcessCommunication)
 add_subdirectory(Utilities)
 
 set(INPUT_OUTPUT_DIR /tmp/InputOutputFiles)

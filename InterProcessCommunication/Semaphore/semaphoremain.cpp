@@ -3,24 +3,26 @@
 #include <thread>
 
 #include "semaphore.h"
-#include "utils.h"
 
-using namespace std;
+void useResource(const std::string& threadName, int milliseconds, Semaphore& semaphore);
 
-void useResource(const string& threadName, int milliseconds, Semaphore& semaphore);
+// this function has been duplicated from Utilities library (utils module) due to the fact that this project cannot be
+// compiled on C++2X for the moment (hence cannot be connected to modules) due to a compilation error related to
+// std::condition_variable
+void clearScreen();
 
 int main(int argc, char** argv)
 {
-    Utilities::clearScreen();
+    clearScreen();
 
     const int c_ConcurrencyFactor{argc == 1 ? 0 : atoi(argv[1])}; // number of concurrent threads allowed by semaphore
     Semaphore semaphore{c_ConcurrencyFactor};
 
-    cout << "Created a semaphore" << endl;
+    std::cout << "Created a semaphore" << std::endl;
 
     if (!semaphore.isLocked())
     {
-        cout << "The semaphore is available, we will now create the threads" << endl << endl;
+        std::cout << "The semaphore is available, we will now create the threads" << std::endl << std::endl;
 
         std::thread firstThread{&useResource, "T1", 2000, std::ref(semaphore)};
         std::thread secondThread{&useResource, "T2", 1000, std::ref(semaphore)};
@@ -34,23 +36,32 @@ int main(int argc, char** argv)
         fourthThread.join();
         fifthThread.join();
 
-        cout << endl << "All threads ended. ";
+        std::cout << std::endl << "All threads ended. ";
     }
     else
     {
-        cout << "Semaphore is locked. Cannot create any threads" << endl;
+        std::cout << "Semaphore is locked. Cannot create any threads" << std::endl;
     }
 
-    cout << "Semaphore is being destroyed" << endl;
+    std::cout << "Semaphore is being destroyed" << std::endl;
 
     return 0;
 }
 
-void useResource(const string& threadName, int milliseconds, Semaphore& semaphore)
+void useResource(const std::string& threadName, int milliseconds, Semaphore& semaphore)
 {
     semaphore.aquire(threadName);
-    cout << "I am a resource, I am being used by thread " << threadName << " for " << milliseconds << " milliseconds"
-         << endl;
+    std::cout << "I am a resource, I am being used by thread " << threadName << " for " << milliseconds
+              << " milliseconds" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds{milliseconds});
     semaphore.release(threadName);
+}
+
+void clearScreen()
+{
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+    system("clear"); // Linux & Mac
+#elif defined(_WIN32)
+    system("cls"); // Windows
+#endif
 }

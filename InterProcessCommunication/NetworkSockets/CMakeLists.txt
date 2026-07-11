@@ -3,7 +3,6 @@ project(NetworkSockets LANGUAGES CXX)
 include_directories(
     Clients
     Servers
-    ../../Utilities/UtilitiesLib
 )
 
 add_executable(Client

@@ -1,9 +1,5 @@
 project(MessageQueues LANGUAGES CXX)
 
-include_directories(
-    ../../Utilities/UtilitiesLib
-)
-
 add_executable(QueueSender
     queuesendermain.cpp
     queuesender.cpp

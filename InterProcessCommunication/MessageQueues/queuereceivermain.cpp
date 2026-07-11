@@ -6,11 +6,10 @@
 
 #include "queuedataobjects.h"
 #include "queuereceiver.h"
-#include "utils.h"
 
-using namespace std;
+import utils;
 
-const string c_QueueFilename{"/tmp/messagequeue"};
+const std::string c_QueueFilename{"/tmp/messagequeue"};
 
 /* run the sender app first and then the receiver (separate terminals) */
 
@@ -22,7 +21,8 @@ int main()
     double doubleBuffer;
     MeteoData meteoDataBuffer;
 
-    cout << "Let's read from data queue (receivers wait and listen to queue if data is not available)" << endl << endl;
+    std::cout << "Let's read from data queue (receivers wait and listen to queue if data is not available)" << std::endl
+              << std::endl;
 
     const int processID{fork()};
 
@@ -31,18 +31,19 @@ int main()
         QueueReceiver childQueueReceiver{c_QueueFilename, true};
 
         childQueueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
-        cout << "Child process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
+        std::cout << "Child process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << std::endl;
 
         childQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
-        cout << "Child process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer
-             << endl;
+        std::cout << "Child process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer
+                  << std::endl;
 
         childQueueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
-        cout << "Child process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
+        std::cout << "Child process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer
+                  << std::endl;
 
         sleep(2); // simulate waiting for the child to exit so parent can remove the queue
 
-        cout << "Child process is exiting" << endl;
+        std::cout << "Child process is exiting" << std::endl;
 
         _exit(0); // inform parent process of exit so the message queue can be removed by parent
     }
@@ -51,19 +52,20 @@ int main()
         QueueReceiver parentQueueReceiver{c_QueueFilename, true};
 
         parentQueueReceiver.readFromQueue(&meteoDataBuffer, DataTypes::METEODATA);
-        cout << "Parent process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer
-             << endl;
+        std::cout << "Parent process " << c_DataTypesNames.at(DataTypes::METEODATA) << " read is: " << meteoDataBuffer
+                  << std::endl;
 
         parentQueueReceiver.readFromQueue(&intBuffer, DataTypes::INT);
-        cout << "Parent process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << endl;
+        std::cout << "Parent process " << c_DataTypesNames.at(DataTypes::INT) << " read is: " << intBuffer << std::endl;
 
         parentQueueReceiver.readFromQueue(&doubleBuffer, DataTypes::DOUBLE);
-        cout << "Parent process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer << endl;
+        std::cout << "Parent process " << c_DataTypesNames.at(DataTypes::DOUBLE) << " read is: " << doubleBuffer
+                  << std::endl;
 
-        cout << "Parent process is waiting for the child to exit" << endl;
+        std::cout << "Parent process is waiting for the child to exit" << std::endl;
         wait(nullptr);
 
-        cout << "Child exited. Parent process is now removing the queue and exiting." << endl << endl;
+        std::cout << "Child exited. Parent process is now removing the queue and exiting." << std::endl << std::endl;
         parentQueueReceiver.removeQueue();
 
         exit(0);

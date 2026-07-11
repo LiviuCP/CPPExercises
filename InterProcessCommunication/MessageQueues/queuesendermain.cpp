@@ -5,11 +5,10 @@
 
 #include "queuedataobjects.h"
 #include "queuesender.h"
-#include "utils.h"
 
-using namespace std;
+import utils;
 
-const string c_QueueFilename{"/tmp/messagequeue"};
+const std::string c_QueueFilename{"/tmp/messagequeue"};
 
 /* run the sender app first and then the receiver (separate terminals) */
 
@@ -21,7 +20,7 @@ int main()
     double firstDouble{5.24}, secondDouble{-2.45};
     MeteoData firstMeteoData{-5, 22.4, 56.2f}, secondMeteoData{23, 2.2, 0.0f};
 
-    cout << "Let's write to data queue" << endl << endl;
+    std::cout << "Let's write to data queue" << std::endl << std::endl;
     sleep(5); // for being able to start the receiver program before data is being sent (if sender program had been
               // started first)
 
@@ -33,18 +32,18 @@ int main()
 
         sleep(1);
         childQueueSender.writeToQueue(&secondInt, DataTypes::INT);
-        cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::INT) << " Value: " << secondInt
-             << endl;
+        std::cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::INT) << " Value: " << secondInt
+                  << std::endl;
 
         sleep(2);
         childQueueSender.writeToQueue(&secondDouble, DataTypes::DOUBLE);
-        cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::DOUBLE) << " Value: " << secondDouble
-             << endl;
+        std::cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::DOUBLE)
+                  << " Value: " << secondDouble << std::endl;
 
         sleep(3); // simulate a longer operation before sending this object type
         childQueueSender.writeToQueue(&secondMeteoData, DataTypes::METEODATA);
-        cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::METEODATA)
-             << " Value: " << secondMeteoData << endl;
+        std::cout << "Child process sent data type: " << c_DataTypesNames.at(DataTypes::METEODATA)
+                  << " Value: " << secondMeteoData << std::endl;
 
         exit(0);
     }
@@ -54,21 +53,21 @@ int main()
 
         sleep(2);
         parentQueueSender.writeToQueue(&firstDouble, DataTypes::DOUBLE);
-        cout << "Parent process sent data type: " << c_DataTypesNames.at(DataTypes::DOUBLE) << " Value: " << firstDouble
-             << endl;
+        std::cout << "Parent process sent data type: " << c_DataTypesNames.at(DataTypes::DOUBLE)
+                  << " Value: " << firstDouble << std::endl;
 
         sleep(3); // simulate a longer operation before sending this object type
         parentQueueSender.writeToQueue(&firstMeteoData, DataTypes::METEODATA);
-        cout << "Parent process sent data type: " << c_DataTypesNames.at(DataTypes::METEODATA)
-             << " Value: " << firstMeteoData << endl;
+        std::cout << "Parent process sent data type: " << c_DataTypesNames.at(DataTypes::METEODATA)
+                  << " Value: " << firstMeteoData << std::endl;
 
         sleep(1);
         parentQueueSender.writeToQueue(&firstInt, DataTypes::INT);
-        cout << "Parent process sent data type: " << c_DataTypesNames.at(DataTypes::INT) << " Value: " << firstInt
-             << endl;
+        std::cout << "Parent process sent data type: " << c_DataTypesNames.at(DataTypes::INT) << " Value: " << firstInt
+                  << std::endl;
 
         sleep(1); // for a nicer output
-        cout << endl;
+        std::cout << std::endl;
 
         exit(0);
     }
