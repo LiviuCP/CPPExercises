@@ -3,25 +3,24 @@
 #include <iostream>
 
 #include "server.h"
-#include "utils.h"
 
-using namespace std;
+import utils;
 
 int main()
 {
     Utilities::clearScreen();
 
-    cout << "Let's create three server objects" << endl;
+    std::cout << "Let's create three server objects" << std::endl;
     Server* webServer{Server::createServer(Server::ServerTypes::WEB)};
     Server* mailServer{Server::createServer(Server::ServerTypes::MAIL)};
     Server* ftpServer{Server::createServer(Server::ServerTypes::FTP)};
     Server* firewall{Server::createServer(Server::ServerTypes::FIREWALL)};
 
-    cout << endl << "Now let's see the object descriptions" << endl << endl;
-    cout << webServer->getDescription() << endl;
-    cout << mailServer->getDescription() << endl;
-    cout << ftpServer->getDescription() << endl;
-    cout << firewall->getDescription() << endl << endl;
+    std::cout << std::endl << "Now let's see the object descriptions" << std::endl << std::endl;
+    std::cout << webServer->getDescription() << std::endl;
+    std::cout << mailServer->getDescription() << std::endl;
+    std::cout << ftpServer->getDescription() << std::endl;
+    std::cout << firewall->getDescription() << std::endl << std::endl;
 
     // user is responsible for deleting the factory created objects
     delete webServer;

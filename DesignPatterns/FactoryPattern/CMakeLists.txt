@@ -1,9 +1,5 @@
 project(FactoryPattern LANGUAGES CXX)
 
-include_directories(
-    ../../Utilities/UtilitiesLib
-)
-
 add_executable(${PROJECT_NAME}
     factorypatternmain.cpp
     server.cpp
