@@ -1,8 +1,5 @@
 /* Utility functions connected to the Matrix class */
 
-// TODO: create a better separation from implementation (similar to datautils)
-// For the moment this was not possible due to some compiling error related to template functions
-// (should be investigated when possible)
 module;
 
 #include <algorithm>

@@ -4,13 +4,13 @@
    (cost). The output is a list of edges that create the loop-free tree connecting all nodes at minimum cost.
 */
 
-#include "prim.h"
-#include "utils.h"
+#include <string>
 
-using namespace std;
+import prim;
+import utils;
 
-static const string c_InFile{Utilities::c_InputOutputDir + "kruskalpriminput.txt"};
-static const string c_OutFile{Utilities::c_InputOutputDir + "primoutput.txt"};
+static const std::string c_InFile{Utilities::c_InputOutputDir + "kruskalpriminput.txt"};
+static const std::string c_OutFile{Utilities::c_InputOutputDir + "primoutput.txt"};
 
 extern int treeAppMain(const std::string& inputFile, const std::string& outputFile, BaseEngine& treeEngine);
 

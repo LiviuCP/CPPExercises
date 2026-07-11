@@ -4,11 +4,18 @@
 #include <algorithm>
 #include <vector>
 
-#include "tst_combinedstltests_data.h"
-#include "gather.h"
+import combined_stl_tests_data;
+import gather;
+import datautils;
 
+using IntList = std::list<int>;
 using IntVector = std::vector<int>;
 using IntVectorDiff = IntVector::difference_type;
+
+using IntMatrix = Matrix<int>;
+
+using matrix_opt_size_t = std::optional<matrix_size_t>;
+using MatrixPoint = std::pair<matrix_opt_size_t, matrix_opt_size_t>;
 
 class CombinedSTLTests : public QObject
 {

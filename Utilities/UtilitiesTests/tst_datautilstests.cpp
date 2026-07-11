@@ -3,8 +3,6 @@
 
 import datautils;
 
-using DataWord = std::vector<bool>;
-
 enum class TrimOperation
 {
     TRIM_LEFT = 0,

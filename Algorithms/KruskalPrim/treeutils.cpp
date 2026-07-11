@@ -1,8 +1,17 @@
+#include <cassert>
 #include <fstream>
+#include <iostream>
+#include <list>
 
-#include "baseengine.h"
-#include "matrixutils.h"
-#include "utils.h"
+import baseengine;
+import matrixutils;
+import utils;
+
+using Node = size_t;
+using Edge = std::pair<Node, Node>;
+using Cost = size_t;
+using GraphMatrix = Matrix<Cost>;
+using Tree = std::list<Edge>;
 
 static void writeTreeToFile(std::ofstream& out, const GraphMatrix& graphMatrix, const Tree& tree)
 {

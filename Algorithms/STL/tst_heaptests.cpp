@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "matrix.h"
+import matrix;
 
 using IntMatrix = Matrix<int>;
 

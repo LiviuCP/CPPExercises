@@ -1,4 +1,49 @@
-#include "prim.h"
+module;
+
+#include <cassert>
+#include <limits>
+#include <list>
+#include <vector>
+
+export module prim;
+export import baseengine;
+
+using Node = size_t;
+using Edge = std::pair<Node, Node>;
+using Cost = size_t;
+using GraphMatrix = Matrix<Cost>;
+using Tree = std::list<Edge>;
+
+export class PrimEngine : public BaseEngine
+{
+public:
+    explicit PrimEngine();
+    bool buildTrees(const GraphMatrix& graphMatrix) override;
+
+private:
+    struct NodeInfo
+    {
+        NodeInfo(Cost cost);
+
+        Cost mNodeCost{scMaxCost};
+        Node mPrecedingNode{scNullNode};
+        bool mIsAddedToTree{false};
+    };
+
+    using NodeInfoMap = std::vector<NodeInfo>;
+
+    void _buildGraph(const GraphMatrix& graphMatrix);
+    void _buildTreeFromGraph(bool isMinTree);
+    void _doBuildTree(const NodeInfoMap& nodeInfoMap, bool isMinTree);
+    void _updateNeighborCosts(Node node, NodeInfoMap& nodeInfoMap, bool (*isNewCostBetter)(Cost newCost, Cost oldCost));
+    void _reset() override;
+
+    static constexpr Cost scMinCost{0};
+    static constexpr Cost scMaxCost{std::numeric_limits<Cost>::max()};
+    static constexpr Node scNullNode{std::numeric_limits<Node>::max()};
+
+    GraphMatrix mGraphMatrix;
+};
 
 PrimEngine::PrimEngine()
     : BaseEngine{"Prim"}

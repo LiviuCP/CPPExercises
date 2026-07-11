@@ -12,25 +12,24 @@
 */
 
 #include <algorithm>
+#include <cassert>
 #include <fstream>
+#include <iostream>
 
-#include "mapcolouringutils.h"
-#include "matrix.h"
-#include "matrixutils.h"
-#include "utils.h"
+import mapcolouringutils;
+import matrixutils;
+import utils;
 
-using namespace std;
+static const std::string c_InFile{Utilities::c_InputOutputDir + "countriesinput.txt"};
+static const std::string c_OutFile{Utilities::c_InputOutputDir + "countriesoutput.txt"};
 
-static const string c_InFile{Utilities::c_InputOutputDir + "countriesinput.txt"};
-static const string c_OutFile{Utilities::c_InputOutputDir + "countriesoutput.txt"};
-
-void printCountryColoursToFile(ofstream& output, const Matrix<matrix_size_t>& countryColours,
+void printCountryColoursToFile(std::ofstream& output, const Matrix<matrix_size_t>& countryColours,
                                const Matrix<bool>& uniqueColours);
 
 int main()
 {
-    ifstream in{c_InFile};
-    ofstream out{c_OutFile};
+    std::ifstream in{c_InFile};
+    std::ofstream out{c_OutFile};
 
     Utilities::clearScreen();
 
@@ -105,33 +104,34 @@ int main()
 
             printCountryColoursToFile(out, countryColours, uniqueColours);
 
-            cout << "Country neighbourhood data read from: " << c_InFile << endl;
-            cout << "Determined colour mapping of countries written to: " << c_OutFile << endl << endl;
+            std::cout << "Country neighbourhood data read from: " << c_InFile << std::endl;
+            std::cout << "Determined colour mapping of countries written to: " << c_OutFile << std::endl << std::endl;
         }
         else
         {
-            cerr << "Invalid input. Please check input file: " << c_InFile << endl << endl;
+            std::cerr << "Invalid input. Please check input file: " << c_InFile << std::endl << std::endl;
         }
     }
     else
     {
-        cerr << "Error in opening input and/or output file" << endl << endl;
+        std::cerr << "Error in opening input and/or output file" << std::endl << std::endl;
     }
 
     return 0;
 }
 
-void printCountryColoursToFile(ofstream& output, const Matrix<matrix_size_t>& countryColours,
+void printCountryColoursToFile(std::ofstream& output, const Matrix<matrix_size_t>& countryColours,
                                const Matrix<bool>& uniqueColours)
 {
     assert(uniqueColours.getNrOfRows() == 1);
 
-    output << countryColours.getNrOfRows() << " countries, " << uniqueColours.getNrOfColumns() << " colours" << endl
-           << endl;
-    output << "Colour mapping ordered by country index:" << endl << endl;
+    output << countryColours.getNrOfRows() << " countries, " << uniqueColours.getNrOfColumns() << " colours"
+           << std::endl
+           << std::endl;
+    output << "Colour mapping ordered by country index:" << std::endl << std::endl;
 
     for (Matrix<matrix_size_t>::ConstNIterator it{countryColours.constNBegin()}; it != countryColours.constNEnd(); ++it)
     {
-        output << "Country " << *it.getRowNr() << " - Colour " << *it << endl;
+        output << "Country " << *it.getRowNr() << " - Colour " << *it << std::endl;
     }
 }

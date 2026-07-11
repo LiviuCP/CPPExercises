@@ -5,7 +5,7 @@
 #include <string>
 #include <utility>
 
-#include "matrix.h"
+import matrix;
 
 using StringIntPair = std::pair<std::string, int>;
 

@@ -1,11 +1,17 @@
 module;
 
+#include <algorithm>
+#include <cassert>
 #include <cctype>
-
-#include "commandargumentsparsingresult.h"
-#include "matrixutils.h"
+#include <expected>
+#include <map>
+#include <optional>
+#include <string>
 
 module commandargumentsparser;
+import datautils;
+
+using matrix_opt_size_t = std::optional<matrix_size_t>;
 
 // required input data received by application
 struct ApplicationArguments

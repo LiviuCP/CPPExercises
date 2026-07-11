@@ -4,10 +4,24 @@ module;
 #include <iostream>
 #include <list>
 #include <numeric>
+#include <string>
+#include <vector>
 
-module datautils;
+// TODO: move to separate .h file
+#if (defined(__APPLE__) && defined(__MACH__))
+#define MACOS
+#endif
 
-bool Utilities::convertBitStringToDataWord(const std::string& bitString, DataWord& word)
+export module datautils;
+
+using SizeVector = std::vector<size_t>;
+
+export using DataWord = std::vector<bool>;
+export using DataSet = std::vector<DataWord>;
+
+export namespace Utilities
+{
+bool convertBitStringToDataWord(const std::string& bitString, DataWord& word)
 {
     const bool c_IsInputValid{!bitString.empty() && std::all_of(bitString.cbegin(), bitString.cend(),
                                                                 [](auto ch) { return ch == '0' || ch == '1'; })};
@@ -22,7 +36,7 @@ bool Utilities::convertBitStringToDataWord(const std::string& bitString, DataWor
     return c_IsInputValid;
 }
 
-DataWord Utilities::invertDataWord(const DataWord& word)
+DataWord invertDataWord(const DataWord& word)
 {
     DataWord result(word.size(), false);
     std::transform(word.cbegin(), word.cend(), result.begin(), [](const bool& value) { return !value; });
@@ -33,7 +47,7 @@ DataWord Utilities::invertDataWord(const DataWord& word)
 /* Convenience function for getting a std::list<DataType>::iterator based on a "virtual index", i.e. number of hops from
  * the starting element */
 template <typename DataType>
-typename std::list<DataType>::iterator Utilities::getListIteratorAtIndex(std::list<DataType>& myList, size_t index)
+typename std::list<DataType>::iterator getListIteratorAtIndex(std::list<DataType>& myList, size_t index)
 {
     auto it{myList.begin()};
 
@@ -46,13 +60,13 @@ typename std::list<DataType>::iterator Utilities::getListIteratorAtIndex(std::li
     return it;
 }
 
-void Utilities::leftTrimWhiteSpace(std::string& str)
+void leftTrimWhiteSpace(std::string& str)
 {
     const auto it{std::find_if(str.cbegin(), str.cend(), [](char ch) { return !std::isspace(ch); })};
     str.erase(str.cbegin(), it);
 }
 
-void Utilities::rightTrimWhiteSpace(std::string& str)
+void rightTrimWhiteSpace(std::string& str)
 {
     const auto reverseIt{std::find_if(str.crbegin(), str.crend(), [](char ch) { return !std::isspace(ch); })};
     const auto it{str.cbegin() + str.size() - std::distance(str.crbegin(), reverseIt)};
@@ -60,13 +74,14 @@ void Utilities::rightTrimWhiteSpace(std::string& str)
     str.erase(it, str.cend());
 }
 
-void Utilities::trimWhiteSpace(std::string& str)
+void trimWhiteSpace(std::string& str)
 {
     leftTrimWhiteSpace(str);
     rightTrimWhiteSpace(str);
 }
+} // namespace Utilities
 
-std::istream& operator>>(std::istream& in, DataSet& dataSet)
+export std::istream& operator>>(std::istream& in, DataSet& dataSet)
 {
     size_t wordsCount{0};
     size_t wordSize{0};
@@ -126,7 +141,7 @@ std::istream& operator>>(std::istream& in, DataSet& dataSet)
     return in;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataSet& dataSet)
+export std::ostream& operator<<(std::ostream& out, const DataSet& dataSet)
 {
     const size_t c_CharsCount = dataSet.size() + std::accumulate(dataSet.cbegin(), dataSet.cend(), 0,
                                                                  [](const size_t partialSum, const auto& toAdd) {
@@ -148,7 +163,7 @@ std::ostream& operator<<(std::ostream& out, const DataSet& dataSet)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const DataWord& word)
+export std::ostream& operator<<(std::ostream& out, const DataWord& word)
 {
     std::string charsToWrite;
     charsToWrite.reserve(word.size());
@@ -160,7 +175,7 @@ std::ostream& operator<<(std::ostream& out, const DataWord& word)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const SizeVector& indexes)
+export std::ostream& operator<<(std::ostream& out, const SizeVector& indexes)
 {
     const size_t c_IndexesSize{indexes.size()};
 

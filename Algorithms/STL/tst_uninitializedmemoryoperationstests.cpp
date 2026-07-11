@@ -6,8 +6,17 @@
 #include <utility>
 #include <vector>
 
-#include "datautils.h"
-#include "matrix.h"
+#define FAIL_DEALLOC(ptr, message)                                                                                     \
+    std::free(ptr);                                                                                                    \
+    ptr = nullptr;                                                                                                     \
+    QFAIL(message);
+
+#define DEALLOC(ptr)                                                                                                   \
+    std::free(ptr);                                                                                                    \
+    ptr = nullptr;
+
+import datautils;
+import matrix;
 
 using StringIntPair = std::pair<std::string, int>;
 using StringIntPairVector = std::vector<StringIntPair>;

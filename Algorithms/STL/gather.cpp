@@ -1,6 +1,12 @@
-#pragma once
+module;
 
-#include "matrixutils.h"
+#include <algorithm>
+#include <functional>
+#include <iterator>
+#include <utility>
+
+export module gather;
+import matrixutils;
 
 /* Unidimensional gathering:
    - elements from a sequence are gathered around a chosen position (gathering point) by using a unary predicate
@@ -18,7 +24,7 @@
    handling occurs as in previous point)
 */
 
-template <typename BidirectionalIt, typename Predicate>
+export template <typename BidirectionalIt, typename Predicate>
 std::pair<BidirectionalIt, BidirectionalIt> gatherSequenceElements(BidirectionalIt startIt, BidirectionalIt endIt,
                                                                    BidirectionalIt gatheringPointIt,
                                                                    Predicate predicate)
@@ -59,7 +65,7 @@ std::pair<BidirectionalIt, BidirectionalIt> gatherSequenceElements(Bidirectional
    column-by-column by using the x coordinate of the gathering point
 */
 
-template <typename DataType>
+export template <typename DataType>
 std::tuple<MatrixPoint, MatrixPoint, matrix_size_t> gatherMatrixElements(
     Matrix<DataType>& matrix, MatrixPoint startingPoint, MatrixPoint endingPoint, MatrixPoint gatheringPoint,
     std::function<bool(const DataType&)>& predicate)

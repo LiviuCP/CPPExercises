@@ -1,8 +1,9 @@
 #include <fstream>
 #include <iostream>
 
-#include "utils.h"
 #include "wordscounter.h"
+
+import utils;
 
 static const std::string c_InFile{Utilities::c_InputOutputDir + "wordscountinginput.txt"};
 static const std::string c_OutFile{Utilities::c_InputOutputDir + "wordscountingoutput.txt"};

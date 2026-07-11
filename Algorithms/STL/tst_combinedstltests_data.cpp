@@ -1,31 +1,32 @@
 // clang-format off
-#pragma once
+module;
 
 #include <list>
 #include <vector>
 
-#include "matrix.h"
+export module combined_stl_tests_data;
+export import matrix;
 
 using IntList = std::list<int>;
 using IntVector = std::vector<int>;
 
 using IntMatrix = Matrix<int>;
 
-static const IntVector c_IntVectorRef1{2, 5, -1, -8, -7, -5, -9, 0, 3, 4, 10, 8, 0, 1};
-static const IntVector c_IntVectorRef2{-1, -8, -7, -5, -9, 2, 5, 0, 3, 4, 10, 8, 0, 1};
-static const IntVector c_IntVectorRef3{2, 5, 0, 3, 4, 10, 8, 0, 1, -1, -8, -7, -5, -9};
-static const IntVector c_IntVectorRef4{2, -1, 5, -8, -7, -5, 0, 3, 4, 10, 8, -9, 0, 1};
-static const IntVector c_IntVectorRef5_6_7{2, -1, -8, -7, -5, 5, 0, 3, 4, 10, 8, -9, 0, 1};
-static const IntVector c_IntVectorRef8_9_10{2, -1, 5, 0, 3, 4, 10, -8, -7, -5, 8, -9, 0, 1};
+export const IntVector c_IntVectorRef1{2, 5, -1, -8, -7, -5, -9, 0, 3, 4, 10, 8, 0, 1};
+export const IntVector c_IntVectorRef2{-1, -8, -7, -5, -9, 2, 5, 0, 3, 4, 10, 8, 0, 1};
+export const IntVector c_IntVectorRef3{2, 5, 0, 3, 4, 10, 8, 0, 1, -1, -8, -7, -5, -9};
+export const IntVector c_IntVectorRef4{2, -1, 5, -8, -7, -5, 0, 3, 4, 10, 8, -9, 0, 1};
+export const IntVector c_IntVectorRef5_6_7{2, -1, -8, -7, -5, 5, 0, 3, 4, 10, 8, -9, 0, 1};
+export const IntVector c_IntVectorRef8_9_10{2, -1, 5, 0, 3, 4, 10, -8, -7, -5, 8, -9, 0, 1};
 
-static const IntList c_IntListRef1{2, 5, -1, -8, -7, -5, -9, 0, 3, 4, 10, 8, 0, 1};
-static const IntList c_IntListRef2{-1, -8, -7, -5, -9, 2, 5, 0, 3, 4, 10, 8, 0, 1};
-static const IntList c_IntListRef3{2, 5, 0, 3, 4, 10, 8, 0, 1, -1, -8, -7, -5, -9};
-static const IntList c_IntListRef4{2, -1, 5, -8, -7, -5, 0, 3, 4, 10, 8, -9, 0, 1};
-static const IntList c_IntListRef5{2, -1, -8, -7, -5, 5, 0, 3, 4, 10, 8, -9, 0, 1};
-static const IntList c_IntListRef8{2, -1, 5, 0, 3, 4, 10, -8, -7, -5, 8, -9, 0, 1};
+export const IntList c_IntListRef1{2, 5, -1, -8, -7, -5, -9, 0, 3, 4, 10, 8, 0, 1};
+export const IntList c_IntListRef2{-1, -8, -7, -5, -9, 2, 5, 0, 3, 4, 10, 8, 0, 1};
+export const IntList c_IntListRef3{2, 5, 0, 3, 4, 10, 8, 0, 1, -1, -8, -7, -5, -9};
+export const IntList c_IntListRef4{2, -1, 5, -8, -7, -5, 0, 3, 4, 10, 8, -9, 0, 1};
+export const IntList c_IntListRef5{2, -1, -8, -7, -5, 5, 0, 3, 4, 10, 8, -9, 0, 1};
+export const IntList c_IntListRef8{2, -1, 5, 0, 3, 4, 10, -8, -7, -5, 8, -9, 0, 1};
 
-static const IntMatrix c_IntMatrixRef1a{8, 9, { 4,  20, -5, -1,  0,   8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef1a{8, 9, { 4,  20, -5, -1,  0,   8,  12,  9,   9,
                                                 4, -1,  -7, -5, -2,   2,  2,   2,  10,
                                                 5, -5, -12, -2, -9,   2,  6,   7,   8,
                                                 4, -6, -5,  -7, -12, -7,  0,  12,  14,
@@ -35,7 +36,7 @@ static const IntMatrix c_IntMatrixRef1a{8, 9, { 4,  20, -5, -1,  0,   8,  12,  9
                                                48,  2, -3,   5,  5,   4,  6,  18,   0
                                         }};
 
-static const IntMatrix c_IntMatrixRef1b{8, 9, {-1, -5, -1,  -9,   0,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef1b{8, 9, {-1, -5, -1,  -9,   0,  8,  12,  9,   9,
                                                -7, -5, -2,  -12,  20,  2,  2,  2,  10,
                                                -5, -12, -2, -7,   5,  2,   6,  7,   8,
                                                -6,  -5, -7,  4,  14,  0,   0,  12,  14,
@@ -45,7 +46,7 @@ static const IntMatrix c_IntMatrixRef1b{8, 9, {-1, -5, -1,  -9,   0,  8,  12,  9
                                                -3,   5,  5,  5,  48,  2,  6,  18,   0
                                         }};
 
-static const IntMatrix c_IntMatrixRef1c{8, 9, { 4,  0,  8,  12,  9, -5,   -1,  -5,  -1,
+export const IntMatrix c_IntMatrixRef1c{8, 9, { 4,  0,  8,  12,  9, -5,   -1,  -5,  -1,
                                                 4, 20,  2,   2,  2, -8,   -7,  -5,  -2,
                                                 5,  2,   6,  7,  8, -3,  -12,  -2,  -9,
                                                 4,  14, 0,   0,  12, 9,   -6,  -5,  -7,
@@ -55,7 +56,7 @@ static const IntMatrix c_IntMatrixRef1c{8, 9, { 4,  0,  8,  12,  9, -5,   -1,  -
                                                48,  2,  6,  18,  0,  3,    2,   4,  -7
                                         }};
 
-static const IntMatrix c_IntMatrixRef1d{8, 9, { 4,  0,  8,  12, -8,  -1,  -5, -1,  -2,
+export const IntMatrix c_IntMatrixRef1d{8, 9, { 4,  0,  8,  12, -8,  -1,  -5, -1,  -2,
                                                 4, 20,  2,   2, -3,  -5,  -7, -5,  -9,
                                                 5,  2,  6,   7,  9,  -14, -12, -2, -7,
                                                 4,  14, 0,   0,  2,  -4,  -6,  -5, -9,
@@ -65,7 +66,7 @@ static const IntMatrix c_IntMatrixRef1d{8, 9, { 4,  0,  8,  12, -8,  -1,  -5, -1
                                                48,  2,  6,  18,  4,   3,   2,  -7,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef1ef{8, 9, {-1,   5,   5,   4,   0,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef1ef{8, 9, {-1,   5,   5,   4,   0,  8,  12,  9,   9,
                                                 -7,  -5,  -1,   4,  20,  2,   2,  2,   10,
                                                 -5,  -5,  -2,   4,   5,  2,   6,  7,   8,
                                                 -6, -12,  -2,   3,  14,  0,   0,  12,  14,
@@ -75,7 +76,7 @@ static const IntMatrix c_IntMatrixRef1ef{8, 9, {-1,   5,   5,   4,   0,  8,  12,
                                                 -3,  -4,  -5,  -7,  48,  2,   6,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef1gh{8, 9, { 4,  0,  8,  12,  9,   9,   2,   4,  -1,
+export const IntMatrix c_IntMatrixRef1gh{8, 9, { 4,  0,  8,  12,  9,   9,   2,   4,  -1,
                                                  4, 20,  2,   2,  2,  10,  -1,  -5,  -2,
                                                  5,  2,  6,   7,  8,  14,  -7,  -5,  -9,
                                                  4, 14,  0,   0,  12,  0,  -12, -2,  -7,
@@ -85,7 +86,7 @@ static const IntMatrix c_IntMatrixRef1gh{8, 9, { 4,  0,  8,  12,  9,   9,   2,  
                                                 48,  2,  6,  18,  0,  -3,  -4,  -5,  -7
                                         }};
 
-static const IntMatrix c_IntMatrixRef1i{8, 9, { 4,  0,  8,  12,  9,  10,   2,  -1,   9,
+export const IntMatrix c_IntMatrixRef1i{8, 9, { 4,  0,  8,  12,  9,  10,   2,  -1,   9,
                                                 4, 20,  2,   2,  2,  14,  -5,  -5,   2,
                                                 5,  2,  6,   7,  8,   0,  -7,  -2,   4,
                                                 4, 14,  0,   0,  12,  3,  -12, -5,   0,
@@ -95,7 +96,7 @@ static const IntMatrix c_IntMatrixRef1i{8, 9, { 4,  0,  8,  12,  9,  10,   2,  -
                                                48,  2,  6,  18, -3,  -4,  -5,  -7,  -9
                                         }};
 
-static const IntMatrix c_IntMatrixRef1j{8, 9, { 4,  0,  8,  12,  9,  10,   2,  -1,   9,
+export const IntMatrix c_IntMatrixRef1j{8, 9, { 4,  0,  8,  12,  9,  10,   2,  -1,   9,
                                                 4, 20,  2,   2,  2,  14,  -5,  -5,   2,
                                                 5,  2,  6,   7,  8,   0,  -7,  -2,   4,
                                                 4,  14, 0,   0,  12,  3,  -12, -5,  -2,
@@ -105,7 +106,7 @@ static const IntMatrix c_IntMatrixRef1j{8, 9, { 4,  0,  8,  12,  9,  10,   2,  -
                                                48,  2,  6,  18, -3,  -4,  -5,  -7,   0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2a{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,   9,  9,
+export const IntMatrix c_IntMatrixRef2a{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,   9,  9,
                                                 4, 20, -7,   2,   2,  2,  10,  -5, -2,
                                                 5, -5,  2,  -12, -2, -9,   6,   7,  8,
                                                -6,  4,  14, -4,  -5, -7, -12,  12, 14,
@@ -115,7 +116,7 @@ static const IntMatrix c_IntMatrixRef2a{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,   
                                                48,  2, -3,   5,  4,  -7,   6,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2b{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef2b{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,  10, -5,  -2,
                                                 5,  4,  2,  -12, -2,  6,   7,  8,  -9,
                                                -6, -5,  14, -5,   0,  0,  12,  14, -7,
@@ -125,7 +126,7 @@ static const IntMatrix c_IntMatrixRef2b{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  5,  2,  -4,  -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2c{8, 9, {-1,  4,  0,   8,  -5, -1,   12,  9,   9,
+export const IntMatrix c_IntMatrixRef2c{8, 9, {-1,  4,  0,   8,  -5, -1,   12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,   -5, -2,  10,
                                                 5, -5,  2,  -12, -2,  6,    7,  8,  -9,
                                                -6,  4,  14, -5,   0,  0,   12,  14, -7,
@@ -135,7 +136,7 @@ static const IntMatrix c_IntMatrixRef2c{8, 9, {-1,  4,  0,   8,  -5, -1,   12,  
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,   0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2d{8, 9, { 4, -1,  0,  -5,  -1,  8,   12,  9,   9,
+export const IntMatrix c_IntMatrixRef2d{8, 9, { 4, -1,  0,  -5,  -1,  8,   12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,   10, -5,  -2,
                                                 5, -5,  2,  -12, -2,  6,    7,  8,  -9,
                                                -6,  4,  14, -5,   0,  0,   12,  14, -7,
@@ -145,7 +146,7 @@ static const IntMatrix c_IntMatrixRef2d{8, 9, { 4, -1,  0,  -5,  -1,  8,   12,  
                                                48,  2, -3,  -4,  -5,  6,  -7,   18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2e{8, 9, {-1,  4,  0,  -5,  -1,  8,   12,  9,   9,
+export const IntMatrix c_IntMatrixRef2e{8, 9, {-1,  4,  0,  -5,  -1,  8,   12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,   10, -5,  -2,
                                                 5, -5,  2,   6,   7,  8,   14,  0,  -9,
                                                -6,  4,  14,  0,   0,  12,  11, -2,  -7,
@@ -155,7 +156,7 @@ static const IntMatrix c_IntMatrixRef2e{8, 9, {-1,  4,  0,  -5,  -1,  8,   12,  
                                                48,  2, -3,   6,  18,  0,   2,   4,  -7
                                         }};
 
-static const IntMatrix c_IntMatrixRef2f{8, 9, {-1,  4,  0,  -5,  -1,  8,   12,  9,   9,
+export const IntMatrix c_IntMatrixRef2f{8, 9, {-1,  4,  0,  -5,  -1,  8,   12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,   10, -5,  -2,
                                                 5, 4,  2,  -12,  -2,  6,    7,  8,  -9,
                                                 8,  5,  14, -5,   0,  0,   12,  14, -7,
@@ -165,7 +166,7 @@ static const IntMatrix c_IntMatrixRef2f{8, 9, {-1,  4,  0,  -5,  -1,  8,   12,  
                                                -3, -3, -14, -4,  -5,  6,   -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2g{8, 9, {-1,  4,  0,   8,  -5, -1,   -5, -2,   9,
+export const IntMatrix c_IntMatrixRef2g{8, 9, {-1,  4,  0,   8,  -5, -1,   -5, -2,   9,
                                                 4, 20, -7,   2,   2,  2,   12,  9,  10,
                                                 5, -5,  2,  -12, -2,  6,    7,  8,  -9,
                                                -6,  4,  14, -5,   0,  0,   12,  14, -7,
@@ -175,7 +176,7 @@ static const IntMatrix c_IntMatrixRef2g{8, 9, {-1,  4,  0,   8,  -5, -1,   -5, -
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,   0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2h{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef2h{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                                -7,  4, 20,   2,   2,  2,  10, -5,  -2,
                                                 5, -5,  2,  -12, -2,  6,   7,  8,  -9,
                                                -6,  4,  14, -5,   0,  0,  12,  14, -7,
@@ -185,7 +186,7 @@ static const IntMatrix c_IntMatrixRef2h{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2i{8, 9, {-1,  4,  0,  -5,  -1,   8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef2i{8, 9, {-1,  4,  0,  -5,  -1,   8,  12,  9,   9,
                                                 4, 20, -7,   2,   2,   2,  10, -5,  -2,
                                                 5, -5,  2,  -12, -2,  -9,   6,  7,   8,
                                                -6,  4,  14, -5,  -7,  -7,   0,  12,  14,
@@ -195,7 +196,7 @@ static const IntMatrix c_IntMatrixRef2i{8, 9, {-1,  4,  0,  -5,  -1,   8,  12,  
                                                48,  2, -3,  -4,   5,   4,   6,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2j{8, 9, {-1,   4,  0,  -5,  -1,  8,   12,   9,  9,
+export const IntMatrix c_IntMatrixRef2j{8, 9, {-1,   4,  0,  -5,  -1,  8,   12,   9,  9,
                                                 4,  20, -7,   2,   2,  2,   10,  -5, -2,
                                                 5,  -3, -5,  -12, -2,  6,    7,   8, -9,
                                                 4,  -8, -6,  -5,   0,  0,   12,  14, -7,
@@ -205,7 +206,7 @@ static const IntMatrix c_IntMatrixRef2j{8, 9, {-1,   4,  0,  -5,  -1,  8,   12, 
                                                48,   2,  5,  -4,  -5,  6,   -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2k{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef2k{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                                 4, 20, -7,  -5,  -2,  2,   2,  2,  10,
                                                 5, -5,  2,  -12, -2,  6,   7,  8,  -9,
                                                -6,  4,  14, -5,   0,  0,  12,  14, -7,
@@ -215,7 +216,7 @@ static const IntMatrix c_IntMatrixRef2k{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef2l{8, 9, { 4,  0, -1,  -5,  -1,  8,   12,  9,   9,
+export const IntMatrix c_IntMatrixRef2l{8, 9, { 4,  0, -1,  -5,  -1,  8,   12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,   10, -5,  -2,
                                                 5, -5,  2,  -12, -2,  6,    7,  8,  -9,
                                                -6,  4,  14, -5,   0,  0,   12,  14, -7,
@@ -225,7 +226,7 @@ static const IntMatrix c_IntMatrixRef2l{8, 9, { 4,  0, -1,  -5,  -1,  8,   12,  
                                                48,  2, -3,  -4,  -5,  6,   -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3a{8, 9, {-1,  4,  0,  -5,  -1,   8,  12,   9,   9,
+export const IntMatrix c_IntMatrixRef3a{8, 9, {-1,  4,  0,  -5,  -1,   8,  12,   9,   9,
                                                 4, 20, -7,   2,   2,   2,  10,  -5,  -2,
                                                 5, -5,  2,  -12, -2,   6,   7,   8,  -9,
                                                -6,  4,  14, -5,  -14, -12, 12,  14,  -7,
@@ -235,7 +236,7 @@ static const IntMatrix c_IntMatrixRef3a{8, 9, {-1,  4,  0,  -5,  -1,   8,  12,  
                                                48,  2, -3,  -4,  -5,   6,  -7,  18,   0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3b{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,  9,
+export const IntMatrix c_IntMatrixRef3b{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,  9,
                                                 4, 20, -7,   2,   2,  2,  10, -5, -2,
                                                 5, -5, -3,  -12, -2,  6,  7,   8, -9,
                                                -6,  4, -14, -5, -12,  0,  12, 14, -7,
@@ -245,7 +246,7 @@ static const IntMatrix c_IntMatrixRef3b{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  2, -3,  -4,  -5,  6,  -7,  18, 0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3c{8, 9, {-1,  4,  0,  -5,  -1,   8,   12,  9,   9,
+export const IntMatrix c_IntMatrixRef3c{8, 9, {-1,  4,  0,  -5,  -1,   8,   12,  9,   9,
                                                 4, 20, -7,   2,   2,   2,   10, -5,  -2,
                                                 5, -5,  2,   0,  -2,   6,    7,  8,  -9,
                                                -6,  4,  14,  19, -5,   0,   12,  14, -7,
@@ -255,7 +256,7 @@ static const IntMatrix c_IntMatrixRef3c{8, 9, {-1,  4,  0,  -5,  -1,   8,   12, 
                                                48,  2, -3,  -4,  -5,   6,   -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3d{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef3d{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,  10, -5,  -2,
                                                 5, -5, -12, 14,   2,  6,   7,  8,  -9,
                                                -6,  4, -5,  -2,   0,  0,  12,  14, -7,
@@ -265,7 +266,7 @@ static const IntMatrix c_IntMatrixRef3d{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3e{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef3e{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,  10, -5,  -2,
                                                 5, -5,  2,   6,   7, -12, -2,  8,  -9,
                                                -6,  4,  14,  0, -14, -14, -5,  14, -7,
@@ -275,7 +276,7 @@ static const IntMatrix c_IntMatrixRef3e{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3f{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef3f{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,  10, -5,  -2,
                                                 5, -5, -12, -2, -12,  6,   7,  8,  -9,
                                                -6,  4, -5, -14,   2,  0,  12,  14, -7,
@@ -285,7 +286,7 @@ static const IntMatrix c_IntMatrixRef3f{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3g{8, 9, {-1,  4,  0,  -5,  -1,   8,   12,  9,   9,
+export const IntMatrix c_IntMatrixRef3g{8, 9, {-1,  4,  0,  -5,  -1,   8,   12,  9,   9,
                                                 4, 20, -7,   2,   2,   2,   10, -5,  -2,
                                                 5, -5,  2,   6,  -14, -12,  -2,  8,  -9,
                                                -6,  4,  14,  0,   7,  -14,  -5,  14, -7,
@@ -295,7 +296,7 @@ static const IntMatrix c_IntMatrixRef3g{8, 9, {-1,  4,  0,  -5,  -1,   8,   12, 
                                                48,  2, -3,  -4,  -5,   6,   -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3h{8, 9, {-1,  4,  0,  -5,   -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef3h{8, 9, {-1,  4,  0,  -5,   -1,  8,  12,  9,   9,
                                                 4, 20, -7,   2,    2,  2,  10, -5,  -2,
                                                 5, -5, -12, 14,    2,  6,   7,  8,  -9,
                                                -6,  4, -5,   4,    0,  0,  12,  14, -7,
@@ -305,7 +306,7 @@ static const IntMatrix c_IntMatrixRef3h{8, 9, {-1,  4,  0,  -5,   -1,  8,  12,  
                                                48,  2, -3,  -4,   -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef3i{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
+export const IntMatrix c_IntMatrixRef3i{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9,   9,
                                                 4, 20, -7,   2,   2,  2,  10, -5,  -2,
                                                 5, -5,  2,   6,   7,  12, -2,  8,  -9,
                                                -6,  4,  14,  0,   0,  11, -5,  14, -7,
@@ -315,13 +316,13 @@ static const IntMatrix c_IntMatrixRef3i{8, 9, {-1,  4,  0,  -5,  -1,  8,  12,  9
                                                48,  2, -3,  -4,  -5,  6,  -7,  18,  0
                                         }};
 
-static const IntMatrix c_IntMatrixRef8a{1, 9, {1, 0, -2, -4, -2, -8, 5, 3, 0}};
-static const IntMatrix c_IntMatrixRef8b{1, 9, {-2, -4, -2, -8, 1, 0, 5, 3, 0}};
-static const IntMatrix c_IntMatrixRef8c{1, 9, {1, 0, 5, 3, 0, -2, -4, -2, -8}};
-static const IntMatrix c_IntMatrixRef8d{1, 9, {1, 0, -2, -4, 5, -2, 3, 0, -8}};
+export const IntMatrix c_IntMatrixRef8a{1, 9, {1, 0, -2, -4, -2, -8, 5, 3, 0}};
+export const IntMatrix c_IntMatrixRef8b{1, 9, {-2, -4, -2, -8, 1, 0, 5, 3, 0}};
+export const IntMatrix c_IntMatrixRef8c{1, 9, {1, 0, 5, 3, 0, -2, -4, -2, -8}};
+export const IntMatrix c_IntMatrixRef8d{1, 9, {1, 0, -2, -4, 5, -2, 3, 0, -8}};
 
-static const IntMatrix c_IntMatrixRef9a{9, 1, {5, 3, -1, -3, -7, -5, 0, 4, 9}};
-static const IntMatrix c_IntMatrixRef9b{9, 1, {-1, -3, -7, -5, 5, 3, 0, 4, 9}};
-static const IntMatrix c_IntMatrixRef9c{9, 1, {5, 3, 0, 4, 9, -1, -3, -7, -5}};
-static const IntMatrix c_IntMatrixRef9d{9, 1, {-1, 5, 3, 0, -3, -7, 4, 9, -5}};
+export const IntMatrix c_IntMatrixRef9a{9, 1, {5, 3, -1, -3, -7, -5, 0, 4, 9}};
+export const IntMatrix c_IntMatrixRef9b{9, 1, {-1, -3, -7, -5, 5, 3, 0, 4, 9}};
+export const IntMatrix c_IntMatrixRef9c{9, 1, {5, 3, 0, 4, 9, -1, -3, -7, -5}};
+export const IntMatrix c_IntMatrixRef9d{9, 1, {-1, 5, 3, 0, -3, -7, 4, 9, -5}};
 // clang-format on

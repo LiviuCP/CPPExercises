@@ -1,13 +1,14 @@
 project(HiddenBoxes LANGUAGES CXX)
 
-include_directories(
-    ../../External/Matrix/MatrixLib/Matrix
-    ../../Utilities/UtilitiesLib
-)
-
 add_executable(${PROJECT_NAME}
     hiddenboxesmain.cpp
-    boxutils.cpp
+)
+
+target_sources(${PROJECT_NAME}
+    PUBLIC
+        FILE_SET hiddenboxes_modules
+        TYPE CXX_MODULES
+        FILES boxutils.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE UtilitiesLib)

@@ -1,15 +1,5 @@
-cmake_minimum_required(VERSION 3.28)
-
 # implementation of ChessHorse using C++2X modules
 project(ChessHorseV2 LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_SCAN_FOR_MODULES ON)
-
-include_directories(
-    ../../External/Matrix/MatrixLib/Matrix
-    ../../Utilities/UtilitiesLib
-)
 
 add_executable(${PROJECT_NAME} chesshorsev2main.cpp)
 

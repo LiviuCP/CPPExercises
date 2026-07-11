@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 project(CPPExercises LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES ON)
@@ -25,7 +25,7 @@ if(WIN32)
     set(LIB_TYPE STATIC)
 endif()
 
-# add_subdirectory(Algorithms)
+add_subdirectory(Algorithms)
 # add_subdirectory(CPPConcepts)
 # add_subdirectory(DesignPatterns)
 # add_subdirectory(InterProcessCommunication)

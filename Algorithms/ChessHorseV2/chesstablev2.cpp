@@ -1,8 +1,7 @@
 module;
 
+#include <cassert>
 #include <iostream>
-
-#include "matrix.h"
 
 module chesstable;
 

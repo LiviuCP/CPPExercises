@@ -1,8 +1,46 @@
+module;
+
+#include <algorithm>
 #include <cassert>
+#include <optional>
+#include <vector>
 
-#include "boxutils.h"
+export module boxutils;
+import matrix;
 
-std::vector<matrix_size_t> retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes)
+bool boxFitsIntoBox(matrix_size_t fittingBoxNumber, matrix_size_t includingBoxNumber,
+                    const Matrix<matrix_size_t>& boxes)
+{
+    const matrix_size_t c_BoxesRowsCount{boxes.getNrOfRows()};
+    const matrix_size_t c_BoxesColumnsCount{boxes.getNrOfColumns()};
+
+    assert(fittingBoxNumber < includingBoxNumber && "Invalid box number (fitting box)");
+    assert(includingBoxNumber < c_BoxesRowsCount && "Invalid box number (including box)");
+
+    // although the dimension 1 case can be handled, it is desirable that the minimum box dimension is 2, otherwise the
+    // solution would become "uninteresting" (each box would fit into another one when the dimension is 1)
+    assert(c_BoxesColumnsCount > 1 && "Invalid dimensions for boxes");
+
+    bool fitsIntoBox{false};
+
+    if (fittingBoxNumber < includingBoxNumber && includingBoxNumber < c_BoxesRowsCount)
+    {
+        fitsIntoBox = true;
+
+        for (matrix_size_t column{0}; column < c_BoxesColumnsCount; ++column)
+        {
+            if (boxes.at(fittingBoxNumber, column) >= boxes.at(includingBoxNumber, column))
+            {
+                fitsIntoBox = false;
+                break;
+            }
+        }
+    }
+
+    return fitsIntoBox;
+}
+
+export std::vector<matrix_size_t> retrieveFittingBoxes(const Matrix<matrix_size_t>& boxes)
 {
     // total number of boxes belonging to series
     const matrix_size_t c_NrOfBoxes{boxes.getNrOfRows()};
@@ -69,36 +107,4 @@ std::vector<matrix_size_t> retrieveFittingBoxes(const Matrix<matrix_size_t>& box
     std::reverse(recoveredIndexes.begin(), recoveredIndexes.end());
 
     return recoveredIndexes;
-}
-
-bool boxFitsIntoBox(matrix_size_t fittingBoxNumber, matrix_size_t includingBoxNumber,
-                    const Matrix<matrix_size_t>& boxes)
-{
-    const matrix_size_t c_BoxesRowsCount{boxes.getNrOfRows()};
-    const matrix_size_t c_BoxesColumnsCount{boxes.getNrOfColumns()};
-
-    assert(fittingBoxNumber < includingBoxNumber && "Invalid box number (fitting box)");
-    assert(includingBoxNumber < c_BoxesRowsCount && "Invalid box number (including box)");
-
-    // although the dimension 1 case can be handled, it is desirable that the minimum box dimension is 2, otherwise the
-    // solution would become "uninteresting" (each box would fit into another one when the dimension is 1)
-    assert(c_BoxesColumnsCount > 1 && "Invalid dimensions for boxes");
-
-    bool fitsIntoBox{false};
-
-    if (fittingBoxNumber < includingBoxNumber && includingBoxNumber < c_BoxesRowsCount)
-    {
-        fitsIntoBox = true;
-
-        for (matrix_size_t column{0}; column < c_BoxesColumnsCount; ++column)
-        {
-            if (boxes.at(fittingBoxNumber, column) >= boxes.at(includingBoxNumber, column))
-            {
-                fitsIntoBox = false;
-                break;
-            }
-        }
-    }
-
-    return fitsIntoBox;
 }

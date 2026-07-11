@@ -4,11 +4,9 @@
 
 #include <iostream>
 
-#include "commandargumentsparsingresult.h"
-#include "utils.h"
-
 import chesstable;
 import commandargumentsparser;
+import utils;
 
 int main(int argc, char** argv)
 {

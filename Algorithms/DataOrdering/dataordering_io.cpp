@@ -1,5 +1,56 @@
-#include "dataordering_io.h"
-#include "matrixutils.h"
+module;
+
+#include <fstream>
+#include <optional>
+#include <string>
+#include <utility>
+
+export module dataordering_io;
+import dataorderingengine;
+import matrixutils;
+
+export enum class ResultType
+{
+    SUCCESS = 0,
+    INPUT_FILE_OPENING_ERROR,
+    OUTPUT_FILE_OPENING_ERROR,
+    INVALID_INPUT
+};
+
+export using Result = std::pair<ResultType, std::optional<DataSet>>;
+
+export class DataOrderingFileReader
+{
+public:
+    DataOrderingFileReader(const std::string& inputFilePath);
+
+    Result readDataSetFromFile();
+
+    void setInputFilePath(const std::string& inputFilePath);
+    const std::string& getInputFilePath() const;
+
+private:
+    std::ifstream m_In;
+    std::string m_InputFilePath;
+};
+
+export class DataOrderingFileWriter
+{
+public:
+    DataOrderingFileWriter(const std::string& outputFilePath);
+
+    Result writeScenarioOutputToFile(const std::string& header, const DataOrderingEngine& engine);
+    void beginSection();
+    void endSection();
+
+    void setOutputFilePath(const std::string& outputFilePath);
+    const std::string& getOutputFilePath() const;
+
+private:
+    std::ofstream m_Out;
+    std::string m_OutputFilePath;
+    size_t m_SectionNumber;
+};
 
 DataOrderingFileReader::DataOrderingFileReader(const std::string& inputFilePath)
 {

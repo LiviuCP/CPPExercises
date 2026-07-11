@@ -7,25 +7,24 @@
    determine the maximum number of boxes that fit into each other
 */
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
 
-#include "boxutils.h"
-#include "matrixutils.h"
-#include "utils.h"
+import boxutils;
+import matrixutils;
+import utils;
 
-using namespace std;
+static const std::string c_InFile{Utilities::c_InputOutputDir + "boxesinput.txt"};
+static const std::string c_OutFile{Utilities::c_InputOutputDir + "boxesoutput.txt"};
 
-static const string c_InFile{Utilities::c_InputOutputDir + "boxesinput.txt"};
-static const string c_OutFile{Utilities::c_InputOutputDir + "boxesoutput.txt"};
-
-void logFittingBoxesToFile(ofstream& outStream, const std::vector<matrix_size_t>& fittingBoxIndexes,
+void logFittingBoxesToFile(std::ofstream& outStream, const std::vector<matrix_size_t>& fittingBoxIndexes,
                            const std::vector<matrix_size_t>& originalIndexes);
 
 int main()
 {
-    ifstream in{c_InFile};
-    ofstream out{c_OutFile};
+    std::ifstream in{c_InFile};
+    std::ofstream out{c_OutFile};
 
     Utilities::clearScreen();
 
@@ -33,7 +32,7 @@ int main()
     {
         Matrix<matrix_size_t> sortedBoxData;
 
-        cout << "Reading all existing box series from input file: " << c_InFile << "\n\n";
+        std::cout << "Reading all existing box series from input file: " << c_InFile << "\n\n";
 
         int nrOfSeries{0};
 
@@ -51,25 +50,25 @@ int main()
                 // maximum fitting series
                 const std::vector<matrix_size_t> c_FittingBoxesIndexes{retrieveFittingBoxes(sortedBoxData)};
 
-                cout << "Writing maximum fitting range of boxes to output file: " << c_OutFile << "\n";
+                std::cout << "Writing maximum fitting range of boxes to output file: " << c_OutFile << "\n";
 
                 logFittingBoxesToFile(out, c_FittingBoxesIndexes, c_OriginalIndexes);
                 ++nrOfSeries;
             }
         }
 
-        cout << "\n" << nrOfSeries << " series found and processed\n\n";
+        std::cout << "\n" << nrOfSeries << " series found and processed\n\n";
     }
     else
     {
-        cerr << "Error in opening input and/or output file\n\n";
+        std::cerr << "Error in opening input and/or output file\n\n";
     }
 
     return 0;
 }
 
 // logs the input file row number of each found box by taking the lexicographical ordering into consideration
-void logFittingBoxesToFile(ofstream& outStream, const std::vector<matrix_size_t>& fittingBoxIndexes,
+void logFittingBoxesToFile(std::ofstream& outStream, const std::vector<matrix_size_t>& fittingBoxIndexes,
                            const std::vector<matrix_size_t>& originalIndexes)
 {
     const size_t c_NrOfFittingBoxes{fittingBoxIndexes.size()};

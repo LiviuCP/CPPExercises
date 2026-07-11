@@ -6,7 +6,7 @@
 #include <vector>
 #include <utility>
 
-#include "matrix.h"
+import matrix;
 
 using IntPair = std::pair<int, int>;
 using StringIntPair = std::pair<std::string, int>;

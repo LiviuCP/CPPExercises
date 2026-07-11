@@ -3,19 +3,9 @@ project(STLAlgorithms LANGUAGES CXX)
 find_package(QT NAMES Qt5 Qt6 COMPONENTS Test REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Test REQUIRED)
 
-include_directories(
-    ../../External/Matrix/MatrixLib/Matrix
-    ../../Utilities/UtilitiesLib
-)
-
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-
-# I tested C++23 specific stuff on Linux only so I disabled them for other major OSes
-if (NOT WIN32 AND NOT APPLE)
-    set(CMAKE_CXX_STANDARD 23)
-endif()
 
 enable_testing()
 
@@ -52,25 +42,37 @@ add_test(NAME UninitializedMemoryOperationsTests COMMAND UninitializedMemoryOper
 add_executable(CombinedSTLTests tst_combinedstltests.cpp)
 add_test(NAME CombinedSTLTests COMMAND CombinedSTLTests)
 
-# I managed to make std::ranges work only on Linux so far, so I excluded this test case from building on the other major desktop OSes
-if (NOT WIN32 AND NOT APPLE)
-    add_executable(CPP2xRangesTests tst_cpp2xrangestests.cpp)
-    add_test(NAME CPP2xRangesTests COMMAND CPP2xRangesTests)
-endif()
+target_sources(CombinedSTLTests
+    PUBLIC
+        FILE_SET combined_stl_tests_modules
+        TYPE CXX_MODULES
+        FILES gather.cpp tst_combinedstltests_data.cpp
+)
+
+add_executable(CPP2xRangesTests tst_cpp2xrangestests.cpp)
+add_test(NAME CPP2xRangesTests COMMAND CPP2xRangesTests)
 
 target_link_libraries(NonModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(NonModifyingSequenceTests PRIVATE MatrixLib)
 target_link_libraries(ModifyingSequenceTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(ModifyingSequenceTests PRIVATE MatrixLib)
 target_link_libraries(PartitioningTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(PartitioningTests PRIVATE MatrixLib)
 target_link_libraries(SortingTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(SortingTests PRIVATE MatrixLib)
 target_link_libraries(SortedRangesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(SortedRangesTests PRIVATE MatrixLib)
 target_link_libraries(HeapTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(HeapTests PRIVATE MatrixLib)
 target_link_libraries(MinMaxTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(MinMaxTests PRIVATE MatrixLib)
 target_link_libraries(ComparisonPermutationTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(ComparisonPermutationTests PRIVATE MatrixLib)
 target_link_libraries(NumericOperationsTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(NumericOperationsTests PRIVATE MatrixLib)
 target_link_libraries(UninitializedMemoryOperationsTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(UninitializedMemoryOperationsTests PRIVATE UtilitiesLib)
 target_link_libraries(CombinedSTLTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
-
-# same here
-if (NOT WIN32 AND NOT APPLE)
-    target_link_libraries(CPP2xRangesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
-endif()
+target_link_libraries(CombinedSTLTests PRIVATE UtilitiesLib)
+target_link_libraries(CPP2xRangesTests PRIVATE Qt${QT_VERSION_MAJOR}::Test)
+target_link_libraries(CPP2xRangesTests PRIVATE MatrixLib)

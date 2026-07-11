@@ -1,8 +1,14 @@
+module;
+
 #include <cassert>
+#include <optional>
 
-#include "mapcolouringutils.h"
+export module mapcolouringutils;
+import matrix;
 
-bool MapColouringUtils::isValidNeighbourhoodMatrix(Matrix<bool> neighbours)
+export namespace MapColouringUtils
+{
+bool isValidNeighbourhoodMatrix(Matrix<bool> neighbours)
 {
     bool isValid{false};
 
@@ -22,7 +28,7 @@ bool MapColouringUtils::isValidNeighbourhoodMatrix(Matrix<bool> neighbours)
     return isValid;
 }
 
-std::optional<matrix_size_t> MapColouringUtils::getFirstAvailableColour(const Matrix<bool>& availableColours)
+std::optional<matrix_size_t> getFirstAvailableColour(const Matrix<bool>& availableColours)
 {
     // lowest index colour that is not used by a country
     std::optional<matrix_size_t> firstAvailableColour;
@@ -47,3 +53,4 @@ std::optional<matrix_size_t> MapColouringUtils::getFirstAvailableColour(const Ma
 
     return firstAvailableColour;
 }
+} // namespace MapColouringUtils
