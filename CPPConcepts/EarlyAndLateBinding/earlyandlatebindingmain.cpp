@@ -2,8 +2,6 @@
 
 #include "utils.h"
 
-using namespace std;
-
 /* This small program shows the difference between early and late binding. */
 
 class Base
@@ -70,32 +68,32 @@ Base::~Base()
 
 void Base::foo1()
 {
-    cout << "Base::foo1()" << endl;
+    std::cout << "Base::foo1()" << std::endl;
 }
 
 void Base::foo2()
 {
-    cout << "Base::foo2()" << endl;
+    std::cout << "Base::foo2()" << std::endl;
 }
 
 void Base::bar1()
 {
-    cout << "bar1() calling foo1()" << endl;
+    std::cout << "bar1() calling foo1()" << std::endl;
     foo1();
 }
 
 void Base::bar2()
 {
-    cout << "bar2() calling foo2()" << endl;
+    std::cout << "bar2() calling foo2()" << std::endl;
     foo2();
 }
 
 void Derived::foo1()
 {
-    cout << "Derived::foo1()" << endl;
+    std::cout << "Derived::foo1()" << std::endl;
 }
 
 void Derived::foo2()
 {
-    cout << "Derived::foo2()" << endl;
+    std::cout << "Derived::foo2()" << std::endl;
 }

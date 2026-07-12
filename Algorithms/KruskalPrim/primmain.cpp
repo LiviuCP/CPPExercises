@@ -7,10 +7,8 @@
 #include "prim.h"
 #include "utils.h"
 
-using namespace std;
-
-static const string c_InFile{Utilities::c_InputOutputDir + "kruskalpriminput.txt"};
-static const string c_OutFile{Utilities::c_InputOutputDir + "primoutput.txt"};
+static const std::string c_InFile{Utilities::c_InputOutputDir + "kruskalpriminput.txt"};
+static const std::string c_OutFile{Utilities::c_InputOutputDir + "primoutput.txt"};
 
 extern int treeAppMain(const std::string& inputFile, const std::string& outputFile, BaseEngine& treeEngine);
 

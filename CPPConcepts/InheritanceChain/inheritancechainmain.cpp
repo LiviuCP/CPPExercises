@@ -11,20 +11,18 @@
 #include "inheritancechain.h"
 #include "utils.h"
 
-using namespace std;
-
 int main()
 {
     Utilities::clearScreen();
 
-    cout << "OBJECT CREATION" << endl;
-    cout << endl << "1) Parent object" << endl;
+    std::cout << "OBJECT CREATION" << std::endl;
+    std::cout << std::endl << "1) Parent object" << std::endl;
     Parent parent;
-    cout << endl << "2) Child object" << endl;
+    std::cout << std::endl << "2) Child object" << std::endl;
     Child child;
-    cout << endl << "3) Grandchild object" << endl;
+    std::cout << std::endl << "3) Grandchild object" << std::endl;
     GrandChild grandChild;
-    cout << endl << "OBJECT DESTRUCTION" << endl << endl;
+    std::cout << std::endl << "OBJECT DESTRUCTION" << std::endl << std::endl;
 
     return 0;
 }

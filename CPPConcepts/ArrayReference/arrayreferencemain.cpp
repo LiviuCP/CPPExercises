@@ -2,8 +2,6 @@
 
 #include "utils.h"
 
-using namespace std;
-
 constexpr size_t c_ArraySize{10};
 
 void incrementArrayElements(int (&array)[c_ArraySize]);
@@ -24,7 +22,7 @@ int main()
 
 void incrementArrayElements(int (&array)[10])
 {
-    cout << "Incrementing array elements" << endl;
+    std::cout << "Incrementing array elements" << std::endl;
 
     for (auto& element : array)
     {
@@ -34,14 +32,14 @@ void incrementArrayElements(int (&array)[10])
 
 void displayArrayInformation(const int (&array)[c_ArraySize])
 {
-    cout << "The array elements are: ";
+    std::cout << "The array elements are: ";
 
     for (auto element : array)
     {
-        cout << element << " ";
+        std::cout << element << " ";
     }
 
-    cout << endl;
+    std::cout << std::endl;
 
     int count{0}, sum{0};
     for (auto& element : array) // actually reference is not required, yet just wanted to test it works (it does but it
@@ -51,5 +49,5 @@ void displayArrayInformation(const int (&array)[c_ArraySize])
         ++count;
     }
 
-    cout << "Their count is " << count << " and sum is " << sum << endl;
+    std::cout << "Their count is " << count << " and sum is " << sum << std::endl;
 }

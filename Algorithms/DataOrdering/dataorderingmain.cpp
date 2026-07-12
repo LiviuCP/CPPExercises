@@ -21,18 +21,16 @@
 #include "dataorderingengine.h"
 #include "utils.h"
 
-using namespace std;
-
 /* Input file contains one or more data sections (separated by an empty row). Each section consists of:
    - header row: number of words and word length (in bits)
    - payload rows: the actual words expressed in binary (one word per row, e.g. 10010100)
 */
 
-static const string c_InFile{Utilities::c_InputOutputDir + "dataorderinginput.txt"};
-static const string c_OutFile{Utilities::c_InputOutputDir + "dataorderingoutput.txt"};
+static const std::string c_InFile{Utilities::c_InputOutputDir + "dataorderinginput.txt"};
+static const std::string c_OutFile{Utilities::c_InputOutputDir + "dataorderingoutput.txt"};
 
-void displayResult(ResultType resultType, size_t orderedDataSetsCount, const string& inputFilePath,
-                   const string& outputFilePath);
+void displayResult(ResultType resultType, size_t orderedDataSetsCount, const std::string& inputFilePath,
+                   const std::string& outputFilePath);
 
 int main()
 {
@@ -40,7 +38,7 @@ int main()
     DataOrderingFileWriter fileWriter{c_OutFile};
 
     Utilities::clearScreen();
-    cout << "Reading dataset from input file:\n" << fileReader.getInputFilePath() << "\n\n";
+    std::cout << "Reading dataset from input file:\n" << fileReader.getInputFilePath() << "\n\n";
 
     Result result{ResultType::SUCCESS, std::nullopt};
     std::vector<DataSet> dataSetsToOrder;
@@ -60,7 +58,8 @@ int main()
             break;
         }
 
-        cout << "Input is valid: " << result.second->size() << " " << result.second->at(0).size() << "-bit words\n";
+        std::cout << "Input is valid: " << result.second->size() << " " << result.second->at(0).size()
+                  << "-bit words\n";
         dataSetsToOrder.push_back(*result.second);
     }
 
@@ -116,16 +115,16 @@ void displayResult(ResultType resultType, size_t orderedDataSetsCount, const std
     switch (resultType)
     {
     case ResultType::SUCCESS:
-        cout << "Resulting ordering written to file:\n" << outputFilePath << "\n\n";
+        std::cout << "Resulting ordering written to file:\n" << outputFilePath << "\n\n";
         break;
     case ResultType::INPUT_FILE_OPENING_ERROR:
-        cout << "Error! Cannot open input file:\n" << inputFilePath << "\n\n";
+        std::cout << "Error! Cannot open input file:\n" << inputFilePath << "\n\n";
         break;
     case ResultType::OUTPUT_FILE_OPENING_ERROR:
-        cout << "Error! Cannot open output file:\n" << outputFilePath << "\n\n";
+        std::cout << "Error! Cannot open output file:\n" << outputFilePath << "\n\n";
         break;
     case ResultType::INVALID_INPUT:
-        cout << "Invalid or no input in file:\n" << inputFilePath << "\n\n";
+        std::cout << "Invalid or no input in file:\n" << inputFilePath << "\n\n";
         break;
     default:
         assert(false);

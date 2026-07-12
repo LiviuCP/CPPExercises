@@ -6,17 +6,15 @@
 #include "matrixutils.h"
 #include "utils.h"
 
-using namespace std;
+static const std::string c_InFile{Utilities::c_InputOutputDir + "huffmaninput.txt"};
+static const std::string c_OutFile{Utilities::c_InputOutputDir + "huffmanoutput.txt"};
 
-static const string c_InFile{Utilities::c_InputOutputDir + "huffmaninput.txt"};
-static const string c_OutFile{Utilities::c_InputOutputDir + "huffmanoutput.txt"};
-
-void writeToFile(ofstream& out, const EncodingOutput& encodingOutput, double efficiencyPercentage);
+void writeToFile(std::ofstream& out, const EncodingOutput& encodingOutput, double efficiencyPercentage);
 
 int main()
 {
-    ifstream in{c_InFile};
-    ofstream out{c_OutFile};
+    std::ifstream in{c_InFile};
+    std::ofstream out{c_OutFile};
 
     Utilities::clearScreen();
 
@@ -38,46 +36,47 @@ int main()
             const double c_EncodingEfficiencyPercentage{100.0 * encoder.getEncodingEfficiency()};
 
             writeToFile(out, c_EncodingOutput, c_EncodingEfficiencyPercentage);
-            cout << c_EncodedCharsCount << " characters encoded by using the Huffman algorithm" << endl << endl;
-            cout << "Please check output file: " << endl << endl << c_OutFile << endl << endl;
+            std::cout << c_EncodedCharsCount << " characters encoded by using the Huffman algorithm" << std::endl
+                      << std::endl;
+            std::cout << "Please check output file: " << std::endl << std::endl << c_OutFile << std::endl << std::endl;
         }
         else
         {
-            cerr << "Invalid input provided" << endl
-                 << endl
-                 << "Please check input file: " << endl
-                 << endl
-                 << c_InFile << endl
-                 << endl;
+            std::cerr << "Invalid input provided" << std::endl
+                      << std::endl
+                      << "Please check input file: " << std::endl
+                      << std::endl
+                      << c_InFile << std::endl
+                      << std::endl;
         }
     }
     else
     {
-        cerr << "Error in opening input and/or output file" << endl << endl;
+        std::cerr << "Error in opening input and/or output file" << std::endl << std::endl;
     }
 
     return 0;
 }
 
-void writeToFile(ofstream& out, const EncodingOutput& encodingOutput, double efficiencyPercentage)
+void writeToFile(std::ofstream& out, const EncodingOutput& encodingOutput, double efficiencyPercentage)
 {
     const size_t c_EncodedCharsCount{encodingOutput.size()};
 
     if (c_EncodedCharsCount > 0u)
     {
-        out << "The resulting Huffman encoding is: " << endl << endl;
+        out << "The resulting Huffman encoding is: " << std::endl << std::endl;
 
         for (EncodingOutput::const_iterator it{encodingOutput.cbegin()}; it != encodingOutput.cend(); ++it)
         {
-            out << it->first << " : " << it->second << endl;
+            out << it->first << " : " << it->second << std::endl;
         }
 
-        out << endl << "Number of encoded characters: " << c_EncodedCharsCount << endl;
-        out << endl << "Encoding efficiency: " << setprecision(2) << efficiencyPercentage << "%" << endl;
+        out << std::endl << "Number of encoded characters: " << c_EncodedCharsCount << std::endl;
+        out << std::endl << "Encoding efficiency: " << std::setprecision(2) << efficiencyPercentage << "%" << std::endl;
 
         if (efficiencyPercentage <= 0.0)
         {
-            out << endl << "The algorithm is inefficient for the provided character occurrences!" << endl;
+            out << std::endl << "The algorithm is inefficient for the provided character occurrences!" << std::endl;
         }
     }
 }

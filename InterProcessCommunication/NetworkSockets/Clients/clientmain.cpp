@@ -5,9 +5,7 @@
 #include "client.h"
 #include "utils.h"
 
-using namespace std;
-
-static const string c_InternalLoopbackAddress{"127.0.0.1"};
+static const std::string c_InternalLoopbackAddress{"127.0.0.1"};
 
 void displayRetrievedData(const Client& client);
 
@@ -15,21 +13,21 @@ int main(int argc, char* argv[])
 {
     Utilities::clearScreen();
 
-    const string c_IpAddress{argc == 1 ? c_InternalLoopbackAddress : argv[1]};
+    const std::string c_IpAddress{argc == 1 ? c_InternalLoopbackAddress : argv[1]};
 
     Client client{1024, 9010, c_IpAddress, "C1"};
-    cout << "Client will connect to server with IP " << client.getIpAddress() << " and attempt to retrieve some data"
-         << endl;
-    this_thread::sleep_for(chrono::seconds{1});
+    std::cout << "Client will connect to server with IP " << client.getIpAddress()
+              << " and attempt to retrieve some data" << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds{1});
     client.retrieveDataFromServer(4);
 
     displayRetrievedData(client);
 
-    this_thread::sleep_for(chrono::seconds{1});
+    std::this_thread::sleep_for(std::chrono::seconds{1});
     client.setIpAddress("127.0.0.1");
-    cout << "Now the client will (re)connect to the internal loopback address (" << client.getIpAddress() << ")"
-         << " and attempt to retrieve more data" << endl;
-    this_thread::sleep_for(chrono::seconds{1});
+    std::cout << "Now the client will (re)connect to the internal loopback address (" << client.getIpAddress() << ")"
+              << " and attempt to retrieve more data" << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds{1});
     client.retrieveDataFromServer(10);
 
     displayRetrievedData(client);
@@ -39,25 +37,25 @@ int main(int argc, char* argv[])
 
 void displayRetrievedData(const Client& client)
 {
-    this_thread::sleep_for(chrono::seconds{1});
+    std::this_thread::sleep_for(std::chrono::seconds{1});
 
     const std::vector<int> clientData{client.getData()};
 
-    cout << "Client " << client.getName();
+    std::cout << "Client " << client.getName();
 
     if (clientData.size() == 0)
     {
-        cout << " has no data!" << endl;
+        std::cout << " has no data!" << std::endl;
     }
     else
     {
-        cout << " data is: ";
+        std::cout << " data is: ";
 
         for (auto element : client.getData())
         {
-            cout << element << " ";
+            std::cout << element << " ";
         }
     }
 
-    cout << endl;
+    std::cout << std::endl;
 }

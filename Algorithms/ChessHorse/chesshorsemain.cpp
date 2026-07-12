@@ -17,8 +17,6 @@ static const std::map<ResultType, std::string> c_ErrorMessages{
      "The starting position is invalid (should be between 1 and rows/columns count).\n"},
 };
 
-using namespace std;
-
 void displayTraversingOutcome(const ChessTable& chessTable);
 
 int main(int argc, char** argv)
@@ -43,9 +41,9 @@ int main(int argc, char** argv)
     }
     else
     {
-        cerr << "Invalid input!\n\n";
-        cerr << c_ErrorMessages.at(resultType) << "\n";
-        cerr << "Please check and try again.\n";
+        std::cerr << "Invalid input!\n\n";
+        std::cerr << c_ErrorMessages.at(resultType) << "\n";
+        std::cerr << "Please check and try again.\n";
     }
 
     return 0;
@@ -56,21 +54,21 @@ void displayTraversingOutcome(const ChessTable& chessTable)
     if (chessTable.isFullyTraversed())
     {
         const IntMatrix& c_TraversedPositions{chessTable.getTraversedPositions()};
-        cout << "The resulting chess table traversing is:\n\n";
+        std::cout << "The resulting chess table traversing is:\n\n";
 
         for (matrix_size_t row{0}; row < c_TraversedPositions.getNrOfRows(); ++row)
         {
             for (Matrix<int>::ConstZIterator it{c_TraversedPositions.constZRowBegin(row)};
                  it != c_TraversedPositions.constZRowEnd(row); ++it)
             {
-                cout << *it << " ";
+                std::cout << *it << " ";
             }
 
-            cout << "\n";
+            std::cout << "\n";
         }
     }
     else
     {
-        cout << "No table traversing solution found!\n";
+        std::cout << "No table traversing solution found!\n";
     }
 }

@@ -5,8 +5,6 @@
 #include "timer.h"
 #include "utils.h"
 
-using namespace std;
-
 class SimpleObserver : public ITimeoutHandler
 {
 public:
@@ -62,7 +60,7 @@ int main()
     timer4.addTimeoutHandler(&simpleObserver);
     timer5.addTimeoutHandler(&complexObserver);
 
-    cout << "* Starting all timers" << endl;
+    std::cout << "* Starting all timers" << std::endl;
 
     timer1.start(5000);
     timer2.start(3500);
@@ -73,56 +71,57 @@ int main()
     while (timer1.isRunning() || timer2.isRunning() || timer3.isRunning() || timer4.isRunning())
         ;
 
-    cout << "* First four timers timed out" << endl;
+    std::cout << "* First four timers timed out" << std::endl;
     if (timer5.isRunning())
     {
-        cout << "* Stopping timer " << timer5.getName() << endl;
+        std::cout << "* Stopping timer " << timer5.getName() << std::endl;
         timer5.stop();
     }
 
-    this_thread::sleep_for(millisecond_t{500});
-    cout << endl
-         << "* Restarting timer " << timer3.getName() << " and starting timer " << timer4.getName()
-         << " with a different timeout period" << endl;
+    std::this_thread::sleep_for(millisecond_t{500});
+    std::cout << std::endl
+              << "* Restarting timer " << timer3.getName() << " and starting timer " << timer4.getName()
+              << " with a different timeout period" << std::endl;
     timer3.restart();
     timer4.start(4500);
     while (timer3.isRunning() || timer4.isRunning())
         ;
-    cout << "* Both timers timed out" << endl;
+    std::cout << "* Both timers timed out" << std::endl;
 
-    this_thread::sleep_for(millisecond_t{500});
-    cout << endl << "* Restarting timer " << timer2.getName() << " for immediate timeout" << endl;
+    std::this_thread::sleep_for(millisecond_t{500});
+    std::cout << std::endl << "* Restarting timer " << timer2.getName() << " for immediate timeout" << std::endl;
     timer2.start();
     while (timer2.isRunning())
         ;
-    cout << "* Timer timed out" << endl;
+    std::cout << "* Timer timed out" << std::endl;
 
-    this_thread::sleep_for(millisecond_t{500});
-    cout << endl
-         << "* Removing simple object from timeout handlers of " << timer1.getName() << " and adding it to timer "
-         << timer3.getName() << endl;
+    std::this_thread::sleep_for(millisecond_t{500});
+    std::cout << std::endl
+              << "* Removing simple object from timeout handlers of " << timer1.getName() << " and adding it to timer "
+              << timer3.getName() << std::endl;
     timer1.removeTimeoutHandler(&simpleObserver);
     timer3.addTimeoutHandler(&simpleObserver);
-    cout << "* Adding timer " << timer5.getName()
-         << " as internal timer of simple object and adding object to handlers for this timer" << endl;
+    std::cout << "* Adding timer " << timer5.getName()
+              << " as internal timer of simple object and adding object to handlers for this timer" << std::endl;
     timer5.addTimeoutHandler(&simpleObserver);
     simpleObserver.setTimer(&timer5);
-    cout << "* Restarting all 3 timers with same timout intervals as before namely: " << timer1.getTimeoutInterval()
-         << ", " << timer3.getTimeoutInterval() << " and " << timer5.getTimeoutInterval();
-    cout << " milliseconds" << endl;
+    std::cout << "* Restarting all 3 timers with same timout intervals as before namely: "
+              << timer1.getTimeoutInterval() << ", " << timer3.getTimeoutInterval() << " and "
+              << timer5.getTimeoutInterval();
+    std::cout << " milliseconds" << std::endl;
     timer1.restart();
     timer3.restart();
     timer5.restart();
     while (timer1.isRunning() || timer3.isRunning() || timer5.isRunning())
         ;
-    cout << "* All timers timed out. No more jobs to assign to them" << endl;
+    std::cout << "* All timers timed out. No more jobs to assign to them" << std::endl;
 
-    this_thread::sleep_for(millisecond_t{500});
-    cout << endl << "* Finally we'll test a cyclical timer" << endl;
+    std::this_thread::sleep_for(millisecond_t{500});
+    std::cout << std::endl << "* Finally we'll test a cyclical timer" << std::endl;
     CyclicalObserver cyclicalObserver;
     (void)cyclicalObserver;
-    this_thread::sleep_for(millisecond_t{5500});
-    cout << "* Goodbye!" << endl << endl;
+    std::this_thread::sleep_for(millisecond_t{5500});
+    std::cout << "* Goodbye!" << std::endl << std::endl;
 
     return 0;
 }
@@ -146,11 +145,11 @@ void SimpleObserver::onTimeout(const Timer* const timer)
 
     if (m_Timer1 == timer)
     {
-        cout << "SimpleObserver, internal timer " << timer->getName() << " expired" << endl;
+        std::cout << "SimpleObserver, internal timer " << timer->getName() << " expired" << std::endl;
     }
     else
     {
-        cout << "SimpleObserver, external timer " << timer->getName() << " expired" << endl;
+        std::cout << "SimpleObserver, external timer " << timer->getName() << " expired" << std::endl;
     }
 }
 
@@ -182,15 +181,15 @@ void ComplexObserver::onTimeout(const Timer* const timer)
 
     if (m_Timer1 == timer)
     {
-        cout << "ComplexObserver, first internal timer " << timer->getName() << " expired" << endl;
+        std::cout << "ComplexObserver, first internal timer " << timer->getName() << " expired" << std::endl;
     }
     else if (m_Timer2 == timer)
     {
-        cout << "ComplexObserver, second internal timer " << timer->getName() << " expired" << endl;
+        std::cout << "ComplexObserver, second internal timer " << timer->getName() << " expired" << std::endl;
     }
     else
     {
-        cout << "ComplexObserver, external timer " << timer->getName() << " expired" << endl;
+        std::cout << "ComplexObserver, external timer " << timer->getName() << " expired" << std::endl;
     }
 }
 
@@ -207,6 +206,7 @@ void CyclicalObserver::onTimeout(const Timer* const timer)
     if (timer == &m_CyclicalTimer)
     {
         ++m_DisplayedValue;
-        cout << "Timer " << m_CyclicalTimer.getName() << " expired! Displayed value is: " << m_DisplayedValue << endl;
+        std::cout << "Timer " << m_CyclicalTimer.getName() << " expired! Displayed value is: " << m_DisplayedValue
+                  << std::endl;
     }
 }
