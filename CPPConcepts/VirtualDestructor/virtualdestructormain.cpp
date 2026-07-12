@@ -28,7 +28,7 @@ int main()
     BaseVirtual* baseVirtual{new DerivedVirtual};
     delete baseVirtual; // destructor of DerivedVirtual is called (virtual), then destructor of BaseVirtual
 
-    std::cout << "Case 2b: derived pointer to derived class, virtual destructor" << std::endl;
+    std::cout << std::endl << "Case 2b: derived pointer to derived class, virtual destructor" << std::endl;
     DerivedVirtual* derivedVirtual{new DerivedVirtual};
     delete derivedVirtual; // destructor of DerivedVirtual is called, then destructor of BaseVirtual
 
