@@ -1,6 +1,6 @@
 project(Algorithms LANGUAGES CXX)
 
-add_subdirectory(ChessHorseV2)
+add_subdirectory(ChessHorse)
 add_subdirectory(HuffmanEncoding)
 add_subdirectory(KruskalPrim)
 add_subdirectory(MapColouring)
