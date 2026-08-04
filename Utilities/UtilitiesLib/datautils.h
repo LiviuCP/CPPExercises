@@ -15,10 +15,6 @@
     std::free(ptr);                                                                                                    \
     ptr = nullptr;
 
-#if (defined(__APPLE__) && defined(__MACH__))
-#define MACOS
-#endif
-
 using SizeVector = std::vector<size_t>;
 
 using DataWord = std::vector<bool>;
