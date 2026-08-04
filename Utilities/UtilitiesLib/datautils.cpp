@@ -7,11 +7,6 @@ module;
 #include <string>
 #include <vector>
 
-// TODO: move to separate .h file
-#if (defined(__APPLE__) && defined(__MACH__))
-#define MACOS
-#endif
-
 export module datautils;
 
 using SizeVector = std::vector<size_t>;

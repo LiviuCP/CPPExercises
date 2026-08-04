@@ -349,7 +349,7 @@ void UninitializedMemoryOperationsTests::testUninitializedMoveN()
 
     try
     {
-#ifdef MACOS
+#if (defined(__APPLE__) && defined(__MACH__))
         StringIntPairMatrix srcMatrix{mPrimaryStringIntPairMatrix};
         const StringIntPairMatrix c_SrcMatrixRef{2, 4, {{"Alex", 10}, {"Alistair", 10}, {"George", 14}, {"Mark", 9},
                                                         {"Andrew", 11}, {"Reggie", 12}, {"Patrick", 14}, {"John", 11}
@@ -365,7 +365,7 @@ void UninitializedMemoryOperationsTests::testUninitializedMoveN()
 
         StringIntPair* const pLast{moveResult.second};
 
-#ifdef MACOS
+#if (defined(__APPLE__) && defined(__MACH__))
         if (srcMatrix.getConstReverseNIterator(1, 0) != moveResult.first || pLast != pFirst + c_UninitializedElementsCount)
         {
             FAIL_DEALLOC(pFirst, "std::uninitialized_move_n() returned invalid iterator pair");
@@ -399,7 +399,7 @@ void UninitializedMemoryOperationsTests::testUninitializedMoveN()
 
         DEALLOC(pFirst);
 
-#ifdef MACOS
+#if (defined(__APPLE__) && defined(__MACH__))
         QVERIFY(c_SrcMatrixRef == srcMatrix && c_DestMatrixRef == destMatrix);
 #else
         QVERIFY(c_SrcVectorRef == srcVector && c_DestMatrixRef == destMatrix);
